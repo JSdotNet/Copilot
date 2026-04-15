@@ -1,0 +1,12 @@
+{
+  "name": "review",
+  "description": "Copilot plugin for TODO-driven, question-driven, and improvement-driven reviews.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Lets-BBQ Team"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["copilot", "review", "todo", "questions", "improvement"],
+  "agents": "agents/",
+  "skills": "skills/"
+}

@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "name": "review",
+      "path": "./plugins/review",
+      "description": "Review workflows focused on TODO items, targeted questions, and future improvements.",
+      "version": "0.1.0"
+    }
+  ]
+}
