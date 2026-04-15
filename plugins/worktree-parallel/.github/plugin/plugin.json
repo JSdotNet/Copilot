@@ -1,0 +1,12 @@
+{
+  "name": "worktree-parallel",
+  "description": "Copilot plugin for dividing work across isolated git worktrees with per-worktree agent continuity.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Lets-BBQ Team"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["copilot", "worktree", "parallel", "isolation", "workflow", "branching"],
+  "agents": "agents/",
+  "skills": "skills/"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "documentation",
+  "version": "1.0.0",
+  "description": "Write and maintain How-To guides, Explanations, Articles, Ideas, and Proposals using GitHub Copilot.",
+  "components": [
+    {
+      "type": "agent",
+      "path": "agents/documentation.agent.md"
+    },
+    {
+      "type": "skill",
+      "path": "skills/create-howto"
+    },
+    {
+      "type": "skill",
+      "path": "skills/create-explanation"
+    },
+    {
+      "type": "skill",
+      "path": "skills/create-article"
+    },
+    {
+      "type": "skill",
+      "path": "skills/create-idea"
+    },
+    {
+      "type": "skill",
+      "path": "skills/create-proposal"
+    }
+  ]
+}

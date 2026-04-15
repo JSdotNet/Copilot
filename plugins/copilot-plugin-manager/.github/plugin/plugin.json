@@ -1,0 +1,12 @@
+{
+  "name": "copilot-plugin-manager",
+  "description": "Copilot plugin for managing preferred Copilot CLI plugins via GitHub URLs.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Lets-BBQ Team"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["copilot", "plugin", "install", "update", "uninstall", "management"],
+  "agents": "agents/",
+  "skills": "skills/"
+}
