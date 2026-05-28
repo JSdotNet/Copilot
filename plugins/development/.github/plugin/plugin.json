@@ -3,7 +3,7 @@
   "description": "Copilot plugin for development planning and implementation workflows.",
   "version": "0.1.0",
   "author": {
-    "name": "Lets-BBQ Team"
+    "name": "Job Schepers"
   },
   "license": "UNLICENSED",
   "keywords": ["copilot", "agent", "development", "planning", "implementation", "execution"],

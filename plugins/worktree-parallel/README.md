@@ -26,17 +26,17 @@ with per-worktree agent continuity.
 4. Create a git worktree and feature branch per approved item.
 5. Output per-worktree session start instructions that reference the calling agent.
 
-## Local Install
+## Install
 
 ```bash
-copilot plugin install ./plugins/worktree-parallel
+copilot plugin install JSdotNet/Copilot:plugins/worktree-parallel
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install ./plugins/worktree-parallel
+copilot plugin install JSdotNet/Copilot:plugins/worktree-parallel
 ```
 
 ## Uninstall

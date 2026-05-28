@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/10_quality_requirements.md'
+description: 'Defines requirements and output standards for arc42-section-10-instructions.'
 ---
 
 # arc42 Section 10: Quality Requirements - Specific Instructions
@@ -52,15 +53,15 @@ Quality Tree (simple hierarchy) + Table of scenarios
 **Quality Tree:**
 ```
 Quality Goals (from Section 1.2)
-├─ Reliable
-│  ├─ Availability (Priority: High)
-│  └─ Fault Tolerance (Priority: Medium)
-├─ Efficient
-│  ├─ Response Time (Priority: High)
-│  └─ Throughput (Priority: Medium)
-└─ Usable
-   ├─ Learnability (Priority: High)
-   └─ Error Prevention (Priority: Medium)
+â”œâ”€ Reliable
+â”‚  â”œâ”€ Availability (Priority: High)
+â”‚  â””â”€ Fault Tolerance (Priority: Medium)
+â”œâ”€ Efficient
+â”‚  â”œâ”€ Response Time (Priority: High)
+â”‚  â””â”€ Throughput (Priority: Medium)
+â””â”€ Usable
+   â”œâ”€ Learnability (Priority: High)
+   â””â”€ Error Prevention (Priority: Medium)
 ```
 
 **Quality Scenarios:**
@@ -164,56 +165,8 @@ Database layer, connection pooling, application services
 - **Recovery:** Full functionality restored without manual intervention
 
 ---
-
-### Quality Scenario Categories:
-
-Use these standard categories for organizing scenarios:
-
-**Usage Scenarios:**
-- Normal operation
-- Peak load
-- Minimum load
-
-**Change Scenarios:**
-- Adding new features
-- Modifying existing features
-- Upgrading dependencies
-- Changing infrastructure
-
-**Failure Scenarios:**
-- Component failures
-- Network issues
-- Security attacks
-- Data corruption
-
-## Output Format
-
-```markdown
-# 10. Quality Requirements
-
-## Overview
-[1-2 paragraphs explaining how quality requirements relate to quality goals from Section 1.2]
-
-## Quality Tree
-
-### Visual Representation
-![Quality Tree](./diagrams/quality-tree.png)
-
-### Hierarchical Breakdown
-
-#### Quality Goal 1: [Name from Section 1.2] - Priority: High
-
-**Quality Categories:**
-- **Reliability** (Priority: High)
-  - Availability (P: High) - QS-001, QS-002
-  - Fault Tolerance (P: Medium) - QS-003
-- **Performance Efficiency** (Priority: Medium)
-  - Response Time (P: High) - QS-004
-  - Throughput (P: Medium) - QS-005
-
-#### Quality Goal 2: [Name from Section 1.2] - Priority: High
-[Continue hierarchy]
-
+applyTo: 'doc/arc42/10_quality_requirements.md'
+description: 'Defines requirements and output standards for arc42-section-10-instructions.'
 ---
 
 ## Quality Scenarios
@@ -240,11 +193,11 @@ Use these standard categories for organizing scenarios:
 | Measure | Downtime < 30s, data loss = 0 |
 
 **Acceptance Criteria:**
-- ✅ Failure detected within 10 seconds
-- ✅ Failover completed within 30 seconds
-- ✅ Zero transaction data loss
-- ✅ No manual intervention required
-- ✅ Operations team alerted
+- âœ… Failure detected within 10 seconds
+- âœ… Failover completed within 30 seconds
+- âœ… Zero transaction data loss
+- âœ… No manual intervention required
+- âœ… Operations team alerted
 
 **Test Approach:**
 - Chaos engineering: Kill primary database during load test
@@ -254,10 +207,8 @@ Use these standard categories for organizing scenarios:
 **Related Scenarios:** QS-002, QS-003
 
 ---
-
-### Scenario QS-002: [Name]
-[Repeat structure]
-
+applyTo: 'doc/arc42/10_quality_requirements.md'
+description: 'Defines requirements and output standards for arc42-section-10-instructions.'
 ---
 
 ## Quality Scenarios by Category
@@ -278,7 +229,7 @@ Use these standard categories for organizing scenarios:
 
 ## Common Mistakes to Avoid
 
-### ❌ Not Allowed:
+### âŒ Not Allowed:
 1. **Vague quality requirements** - "Should be fast" is not measurable
 2. **No link to Section 1.2** - Must trace to quality goals
 3. **Untestable scenarios** - No way to verify if met
@@ -290,7 +241,7 @@ Use these standard categories for organizing scenarios:
 9. **No measurable numbers** - Must have concrete metrics
 10. **Forgetting negative scenarios** - Include failure cases
 
-### ✅ Desired:
+### âœ… Desired:
 1. **Concrete and measurable** - Specific numbers and criteria
 2. **Traceable to Section 1.2** - Clear link to quality goals
 3. **Testable** - Can actually verify if met
@@ -315,7 +266,7 @@ Use these standard categories for organizing scenarios:
 - **Section 11:** Unachievable scenarios become risks
 
 ### Critical Traceability:
-**Section 1.2 (Quality Goals) → Section 10 (Quality Scenarios)**
+**Section 1.2 (Quality Goals) â†’ Section 10 (Quality Scenarios)**
 - Every quality goal from 1.2 must have scenarios in Section 10
 - Every scenario must support a quality goal from 1.2
 
@@ -398,3 +349,4 @@ Use Q42 properties for quality tree organization:
 
 ---
 *Based on docs.arc42.org/section-10/ and official arc42 sources*
+

@@ -4,18 +4,16 @@
 
 When generating changes for this repository:
 
-1. Preserve compatibility with the customization asset formats and manifest schema currently used in this codebase.
-2. Prioritize conventions already defined in `.github/instructions/**/*.md`.
-3. Follow established patterns in existing plugin bundles under `plugins/*`.
-4. Maintain the current plugin-based monorepo structure.
-5. Prioritize maintainability, consistency, and traceability over introducing new patterns.
+1. Preserve compatibility with existing customization asset formats, manifest schema, and the current plugin-based monorepo structure.
+2. Follow conventions already defined in `.github/instructions/**/*.md` and established patterns in existing plugin bundles under `plugins/*`.
+3. Prioritize maintainability, consistency, and traceability over introducing new patterns.
 
 ## Brevity And Signal
 
 Less is more.
 
 - Prefer concise rules over repeated explanations.
-- Do not restate a rule already covered by a higher-priority instruction.
+- In all sections, do not restate a rule already covered by a higher-priority instruction.
 - If something is important, highlight it once with a clear directive instead of duplicating it in multiple sections.
 
 ## Technology And Version Detection
@@ -34,6 +32,8 @@ Never assume runtime framework versions when they are not explicitly present in 
 ## Context File Priority
 
 When generating or editing customization assets, use this source priority:
+
+In case of conflict, follow the Priority Guidelines over Context File Priority.
 
 1. `.github/instructions/markdown.instructions.md`
 2. `.github/instructions/customization-structure.instructions.md`

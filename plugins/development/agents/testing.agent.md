@@ -13,7 +13,6 @@ Create and maintain test coverage for approved implementation work.
 ## Mandatory Instruction Enforcement
 
 - Always load and apply .github/copilot-instructions.md.
-- Always load and apply .github/instructions/agent/agent-handoff.instructions.md.
 - Always load and apply .github/instructions/code/unit-test.instructions.md for test creation.
 
 ## Scope

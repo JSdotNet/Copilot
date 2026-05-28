@@ -33,21 +33,21 @@ function Invoke-CopilotPlugin {
 $cli = Get-CopilotCommand
 
 $pluginPaths = @(
-    './plugins/architecture',
-    './plugins/copilot-plugin-manager',
-    './plugins/copilot-spec-builder',
-    './plugins/development',
-    './plugins/documentation',
-    './plugins/product-owner',
-    './plugins/review',
-    './plugins/wip-convention',
-    './plugins/worktree-parallel'
+    'JSdotNet/Copilot:plugins/architecture',
+    'JSdotNet/Copilot:plugins/copilot-plugin-manager',
+    'JSdotNet/Copilot:plugins/copilot-spec-builder',
+    'JSdotNet/Copilot:plugins/development',
+    'JSdotNet/Copilot:plugins/documentation',
+    'JSdotNet/Copilot:plugins/product-owner',
+    'JSdotNet/Copilot:plugins/review',
+    'JSdotNet/Copilot:plugins/wip-convention',
+    'JSdotNet/Copilot:plugins/worktree-parallel'
 )
 
 $failed = @()
 
 foreach ($pluginPath in $pluginPaths) {
-    Write-Host "Installing plugin from $pluginPath ..."
+    Write-Host "Installing plugin $pluginPath ..."
 
     if (-not (Invoke-CopilotPlugin -Cli $cli -Arguments @('plugin', 'install', $pluginPath))) {
         $failed += $pluginPath
@@ -62,5 +62,5 @@ if ($failed.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'All local plugins installed successfully.'
+Write-Host 'All plugins installed successfully.'
 exit 0

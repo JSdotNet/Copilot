@@ -34,7 +34,6 @@ Drive high-quality reviews using three explicit modes:
 - `../skills/todo-review/SKILL.md`
 - `../skills/question-review/SKILL.md`
 - `../skills/suggestion-review/SKILL.md`
-- `../../../.github/instructions/agent-handoff.instructions.md`
 
 ## Custom Instructions
 

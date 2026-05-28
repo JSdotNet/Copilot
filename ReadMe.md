@@ -125,7 +125,7 @@ Repository organization centers on reusable Copilot plugin bundles:
 Current workflow pattern inferred from repository assets:
 
 1. Create or update plugin assets under `plugins/<plugin>/...`.
-2. Reinstall the affected plugin locally using `copilot plugin install ./plugins/<plugin>`.
+2. Reinstall the affected plugin from GitHub using `copilot plugin install JSdotNet/Copilot:plugins/<plugin>`.
 3. Validate behavior through agent and skill invocation.
 4. Iterate and keep repository-level instructions aligned.
 

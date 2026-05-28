@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/*.md'
+description: 'Defines global rules and quality standards for arc42 architecture documentation.'
 ---
 
 # arc42 Architecture Documentation - Global Instructions
@@ -21,7 +22,7 @@ arc42 is a proven, open-source template for software architecture documentation 
 - **ALL compartments are OPTIONAL**
 - "The cabinet has value even if certain compartments remain empty"
 - Create content in ANY order your project requires
-- Reading order (1→12) optimized for understandability
+- Reading order (1â†’12) optimized for understandability
 - Creation order: Whatever works for your project
 
 ### Top-Down Organization
@@ -209,3 +210,4 @@ arc42 is a proven, open-source template for software architecture documentation 
 
 ---
 *Based on official arc42 documentation | Version 1.0 | November 2025*
+

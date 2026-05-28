@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/04_solution_strategy.md'
+description: 'Defines requirements and output standards for arc42-section-04-instructions.'
 ---
 
 # arc42 Section 4: Solution Strategy - Specific Instructions
@@ -174,7 +175,7 @@ List of architecturally significant decisions:
 
 ## Common Mistakes to Avoid
 
-### ❌ Not Allowed:
+### âŒ Not Allowed:
 1. **Too much detail** - This is overview, not detailed design
 2. **No link to quality goals** - Every decision must support quality goals
 3. **Missing quality goal coverage** - All quality goals from Section 1.2 must be addressed
@@ -185,7 +186,7 @@ List of architecturally significant decisions:
 8. **No decomposition strategy** - Must explain high-level structure
 9. **Listing technologies without context** - Explain how they solve problems
 
-### ✅ Desired:
+### âœ… Desired:
 1. **Brief and concrete** - 2-5 pages maximum
 2. **Every quality goal addressed** - Traceable from Section 1.2
 3. **Clear rationale** - Explain WHY for each decision
@@ -210,7 +211,7 @@ List of architecturally significant decisions:
 - **Section 10:** Strategies validate against quality scenarios
 
 ### Traceability:
-**Section 1.2 (Quality Goals) → Section 4 (Solution Strategy) → Section 10 (Quality Requirements)**
+**Section 1.2 (Quality Goals) â†’ Section 4 (Solution Strategy) â†’ Section 10 (Quality Requirements)**
 - Each quality goal must have a strategy
 - Each strategy must have measurable outcomes in Section 10
 
@@ -251,3 +252,4 @@ List of architecturally significant decisions:
 
 ---
 *Based on docs.arc42.org/section-4/ and official arc42 sources*
+

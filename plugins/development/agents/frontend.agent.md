@@ -13,7 +13,6 @@ Implement frontend changes from an approved plan and API contract.
 ## Mandatory Instruction Enforcement
 
 - Always load and apply .github/copilot-instructions.md.
-- Always load and apply .github/instructions/agent/agent-handoff.instructions.md.
 - Always load and apply relevant path-based instruction files before editing code.
 
 ## Scope

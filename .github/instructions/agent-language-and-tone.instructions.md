@@ -18,7 +18,7 @@ description: Establishes default language and tone standards for .github markdow
 ## Language Rules
 
 - Use the configured expected result language as default for all agent outputs.
-- Use another language only when the user explicitly asks for it or a target artifact requires it.
+- Use another language only when the user explicitly asks for it or when the target artifact (the final requested output) must be in that language, such as translated UI copy, locale-specific documentation, or examples for a language-learning task.
 - Keep one consistent language per response unless a mixed-language format is explicitly requested.
 
 ## Common Tone for Agent Results

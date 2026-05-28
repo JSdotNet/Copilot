@@ -28,22 +28,22 @@ Track GitHub Copilot plugins used by this repository so team members can install
 
 - `development` (`0.1.0`)
   - Source path: `plugins/development`
-  - Install: `copilot plugin install ./plugins/development`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/development`
   - Notes: Development planning and execution workflows.
 
 - `architecture` (`0.1.0`)
   - Source path: `plugins/architecture`
-  - Install: `copilot plugin install ./plugins/architecture`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/architecture`
   - Notes: Architecture-focused workflows for arc42, blueprints, ADRs, and technical debt records.
 
 - `copilot-spec-builder` (`0.1.0`)
   - Source path: `plugins/copilot-spec-builder`
-  - Install: `copilot plugin install ./plugins/copilot-spec-builder`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-spec-builder`
   - Notes: GitHub customization asset authoring — agents, instructions, plugins, and skills.
 
 - `copilot-plugin-manager` (`0.1.0`)
   - Source path: `plugins/copilot-plugin-manager`
-  - Install: `copilot plugin install ./plugins/copilot-plugin-manager`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager`
   - Notes: Plugin lifecycle management — install, update, uninstall, list, and check for updates.
 
 ## Skills

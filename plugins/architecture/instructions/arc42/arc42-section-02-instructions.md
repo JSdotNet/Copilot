@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/02_architecture_constraints.md'
+description: 'Defines requirements and output standards for arc42-section-02-instructions.'
 ---
 
 
@@ -139,7 +140,7 @@ This section documents constraints that restrict our freedom of design, implemen
 
 ## Common Mistakes to Avoid
 
-### ❌ Not Allowed:
+### âŒ Not Allowed:
 1. Treating all constraints as non-negotiable
 2. Mixing constraints with requirements
 3. Ignoring organizational constraints
@@ -153,7 +154,7 @@ This section documents constraints that restrict our freedom of design, implemen
 11. Being too abstract
 12. Documenting every tiny restriction
 
-### ✅ Desired:
+### âœ… Desired:
 1. Clear categorization (Technical, Organizational, Political, Conventions)
 2. Explicit rationale for every constraint
 3. Authority documentation (who/what imposed this)
@@ -192,3 +193,4 @@ This section documents constraints that restrict our freedom of design, implemen
 
 ---
 *Based on docs.arc42.org/section-2/ and official arc42 sources*
+

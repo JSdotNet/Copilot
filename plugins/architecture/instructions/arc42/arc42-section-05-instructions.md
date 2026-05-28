@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/05_building_block_view.md'
+description: 'Defines requirements and output standards for arc42-section-05-instructions.'
 ---
 
 # arc42 Section 5: Building Block View - Specific Instructions
@@ -68,12 +69,12 @@ Section 5 documents the static decomposition of the system into building blocks 
 ### Example Lean Level-1:
 
 ```
-┌────────────────────────────────────────┐
-│         Product Search System          │
-├────────┬───────────┬──────────┬────────┤
-│   UI   │  Search   │ Product  │  Auth  │
-│ Layer  │  Engine   │  Catalog │ Service│
-└────────┴───────────┴──────────┴────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚         Product Search System          â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚   UI   â”‚  Search   â”‚ Product  â”‚  Auth  â”‚
+â”‚ Layer  â”‚  Engine   â”‚  Catalog â”‚ Serviceâ”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 | Component | Responsibility |
@@ -231,144 +232,8 @@ Links:
 - ISSUE-123: <Description>
 
 ---
-
-## Level 2: <Component Name> Internal Structure (White-box)
-
-### Refinement Motivation
-[Why zoom into this component?]
-
-### Internal Structure Diagram
-![Component Internal Structure](./diagrams/<component>-internal.png)
-
-### Internal Building Blocks
-[List and describe sub-components]
-
-### Internal Interfaces
-[How sub-components communicate]
-
-## Building Block: <Sub-component> (Black-box)
-[Repeat black-box template]
-```
-
-## Common Mistakes to Avoid
-
-### ❌ Not Allowed:
-1. **Skipping Level-1** - This is MANDATORY!
-2. **Too many levels** - Stop when reaching code level
-3. **Inconsistent notation** - Use same notation throughout
-4. **Missing interfaces** - Document how blocks communicate
-5. **No rationale** - Always explain WHY this structure
-6. **Mixing abstraction levels** - Keep each level consistent
-7. **Circular dependencies** - Indicates design problem
-8. **Too fine-grained at Level-1** - Start coarse, refine later
-9. **No link to source code** - Specify actual locations
-10. **Forgetting external interfaces** - Must match Section 3 context
-11. **Incomplete black-box descriptions** - Cover all aspects
-
-### ✅ Desired:
-1. **Level-1 always present** - Foundation for understanding
-2. **Hierarchical refinement** - Top-down, gradual detail
-3. **Consistent notation** - UML, C4, or custom with legend
-4. **Complete black-box descriptions** - All aspects covered
-5. **Clear interfaces** - How components communicate
-6. **Rationale at each level** - Why this structure?
-7. **Appropriate stopping point** - Don't over-document
-8. **Links to source code** - Actual file paths
-9. **Consistency with Section 3** - External interfaces match
-10. **Traceability to requirements** - Which component satisfies which requirement
-
-## Integration with Other Sections
-
-### Input from Other Sections:
-- **Section 3:** External interfaces must appear at Level-1
-- **Section 4:** Decomposition strategy guides Level-1 structure
-
-### Output for Other Sections:
-- **Section 6:** Runtime scenarios use these building blocks
-- **Section 7:** Deployment maps these blocks to infrastructure
-- **Section 8:** Cross-cutting concepts may affect all blocks
-- **Section 10:** Quality requirements apply to specific blocks
-
-### Critical Consistency Rules:
-- **Section 3 ↔ Section 5.1:** External interfaces MUST match
-- **Section 5 ↔ Section 6:** Building blocks in runtime scenarios must exist in Level-1 or Level-2
-- **Section 5 ↔ Section 7:** Building blocks must map to deployment units
-
-## Validation Criteria
-
-### Level-1 Checklist (MANDATORY):
-- [ ] White-box diagram present
-- [ ] All top-level components shown
-- [ ] Interfaces between components documented
-- [ ] Each component has black-box description
-- [ ] Decomposition rationale provided
-- [ ] External interfaces match Section 3
-- [ ] Links to source code directories
-- [ ] Notation legend provided
-
-### Black-box Description Checklist:
-- [ ] Purpose/responsibility clear
-- [ ] All interfaces documented
-- [ ] Quality attributes specified
-- [ ] Source code location provided
-- [ ] Fulfilled requirements listed
-- [ ] Open issues noted
-
-### White-box Description Checklist:
-- [ ] Internal structure diagram present
-- [ ] All internal components listed
-- [ ] Internal interfaces documented
-- [ ] Rationale for internal structure provided
-
-### Overall Quality:
-- [ ] Appropriate abstraction levels (not too many)
-- [ ] Consistent with Section 3, 4, 6, 7
-- [ ] Helps developers navigate codebase
-- [ ] Stakeholders can understand system structure
-
-## Official arc42 Tips for Section 5
-
-**Tip 5-1:** Level-1 is your friend
-- Most important level of building block view
-- Shows top-level system structure
-- MANDATORY - never skip this!
-- Foundation for all further refinement
-
-**Tip 5-2:** Use hierarchical refinement
-- Start coarse (Level-1)
-- Refine interesting/complex/critical components (Level-2)
-- Continue only where necessary (Level-3+)
-- Stop at appropriate level (usually not beyond Level-3)
-
-**Tip 5-3:** Distinguish black-box from white-box
-- Black-box: External view (purpose, interfaces, qualities)
-- White-box: Internal view (structure, sub-components)
-- Alternate between views as you refine
-
-**Tip 5-4:** Document interfaces explicitly
-- How building blocks communicate
-- What data is exchanged
-- Protocols and formats
-- Critical for understanding dependencies
-
-**Tip 5-5:** Link to source code
-- Provide actual directory/file paths
-- Enables developers to find implementation
-- Keeps documentation useful and current
-
-## Notation Options
-
-### Recommended Notations:
-1. **C4 Model (Container and Component diagrams)**
-2. **UML Component Diagrams**
-3. **Informal box-and-line diagrams**
-4. **Package/namespace diagrams**
-
-### Key Elements:
-- **[Component]** = Building block (box)
-- **Interface** = Lollipop or explicit interface symbol
-- **Dependency** = Arrow (uses/requires)
-- **Composition** = Nested boxes or containment
-
+applyTo: 'doc/arc42/05_building_block_view.md'
+description: 'Defines requirements and output standards for arc42-section-05-instructions.'
 ---
 *Based on docs.arc42.org/section-5/ and official arc42 sources*
+

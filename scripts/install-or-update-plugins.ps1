@@ -75,7 +75,7 @@ foreach ($pluginDir in $pluginDirs) {
     $status = 'failed'
 
     if ($Mode -eq 'install') {
-        if (Invoke-CopilotPluginCommand -Arguments @('plugin', 'install', $pluginPath)) {
+        if (Invoke-CopilotPluginCommand -Arguments @('plugin', 'install', "JSdotNet/Copilot:plugins/$pluginName")) {
             $status = 'installed'
         }
     }
@@ -90,8 +90,8 @@ foreach ($pluginDir in $pluginDirs) {
             $status = 'updated'
         }
         else {
-            Write-Host "Update failed for '$pluginName'. Trying install from local path..."
-            if (Invoke-CopilotPluginCommand -Arguments @('plugin', 'install', $pluginPath)) {
+            Write-Host "Update failed for '$pluginName'. Trying install from GitHub..."
+            if (Invoke-CopilotPluginCommand -Arguments @('plugin', 'install', "JSdotNet/Copilot:plugins/$pluginName")) {
                 $status = 'installed'
             }
         }

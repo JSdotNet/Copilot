@@ -5,7 +5,7 @@ tools: ['read/readFile', 'search', 'web/fetch', 'edit/createFile', 'edit/editFil
 agents: ['Explore']
 handoffs:
   - label: Review
-    agent: spec-review.agent.md
+    agent: spec-review
     prompt: >-
       Review the drafted customization asset created from the approved plan.
       Provide findings, risks, and required corrections in Markdown.
@@ -45,7 +45,7 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 2. Execute plan steps in target files.
 3. Validate naming, frontmatter, references, and structure.
 4. Summarize changed files and unresolved items.
-5. Recommend handoff to `spec-review.agent.md` for quality review.
+5. Recommend handoff to `spec-review` for quality review.
 
 ## Local Reference
 
@@ -58,7 +58,6 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 - Always apply `../instructions/authoring/create-instruction.instructions.md` when editing instruction assets.
 - Always apply `../instructions/authoring/create-plugin.instructions.md` when editing plugin package files.
 - Always apply `../instructions/authoring/create-skill.instructions.md` when editing skill assets.
-- Always apply `../../../.github/instructions/agent-handoff.instructions.md` before handoff decisions.
 
 ## References
 
@@ -75,7 +74,7 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 2. Edit only planned files and keep structure stable.
 3. Record changed file paths and notable decisions.
 4. Ask for explicit approval before handoff.
-5. Recommend handoff to `spec-review.agent.md` after draft creation.
+5. Recommend handoff to `spec-review` after draft creation.
 
 **Reminder:** This agent executes approved customization plans and does not replace planning or review roles.
 

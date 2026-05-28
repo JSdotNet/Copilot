@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/11_risks_and_technical_debt.md'
+description: 'Defines requirements and output standards for arc42-section-11-instructions.'
 ---
 
 # arc42 Section 11: Risks and Technical Debt - Specific Instructions
@@ -78,7 +79,7 @@ Simple tables for risks and technical debt
 
 **Impact:** [Low | Medium | High | Critical]
 
-**Priority:** [Calculated from Probability × Impact]
+**Priority:** [Calculated from Probability Ã— Impact]
 
 **Indicators:**
 [What signals that this risk is becoming reality?]
@@ -112,81 +113,8 @@ Simple tables for risks and technical debt
 [Has this risk occurred before? When? How was it handled?]
 
 ---
-
-### Technical Debt Documentation Structure:
-
-#### Technical Debt: TD-<XXX> - <Name>
-
-**Category:** [Code Quality | Architecture | Documentation | Testing | Infrastructure]
-
-**Description:**
-[What is the shortcut/compromise?]
-
-**Origin:**
-- **When Created:** [Date/Sprint/Release]
-- **Why Created:** [Rationale for the compromise]
-- **Decision Maker:** [Who approved this trade-off]
-
-**Current Impact:**
-
-**Code Quality:**
-[How does it affect code maintainability?]
-
-**Performance:**
-[Any performance implications?]
-
-**Security:**
-[Security concerns?]
-
-**Development Velocity:**
-[How does it slow down development?]
-
-**Estimated Cost to Fix:**
-- **Effort:** [Story points/hours/days]
-- **Resources:** [Team/skills needed]
-- **Risk of Fix:** [What could break?]
-
-**Cost of Not Fixing:**
-[What happens if we leave it?]
-
-**Remediation Plan:**
-
-**Option 1: Fix Now**
-- Timeline: [When]
-- Approach: [How]
-- Cost: [Resources]
-
-**Option 2: Fix Later**
-- Triggers: [What would cause us to fix this]
-- Timeline: [When]
-
-**Option 3: Accept**
-- Rationale: [Why we consciously accept this]
-- Monitoring: [How we track its impact]
-
-**Decision:** [Which option chosen and why]
-
-**Responsible:** [Who owns resolving this]
-
-**Target Date:** [When to fix or next review]
-
-**Status:** [Identified | Scheduled | In Progress | Resolved | Accepted]
-
-**Dependencies:**
-[Other technical debt or risks related to this]
-
-## Output Format
-
-```markdown
-# 11. Risks and Technical Debt
-
-## Overview
-[1-2 paragraphs explaining risk management approach and technical debt policy]
-
-**Last Updated:** YYYY-MM-DD
-
-**Next Review:** YYYY-MM-DD
-
+applyTo: 'doc/arc42/11_risks_and_technical_debt.md'
+description: 'Defines requirements and output standards for arc42-section-11-instructions.'
 ---
 
 ## Risks
@@ -229,10 +157,8 @@ Simple tables for risks and technical debt
 **Status:** Under Observation
 
 ---
-
-#### Risk R-002: <Name>
-[Repeat structure]
-
+applyTo: 'doc/arc42/11_risks_and_technical_debt.md'
+description: 'Defines requirements and output standards for arc42-section-11-instructions.'
 ---
 
 ## Technical Debt
@@ -278,141 +204,8 @@ Simple tables for risks and technical debt
 **Status:** Scheduled
 
 ---
-
-## Risk & Debt Trends
-
-### Newly Identified (This Quarter):
-- R-005: Third-party API deprecation
-- TD-008: Missing database indexes
-
-### Resolved (This Quarter):
-- R-002: Successfully migrated to new hosting provider
-- TD-003: Completed test automation for critical paths
-
-### Ongoing Monitoring:
-- R-001: Database scalability - metrics tracking, review monthly
-- TD-002: Legacy authentication code - scheduled refactor Q2
-```
-
-## Common Mistakes to Avoid
-
-### ❌ Not Allowed:
-1. **Hiding risks** - Pretending they don't exist doesn't help
-2. **No mitigation plans** - Identifying risk without action plan is incomplete
-3. **Not prioritizing** - Everything can't be critical
-4. **Ignoring technical debt** - Sweeping under the rug
-5. **Never updating** - Risks and debt evolve, keep current
-6. **Too much detail** - Don't document every minor issue
-7. **No ownership** - Risks need responsible parties
-8. **Vague descriptions** - Be specific about probability and impact
-9. **Forgetting external risks** - Vendor, regulatory, market risks matter too
-10. **Not learning from history** - Document what happened if risks occur
-
-### ✅ Desired:
-1. **Transparent documentation** - Honest about problems
-2. **Prioritized by severity** - Risk = Probability × Impact
-3. **Mitigation strategies defined** - For each significant risk
-4. **Regular reviews** - Update quarterly minimum
-5. **Ownership assigned** - Who monitors/mitigates
-6. **Appropriate detail** - Focus on significant risks
-7. **Both prevention and contingency** - Proactive and reactive plans
-8. **Technical debt conscious** - Explicit about shortcuts taken
-9. **Remediation plans** - Path to resolving technical debt
-10. **Stakeholder awareness** - Risks communicated appropriately
-
-## Integration with Other Sections
-
-### Input from Other Sections:
-- **Section 1.2:** Unachievable quality goals become risks
-- **Section 2:** Constraints may create risks
-- **Section 4:** Solution strategy trade-offs may create debt
-- **Section 9:** Decisions may introduce risks
-- **Section 10:** Quality scenarios not met become risks
-
-### Output for Other Sections:
-- **Section 9:** Risk mitigation may require new decisions
-- **Section 4:** High-priority risks may trigger strategy changes
-
-## Validation Criteria
-
-### Risk Documentation:
-- [ ] All significant risks identified
-- [ ] Probability and impact assessed
-- [ ] Priorities assigned (based on probability × impact)
-- [ ] Mitigation strategies defined
-- [ ] Responsible parties assigned
-- [ ] Review dates set
-- [ ] Both technical and non-technical risks included
-- [ ] External risks considered (vendors, regulations, etc.)
-
-### Technical Debt Documentation:
-- [ ] Known shortcuts documented
-- [ ] Origin and rationale recorded
-- [ ] Current impact assessed
-- [ ] Cost to fix estimated
-- [ ] Remediation plan or acceptance rationale provided
-- [ ] Ownership assigned
-- [ ] Target dates set (or conscious acceptance documented)
-
-### Process:
-- [ ] Section reviewed regularly (quarterly minimum)
-- [ ] New risks added as identified
-- [ ] Resolved risks updated/closed
-- [ ] Technical debt tracked against plan
-- [ ] Stakeholders informed of critical risks
-
-## Official arc42 Tips for Section 11
-
-**Tip 11-1:** Be transparent
-- Document known problems honestly
-- Don't hide issues from stakeholders
-- Transparency enables better decisions
-
-**Tip 11-2:** Prioritize by impact
-- Use risk matrix (probability × impact)
-- Focus on high-priority items
-- Not everything is critical
-
-**Tip 11-3:** Include mitigation plans
-- Don't just identify risks
-- Document how to prevent/reduce/handle
-- Assign responsibility
-
-**Tip 11-4:** Review regularly
-- Risks evolve over time
-- New risks emerge
-- Old risks may resolve
-- Update section quarterly minimum
-
-**Tip 11-5:** Track technical debt explicitly
-- Document conscious shortcuts
-- Include remediation timeline
-- Or explicitly accept the debt
-
-## Risk Assessment Matrix
-
-### Probability Levels:
-- **Very Low:** < 10%
-- **Low:** 10-30%
-- **Medium:** 30-60%
-- **High:** 60-90%
-- **Very High:** > 90%
-
-### Impact Levels:
-- **Low:** Minor inconvenience, easily worked around
-- **Medium:** Noticeable impact, requires effort to manage
-- **High:** Significant impact, major disruption
-- **Critical:** Catastrophic, system failure or major business impact
-
-### Priority Matrix:
-
-|                | Low Impact | Medium Impact | High Impact | Critical Impact |
-|----------------|-----------|---------------|-------------|-----------------|
-| **Very Low**   | Low       | Low           | Medium      | Medium          |
-| **Low**        | Low       | Medium        | Medium      | High            |
-| **Medium**     | Medium    | Medium        | High        | High            |
-| **High**       | Medium    | High          | High        | Critical        |
-| **Very High**  | High      | High          | Critical    | Critical        |
-
+applyTo: 'doc/arc42/11_risks_and_technical_debt.md'
+description: 'Defines requirements and output standards for arc42-section-11-instructions.'
 ---
 *Based on docs.arc42.org/section-11/ and official arc42 sources*
+

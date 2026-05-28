@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/09_architecture_decisions.md'
+description: 'Defines requirements and output standards for arc42-section-09-instructions.'
 ---
 
 # arc42 Section 9: Architecture Decisions - Specific Instructions
@@ -69,112 +70,16 @@ Simple numbered list with basic ADR structure
 **Decision:** Adopt microservices architecture with services organized by business capabilities (Customer, Order, Inventory, Payment).
 
 **Consequences:**
-- ✅ Independent scaling and deployment
-- ✅ Technology diversity possible
-- ✅ Team autonomy
-- ❌ Increased operational complexity
-- ❌ Need for service mesh/API gateway
-- ❌ Distributed transaction challenges
+- âœ… Independent scaling and deployment
+- âœ… Technology diversity possible
+- âœ… Team autonomy
+- âŒ Increased operational complexity
+- âŒ Need for service mesh/API gateway
+- âŒ Distributed transaction challenges
 
 ---
-
-**ADR-002: PostgreSQL as Primary Database**
-
-**Context:** Need reliable, ACID-compliant database. Team has PostgreSQL expertise. Cost constraints limit commercial database options.
-
-**Decision:** Use PostgreSQL 14+ for all primary data storage.
-
-**Consequences:**
-- ✅ ACID guarantees for data integrity
-- ✅ No licensing costs
-- ✅ Team expertise available
-- ✅ JSON support for flexible schemas
-- ❌ Cannot use specialized databases (graph, time-series) without justification
-- ❌ Vertical scaling limitations
-
-## Thorough Variant (Complete Version)
-
-### Full ADR Template:
-
-#### ADR-<XXX>: <Short Title>
-
-**Status:** [Proposed | Accepted | Superseded by ADR-YYY | Deprecated]
-
-**Date:** YYYY-MM-DD
-
-**Stakeholders:**
-- Decision makers: [Names/roles]
-- Consulted: [Names/roles]
-- Informed: [Names/roles]
-
-**Context:**
-[Detailed problem description]
-- What is the issue we're addressing?
-- Why is it architecturally significant?
-- What forces/constraints are at play?
-- What is the current situation?
-
-**Decision:**
-[Complete description of the decision]
-- What exactly did we decide?
-- How will it be implemented?
-- What is the scope of this decision?
-
-**Alternatives Considered:**
-
-**Alternative 1: <Name>**
-- Description: [What is this alternative?]
-- Evaluation against criteria: [How it scores]
-- Pros: [Benefits]
-- Cons: [Drawbacks]
-- Reason for rejection: [Why not chosen]
-
-**Decision Criteria Used:**
-Priority-ordered criteria for evaluation:
-1. [Primary criterion - e.g., Performance]
-2. [Secondary criterion - e.g., Cost]
-3. [Tertiary criterion - e.g., Team expertise]
-
-**Alternative 2: <Name>**
-[Same structure]
-
-**Consequences:**
-
-**Positive:**
-- ✅ [Benefit 1]
-- ✅ [Benefit 2]
-- ✅ [Benefit 3]
-
-**Negative:**
-- ❌ [Drawback 1]
-- ❌ [Drawback 2]
-- ❌ [Drawback 3]
-
-**Neutral:**
-- ➡️ [Impact 1]
-- ➡️ [Impact 2]
-
-**Implications for:**
-- Building Blocks: [Which components affected - link to Section 5]
-- Quality Goals: [Which goals supported/compromised - link to Section 1.2]
-- Constraints: [Which constraints does this create - link to Section 2]
-- Deployment: [How does this affect deployment - link to Section 7]
-
-**Related Decisions:**
-- Supersedes: ADR-XXX
-- Requires: ADR-YYY
-- Related to: ADR-ZZZ
-
-**Validation:**
-[How will we verify this decision was correct?]
-- Metrics to track
-- Success criteria
-- Review date
-
-**References:**
-- [External resources, research, documentation]
-- [Standards or guidelines followed]
-
+applyTo: 'doc/arc42/09_architecture_decisions.md'
+description: 'Defines requirements and output standards for arc42-section-09-instructions.'
 ---
 
 ## Output Format
@@ -195,37 +100,8 @@ Priority-ordered criteria for evaluation:
 | ADR-003 | <Title> | Superseded | 2025-03-10 |
 
 ---
-
-## ADR-001: <Title>
-
-**Status:** Accepted
-
-**Date:** 2025-MM-DD
-
-**Context:**
-[Problem description]
-
-**Decision:**
-[What was decided]
-
-**Alternatives Considered:**
-- **Alternative 1:** [Brief description and why rejected]
-- **Alternative 2:** [Brief description and why rejected]
-
-**Consequences:**
-
-**Positive:**
-- ✅ [Benefit]
-- ✅ [Benefit]
-
-**Negative:**
-- ❌ [Drawback]
-- ❌ [Drawback]
-
-**Implications:**
-- Affects Building Blocks: [List from Section 5]
-- Supports Quality Goals: [List from Section 1.2]
-
+applyTo: 'doc/arc42/09_architecture_decisions.md'
+description: 'Defines requirements and output standards for arc42-section-09-instructions.'
 ---
 
 ## ADR-002: <Title>
@@ -234,7 +110,7 @@ Priority-ordered criteria for evaluation:
 
 ## Common Mistakes to Avoid
 
-### ❌ Not Allowed:
+### âŒ Not Allowed:
 1. **Documenting implementation details** - Not architecturally significant
 2. **No rationale** - Just stating decision without WHY
 3. **Missing alternatives** - Not showing what else was considered
@@ -246,7 +122,7 @@ Priority-ordered criteria for evaluation:
 9. **Too vague** - Be specific and concrete
 10. **Not updating when superseded** - Mark old decisions clearly
 
-### ✅ Desired:
+### âœ… Desired:
 1. **Architecturally significant decisions only** - High impact, hard to reverse
 2. **Clear rationale** - Explain WHY this decision
 3. **Alternatives documented** - What else was considered and why rejected
@@ -323,21 +199,21 @@ Priority-ordered criteria for evaluation:
 ## When to Document a Decision
 
 ### Document When:
-- ✅ Decision affects multiple components
-- ✅ Decision is expensive to reverse
-- ✅ Decision has significant trade-offs
-- ✅ Decision constrains future choices
-- ✅ Decision is non-obvious or controversial
-- ✅ Decision impacts quality goals
-- ✅ Team debated multiple alternatives
+- âœ… Decision affects multiple components
+- âœ… Decision is expensive to reverse
+- âœ… Decision has significant trade-offs
+- âœ… Decision constrains future choices
+- âœ… Decision is non-obvious or controversial
+- âœ… Decision impacts quality goals
+- âœ… Team debated multiple alternatives
 
 ### Don't Document When:
-- ❌ Decision is implementation detail
-- ❌ Decision is obvious or standard practice
-- ❌ Decision can be easily reversed
-- ❌ Decision is temporary workaround
-- ❌ Decision has no significant consequences
-- ❌ Decision is already documented elsewhere (e.g., code comments sufficient)
+- âŒ Decision is implementation detail
+- âŒ Decision is obvious or standard practice
+- âŒ Decision can be easily reversed
+- âŒ Decision is temporary workaround
+- âŒ Decision has no significant consequences
+- âŒ Decision is already documented elsewhere (e.g., code comments sufficient)
 
 ## ADR Process
 
@@ -364,3 +240,4 @@ Priority-ordered criteria for evaluation:
 
 ---
 *Based on docs.arc42.org/section-9/ and official arc42 sources*
+

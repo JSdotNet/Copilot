@@ -12,10 +12,10 @@ description: Defines mandatory approval flow and wording for cross-agent handoff
 
 ## Mandatory Policy
 
-- Always propose handoff when another specialist agent is better suited for the request.
-- Always ask for explicit user approval before every handoff.
+- Always propose a handoff when another specialist agent is better suited for the request.
+- Always ask for explicit user approval before performing a handoff.
 - Never switch agents without explicit user approval in the current conversation.
-- If approval is not granted, continue in current scope and clearly state limitations.
+- If approval is not granted, continue in the current scope and clearly state limitations.
 - For recurring transitions, prefer agent frontmatter `handoffs` so the next step is explicit and easy to approve.
 
 ## Required Handoff Flow
@@ -24,7 +24,7 @@ description: Defines mandatory approval flow and wording for cross-agent handoff
 2. Name the target agent and expected benefit.
 3. Ask the user for explicit approval to proceed.
 4. If artifacts exist, store them under `.wip/` and reference the path in the handoff context.
-5. Only after approval, perform the handoff.
+5. Perform the handoff only after approval is granted.
 
 ## Compliance Checklist
 

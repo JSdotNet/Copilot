@@ -31,17 +31,17 @@ Installable GitHub Copilot CLI plugin for architecture design and documentation 
   - `instructions/arc42/arc42-section-11-instructions.md`
   - `instructions/arc42/arc42-section-12-instructions.md`
 
-## Local Install
+## Install
 
 ```bash
-copilot plugin install ./plugins/architecture
+copilot plugin install JSdotNet/Copilot:plugins/architecture
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install ./plugins/architecture
+copilot plugin install JSdotNet/Copilot:plugins/architecture
 ```
 
 ## Uninstall

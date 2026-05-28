@@ -34,17 +34,17 @@ Installable GitHub Copilot CLI plugin for development planning and execution wor
 - Architecture assets are now maintained in `plugins/architecture`.
 - Install `plugins/architecture` when you need architecture-specific handoffs from `development-plan.agent.md`.
 
-## Local Install
+## Install
 
 ```bash
-copilot plugin install ./plugins/development
+copilot plugin install JSdotNet/Copilot:plugins/development
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install ./plugins/development
+copilot plugin install JSdotNet/Copilot:plugins/development
 ```
 
 ## Uninstall

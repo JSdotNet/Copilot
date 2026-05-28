@@ -11,7 +11,7 @@ Define the standard for creating, structuring, and using agent files in the proj
 
 ## General Rules
 
-- An agent file must only be created if the user explicitly requests a specific dialogue/configuration mode for the AI (e.g., "Create an architect agent", "Add a reviewer agent").
+- An agent file must only be created if the user explicitly requests a specific dialogue/configuration mode for the AI (e.g., "Create an architect agent", "Add a reviewer agent") or the approved plugin scope clearly requires a dedicated agent.
 - Agents are passive: they modify the AI's behavior in the background for all relevant requests.
 - If the user asks for a plugin-like capability bundle, define the package scope first, then determine whether new agents, instructions, skills, prompts, and resource files are needed.
 - Each agent must be documented in English and clearly describe:
@@ -22,7 +22,7 @@ Define the standard for creating, structuring, and using agent files in the proj
 - The front matter must include:
   - `model` (required): selected from approved options.
   - `tools` (optional): List of tools required by the agent.
-  - `description` (optional): summary of the agent
+  - `description` (optional): summary of the agent.
 
 ## Model Selection Policy
 
@@ -62,6 +62,7 @@ Review requirement:
 
 ```markdown
 ---
+model: auto
 description: "Architect: Configure Copilot to act as a software architect."
 ---
 

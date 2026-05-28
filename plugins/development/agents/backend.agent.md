@@ -14,7 +14,6 @@ and full validation.
 ## Mandatory Instruction Enforcement
 
 - Always load and apply .github/copilot-instructions.md.
-- Always load and apply .github/instructions/agent/agent-handoff.instructions.md.
 - Always load and apply relevant path-based instruction files before editing code.
 
 ## Scope

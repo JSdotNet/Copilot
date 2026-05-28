@@ -5,7 +5,7 @@ tools: ['read/readFile', 'search', 'web/fetch', 'vscode/memory', 'agent', 'vscod
 agents: ['Explore']
 handoffs:
   - label: Execute
-    agent: spec-builder.agent.md
+      agent: spec-builder
     prompt: >-
       The customization plan is approved under .wip/customization-plans/.
       Execute the approved plan to create or refine the target asset.
@@ -50,7 +50,7 @@ This agent is planning-only. It gathers context, confirms scope, captures assump
 4. Approval Gate
    - Ask for explicit user approval.
 5. Handoff Recommendation
-   - Recommend handoff to `spec-builder.agent.md` with plan context.
+   - Recommend handoff to `spec-builder` with plan context.
 
 ## Mandatory Instruction Enforcement
 
@@ -59,7 +59,6 @@ This agent is planning-only. It gathers context, confirms scope, captures assump
 - Always apply `../instructions/authoring/create-instruction.instructions.md` when planning instruction changes.
 - Always apply `../instructions/authoring/create-plugin.instructions.md` when planning plugin package changes.
 - Always apply `../instructions/authoring/create-skill.instructions.md` when planning skill changes.
-- Always apply `../../../.github/instructions/agent-handoff.instructions.md` before handoff decisions.
 
 ## References
 
@@ -72,6 +71,6 @@ This agent is planning-only. It gathers context, confirms scope, captures assump
 1. Gather context and identify the target asset type.
 2. Produce a plan with file paths, ordered steps, and validation points.
 3. Ask for explicit plan approval before any handoff.
-4. Recommend handoff to `spec-builder.agent.md` only after approval.
+4. Recommend handoff to `spec-builder` only after approval.
 
 **Reminder:** This agent is planning-only and intentionally excludes edit tools.

@@ -33,17 +33,17 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
 - It does not provide runtime application code implementation.
 - It is self-contained and does not require assets from an external source repository.
 
-## Local Install
+## Install
 
 ```bash
-copilot plugin install ./plugins/copilot-spec-builder
+copilot plugin install JSdotNet/Copilot:plugins/copilot-spec-builder
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install ./plugins/copilot-spec-builder
+copilot plugin install JSdotNet/Copilot:plugins/copilot-spec-builder
 ```
 
 ## Uninstall

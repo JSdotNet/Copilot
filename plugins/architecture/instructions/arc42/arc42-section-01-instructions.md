@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/01_introduction_and_goals.md'
+description: 'Defines requirements and output standards for arc42-section-01-instructions.'
 ---
 
 
@@ -155,7 +156,7 @@ Section 1 introduces stakeholders to the fundamental driving forces behind the a
 
 ## Common Mistakes to Avoid
 
-### ❌ Not Allowed:
+### âŒ Not Allowed:
 1. Starting development without signed quality goals
 2. Using buzzwords instead of concrete scenarios
 3. Having more than 5 quality goals
@@ -163,7 +164,7 @@ Section 1 introduces stakeholders to the fundamental driving forces behind the a
 5. Including ALL requirements instead of essential ones
 6. Omitting stakeholder expectations
 
-### ✅ Desired:
+### âœ… Desired:
 1. Concrete, measurable quality goals with numbers
 2. Maximum 3-5 quality goals
 3. Signed stakeholder agreement

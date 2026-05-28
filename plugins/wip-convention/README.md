@@ -5,13 +5,13 @@ Encapsulates the `.wip` folder convention for storing work-in-progress artifacts
 ## Installation
 
 ```bash
-copilot plugin install plugins/wip-convention
+copilot plugin install JSdotNet/Copilot:plugins/wip-convention
 ```
 
 After installation, re-install if you make changes to the plugin:
 
 ```bash
-copilot plugin install plugins/wip-convention
+copilot plugin install JSdotNet/Copilot:plugins/wip-convention
 ```
 
 ## Features

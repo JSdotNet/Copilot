@@ -14,7 +14,6 @@ language and repository conventions.
 ## Mandatory Instruction Enforcement
 
 - Always load and apply .github/copilot-instructions.md.
-- Always load and apply .github/instructions/agent/agent-handoff.instructions.md.
 - Always provide naming guidance in English.
 
 ## Scope

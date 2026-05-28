@@ -26,23 +26,17 @@ Installable GitHub Copilot CLI plugin for managing preferred Copilot plugins via
 
 Edit `resources/preferred-plugins.md` to add or remove preferred plugins. Each skill reads from this list.
 
-## Local Install
+## Install
 
 ```bash
-copilot plugin install ./plugins/copilot-plugin-manager
+copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager
 copilot plugin list
-```
-
-## Install From GitHub
-
-```bash
-copilot plugin install https://github.com/<owner>/<repo>/plugins/copilot-plugin-manager
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install ./plugins/copilot-plugin-manager
+copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager
 ```
 
 ## Uninstall

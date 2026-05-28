@@ -1,17 +1,17 @@
 ---
 description: Interactive development planning agent that researches, aligns, and produces approved implementation plans for execution handoff.
-model: Claude Opus 4.6 (copilot)
+model: GPT-5.3-Codex
 tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'vscode/askQuestions']
 agents: ['Explore']
 handoffs:
   - label: Architecture Review
-    agent: architect.agent.md
+    agent: architect
     prompt: >-
       Review the current implementation plan and unresolved architecture decisions.
       Provide architecture guidance and document constraints and trade-offs in Markdown.
     send: false
   - label: Naming Review
-    agent: naming.agent.md
+    agent: naming
     prompt: >-
       Review the plan for proposed names (aggregates, entities, value objects,
       services, endpoints, and events). Suggest consistent domain and API naming
@@ -26,7 +26,7 @@ handoffs:
     send: true
     showContinueOn: false
   - label: Start Implementation
-    agent: developer.agent.md
+    agent: developer
     prompt: >-
       The implementation plan is approved under .wip/implementation-plans/.
       Execute it phase-by-phase with explicit user approval gates.
@@ -44,7 +44,6 @@ assumptions with the user, captures decisions, and produces an execution
 blueprint that can be handed off to the developer execution agent.
 
 ## Mandatory Instruction Enforcement
-- Always load and apply .github/instructions/agent/agent-handoff.instructions.md before handoff decisions.
 - Always load and apply .github/instructions/agent/agent-model-recommendation.instructions.md when editing .github/agents/**/*.md.
 - Always load and apply .github/instructions/markdown.instructions.md before drafting Markdown artifacts.
 - Always load and apply .github/copilot-instructions.md for repository-wide constraints and standards.
@@ -112,7 +111,7 @@ Use these skills when they improve speed or quality:
 - refactor-plan
 
 ## Handoff Approval Policy
-- Architecture Review handoff uses `architect.agent.md` from the `architecture` plugin.
+- Architecture Review handoff uses `architect` from the `architecture` plugin.
 - Always propose handoff to **Architect Agent** when architectural trade-offs,
   constraints, or structural decisions are unresolved.
 - Always propose handoff to **Naming Agent** when domain or API naming needs

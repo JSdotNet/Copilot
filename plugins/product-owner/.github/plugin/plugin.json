@@ -1,0 +1,12 @@
+{
+  "name": "product-owner",
+  "description": "Copilot plugin for product backlog authoring and Jira/GitHub issue synchronization workflows.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["copilot", "product-owner", "jira", "github-issues", "backlog", "story", "epic", "bug"],
+  "agents": "agents/",
+  "skills": "skills/"
+}

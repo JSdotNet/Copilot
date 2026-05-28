@@ -13,7 +13,6 @@ Perform review-only security analysis of code changes and provide actionable fin
 ## Mandatory Instruction Enforcement
 
 - Always load and apply .github/copilot-instructions.md.
-- Always load and apply .github/instructions/agent/agent-handoff.instructions.md.
 - Always keep findings and recommendations in English.
 
 ## Scope

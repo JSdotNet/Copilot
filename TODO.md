@@ -1,53 +1,85 @@
 
 
-- Readme
-- Instructions
-- Marketplace.json
+# Plugins
+- Commit MVP versions
+- Test install
+
+## Developement
+- 1 coding agent with knowledge of MCP
+
+- Add upgrade skill
+- Add Aspire skill
 
 
-- Review agent
- - TODO focussed
- - Question focussed
- - Suggestions focussed
+# docs - guide
+- Add my specs
 
-- Copilot Review
-- Personal review questions
+# MCP
+- Add, Test, Deploy? + credits!
 
-- Install local and test
-
-- Install for this (or all) projects
-= Extension?
+# Template!
 
 
 
+# Prompt backlog manager
+- Extension?
+- CLI calls?
+
+- Multi project
+  - central + repo
+  - Phone
 
 Use .copilot/config.json with a plugins.disabled list.
 .copilot-ignore (that only affects file scanning)
 
+For:
+- Task
+- Feature
+- Bug
+- Repeating
+- Story
 
+# Test projects
+- Prompt backlog manager
+- MD Blog?
+- Tool & Technologies
+- Lets BBQ
+
+
+
+
+
+
+
+
+Window Copilot Routine?
+Update Explanation!
+
+
+
+
+
+https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing
 
 # Copilot Spec Builder Plugin
 
 # Developement Plugin
 
-Add upgrade skill
-Add Aspire skill
-Separate Architect
+
 
 # Write Readme
 
 
-
 Plugin install (local repo plugins):
-copilot plugin install ./plugins/architecture
-copilot plugin install ./plugins/copilot-plugin-manager
-copilot plugin install ./plugins/copilot-spec-builder
-copilot plugin install ./plugins/development
-copilot plugin install ./plugins/documentation
-copilot plugin install ./plugins/product-owner
-copilot plugin install ./plugins/review
-copilot plugin install ./plugins/wip-convention
-copilot plugin install ./plugins/worktree-parallel
+copilot plugin install JSdotNet/Copilot:plugins/architecture
+copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager
+copilot plugin install JSdotNet/Copilot:plugins/copilot-spec-builder
+copilot plugin install JSdotNet/Copilot:plugins/development
+copilot plugin install JSdotNet/Copilot:plugins/documentation
+copilot plugin install JSdotNet/Copilot:plugins/product-owner
+copilot plugin install JSdotNet/Copilot:plugins/review
+copilot plugin install JSdotNet/Copilot:plugins/wip-convention
+copilot plugin install JSdotNet/Copilot:plugins/worktree-parallel
 
 Plugin update:
 copilot plugin update architecture

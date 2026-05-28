@@ -21,16 +21,16 @@ Covers five artifact types: **How-To guides**, **Explanations**, **Articles**, *
 
 ## Installation
 
-Install from the local path using the Copilot CLI:
+Install from GitHub using the Copilot CLI:
 
 ```bash
-copilot plugin install ./plugins/documentation
+copilot plugin install JSdotNet/Copilot:plugins/documentation
 ```
 
 Re-install after any changes to pick up updates:
 
 ```bash
-copilot plugin install ./plugins/documentation
+copilot plugin install JSdotNet/Copilot:plugins/documentation
 ```
 
 ## Usage
@@ -84,5 +84,5 @@ All instruction files use generic `applyTo` globs so they work in any repository
 ## Updating
 
 1. Edit the relevant agent, instruction, or skill file.
-2. Re-install the plugin: `copilot plugin install ./plugins/documentation`
+2. Re-install the plugin: `copilot plugin install JSdotNet/Copilot:plugins/documentation`
 3. Test with a sample request to confirm the change takes effect.

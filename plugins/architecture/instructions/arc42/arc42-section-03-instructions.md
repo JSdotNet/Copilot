@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/03_system_scope_and_context.md'
+description: 'Defines requirements and output standards for arc42-section-03-instructions.'
 ---
 
 # arc42 Section 3: Context and Scope - Specific Instructions
@@ -167,7 +168,7 @@ Section 3 defines the system boundary, showing what is part of the system and wh
 
 ## Common Mistakes to Avoid
 
-### ❌ Not Allowed:
+### âŒ Not Allowed:
 1. **Mixing business and technical concerns** in business context
 2. **Showing internal components** in context diagram (context = external view only!)
 3. **No clear system boundary** - unclear what's in vs. out
@@ -179,7 +180,7 @@ Section 3 defines the system boundary, showing what is part of the system and wh
 9. **Ignoring non-human actors** (batch jobs, scheduled tasks, monitoring)
 10. **Forgetting to show data flow direction**
 
-### ✅ Desired:
+### âœ… Desired:
 1. **Clear system boundary** - obvious what's inside vs. outside
 2. **Business context first** - WHAT is exchanged
 3. **Technical context separate** (if needed) - HOW it's exchanged
@@ -201,7 +202,7 @@ Section 3 defines the system boundary, showing what is part of the system and wh
 - **Section 12 (Glossary):** External entities need definitions
 
 ### Critical Consistency Rule:
-**Section 3 (Context) ↔ Section 5.1 (Building Block Level-1)**
+**Section 3 (Context) â†” Section 5.1 (Building Block Level-1)**
 - External interfaces shown in context MUST appear in Level-1
 - System boundary MUST be identical
 - Communication partners MUST match
@@ -267,27 +268,28 @@ Section 3 defines the system boundary, showing what is part of the system and wh
 ### Example C4 System Context:
 
 ```
-┌─────────────┐
-│   End User  │
-└──────┬──────┘
-       │ uses (HTTPS)
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚   End User  â”‚
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
+       â”‚ uses (HTTPS)
        v
-┌──────────────────────┐
-│                      │
-│  Product Search      │◄──────┐
-│  System              │       │ reads data
-│                      │       │ (JDBC)
-└──────┬───────────────┘       │
-       │                ┌──────┴──────┐
-       │ sends          │  Inventory  │
-       │ payments       │  Database   │
-       │ (REST/JSON)    │  (Legacy)   │
-       v                └─────────────┘
-┌──────────────┐
-│   Payment    │
-│   Gateway    │
-└──────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                      â”‚
+â”‚  Product Search      â”‚â—„â”€â”€â”€â”€â”€â”€â”
+â”‚  System              â”‚       â”‚ reads data
+â”‚                      â”‚       â”‚ (JDBC)
+â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜       â”‚
+       â”‚                â”Œâ”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”
+       â”‚ sends          â”‚  Inventory  â”‚
+       â”‚ payments       â”‚  Database   â”‚
+       â”‚ (REST/JSON)    â”‚  (Legacy)   â”‚
+       v                â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚   Payment    â”‚
+â”‚   Gateway    â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ---
 *Based on docs.arc42.org/section-3/ and official arc42 sources*
+

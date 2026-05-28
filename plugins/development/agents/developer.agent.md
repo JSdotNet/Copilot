@@ -4,39 +4,39 @@ model: GPT-5.3-Codex
 tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask']
 handoffs:
   - label: TDD - Red Phase (domain)
-    agent: testing.agent.md
+    agent: testing
     prompt: >-
       Write failing domain tests from the approved implementation plan under
       .wip/implementation-plans/. No production code changes yet. Return failing
       test summary.
     send: false
   - label: TDD - Green Phase (domain)
-    agent: backend.agent.md
+    agent: backend
     prompt: >-
       Implement minimal domain production code to make red-phase tests pass.
       Run dotnet test and report results.
     send: false
   - label: Implement Backend Layers
-    agent: backend.agent.md
+    agent: backend
     prompt: >-
       Implement Application, Infrastructure, and API layers according to the
       approved plan in .wip/implementation-plans/. Run dotnet test after each
       layer and report results.
     send: false
   - label: Run Test Suite
-    agent: testing.agent.md
+    agent: testing
     prompt: >-
       Add or update tests for implemented changes, run dotnet test, and report
       pass/fail plus coverage notes.
     send: false
   - label: Security Review
-    agent: security.agent.md
+    agent: security
     prompt: >-
       Review current changed files for security issues and provide findings with
       severity and recommended remediations in .wip/security-review/.
     send: false
   - label: Frontend Implementation
-    agent: frontend.agent.md
+    agent: frontend
     prompt: >-
       Backend is approved for frontend integration. Implement UI updates from
       plan and API contract under .wip/implementation-plans/. Run relevant tests
@@ -55,7 +55,6 @@ security specialist agents and ensures each delivery phase is validated before
 proceeding.
 
 ## Mandatory Instruction Enforcement
-- Always load and apply .github/instructions/agent/agent-handoff.instructions.md before handoff decisions.
 - Always load and apply .github/copilot-instructions.md and all relevant path-based instruction files before editing code.
 
 ## Partial Results Storage
@@ -77,19 +76,19 @@ proceeding.
 ## Phase Workflow
 
 1. Phase 1 - Domain TDD
-   - Propose handoff: `TDD - Red Phase (domain)` to `testing.agent.md`.
-   - After red phase, propose handoff: `TDD - Green Phase (domain)` to `backend.agent.md`.
+  - Propose handoff: `TDD - Red Phase (domain)` to `testing`.
+  - After red phase, propose handoff: `TDD - Green Phase (domain)` to `backend`.
    - Run `dotnet test` and confirm domain tests pass.
    - Ask for explicit user approval before advancing.
 2. Phase 2 - Backend Layers
-   - Propose handoff: `Implement Backend Layers` to `backend.agent.md`.
-   - Propose handoff: `Run Test Suite` to `testing.agent.md`.
-   - Propose handoff: `Security Review` to `security.agent.md`.
+  - Propose handoff: `Implement Backend Layers` to `backend`.
+  - Propose handoff: `Run Test Suite` to `testing`.
+  - Propose handoff: `Security Review` to `security`.
    - Require clean backend test run and security findings triaged.
    - Ask for explicit user approval before frontend work.
 3. Phase 3 - Frontend
-   - Propose handoff: `Frontend Implementation` to `frontend.agent.md`.
-   - Propose handoff: `Run Test Suite` to `testing.agent.md`.
+  - Propose handoff: `Frontend Implementation` to `frontend`.
+  - Propose handoff: `Run Test Suite` to `testing`.
    - Require clean frontend-related test results.
    - Ask for explicit user approval before final validation.
 4. Phase 4 - Final Validation

@@ -1,5 +1,6 @@
----
+﻿---
 applyTo: 'doc/arc42/07_deployment_view.md'
+description: 'Defines requirements and output standards for arc42-section-07-instructions.'
 ---
 
 # arc42 Section 7: Deployment View - Specific Instructions
@@ -50,7 +51,7 @@ Simple deployment diagram + table
 
 ```
 [Load Balancer] --> [App Server 1] --> [Database]
-                --> [App Server 2] ──┘
+                --> [App Server 2] â”€â”€â”˜
 ```
 
 | Infrastructure Node | Hosted Components | Technology |
@@ -164,133 +165,8 @@ Document differences between:
 | <Database> | PostgreSQL | 5432 | Data access |
 
 ---
-
-### Node: <n>
-[Repeat structure for each node]
-
-## Multiple Environments
-
-### Production
-[Specific configuration for production]
-- Nodes: 3x App Servers, 1x Database (with standby)
-- Scaling: Auto-scaling 3-10 instances
-- Monitoring: Prometheus + Grafana
-
-### Staging
-[Differences from production]
-- Nodes: 1x App Server, 1x Database
-- Reduced capacity for cost savings
-
-### Development
-[Local development setup]
-- Docker Compose with all services
-- Local database
-```
-
-## Common Mistakes to Avoid
-
-### ❌ Not Allowed:
-1. **Over-documenting trivial deployments** - Skip if obvious
-2. **Missing mapping to building blocks** - Must link to Section 5
-3. **No environment differences** - Document dev/test/prod variations
-4. **Ignoring cloud services** - Document cloud provider services used
-5. **Missing network/security aspects** - Firewall rules, VPNs, zones
-6. **No deployment process** - How software gets deployed
-7. **Outdated diagrams** - Keep synchronized with actual infrastructure
-8. **Too much detail** - Stay at infrastructure level, not server config
-9. **No scalability information** - How does system scale?
-10. **Missing communication channels** - How nodes communicate
-
-### ✅ Desired:
-1. **Clear infrastructure diagram** - Shows all nodes
-2. **Mapping to building blocks** - Links Section 5 to Section 7
-3. **Environment differences documented** - Dev, test, production
-4. **Cloud services explicit** - AWS/Azure/GCP services named
-5. **Deployment automation described** - CI/CD, tools
-6. **Network topology shown** - Security zones, VPNs
-7. **Scalability approach clear** - Horizontal/vertical scaling
-8. **Quality attributes per node** - Performance, availability
-9. **Current and accurate** - Matches actual infrastructure
-10. **Appropriate abstraction** - Not too detailed, not too vague
-
-## Integration with Other Sections
-
-### Input from Other Sections:
-- **Section 5:** Building blocks that need deployment
-- **Section 6:** Runtime scenarios may influence deployment
-- **Section 10:** Quality requirements drive infrastructure decisions
-
-### Output for Other Sections:
-- **Section 11:** Infrastructure risks and limitations
-
-### Critical Consistency:
-- **Section 5 ↔ Section 7:** Every deployable building block must map to infrastructure
-- Building blocks in Section 5 must run somewhere in Section 7
-
-## Validation Criteria
-
-- [ ] All deployable building blocks (Section 5) mapped to infrastructure
-- [ ] Infrastructure diagram present and clear
-- [ ] Technology specifications documented
-- [ ] Communication channels described
-- [ ] Deployment process explained
-- [ ] Multiple environments documented (if applicable)
-- [ ] Cloud services explicitly named (if applicable)
-- [ ] Scalability approach described
-- [ ] Security zones/boundaries shown
-- [ ] Quality attributes per node documented
-
-## Official arc42 Tips for Section 7
-
-**Tip 7-1:** Show infrastructure and mapping
-- Document technical infrastructure
-- Map building blocks to infrastructure nodes
-- Show communication channels
-
-**Tip 7-2:** Document multiple environments
-- Production, staging, development differ
-- Explain key differences
-- May use separate diagrams
-
-**Tip 7-3:** Include deployment process
-- How software gets deployed
-- Automation tools used
-- CI/CD pipeline overview
-
-**Tip 7-4:** Consider cloud infrastructure
-- Cloud services are infrastructure too
-- AWS S3, Lambda, RDS are infrastructure nodes
-- Document cloud-specific aspects
-
-## Cloud Deployment Specifics
-
-### AWS Example Elements:
-- Regions and Availability Zones
-- VPC, Subnets, Security Groups
-- EC2 instances / ECS containers / Lambda functions
-- RDS databases
-- S3 storage
-- CloudFront CDN
-- Route53 DNS
-- Load Balancers (ALB/NLB)
-
-### Azure Example Elements:
-- Regions and Availability Zones
-- Resource Groups, Virtual Networks
-- Virtual Machines / Container Instances / Functions
-- SQL Database / Cosmos DB
-- Blob Storage
-- Application Gateway
-- Traffic Manager
-
-### Kubernetes Example:
-- Clusters and Namespaces
-- Nodes (worker nodes)
-- Pods (containers)
-- Services (load balancing)
-- Ingress (external access)
-- Persistent Volumes
-- ConfigMaps and Secrets
-
+applyTo: 'doc/arc42/07_deployment_view.md'
+description: 'Defines requirements and output standards for arc42-section-07-instructions.'
 ---
 *Based on docs.arc42.org/section-7/ and official arc42 sources*
+
