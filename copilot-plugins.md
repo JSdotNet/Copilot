@@ -41,6 +41,11 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-spec-builder`
   - Notes: GitHub customization asset authoring — agents, instructions, plugins, and skills.
 
+- `csharp-coding` (`0.1.0`)
+  - Source path: `plugins/csharp-coding`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/csharp-coding`
+  - Notes: Single-agent C# .NET coding expert — write, review, optimize, test, refactor, and propose features. Alternative to the `development` plugin for focused coding workflows.
+
 - `copilot-plugin-manager` (`0.1.0`)
   - Source path: `plugins/copilot-plugin-manager`
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager`
