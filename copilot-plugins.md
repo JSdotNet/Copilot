@@ -46,6 +46,11 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager`
   - Notes: Plugin lifecycle management — install, update, uninstall, list, and check for updates.
 
+- `automations` (`0.1.0`)
+  - Source path: `plugins/automations`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/automations`
+  - Notes: Automation prompts for Azure SRE → GitHub issues, session creation from issues, and session branch updates.
+
 ## Skills
 
 - See [Copilot Skills](./copilot-skills.md) for skill inventory and provenance.

@@ -1,0 +1,11 @@
+{
+  "name": "automations",
+  "description": "Copilot plugin with automation prompts for GitHub, Azure, and session management workflows.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["copilot", "automation", "github", "azure", "sre", "session", "worktree"],
+  "skills": "skills/"
+}
