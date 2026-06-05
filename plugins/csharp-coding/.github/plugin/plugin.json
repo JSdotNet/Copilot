@@ -1,0 +1,12 @@
+{
+  "name": "csharp-coding",
+  "description": "Copilot plugin for C# .NET coding expertise — write, review, optimize, and test C# code.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["copilot", "agent", "csharp", "dotnet", "coding", "tdd", "review", "optimization"],
+  "agents": "agents/",
+  "skills": "skills/"
+}
