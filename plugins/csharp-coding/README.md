@@ -17,6 +17,12 @@ A focused, single-agent plugin for writing, reviewing, optimizing, and testing C
   - `skills/csharp-xunit/SKILL.md`
   - `skills/microsoft-code-reference/SKILL.md`
   - `skills/feature-proposal/SKILL.md`
+  - `skills/delegate-to-coding/SKILL.md`
+  - `skills/azure/SKILL.md`
+  - `skills/aspire/SKILL.md`
+  - `skills/open-telemetry/SKILL.md`
+  - `skills/aspire-logging/SKILL.md`
+  - `skills/sre/SKILL.md`
 
 ## MCP Servers (optional, enhance capabilities)
 
@@ -39,6 +45,13 @@ The agent works without MCP servers using `web/fetch` as a fallback.
 - **Package management** — NuGet add, remove, and update via dotnet CLI.
 - **Feature proposals** — scoped proposals stored under `.wip/proposals/`.
 - **Learning resources** — official docs via Microsoft Learn MCP or web fetch.
+
+- **Azure SDK** — Azure service integrations with `DefaultAzureCredential`.
+- **Aspire** — AppHost wiring, service discovery, and integration tests.
+- **OpenTelemetry** — tracing, metrics, and logging setup.
+- **Aspire logging** — retrieve and analyze logs/traces via Aspire MCP.
+- **SRE** — error budgets, resilience patterns, health checks, and runbooks.
+- **Delegate to coding** — skill for other agents to hand off coding tasks here.
 
 ## Optional Handoffs
 
