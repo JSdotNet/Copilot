@@ -2,33 +2,32 @@
 #
 # Global repository instructions live in .github/copilot-instructions.md and apply to
 # ALL Copilot surfaces (VS Code, GitHub.com, CLI, this App). This file adds behaviour
-# that is specific to the GitHub Copilot App — session lifecycle scripts and automation.
+# that is specific to the GitHub Copilot App — session lifecycle and automation.
 
 instructions: |-
-  ## GitHub Copilot App — Session Instructions
+  Apply `.github/copilot-instructions.md` in full. The rules below are App-specific additions only.
 
-  Full repository guidance is in `.github/copilot-instructions.md`; apply it in full.
-  The notes below are specific to this App and supplement that file.
+  This repository is a plugin and documentation monorepo. It has no application runtime,
+  no `src/` tree, and no standard build or test pipeline. Do not invent .NET, npm, or CI
+  validation steps unless the user explicitly asks and the required scripts or files exist.
 
-  ### MCP Server — When and How to Use It
+  ### MCP Server
 
-  The MCP server is installed globally as `jsdotnet-project-guidelines-mcpserver`.
-  It exposes tools: `list_docs`, `search_docs`, `search_docs_by_tag`, `list_docs_by_type`, `get_doc`.
+  The MCP server `jsdotnet-project-guidelines-mcpserver` is available with tools:
+  `list_docs`, `search_docs`, `search_docs_by_tag`, `list_docs_by_type`, `get_doc`.
 
-  **Use the MCP server when working on plugin assets in `plugins/`:**
-  Before adding or changing any plugin, agent, instruction, or skill, query the server
-  to verify relevant guidelines or ADRs. For example: `search_docs("plugin structure")` or
-  `list_docs_by_type("structures")`.
+  Before changing governed plugin or guidance assets — for example files under `plugins/`,
+  or assets such as `.agent.md`, `.instructions.md`, `SKILL.md`, `plugin.json`, and related
+  scripts — use the MCP server to verify relevant guidelines or ADRs.
 
-  **Do NOT use the MCP server when working on `docs/`:**
-  You are editing the source content directly — querying the server would only reflect
-  the previously published version, not your in-progress changes.
+  Do not use the MCP server when directly editing source content under `docs/`.
 
   ### Pull Requests
 
-  PRs are created only when the user explicitly requests it (via the "Create PR" button).
-  When creating a PR, always use the **JSdotNet** GitHub organization account.
+  Do not create a pull request unless the user explicitly requests it.
+  When a pull request is requested, use the currently authenticated JSdotNet-authorized
+  account. If the required organisation authorisation is unavailable, stop and ask the user.
 
 automation:
-  auto_issue_session: true
+  auto_issue_session: false
   remote_control: false
