@@ -6,6 +6,6 @@
     "name": "Job Schepers"
   },
   "license": "UNLICENSED",
-  "keywords": ["copilot", "automation", "github", "azure", "sre", "session", "worktree", "packages", "performance", "cost", "guidelines"],
+  "keywords": ["copilot", "automation", "github", "azure", "sre", "session", "worktree", "packages", "performance", "cost", "review"],
   "skills": "skills/"
 }

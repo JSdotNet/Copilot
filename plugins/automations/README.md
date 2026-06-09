@@ -14,7 +14,7 @@ Each skill is a self-contained workflow prompt that can be invoked directly in c
 | `update-open-sessions` | Rebase or merge all open sessions onto the latest source branch | Git / GitHub access |
 | `automation: package-update` | Update all outdated packages and open a PR | `nuget-manager`, `check-plugin-updates`, `update-plugins`, `aspire` skills |
 | `automation: performance-review` | Identify 10 perf improvements, implement the best one, open a PR | `code-optimization`, `code-review`, `delegate-to-coding`, `tdd`, `aspire-logging` skills |
-| `automation: guidelines-cap-analysis` | Audit instruction/agent/skill files for size and duplication | `suggestion-review`, `todo-review` skills |
+| `automation: review` | Full automated review cycle: TODOs, suggestions, and code review; optionally creates GitHub issues | `todo-review`, `suggestion-review`, `code-review`, `create-github-issue` skills |
 | `automation: weekly-cost-analysis` | Retrieve `/chronicle cost-tips` and produce weekly cost report | Chronicle (`/chronicle cost-tips`) |
 
 ## Install
