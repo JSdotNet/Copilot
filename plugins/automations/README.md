@@ -12,6 +12,10 @@ Each skill is a self-contained workflow prompt that can be invoked directly in c
 | `azure-sre-to-github-issue` | Create GitHub issues from active Azure SRE alerts | Azure skill or MCP tool |
 | `start-session-from-issue` | Start a Copilot session per GitHub issue in plan mode | GitHub access |
 | `update-open-sessions` | Rebase or merge all open sessions onto the latest source branch | Git / GitHub access |
+| `automation: package-update` | Update all outdated packages and open a PR | `nuget-manager`, `check-plugin-updates`, `update-plugins`, `aspire` skills |
+| `automation: performance-review` | Identify 10 perf improvements, implement the best one, open a PR | `code-optimization`, `code-review`, `delegate-to-coding`, `tdd`, `aspire-logging` skills |
+| `automation: guidelines-cap-analysis` | Audit instruction/agent/skill files for size and duplication | `suggestion-review`, `todo-review` skills |
+| `automation: weekly-cost-analysis` | Retrieve `/chronicle cost-tips` and produce weekly cost report | Chronicle (`/chronicle cost-tips`) |
 
 ## Install
 
