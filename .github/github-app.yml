@@ -2,16 +2,18 @@
 # Guideline source: jsdotnet.project.guidelines.mcpserver (config-github-app-yml)
 
 # --- Pre-PR Validation ---
-# All steps are mandatory. A non-zero exit code on any step aborts PR creation.
+# This repository contains only Copilot plugin assets (Markdown, JSON, PowerShell).
+# There is no runtime code to restore, build, or test.
+# Validation is limited to structural checks on plugin manifests and scripts.
 pre_flight:
-  - name: Restore dependencies
-    run: dotnet restore
-
-  - name: Build (compile)
-    run: dotnet build --no-restore --configuration Release
-
-  - name: Run tests
-    run: dotnet test --no-build --configuration Release --logger trx --results-directory ./TestResults
+  - name: Validate plugin manifests
+    run: |
+      Get-ChildItem -Path plugins -Recurse -Filter plugin.json | ForEach-Object {
+        $content = Get-Content $_.FullName -Raw | ConvertFrom-Json
+        if (-not $content.name) { throw "Missing 'name' in $($_.FullName)" }
+        if (-not $content.version) { throw "Missing 'version' in $($_.FullName)" }
+      }
+    shell: pwsh
 
 # --- Post-PR: Pipeline Monitoring ---
 # Wait 5 minutes after PR creation before checking CI to allow all checks to trigger.
