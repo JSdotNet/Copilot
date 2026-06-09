@@ -1,21 +1,22 @@
 ---
 name: automation: package-update
 description: >
-  Update all outdated packages across the repository (NuGet, Copilot plugins, npm) and open a PR
-  with the changes. Use when: running scheduled dependency hygiene, triaging outdated packages,
-  keeping dependencies current.
+  Update all outdated NuGet packages and Copilot plugins in a .NET solution and open a PR
+  with the changes. Handles Central Package Management, Aspire integration upgrades, and
+  post-update build and test verification.
+  Use when: running scheduled dependency hygiene, triaging outdated NuGet packages,
+  keeping a .NET solution current.
 ---
 
 # Automation: Package Update
 
 ## Purpose
 
-Scan the repository for outdated packages across all package ecosystems, apply safe updates,
+Scan a .NET solution for outdated NuGet packages and Copilot plugins, apply safe updates,
 verify the build and tests still pass, then open a pull request with the changes.
 
 ## Inputs
 
-- Ecosystems to update: `all` (default), `nuget`, `plugins`, `npm` — comma-separated list.
 - Update strategy: `minor-and-patch` (default, safe) or `major` (includes breaking changes; requires confirmation).
 - Target branch for the PR (default: repository default branch).
 - Dry-run mode: `true` previews what would change without writing files (default: `false`).
@@ -24,71 +25,62 @@ verify the build and tests still pass, then open a pull request with the changes
 
 This skill orchestrates the following installed skills:
 
-- **`nuget-manager`** — lists outdated NuGet packages and applies version bumps safely via the `dotnet` CLI.
+- **`nuget-manager`** — lists outdated NuGet packages and applies version bumps safely via the `dotnet` CLI. Handles both individual `.csproj` files and `Directory.Packages.props` (Central Package Management).
 - **`check-plugin-updates`** — identifies Copilot plugins that need reinstall or are missing from the preferred list.
 - **`update-plugins`** — reinstalls all preferred Copilot plugins to apply the latest versions.
-- **`aspire`** — when the solution uses .NET Aspire, checks whether Aspire hosting and client integration
-  packages have new versions and whether any configuration changes are required after an upgrade.
+- **`aspire`** — when the solution contains an `.AppHost` project, checks whether `Aspire.Hosting.*` and `Aspire.*` client integration packages have new versions and whether any configuration or API changes are required after an upgrade.
 
 ## Workflow
 
 ### Phase 1 — Audit
 
-1. **NuGet** (if in scope): use the `nuget-manager` skill to run:
+1. Use the `nuget-manager` skill to list all outdated NuGet packages:
 
    ```bash
    dotnet list package --outdated
    ```
 
-   Capture each package with its current and latest version.
+   Capture each package with its current and latest version. If the solution uses
+   Central Package Management (`Directory.Packages.props`), note which packages are
+   managed centrally versus per-project.
 
-2. **Copilot plugins** (if in scope): use the `check-plugin-updates` skill to compare installed
-   plugins against `resources/preferred-plugins.md` and identify packages that need reinstall.
+2. Use the `check-plugin-updates` skill to compare installed Copilot plugins against
+   `resources/preferred-plugins.md` and identify any that need reinstall.
 
-3. **npm** (if in scope — only when `package.json` files exist in the repo):
+3. Detect whether an `.AppHost` project exists. If so, use the `aspire` skill to cross-check
+   all `Aspire.Hosting.*` and `Aspire.*` packages against the latest releases and flag
+   any hosting or client integration packages that are behind.
 
-   ```bash
-   npm outdated --json
-   ```
+4. Present an audit table:
 
-4. **Aspire integrations** (automatically included when an `.AppHost` project is detected): use the
-   `aspire` skill to verify hosting and client integration package versions against the latest
-   `Aspire.Hosting.*` and `Aspire.*` releases and flag any that are behind.
+   | Package | Project / Scope | Current | Latest | Type | Action |
+   |---------|----------------|---------|--------|------|--------|
+   | `Newtonsoft.Json` | `src/Api/Api.csproj` | `13.0.1` | `13.0.3` | patch | Update |
+   | `Microsoft.Extensions.Logging` | `Directory.Packages.props` | `8.0.0` | `9.0.0` | major | Confirm |
+   | `Aspire.Hosting.Redis` | `AppHost/AppHost.csproj` | `9.0.0` | `9.1.0` | minor | Update |
+   | `automations` | Copilot plugin | — | — | reinstall | Reinstall |
 
-5. Present an audit table grouped by ecosystem:
-
-   | Ecosystem | Package | Current | Latest | Type | Action |
-   |-----------|---------|---------|--------|------|--------|
-   | NuGet | `Newtonsoft.Json` | `13.0.1` | `13.0.3` | patch | Update |
-   | Plugin | `automations` | — | — | reinstall | Reinstall |
-   | npm | `lodash` | `4.17.20` | `4.17.21` | patch | Update |
-
-6. If `update-strategy` is `major`, highlight all major bumps and ask for explicit confirmation
+5. If `update-strategy` is `major`, highlight all major bumps and ask for explicit confirmation
    before including them. Stop here if dry-run is `true`.
 
 ### Phase 2 — Apply Updates
 
-7. Create a new branch named `chore/package-updates-<YYYY-MM-DD>`.
+6. Create a new branch named `chore/nuget-updates-<YYYY-MM-DD>`.
 
-8. **NuGet updates**: for each outdated package, follow the `nuget-manager` skill procedure:
-   - Edit `<PackageReference Version="..." />` in `.csproj` or `Directory.Packages.props`.
+7. **NuGet updates**: follow the `nuget-manager` skill procedure for each package:
+   - For solutions using `Directory.Packages.props`: update `<PackageVersion>` entries there.
+   - For per-project packages: edit `<PackageReference Version="..." />` in the `.csproj`.
    - Run `dotnet restore` after each batch to catch dependency conflicts early.
 
-9. **Plugin updates**: use the `update-plugins` skill to reinstall all outdated plugins.
+8. **Aspire updates**: if Aspire packages were flagged, use the `aspire` skill to apply any
+   configuration or API changes required by the new version (for example, renamed integration
+   packages or updated `AddResource` signatures).
 
-10. **npm updates** (when applicable):
-
-    ```bash
-    npm update
-    ```
-
-11. **Aspire updates**: if Aspire packages were flagged, use the `aspire` skill to apply any
-    configuration or API changes required by the new version (for example, renamed integration
-    packages or updated `AddResource` signatures).
+9. **Plugin updates**: use the `update-plugins` skill to reinstall all outdated Copilot plugins.
 
 ### Phase 3 — Verify
 
-12. Build and test after all updates:
+10. Build and test after all updates:
 
     ```bash
     dotnet build
@@ -100,34 +92,35 @@ This skill orchestrates the following installed skills:
 
 ### Phase 4 — Pull Request
 
-13. Commit all changes with message:
+11. Commit all changes with message:
 
     ```
-    chore: update packages <YYYY-MM-DD>
+    chore: update NuGet packages <YYYY-MM-DD>
 
     - NuGet: <n> packages updated
-    - Plugins: <n> plugins reinstalled
-    - npm: <n> packages updated
+    - Aspire integrations: <n> packages updated
+    - Copilot plugins: <n> plugins reinstalled
     ```
 
-14. Push the branch and open a PR:
-    - **Title:** `chore: package updates <YYYY-MM-DD>`
+12. Push the branch and open a PR:
+    - **Title:** `chore: NuGet package updates <YYYY-MM-DD>`
     - **Body:** the audit table from Phase 1 with each row marked Updated or Skipped.
     - **Labels:** `dependencies`, `automated`.
 
 ### Phase 5 — Summary
 
-15. Output a final summary table:
+13. Output a final summary table:
 
-    | Package | Ecosystem | Old | New | Result |
-    |---------|-----------|-----|-----|--------|
-    | `Newtonsoft.Json` | NuGet | `13.0.1` | `13.0.3` | ✅ Updated |
-    | `xunit` | NuGet | `2.6.0` | `2.7.0` | ⚠️ Skipped (test failure) |
-    | `automations` | Plugin | — | — | ✅ Reinstalled |
+    | Package | Current | New | Result |
+    |---------|---------|-----|--------|
+    | `Newtonsoft.Json` | `13.0.1` | `13.0.3` | ✅ Updated |
+    | `xunit` | `2.6.0` | `2.7.0` | ⚠️ Skipped (test failure) |
+    | `Aspire.Hosting.Redis` | `9.0.0` | `9.1.0` | ✅ Updated |
+    | `automations` | — | — | ✅ Reinstalled |
 
 ## Output
 
-- Branch with all safe package updates applied and tests passing.
+- Branch with all safe NuGet and Aspire package updates applied and tests passing.
 - Pull request with a full audit table in the body.
 - Summary table of results per package.
 
@@ -136,4 +129,4 @@ This skill orchestrates the following installed skills:
 - Major version bumps are opt-in; always confirm with the user before applying them.
 - Packages that break tests are skipped and flagged, not force-updated.
 - Run this automation on a fixed weekly schedule to keep dependency debt low.
-- Phases for ecosystems not present in the repository are silently skipped.
+- The Aspire phase is skipped automatically when no `.AppHost` project is present.
