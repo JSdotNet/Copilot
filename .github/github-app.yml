@@ -1,89 +1,34 @@
-# GitHub Copilot Coding Agent Configuration
-# Guideline source: jsdotnet.project.guidelines.mcpserver (config-github-app-yml)
-
-# --- Pre-PR Validation ---
-# This repository contains only Copilot plugin assets (Markdown, JSON, PowerShell).
-# There is no runtime code to restore, build, or test.
-# Validation is limited to structural checks on plugin manifests and scripts.
-pre_flight:
-  - name: Validate plugin manifests
-    run: |
-      Get-ChildItem -Path plugins -Recurse -Filter plugin.json | ForEach-Object {
-        $content = Get-Content $_.FullName -Raw | ConvertFrom-Json
-        if (-not $content.name) { throw "Missing 'name' in $($_.FullName)" }
-        if (-not $content.version) { throw "Missing 'version' in $($_.FullName)" }
-      }
-    shell: pwsh
-
-# --- Post-PR: Pipeline Monitoring ---
-# Wait 5 minutes after PR creation before checking CI to allow all checks to trigger.
-# On failure: diagnose, fix, push a corrective commit, and re-check. Retry up to 3 times.
-# Do not force-push; use regular commits so reviewers can follow the correction history.
-on_pr_opened:
-  - name: Wait for CI to start
-    wait: 5m
-
-  - name: Check pipeline status
-    action: check_ci
-    on_failure: fix_and_push
-
-  - name: Wait for initial review
-    wait: 5m
-
-  - name: Process review comments
-    action: address_review_comments
-
-# --- PR Conventions ---
-pr_conventions:
-  # Title must follow Conventional Commits: <type>(<optional-scope>): <short imperative summary>
-  # Allowed types: feat, fix, refactor, test, docs, chore, perf, ci, build
-  title_format: "<type>(<optional-scope>): <short imperative summary>"
-
-  # Branch naming: <type>/<short-slug>
-  # Examples: feat/order-cancellation, fix/token-expiry, docs/adr-0014-caching
-  branch_format: "<type>/<short-slug>"
-
-  # PR description must be populated with this template
-  description_template: |
-    ## Summary
-    <!-- What does this PR do and why? -->
-
-    ## Changes
-    <!-- Bullet list of notable changes -->
-
-    ## Testing
-    <!-- How was this tested? Reference test files or test results. -->
-
-    ## Related
-    <!-- Issue refs, ADR refs, or links -->
-
-# --- GitHub & Git Account Management ---
-automation:
-  auto_issue_session: false
-  remote_control: false
-
-instructions:
-  github_account: "Use the repository account for all GitHub operations in this repo."
-  gh_cli: "Before running gh commands such as pr create, pr merge, issue create, or api calls, switch to the git_transport."
-  git_transport: "Use the repository SSH remote/account for push, pull, fetch, and clone operations."
-
-# --- Scope & Safety Boundaries ---
-# The agent IS permitted to:
-#   - Create and push commits on its own branch.
-#   - Open, update, and comment on PRs.
-#   - Run build and test commands listed in this file.
-#   - Propose code changes in response to review comments.
+# GitHub Copilot App configuration for JSdotNet/Copilot
 #
-# The agent is NOT permitted to:
-#   - Merge PRs without a human-approved review.
-#   - Delete branches other than its own short-lived ones.
-#   - Modify .github/, docs/config/, or infrastructure-as-code files
-#     (*.tf, *.bicep, *.yaml in deployment folders) without an explicit human instruction.
-#   - Push directly to main, develop, or any protected branch.
-#   - Access, log, or store secrets — always use repository or environment secrets
-#     via secrets.* references.
+# Global repository instructions live in .github/copilot-instructions.md and apply to
+# ALL Copilot surfaces (VS Code, GitHub.com, CLI, this App). This file adds behaviour
+# that is specific to the GitHub Copilot App — session lifecycle scripts and automation.
 
-# --- Secrets & Environment Variables ---
-# - Never hard-code credentials or tokens in code or config files.
-# - Reference secrets exclusively via ${{ secrets.SECRET_NAME }} in workflow files.
-# - If a required secret is missing, fail loudly with a clear error message.
+instructions: |-
+  ## GitHub Copilot App — Session Instructions
+
+  Full repository guidance is in `.github/copilot-instructions.md`; apply it in full.
+  The notes below are specific to this App and supplement that file.
+
+  ### MCP Server — When and How to Use It
+
+  The MCP server is installed globally as `jsdotnet-project-guidelines-mcpserver`.
+  It exposes tools: `list_docs`, `search_docs`, `search_docs_by_tag`, `list_docs_by_type`, `get_doc`.
+
+  **Use the MCP server when working on plugin assets in `plugins/`:**
+  Before adding or changing any plugin, agent, instruction, or skill, query the server
+  to verify relevant guidelines or ADRs. For example: `search_docs("plugin structure")` or
+  `list_docs_by_type("structures")`.
+
+  **Do NOT use the MCP server when working on `docs/`:**
+  You are editing the source content directly — querying the server would only reflect
+  the previously published version, not your in-progress changes.
+
+  ### Pull Requests
+
+  PRs are created only when the user explicitly requests it (via the "Create PR" button).
+  When creating a PR, always use the **JSdotNet** GitHub organization account.
+
+automation:
+  auto_issue_session: true
+  remote_control: false
