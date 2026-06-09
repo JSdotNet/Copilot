@@ -1,0 +1,12 @@
+{
+  "name": "aikido",
+  "description": "Copilot plugin for Aikido Security — scan code for vulnerabilities and secrets, triage findings, fix security issues, and sync to GitHub Issues using the Aikido MCP server.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["copilot", "security", "aikido", "sast", "vulnerabilities", "secrets", "scanning", "iac"],
+  "agents": "agents/",
+  "skills": "skills/"
+}
