@@ -23,6 +23,11 @@ summary and optionally creates GitHub review annotations.
 - Create review comments: `true` stages inline PR review comments for critical and high findings
   (default: `false` — summary only).
 
+## MCP Prerequisite
+
+> If the Aikido MCP server (`aikido_full_scan`, `aikido_sast_scan`, or `aikido_secrets_scan`) is not available,
+> stop immediately and tell the user to configure it using the setup instructions in `agents/aikido.agent.md`.
+
 ## Workflow
 
 ### Phase 1 — Get Changed Files

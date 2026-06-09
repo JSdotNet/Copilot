@@ -36,6 +36,11 @@ targeted re-scan.
 - Repo name (optional): used to filter `aikido_issues_list` if no issue ID is available.
 - Accepted risk: `true` marks the finding as known/accepted without fixing (default: `false`).
 
+## MCP Prerequisite
+
+> If the Aikido MCP server (`aikido_issues_list`) is not available, stop immediately
+> and tell the user to configure it using the setup instructions in `agents/aikido.agent.md`.
+
 ## Workflow
 
 ### Phase 1 — Retrieve the Finding

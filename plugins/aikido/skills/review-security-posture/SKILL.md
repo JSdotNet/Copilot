@@ -24,6 +24,11 @@ highlight what needs immediate attention, and recommend a remediation order.
   `scm_security`, `ai_pentest` (default: all types).
 - Minimum severity: `critical`, `high`, `medium`, `low` (default: `low` — show all).
 
+## MCP Prerequisite
+
+> If the Aikido MCP server (`aikido_issues_list`) is not available, stop immediately
+> and tell the user to configure it using the setup instructions in `agents/aikido.agent.md`.
+
 ## Workflow
 
 ### Phase 1 — Fetch All Issues

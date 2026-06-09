@@ -24,6 +24,11 @@ issue ID fingerprint to prevent duplicates on re-runs.
 - Assignee GitHub username (optional).
 - Dry-run mode: `true` previews what would be created without creating issues (default: `false`).
 
+## MCP Prerequisite
+
+> If the Aikido MCP server (`aikido_issues_list`) is not available, stop immediately
+> and tell the user to configure it using the setup instructions in `agents/aikido.agent.md`.
+
 ## Workflow
 
 ### Phase 1 — Fetch Aikido Findings

@@ -164,6 +164,11 @@ When the user asks for runtime implementation details, first check whether the r
 
 Only propose runtime code patterns when concrete runtime code and version constraints are present in scope.
 
+## Security Scanning
+
+Scan any new or modified code with `aikido_full_scan` before finalizing changes.
+This security check is required.
+
 ## Output Quality Checklist
 
 Before finalizing generated changes:
