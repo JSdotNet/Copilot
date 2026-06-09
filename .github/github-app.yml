@@ -1,0 +1,87 @@
+# GitHub Copilot Coding Agent Configuration
+# Guideline source: jsdotnet.project.guidelines.mcpserver (config-github-app-yml)
+
+# --- Pre-PR Validation ---
+# All steps are mandatory. A non-zero exit code on any step aborts PR creation.
+pre_flight:
+  - name: Restore dependencies
+    run: dotnet restore
+
+  - name: Build (compile)
+    run: dotnet build --no-restore --configuration Release
+
+  - name: Run tests
+    run: dotnet test --no-build --configuration Release --logger trx --results-directory ./TestResults
+
+# --- Post-PR: Pipeline Monitoring ---
+# Wait 5 minutes after PR creation before checking CI to allow all checks to trigger.
+# On failure: diagnose, fix, push a corrective commit, and re-check. Retry up to 3 times.
+# Do not force-push; use regular commits so reviewers can follow the correction history.
+on_pr_opened:
+  - name: Wait for CI to start
+    wait: 5m
+
+  - name: Check pipeline status
+    action: check_ci
+    on_failure: fix_and_push
+
+  - name: Wait for initial review
+    wait: 5m
+
+  - name: Process review comments
+    action: address_review_comments
+
+# --- PR Conventions ---
+pr_conventions:
+  # Title must follow Conventional Commits: <type>(<optional-scope>): <short imperative summary>
+  # Allowed types: feat, fix, refactor, test, docs, chore, perf, ci, build
+  title_format: "<type>(<optional-scope>): <short imperative summary>"
+
+  # Branch naming: <type>/<short-slug>
+  # Examples: feat/order-cancellation, fix/token-expiry, docs/adr-0014-caching
+  branch_format: "<type>/<short-slug>"
+
+  # PR description must be populated with this template
+  description_template: |
+    ## Summary
+    <!-- What does this PR do and why? -->
+
+    ## Changes
+    <!-- Bullet list of notable changes -->
+
+    ## Testing
+    <!-- How was this tested? Reference test files or test results. -->
+
+    ## Related
+    <!-- Issue refs, ADR refs, or links -->
+
+# --- GitHub & Git Account Management ---
+automation:
+  auto_issue_session: false
+  remote_control: false
+
+instructions:
+  github_account: "Use the repository account for all GitHub operations in this repo."
+  gh_cli: "Before running gh commands such as pr create, pr merge, issue create, or api calls, switch to the git_transport."
+  git_transport: "Use the repository SSH remote/account for push, pull, fetch, and clone operations."
+
+# --- Scope & Safety Boundaries ---
+# The agent IS permitted to:
+#   - Create and push commits on its own branch.
+#   - Open, update, and comment on PRs.
+#   - Run build and test commands listed in this file.
+#   - Propose code changes in response to review comments.
+#
+# The agent is NOT permitted to:
+#   - Merge PRs without a human-approved review.
+#   - Delete branches other than its own short-lived ones.
+#   - Modify .github/, docs/config/, or infrastructure-as-code files
+#     (*.tf, *.bicep, *.yaml in deployment folders) without an explicit human instruction.
+#   - Push directly to main, develop, or any protected branch.
+#   - Access, log, or store secrets — always use repository or environment secrets
+#     via secrets.* references.
+
+# --- Secrets & Environment Variables ---
+# - Never hard-code credentials or tokens in code or config files.
+# - Reference secrets exclusively via ${{ secrets.SECRET_NAME }} in workflow files.
+# - If a required secret is missing, fail loudly with a clear error message.
