@@ -1,0 +1,33 @@
+# GitHub Copilot App configuration for JSdotNet/Copilot
+#
+# Global repository instructions live in .github/copilot-instructions.md and apply to
+# ALL Copilot surfaces (VS Code, GitHub.com, CLI, this App). This file adds behaviour
+# that is specific to the GitHub Copilot App — session lifecycle and automation.
+
+instructions: |-
+  Apply `.github/copilot-instructions.md` in full. The rules below are App-specific additions only.
+
+  This repository is a plugin and documentation monorepo. It has no application runtime,
+  no `src/` tree, and no standard build or test pipeline. Do not invent .NET, npm, or CI
+  validation steps unless the user explicitly asks and the required scripts or files exist.
+
+  ### MCP Server
+
+  The MCP server `jsdotnet-project-guidelines-mcpserver` is available with tools:
+  `list_docs`, `search_docs`, `search_docs_by_tag`, `list_docs_by_type`, `get_doc`.
+
+  Before changing governed plugin or guidance assets — for example files under `plugins/`,
+  or assets such as `.agent.md`, `.instructions.md`, `SKILL.md`, `plugin.json`, and related
+  scripts — use the MCP server to verify relevant guidelines or ADRs.
+
+  Do not use the MCP server when directly editing source content under `docs/`.
+
+  ### Pull Requests
+
+  Do not create a pull request unless the user explicitly requests it.
+  When a pull request is requested, use the currently authenticated JSdotNet-authorized
+  account. If the required organisation authorisation is unavailable, stop and ask the user.
+
+automation:
+  auto_issue_session: false
+  remote_control: false
