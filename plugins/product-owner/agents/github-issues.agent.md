@@ -1,5 +1,6 @@
 ---
 description: GitHub Issues specialist agent for creating, updating, and syncing GitHub issues from Markdown backlog artifacts.
+model: claude-haiku-4.5
 tools: ['read/readFile', 'edit/editFiles', 'search/codebase', 'search/textSearch']
 handoffs:
   - label: Refine Backlog Artifact

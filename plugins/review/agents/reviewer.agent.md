@@ -1,6 +1,6 @@
 ---
 description: Review specialist for TODO-driven, question-driven, and future-improvement reviews.
-model: GPT-5.3-Codex
+model: claude-haiku-4.5
 tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles']
 ---
 

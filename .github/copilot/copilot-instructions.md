@@ -177,6 +177,13 @@ Before finalizing generated changes:
 - Verify duplicate or restated guidance has been removed.
 - Verify plugin assets do not depend on another plugin for required functionality.
 
+## Session Lifecycle
+
+- Compact when input tokens exceed ~50K (check with `/usage`). Do not wait for slowdown — by then 10+ bloated turns have already been paid for.
+- Open a new session at logical task milestones rather than continuing. Starting fresh is free; carrying 80K tokens of stale history is not.
+- For codebase investigation tasks (e.g. "find all ADRs referencing X"), delegate to an explore subagent so its reads stay out of main context.
+- For review, proposal, and documentation sessions, prefer `claude-haiku-4.5` unless the task requires code reasoning.
+
 ## Project-Specific Guidance
 
 - Prefer consistency with existing repository conventions over generic external best practices.

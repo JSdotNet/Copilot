@@ -1,6 +1,6 @@
 ---
 description: Copilot assistant for writing and maintaining documentation artifacts (How-To, Explanations, Blog/Articles, Proposals, and Ideas).
-model: auto
+model: claude-haiku-4.5
 tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles']
 ---
 
