@@ -25,8 +25,12 @@ instructions: |-
   ### Pull Requests
 
   Do not create a pull request unless the user explicitly requests it.
-  When a pull request is requested, use the currently authenticated JSdotNet-authorized
-  account. If the required organisation authorisation is unavailable, stop and ask the user.
+  When a pull request is requested, prefer the `JSdotNet` GitHub account for GitHub CLI
+  and API operations, and switch to that account before creating the pull request when it
+  is available locally.
+  Prefer same-repository branches over fork creation when the branch is already pushed to
+  `JSdotNet/Copilot`.
+  If the required organisation authorisation is unavailable, stop and ask the user.
 
 automation:
   auto_issue_session: false
