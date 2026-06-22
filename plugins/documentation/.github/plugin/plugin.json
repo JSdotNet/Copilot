@@ -1,7 +1,7 @@
 {
   "name": "documentation",
-  "version": "0.1.0",
-  "description": "Write and maintain How-To guides, Explanations, Articles, Ideas, and Proposals using GitHub Copilot.",
+  "version": "0.2.0",
+  "description": "Write and maintain documentation artifacts and profile content using GitHub Copilot.",
   "agents": "agents/",
   "skills": "skills/"
 }
