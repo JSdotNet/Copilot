@@ -18,6 +18,7 @@ A focused, single-agent plugin for writing, reviewing, optimizing, and testing C
   - `skills/microsoft-code-reference/SKILL.md`
   - `skills/feature-proposal/SKILL.md`
   - `skills/delegate-to-coding/SKILL.md`
+  - `skills/sync/SKILL.md`
   - `skills/azure/SKILL.md`
   - `skills/aspire/SKILL.md`
   - `skills/open-telemetry/SKILL.md`
