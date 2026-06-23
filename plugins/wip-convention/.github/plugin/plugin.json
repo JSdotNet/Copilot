@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Encapsulates the .wip folder convention for storing work-in-progress artifacts. Provides skills and instructions to align agents with the .wip workflow.",
   "skills": "skills/",
+  "hooks": "hooks.json",
   "keywords": [
     "wip",
     "work-in-progress",

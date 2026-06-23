@@ -27,6 +27,7 @@ Covers six documentation artifact types and three profile artifact types.
 | Skill | `skills/create-github-profile` | Guided GitHub profile creation workflow |
 | Skill | `skills/create-project-profile` | Guided GitHub project profile workflow |
 | Skill | `skills/create-linkedin-profile` | Guided LinkedIn profile workflow |
+| Hooks | `hooks.json` | Session-start artifact structure guardrail prompt |
 
 ## Installation
 

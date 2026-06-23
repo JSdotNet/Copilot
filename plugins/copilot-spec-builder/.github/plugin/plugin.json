@@ -8,5 +8,6 @@
   "license": "UNLICENSED",
   "keywords": ["copilot", "github", "agent", "instruction", "plugin", "skill", "markdown"],
   "agents": "agents/",
-  "skills": "skills/"
+  "skills": "skills/",
+  "hooks": "hooks.json"
 }

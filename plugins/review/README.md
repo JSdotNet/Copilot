@@ -10,6 +10,8 @@ Installable GitHub Copilot CLI plugin for structured review workflows.
   - `skills/todo-review/SKILL.md`
   - `skills/question-review/SKILL.md`
   - `skills/suggestion-review/SKILL.md`
+- Hooks:
+  - `hooks.json` (session-start finding quality guardrail prompt)
 
 ## Scope
 

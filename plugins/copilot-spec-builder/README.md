@@ -25,6 +25,8 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
   - `instructions/authoring/create-skill.instructions.md`
 - Resources:
   - `resources/quick-reference.md`
+- Hooks:
+  - `hooks.json` (session-start authoring quality guardrail prompt)
 
 ## Scope
 

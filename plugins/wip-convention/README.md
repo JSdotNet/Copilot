@@ -40,6 +40,10 @@ Directs agents to use the `.wip` folder convention correctly.
 | `wip-proposals.instructions.md` | `.wip/proposals/*.md` | Proposal quality standards |
 | `wip-confidence.instructions.md` | `.wip/work/**/*.md` | 97% confidence threshold |
 
+### Hook configuration
+
+- `hooks.json` adds a session-start guardrail prompt to keep artifact placement aligned with the `.wip` convention.
+
 ## Folder Structure
 
 After using this convention, your repository will have:
