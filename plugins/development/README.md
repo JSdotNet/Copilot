@@ -5,14 +5,9 @@ Installable GitHub Copilot CLI plugin for development planning and execution wor
 ## Includes
 
 - Agents:
-  - `agents/development-plan.agent.md`
   - `agents/developer.agent.md`
-  - `agents/backend.agent.md`
-  - `agents/frontend.agent.md`
-  - `agents/naming.agent.md`
-  - `agents/security.agent.md`
-  - `agents/testing.agent.md`
 - Skills:
+  - `skills/use-developer/SKILL.md`
   - `skills/aspire/SKILL.md`
   - `skills/microsoft-code-reference/SKILL.md`
   - `skills/nuget-manager/SKILL.md`
@@ -33,6 +28,11 @@ Installable GitHub Copilot CLI plugin for development planning and execution wor
 
 - Architecture assets are now maintained in `plugins/architecture`.
 - Install `plugins/architecture` when you need architecture-specific handoffs from `development-plan.agent.md`.
+
+## Agent Visibility
+
+- Only `developer` is publicly exposed by this plugin.
+- Specialist agents under `agents-internal/` are internal implementation assets and are not exposed directly.
 
 ## Install
 

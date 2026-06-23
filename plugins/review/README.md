@@ -7,6 +7,7 @@ Installable GitHub Copilot CLI plugin for structured review workflows.
 - Agent:
   - `agents/reviewer.agent.md`
 - Skills:
+  - `skills/use-reviewer/SKILL.md`
   - `skills/todo-review/SKILL.md`
   - `skills/question-review/SKILL.md`
   - `skills/suggestion-review/SKILL.md`
