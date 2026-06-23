@@ -1,13 +1,13 @@
 ---
 name: orch-project-setup
-description: 'Orchestrate .github setup and project scaffolding with Aspire integration. Use this skill to initialize development environment, setup GitHub workflows, create project structure with Aspire AppHost, and establish coding standards for existing repositories.'
+description: 'Orchestrate .github setup and project scaffolding with Aspire integration and validation. Use this skill to initialize development environment, setup GitHub workflows, create project structure with Aspire AppHost, validate compilation/testing, and establish coding standards for existing repositories.'
 ---
 
 # Orchestrate Project Setup
 
-Automate the complete project setup workflow for existing repositories using GitHub Copilot App canvas interface.
+Automate the complete project setup workflow for existing repositories using GitHub Copilot App canvas interface, including automated validation and testing.
 
-> **Note:** This skill assumes your repository already exists. It focuses on setting up the development infrastructure, guidelines, and initial scaffolding.
+> **Note:** This skill assumes your repository already exists. It focuses on setting up the development infrastructure, guidelines, and initial scaffolding with built-in validation.
 
 ## Workflow Stages
 
@@ -42,45 +42,67 @@ Automate the complete project setup workflow for existing repositories using Git
 
 **Agents:** `csharp-coding:coding`, `development:developer`
 
-### Stage 4: Aspire Scaffolding
+### Stage 4: Aspire AppHost & Project Scaffolding
+**Combined Stage** — Stages 4 & 5 merged (they are interdependent)
+
+#### Part A: Aspire AppHost Creation
 - **Create AppHost project** for service orchestration
 - **Add integrations** based on project type
 - **Wire up service discovery** and health checks
 - **Configure dashboard** for local development
-- **Create example service** demonstrating patterns
 - **Setup environment configuration** for development/staging/production
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
-**Skills Used:** `aspire` skill from development plugin
-
-### Stage 5: Initial Project Structure
-- **Create project directories** (src/, tests/, docs/)
+#### Part B: Initial Project Structure & Services
+- **Create project directories** (src/, services/, tests/, docs/)
+- **Create example service** demonstrating patterns
+- **Wire service to AppHost** with health checks and references
 - **Generate boilerplate code** (entry points, core types, AppHost references)
 - **Set up testing framework** (xUnit, NUnit, etc.)
 - **Create first unit tests** as examples
 - **Setup test data fixtures**
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Rationale:** AppHost and initial services are tightly coupled. The example service references the AppHost configuration, service discovery setup, and health checks created in the AppHost project. Separating them would create circular dependencies.
 
-### Stage 6: Team Onboarding
-- **Create local development setup guide**
-- **Generate Aspire quick-start** (how to run AppHost)
-- **Document environment setup** (required tools, SDKs)
-- **Create troubleshooting guide**
-- **Generate plugin setup instructions** for Copilot
+**Agents:** `csharp-coding:coding`, `development:developer`  
+**Skills Used:** `aspire` skill from development plugin
 
-**Agents:** `documentation:documentation`, `product-owner:product-owner`
+### Stage 5: Validation & Verification
+**NEW STAGE** — Ensure project is ready for development
+
+- **Compile all projects** to verify no build errors
+- **Run unit test suite** to verify test framework works
+- **Execute integration tests** against AppHost
+- **Start Aspire AppHost** (`aspire run`)
+- **Verify dashboard** is accessible and services are running
+- **Check health endpoints** of all services
+- **Validate database connectivity** (if applicable)
+- **Run smoke tests** against running application
+- **Generate validation report** with results and recommendations
+
+**Validation Checklist:**
+- [ ] All projects compile without errors
+- [ ] Unit tests pass (>0% coverage established)
+- [ ] Integration tests execute successfully
+- [ ] AppHost starts without errors
+- [ ] Dashboard is accessible (default: localhost:18888)
+- [ ] All services report healthy status
+- [ ] Database connections working
+- [ ] API endpoints respond correctly
+- [ ] Logs show expected output
+
+**Agents:** `csharp-coding:coding`, `development:developer`  
+**Output:** Validation report showing status, any issues, and next steps
 
 ## Usage Pattern
 
 ```
 Orchestrate project setup for:
 - Repository: "MyAwesomeAPI" (already exists on GitHub)
-- Type: "ASP.NET Core API"
+- Type: "ASP.NET Core API with Aspire"
 - Language: C#
-- Aspire services: API, Database, Cache, Queue
-- Include development guides and troubleshooting
+- Aspire services: API, Database, Cache, Worker
 - Setup GitHub workflows and branch protection
+- Validate compilation and running application
 ```
 
 ## Canvas Interface
@@ -91,15 +113,22 @@ This skill opens a **project setup canvas** in GitHub Copilot App showing:
 - **Checklist** of setup tasks
 - **Generated files preview** (.github structure, guidelines, scaffolding)
 - **Configuration options** (Aspire services, integrations, tooling)
-- **Action buttons** to generate, preview, or apply changes
+- **Validation status** during Stage 5 (real-time console output)
+- **Health indicators** for each component:
+  - Build status (compiling...)
+  - Test status (running tests...)
+  - Application status (running AppHost...)
+  - Service health (checking endpoints...)
+- **Action buttons** to generate, preview, apply, or re-validate
+- **Validation report** with detailed results
 
 ## Integration Points
 
 - **Development Plugin**: Coordinate with `development-plan` agent
 - **Architecture Plugin**: Generate arc42 blueprints
 - **Documentation Plugin**: Create project documentation
-- **Product Owner Plugin**: Setup issue templates and backlog
 - **project-guideline-MCP**: Generate project-specific guidelines
+- **csharp-coding Plugin**: Implementation and validation
 - **GitHub Copilot App**: Canvas-based workflow orchestration
 
 ## Key Benefits
@@ -107,8 +136,46 @@ This skill opens a **project setup canvas** in GitHub Copilot App showing:
 - **No manual setup** - Automated .github folder creation
 - **Guideline-driven** - Uses project-guideline-MCP for consistent standards
 - **Aspire-ready** - Immediate support for distributed applications
-- **Team-aligned** - Enforces organization standards from day one
-- **Visible progress** - Canvas shows what's being created and why
+- **Integrated services** - AppHost and initial services created together
+- **Validated setup** - Automatic verification that everything compiles and runs
+- **Visible progress** - Canvas shows real-time status during validation
+- **Ready to develop** - After completion, developers can immediately start coding
+
+## Validation Stage Details
+
+The **Stage 5: Validation** is critical for ensuring the project is ready:
+
+### Build Validation
+```
+✓ Compile AppHost project
+✓ Compile all service projects
+✓ Compile test projects
+✓ Resolve all NuGet dependencies
+```
+
+### Test Validation
+```
+✓ Run unit tests (establish baseline)
+✓ Run integration tests against AppHost
+✓ Verify test framework is working
+```
+
+### Application Validation
+```
+✓ Start Aspire AppHost: aspire run
+✓ Wait for dashboard initialization
+✓ Check all services started successfully
+✓ Verify health endpoints responsive
+✓ Test database connectivity (if configured)
+✓ Run smoke tests against API endpoints
+```
+
+### Failure Handling
+If validation fails, the canvas displays:
+- Specific error messages
+- Which stage failed
+- Suggested fixes
+- Option to re-run validation after fixes
 
 ## Reference
 
