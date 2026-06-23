@@ -13,6 +13,8 @@ Installable GitHub Copilot CLI plugin for development planning and execution wor
   - `skills/nuget-manager/SKILL.md`
   - `skills/refactor/SKILL.md`
   - `skills/refactor-plan/SKILL.md`
+- Hooks:
+  - `hooks.json` (session-start implementation plan completeness guardrail prompt)
 - Instructions:
   - `instructions/copilot-instructions.md`
   - `instructions/agent/agent-handoff.instructions.md`

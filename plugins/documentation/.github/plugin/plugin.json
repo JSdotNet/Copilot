@@ -3,5 +3,6 @@
   "version": "0.2.0",
   "description": "Write and maintain documentation artifacts, infographics, and profile content using GitHub Copilot.",
   "agents": "agents/",
-  "skills": "skills/"
+  "skills": "skills/",
+  "hooks": "hooks.json"
 }
