@@ -54,23 +54,14 @@ Execute a complete feature development workflow from backlog to production using
 
 **Agents:** `review:reviewer`, `csharp-coding:coding`
 
-### Stage 6: Documentation
-- **Update API documentation** (OpenAPI/Swagger)
-- **Write user-facing documentation**
-- **Create changelog entry**
-- **Update runbooks** if operational changes
-- **Record architectural decisions** (ADR if needed)
+### Stage 6: E2E Validation & Result Recording
+- **Prepare end-to-end test scenarios** from acceptance criteria
+- **Execute E2E test suite** against integrated feature flow
+- **Capture evidence** (logs, screenshots, and run metadata)
+- **Record validation result** with pass/fail status per scenario
+- **Publish validation summary** for release decision input
 
-**Agents:** `documentation:documentation`, `development:developer`
-
-### Stage 7: Deployment & Release
-- **Merge to main/develop** branch
-- **Deploy to staging** environment
-- **Run smoke tests** on staging
-- **Deploy to production** (with approval)
-- **Monitor metrics** and error rates
-
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `development:testing`, `csharp-coding:coding`, `review:reviewer`
 
 ## Usage Pattern
 
@@ -92,13 +83,10 @@ Orchestrate feature development for:
 - [ ] Unit tests written (>80% coverage)
 - [ ] Integration tests passing
 - [ ] Security scanning passed
-- [ ] Documentation updated
-- [ ] Changelog entry created
-- [ ] PR merged to main branch
-- [ ] Deployed to staging
-- [ ] Approved for production
-- [ ] Deployed to production
-- [ ] Monitored for 24 hours
+- [ ] E2E test scenarios defined from acceptance criteria
+- [ ] E2E validation executed successfully
+- [ ] E2E run evidence captured (logs/screenshots)
+- [ ] Validation result recorded and shared
 
 ## Canvas Interface
 
@@ -109,9 +97,10 @@ This skill opens a **feature development canvas** in GitHub Copilot App showing:
 - **Definition of Done** interactive checklist
 - **Code review status** with comment threads
 - **Test coverage** visualization
+- **E2E validation panel** with scenario-level pass/fail status
+- **Result recording section** for logs, screenshots, and final verdict
 - **Integration buttons** to switch to `csharp-coding:coding` agent for implementation
-- **Deployment gates** and approval workflow
-- **Release notes** generator
+- **Validation export** for stakeholder sign-off
 
 ## Integration Points
 
@@ -119,7 +108,6 @@ This skill opens a **feature development canvas** in GitHub Copilot App showing:
 - **Development Plugin**: Plan and execute implementation
 - **Architecture Plugin**: Design and ADR documentation
 - **csharp-coding Plugin**: Switch to coding agent for implementation and testing
-- **Documentation Plugin**: API and user documentation
 - **GitHub Copilot App**: Canvas-based feature status tracking
 
 ## Reference

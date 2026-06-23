@@ -11,6 +11,7 @@ This plugin provides specialized skills for GitHub Copilot App users who need to
    - Project setup with .github folder initialization
    - MVP creation and sprint planning
    - Package/dependency updates with security scanning
+   - Aspire upgrade orchestration with plan refinement and feature adoption
    - Feature development lifecycle management
    - Bug triage with test-driven development (TDD)
 
@@ -24,6 +25,7 @@ Each orchestration skill opens an interactive canvas in GitHub Copilot App and c
 - `skills/orch-project-setup/SKILL.md` - Setup .github folder, guidelines, and Aspire scaffolding
 - `skills/orch-create-mvp/SKILL.md` - MVP development from planning to deployment (canvas)
 - `skills/orch-update-packages/SKILL.md` - Safe, coordinated dependency updates (canvas)
+- `skills/orch-aspire-update/SKILL.md` - Plan-first Aspire upgrade and new feature adoption (canvas)
 - `skills/orch-feature/SKILL.md` - Feature development lifecycle management (canvas)
 - `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow (canvas)
 
@@ -38,7 +40,7 @@ copilot plugin list
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- In the command palette: `orch-project-setup`, `orch-create-mvp`, `orch-feature`, `orch-bug`
+- In the command palette: `orch-project-setup`, `orch-create-mvp`, `orch-aspire-update`, `orch-feature`, `orch-bug`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -115,6 +117,18 @@ Invoke: orch-update-packages
 - Deployment: Staging → Production
 ```
 
+### Orchestrate Aspire Update
+
+```
+Invoke: orch-aspire-update
+- Project: "Orders.Platform"
+- Current Aspire: 9.x
+- Target Aspire: latest supported
+- Refine update plan before implementation
+- Enable selected new Aspire features after upgrade
+- Record validation evidence and summary
+```
+
 ### Orchestrate Feature Development
 
 ```
@@ -154,16 +168,13 @@ copilot-app plugin
 
 ## Workflow Coordination Model
 
-Each orchestration skill with canvas:
+Each orchestration skill with canvas follows a staged workflow tailored to the scenario (project setup, MVP, feature, package updates, or bug fix):
 
 1. **Opens canvas interface** in GitHub Copilot App
-2. **Planning stage** - Define scope and approach
-3. **Design stage** - Architecture and design decisions
-4. **Implementation stage** - Code creation with agent handoff to csharp-coding
-5. **Testing stage** - Quality assurance and validation
-6. **Review stage** - Peer and security review
-7. **Documentation** - Update docs, changelog, guides
-8. **Deployment** - Release to production with monitoring
+2. **Planning and design stages** - Define scope, architecture, and risks
+3. **Implementation stage** - Code creation with agent handoff to `csharp-coding:coding`
+4. **Validation stages** - Unit, integration, and where applicable E2E validation with recorded outcomes
+5. **Quality and handoff stage** - Review readiness and next-step orchestration
 
 Agent selection per stage is automated based on the task context.
 
@@ -171,6 +182,7 @@ Agent selection per stage is automated based on the task context.
 
 The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-project-setup` uses the `aspire` skill from the development plugin
+- `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
 - All orchestration skills can invoke specialized agents and their associated skills
 - Canvas interfaces provide easy integration points for skill composition

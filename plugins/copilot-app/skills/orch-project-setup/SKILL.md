@@ -30,7 +30,7 @@ Automate the complete project setup workflow for existing repositories using Git
 - **Create architecture documentation** (arc42 blueprint if applicable)
 - **Document development guidelines** and coding standards
 - **Set up copilot-instructions.md** for consistency
-- **Generate CONTRIBUTING.md** for team collaboration
+- **Generate CONTRIBUTING.md** for single-maintainer workflow
 
 **Agents:** `documentation:documentation`, `architecture:architect`
 
@@ -66,18 +66,21 @@ Automate the complete project setup workflow for existing repositories using Git
 **Agents:** `csharp-coding:coding`, `development:developer`  
 **Skills Used:** `aspire` skill from development plugin
 
-### Stage 5: Validation & Verification
+### Stage 5: Build & Test Validation
 **NEW STAGE** — Ensure project is ready for development
 
 - **Compile all projects** to verify no build errors
 - **Run unit test suite** to verify test framework works
 - **Execute integration tests** against AppHost
-- **Start Aspire AppHost** (`aspire run`)
+
+### Stage 6: Running Application Validation & Recording
+- **Start Aspire AppHost** (`aspire run`) and confirm startup stability
 - **Verify dashboard** is accessible and services are running
 - **Check health endpoints** of all services
 - **Validate database connectivity** (if applicable)
-- **Run smoke tests** against running application
-- **Generate validation report** with results and recommendations
+- **Run smoke tests** against the running application
+- **Record validation evidence** (runtime logs, endpoint results, screenshots)
+- **Generate runtime validation report** with pass/fail outcomes and recommendations
 
 **Validation Checklist:**
 - [ ] All projects compile without errors
@@ -89,9 +92,10 @@ Automate the complete project setup workflow for existing repositories using Git
 - [ ] Database connections working
 - [ ] API endpoints respond correctly
 - [ ] Logs show expected output
+- [ ] Runtime validation evidence recorded and attached to report
 
 **Agents:** `csharp-coding:coding`, `development:developer`  
-**Output:** Validation report showing status, any issues, and next steps
+**Output:** Build/test validation report plus runtime validation recording report
 
 ## Usage Pattern
 
@@ -113,11 +117,12 @@ This skill opens a **project setup canvas** in GitHub Copilot App showing:
 - **Checklist** of setup tasks
 - **Generated files preview** (.github structure, guidelines, scaffolding)
 - **Configuration options** (Aspire services, integrations, tooling)
-- **Validation status** during Stage 5 (real-time console output)
+- **Validation status** during Stage 5 and Stage 6 (real-time console output)
 - **Health indicators** for each component:
   - Build status (compiling...)
   - Test status (running tests...)
   - Application status (running AppHost...)
+  - Recording status (collecting validation evidence...)
   - Service health (checking endpoints...)
 - **Action buttons** to generate, preview, apply, or re-validate
 - **Validation report** with detailed results
