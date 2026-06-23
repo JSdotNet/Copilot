@@ -1,0 +1,147 @@
+---
+name: orch-bug
+description: 'Orchestrate bug resolution workflow from triage through deployment using GitHub Copilot App canvas. Manages bug lifecycle including reproduction, root cause analysis, TDD fix implementation (test first), verification, and production deployment. Prioritizes speed for critical issues with automated handoffs to csharp-coding for TDD.'
+---
+
+# Orchestrate Bug Resolution
+
+Execute a complete bug fix workflow from identification through production deployment using test-driven development (TDD) approach.
+
+## Workflow Stages
+
+### Stage 1: Bug Triage & Analysis
+- **Reproduce the bug** following provided steps
+- **Determine severity** and impact assessment
+- **Identify affected versions** and users
+- **Create detailed bug report** with logs/traces
+- **Assign priority** (critical, high, medium, low)
+
+**Agents:** `product-owner:product-owner`, `development:developer`, `review:reviewer`
+
+### Stage 2: Root Cause Analysis
+- **Debug issue** using logs and diagnostics
+- **Identify root cause** in codebase
+- **Check for related bugs** (similar patterns)
+- **Document findings** for the fix
+- **Create minimal reproduction case**
+
+**Agents:** `csharp-coding:coding`, `development:developer`
+
+### Stage 3: Fix Implementation (TDD Approach)
+- **Create failing test first** that reproduces the bug
+- **Write test case** that fails with current code
+- **Implement minimal fix** addressing root cause
+- **Make test pass** with the fix
+- **Add regression tests** to prevent recurrence
+- **Refactor** if needed for code quality
+- **Verify fix** doesn't break other functionality
+
+**Agents:** `csharp-coding:coding` (switch to coding agent for TDD implementation)
+
+### Stage 4: Testing & Verification
+- **Run unit tests** including new regression test
+- **Perform integration testing** on affected features
+- **Test edge cases** and boundary conditions
+- **Verify fix** in reproduction environment
+- **Check for side effects**
+
+**Agents:** `development:testing`, `csharp-coding:coding`
+
+### Stage 5: Code Review & Security
+- **Submit PR for urgent review** (critical bugs)
+- **Address review feedback** immediately
+- **Run security scanning** for vulnerability checks
+- **Verify all automated checks** pass
+- **Approve for immediate merge** (critical) or normal review
+
+**Agents:** `review:reviewer`, `csharp-coding:coding`
+
+### Stage 6: Documentation & Communication
+- **Update changelog** with bug fix details
+- **Document workaround** if applicable
+- **Create incident post-mortem** (for critical bugs)
+- **Update documentation** if behavior changed
+- **Notify affected users** (if applicable)
+
+**Agents:** `documentation:documentation`, `product-owner:product-owner`
+
+### Stage 7: Deployment & Monitoring
+- **Merge PR** (immediately for critical)
+- **Build and create patch release** if needed
+- **Deploy to production** (expedited for critical)
+- **Monitor closely** for 24+ hours post-deployment
+- **Collect feedback** from users
+
+**Agents:** `csharp-coding:coding`, `development:developer`
+
+## Severity Levels & Response Times
+
+| Severity | Description | Response | Deploy |
+|----------|-------------|----------|--------|
+| Critical | System down, data loss, security | Immediate | ASAP |
+| High | Major feature broken, significant impact | 2-4 hours | Same day |
+| Medium | Feature degraded, workaround exists | 1-2 days | Next release |
+| Low | Minor issue, cosmetic, edge case | 1 week | Normal cycle |
+
+## Usage Pattern
+
+```
+Orchestrate bug fix for:
+- Bug: "Login fails with special characters in password"
+- Severity: High (affects 5% of users)
+- Affected versions: 2.1.0, 2.1.1
+- Root cause: Insufficient input sanitization
+- Fix type: Hotfix
+- Deploy target: Production (same day)
+```
+
+## Critical Bug Hotfix Process
+
+```
+1. Branch: hotfix/bug-id (from latest production tag)
+2. Fix: Minimal changes, test thoroughly
+3. PR: Immediate review (no waiting)
+4. Merge: Direct to main and develop
+5. Release: Create v2.1.2-hotfix
+6. Deploy: To production immediately
+7. Monitor: Intensive for 24 hours
+```
+
+## Canvas Interface
+
+This skill opens a **bug resolution canvas** in GitHub Copilot App showing:
+
+- **Bug triage panel** with severity and priority assessment
+- **Root cause investigation** workspace with logs and traces
+- **Test-driven fix workflow** showing:
+  - Failing test creation
+  - Fix implementation progress
+  - Test passing confirmation
+  - Regression test coverage
+- **Integration buttons** to switch to `csharp-coding:coding` agent for TDD
+- **Hotfix fast-track** for critical bugs
+- **Deployment gates** and monitoring dashboard
+- **Communication timeline** for stakeholders
+
+## TDD Workflow Visualization
+
+```
+Canvas displays the TDD cycle:
+1. [Red] Write failing test that reproduces bug
+2. [Green] Implement minimal fix to make test pass  
+3. [Refactor] Clean up code while tests stay green
+4. [Verify] Add regression tests for long-term prevention
+```
+
+## Integration Points
+
+- **Product Owner Plugin**: Bug reporting and triage
+- **Development Plugin**: Root cause analysis and planning
+- **csharp-coding Plugin**: Switch to coding agent for TDD implementation
+- **Review Plugin**: Quality and security validation
+- **GitHub Copilot App**: Canvas-based bug tracking and deployment orchestration
+- **GitHub Issues**: Bug tracking and stakeholder communication
+
+## Reference
+
+Source skill location: `plugins/copilot-app/skills/orch-bug/SKILL.md`
