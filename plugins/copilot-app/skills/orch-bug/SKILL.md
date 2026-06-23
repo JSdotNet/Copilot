@@ -1,11 +1,11 @@
 ---
-name: orchestrate-bug
-description: 'Orchestrate bug resolution workflow from triage through deployment. Use this skill to manage bug lifecycle including reproduction, root cause analysis, fix implementation, verification, and production deployment. Prioritizes speed for critical issues and quality for all fixes.'
+name: orch-bug
+description: 'Orchestrate bug resolution workflow from triage through deployment using GitHub Copilot App canvas. Manages bug lifecycle including reproduction, root cause analysis, TDD fix implementation (test first), verification, and production deployment. Prioritizes speed for critical issues with automated handoffs to csharp-coding for TDD.'
 ---
 
 # Orchestrate Bug Resolution
 
-Execute a complete bug fix workflow from identification through production deployment.
+Execute a complete bug fix workflow from identification through production deployment using test-driven development (TDD) approach.
 
 ## Workflow Stages
 
@@ -27,14 +27,16 @@ Execute a complete bug fix workflow from identification through production deplo
 
 **Agents:** `csharp-coding:coding`, `development:developer`
 
-### Stage 3: Fix Implementation
-- **Create hotfix branch** (for critical issues)
+### Stage 3: Fix Implementation (TDD Approach)
+- **Create failing test first** that reproduces the bug
+- **Write test case** that fails with current code
 - **Implement minimal fix** addressing root cause
-- **Add regression test** to prevent recurrence
-- **Validate fix** doesn't break other functionality
-- **Consider performance impact**
+- **Make test pass** with the fix
+- **Add regression tests** to prevent recurrence
+- **Refactor** if needed for code quality
+- **Verify fix** doesn't break other functionality
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding` (switch to coding agent for TDD implementation)
 
 ### Stage 4: Testing & Verification
 - **Run unit tests** including new regression test
@@ -105,15 +107,41 @@ Orchestrate bug fix for:
 7. Monitor: Intensive for 24 hours
 ```
 
+## Canvas Interface
+
+This skill opens a **bug resolution canvas** in GitHub Copilot App showing:
+
+- **Bug triage panel** with severity and priority assessment
+- **Root cause investigation** workspace with logs and traces
+- **Test-driven fix workflow** showing:
+  - Failing test creation
+  - Fix implementation progress
+  - Test passing confirmation
+  - Regression test coverage
+- **Integration buttons** to switch to `csharp-coding:coding` agent for TDD
+- **Hotfix fast-track** for critical bugs
+- **Deployment gates** and monitoring dashboard
+- **Communication timeline** for stakeholders
+
+## TDD Workflow Visualization
+
+```
+Canvas displays the TDD cycle:
+1. [Red] Write failing test that reproduces bug
+2. [Green] Implement minimal fix to make test pass  
+3. [Refactor] Clean up code while tests stay green
+4. [Verify] Add regression tests for long-term prevention
+```
+
 ## Integration Points
 
 - **Product Owner Plugin**: Bug reporting and triage
 - **Development Plugin**: Root cause analysis and planning
-- **C# Coding Plugin**: Fix implementation and testing
+- **csharp-coding Plugin**: Switch to coding agent for TDD implementation
 - **Review Plugin**: Quality and security validation
-- **GitHub Copilot App**: Bug status and deployment tracking
-- **GitHub Issues**: Bug tracking and communication
+- **GitHub Copilot App**: Canvas-based bug tracking and deployment orchestration
+- **GitHub Issues**: Bug tracking and stakeholder communication
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orchestrate-bug/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-bug/SKILL.md`

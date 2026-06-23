@@ -1,11 +1,11 @@
 ---
-name: orchestrate-update-packages
-description: 'Orchestrate dependency and package update workflows. Use this skill to coordinate safe, automated updates of NuGet packages, npm modules, SDKs, and tools across projects. Includes security scanning, compatibility testing, and release management stages.'
+name: orch-update-packages
+description: 'Orchestrate dependency and package update workflows using GitHub Copilot App canvas. Coordinates safe, automated updates of NuGet packages, npm modules, SDKs, and tools across projects. Includes security scanning, compatibility testing, and release management with agent handoffs to csharp-coding for implementation.'
 ---
 
 # Orchestrate Update Packages
 
-Execute a complete package update workflow with validation, testing, and deployment.
+Execute a complete package update workflow with validation, testing, and deployment using canvas interface.
 
 ## Workflow Stages
 
@@ -87,14 +87,26 @@ Orchestrate package updates for:
 | Minor versions | Medium | Full suite | Staged |
 | Major versions | Low | Extended | Careful review |
 
+## Canvas Interface
+
+This skill opens a **package update canvas** in GitHub Copilot App showing:
+
+- **Dependency scan results** with CVE severity levels
+- **Update recommendations** grouped by category and priority
+- **Compatibility impact** analysis for breaking changes
+- **Test coverage** visualization pre- and post-update
+- **Integration buttons** to switch to `csharp-coding:coding` agent for testing
+- **Deployment timeline** with staging and production gates
+- **Rollback plan** quick reference
+
 ## Integration Points
 
 - **Development Plugin**: Use `nuget-manager` and package update skills
-- **C# Coding Plugin**: Code review for compatibility issues
+- **C# Coding Plugin**: Switch to coding agent for implementation and testing
 - **Review Plugin**: Security and quality validation
 - **Architecture Plugin**: Impact analysis on system design
-- **GitHub Copilot App**: Progress tracking and notifications
+- **GitHub Copilot App**: Canvas-based workflow orchestration and notifications
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orchestrate-update-packages/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-update-packages/SKILL.md`

@@ -1,17 +1,17 @@
 ---
-name: create-pr-jsdotnet
-description: 'Create a GitHub Pull Request with JSdotNet account. Use this skill when you need to create a PR for the JSdotNet/Copilot repository with proper title, description, labels, and branch naming conventions. This skill integrates with the GitHub Copilot App to streamline PR creation workflows.'
+name: pr-jsdotnet
+description: 'Create a GitHub Pull Request in any JSdotNet repository. Use this skill when you need to create a PR with JSdotNet account credentials, proper title, description, labels, and branch naming conventions. Integrates with GitHub Copilot App to streamline PR workflows across all JSdotNet organization repositories.'
 ---
 
-# Create PR with JSdotNet Account
+# Create PR in JSdotNet Repositories
 
-Create a GitHub Pull Request using the JSdotNet account integration.
+Create a GitHub Pull Request in any JSdotNet organization repository using native GitHub Copilot App interface.
 
 ## Prerequisites
 
 - GitHub Copilot App authenticated with JSdotNet account access
 - Feature branch already created and committed with changes
-- Repository context: `JSdotNet/Copilot`
+- Target repository: Any repo in JSdotNet organization (e.g., JSdotNet/Copilot, JSdotNet/Awesome, etc.)
 
 ## Key Features
 
@@ -56,7 +56,8 @@ Create a PR to fix the issue:
 - **Copilot CLI**: Sync PR information to session context
 - **Development plugin**: Coordinate with `create-pull-request` function
 - **Product Owner plugin**: Use with GitHub Issues workflow
+- **Any JSdotNet repository**: Works across all JSdotNet organization repos
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/create-pr-jsdotnet/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/pr-jsdotnet/SKILL.md`

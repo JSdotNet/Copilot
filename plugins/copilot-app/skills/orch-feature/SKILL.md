@@ -1,11 +1,11 @@
 ---
-name: orchestrate-feature
-description: 'Orchestrate feature development from conception through production deployment. Use this skill to manage the complete feature lifecycle including planning, design, implementation, testing, documentation, and release. Coordinates multiple agents and plugins for cohesive workflows.'
+name: orch-feature
+description: 'Orchestrate feature development from conception through production deployment using GitHub Copilot App canvas. Manages the complete feature lifecycle including planning, design, implementation, testing, documentation, and release. Coordinates multiple agents with automation handoffs to csharp-coding for development.'
 ---
 
 # Orchestrate Feature Development
 
-Execute a complete feature development workflow from backlog to production.
+Execute a complete feature development workflow from backlog to production using canvas interface.
 
 ## Workflow Stages
 
@@ -100,15 +100,28 @@ Orchestrate feature development for:
 - [ ] Deployed to production
 - [ ] Monitored for 24 hours
 
+## Canvas Interface
+
+This skill opens a **feature development canvas** in GitHub Copilot App showing:
+
+- **Feature specification** with acceptance criteria
+- **Development progress** tracking each stage
+- **Definition of Done** interactive checklist
+- **Code review status** with comment threads
+- **Test coverage** visualization
+- **Integration buttons** to switch to `csharp-coding:coding` agent for implementation
+- **Deployment gates** and approval workflow
+- **Release notes** generator
+
 ## Integration Points
 
 - **Product Owner Plugin**: Create and manage user stories
 - **Development Plugin**: Plan and execute implementation
 - **Architecture Plugin**: Design and ADR documentation
-- **C# Coding Plugin**: Implementation and code review
+- **csharp-coding Plugin**: Switch to coding agent for implementation and testing
 - **Documentation Plugin**: API and user documentation
-- **GitHub Copilot App**: Feature status tracking
+- **GitHub Copilot App**: Canvas-based feature status tracking
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orchestrate-feature/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-feature/SKILL.md`

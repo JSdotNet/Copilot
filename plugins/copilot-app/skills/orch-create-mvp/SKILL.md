@@ -1,11 +1,11 @@
 ---
-name: orchestrate-create-mvp
-description: 'Orchestrate Minimum Viable Product (MVP) creation workflow. Use this skill to coordinate rapid development of core features across planning, implementation, testing, and deployment stages. Integrates development, product-owner, and architecture plugins with automated agent handoffs.'
+name: orch-create-mvp
+description: 'Orchestrate Minimum Viable Product (MVP) creation using GitHub Copilot App canvas. Coordinates rapid development of core features across planning, implementation, testing, and deployment stages. Integrates development, product-owner, architecture, and csharp-coding plugins with automated agent handoffs.'
 ---
 
 # Orchestrate Create MVP
 
-Execute a complete MVP development workflow from planning through deployment using coordinated agents.
+Execute a complete MVP development workflow from planning through deployment using coordinated agents and canvas interface.
 
 ## Workflow Stages
 
@@ -91,14 +91,26 @@ Epic: "Reporting Engine MVP"
     └── Story: Report delivery email
 ```
 
+## Canvas Interface
+
+This skill opens an **MVP development canvas** in GitHub Copilot App showing:
+
+- **MVP roadmap** with feature breakdown and timeline
+- **Sprint planner** showing task allocation and dependencies
+- **Progress dashboard** tracking completion across stages
+- **Team collaboration** panel for assignments and comments
+- **Integration buttons** to switch to `csharp-coding:coding` agent for implementation
+- **Status indicators** for each component (planning, in-progress, testing, deployed)
+
 ## Integration Points
 
 - **Development Plugin**: Coordinate MVP planning with `development-plan` agent
 - **Product Owner Plugin**: Create stories and manage backlog
 - **Architecture Plugin**: Design MVP architecture
-- **GitHub Copilot App**: Orchestrate workflow and progress tracking
+- **csharp-coding Plugin**: Switch to coding agent for implementation sprints
+- **GitHub Copilot App**: Canvas-based workflow orchestration
 - **GitHub Issues**: Track MVP tasks and blockers
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orchestrate-create-mvp/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-create-mvp/SKILL.md`
