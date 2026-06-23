@@ -61,6 +61,11 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/aikido`
   - Notes: Aikido Security integration — scan code for SAST vulnerabilities and secrets, fix findings, review security posture, and sync issues to GitHub. Requires the Aikido MCP server (`@aikidosec/mcp`).
 
+- `copilot-app` (`0.1.0`)
+  - Source path: `plugins/copilot-app`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app`
+  - Notes: GitHub Copilot App plugin for PR creation with JSdotNet account and orchestrating development tasks (project-setup, MVP, package updates, features, bugs).
+
 ## Skills
 
 - See [Copilot Skills](./copilot-skills.md) for skill inventory and provenance.
