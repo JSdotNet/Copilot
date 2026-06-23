@@ -6,9 +6,8 @@ Installable GitHub Copilot CLI plugin for product backlog authoring and issue sy
 
 - Agents:
   - `agents/product-owner.agent.md`
-  - `agents/jira.agent.md`
-  - `agents/github-issues.agent.md`
 - Skills:
+  - `skills/use-product-owner/SKILL.md`
   - `skills/write-story/SKILL.md`
   - `skills/write-epic/SKILL.md`
   - `skills/write-bug/SKILL.md`
@@ -39,6 +38,11 @@ Installable GitHub Copilot CLI plugin for product backlog authoring and issue sy
 ## Optional Integrations
 
 - Architecture handoff (`architect`) is optional and requires the `architecture` plugin to be installed.
+
+## Agent Visibility
+
+- Only `product-owner` is publicly exposed by this plugin.
+- Specialist agents under `agents-internal/` are internal implementation assets and are not exposed directly.
 
 ## Resources
 

@@ -7,6 +7,7 @@ Installable GitHub Copilot CLI plugin for architecture design and documentation 
 - Agents:
   - `agents/architect.agent.md`
 - Skills:
+  - `skills/use-architect/SKILL.md`
   - `skills/architecture-arc42-generator/SKILL.md`
   - `skills/architecture-blueprint-generator/SKILL.md`
   - `skills/create-architectural-decision-record/SKILL.md`

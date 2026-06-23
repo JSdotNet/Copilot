@@ -9,6 +9,8 @@ Covers six documentation artifact types and three profile artifact types.
 |---|---|---|
 | Agent | `agents/documentation.agent.md` | Orchestrates all six documentation artifact types |
 | Agent | `agents/profile.agent.md` | Orchestrates GitHub, project, and LinkedIn profile artifacts |
+| Skill | `skills/use-documentation` | Switches to the documentation agent and starts the documentation workflow |
+| Skill | `skills/use-profile` | Switches to the profile agent and starts the profile workflow |
 | Instruction | `instructions/documentation/howto.instructions.md` | How-To writing rules |
 | Instruction | `instructions/documentation/explanations.instructions.md` | Explanation writing rules |
 | Instruction | `instructions/documentation/articles.instructions.md` | Article writing rules |
