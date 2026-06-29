@@ -38,9 +38,9 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 - **Enable selected Aspire features** from the refined plan
 - **Adopt feature configuration** in AppHost and service projects
 - **Add or update telemetry/health setup** when required by new features
-- **Document enabled features** and expected operational impact
+- **Record enabled features** and expected operational impact in canvas notes
 
-**Agents:** `csharp-coding:coding`, `architecture:architect`, `documentation:documentation`  
+**Agents:** `csharp-coding:coding`, `architecture:architect`  
 **Skills Used:** `aspire`, `open-telemetry`
 
 ### Stage 5: Validation & Recording
@@ -60,7 +60,7 @@ Orchestrate Aspire update for:
 - Current Aspire: 9.x
 - Target Aspire: 9.latest
 - New features to adopt: improved telemetry defaults, updated service discovery configuration
-- Constraints: zero downtime in production rollout window
+- Constraints: preserve local developer workflow stability
 - Output: refined upgrade plan + validation recording report
 ```
 
@@ -92,7 +92,6 @@ This skill opens an **Aspire update canvas** in GitHub Copilot App showing:
 - **csharp-coding Plugin**: Coding agent for upgrade and migration implementation
 - **Architecture Plugin**: Breaking-change and design impact review
 - **Review Plugin**: Validation and risk-focused review
-- **Documentation Plugin**: Upgrade notes and operational guidance
 - **GitHub Copilot App**: Canvas-based orchestration and evidence tracking
 
 ## Reference

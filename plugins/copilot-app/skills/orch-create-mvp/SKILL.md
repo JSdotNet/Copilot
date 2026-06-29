@@ -1,11 +1,11 @@
 ---
 name: orch-create-mvp
-description: 'Orchestrate Minimum Viable Product (MVP) creation using GitHub Copilot App canvas. Coordinates rapid development of core features across planning, implementation, testing, and deployment stages. Integrates development, product-owner, architecture, and csharp-coding plugins with automated agent handoffs.'
+description: 'Orchestrate Minimum Viable Product (MVP) creation using GitHub Copilot App canvas. Coordinates rapid development of core features across planning, implementation, testing, local run, and monitoring stages with automated handoffs.'
 ---
 
 # Orchestrate Create MVP
 
-Execute a complete MVP development workflow from planning through deployment using coordinated agents and canvas interface.
+Execute a complete MVP development workflow from planning through local run and monitoring using coordinated agents and canvas interface.
 
 ## Workflow Stages
 
@@ -21,7 +21,7 @@ Execute a complete MVP development workflow from planning through deployment usi
 - **Design system architecture** for MVP scope
 - **Document API contracts** and data models
 - **Plan integration points** with external services
-- **Create deployment strategy**
+- **Define local runtime validation strategy**
 
 **Agents:** `architecture:architect`, `development:developer`
 
@@ -41,21 +41,13 @@ Execute a complete MVP development workflow from planning through deployment usi
 
 **Agents:** `development:testing`, `review:reviewer`, `csharp-coding:coding`
 
-### Stage 5: Documentation & Release
-- **Generate API documentation** (OpenAPI/Swagger)
-- **Create deployment guides** and runbooks
-- **Document known limitations** and future enhancements
-- **Prepare release notes**
+### Stage 5: Run & Monitoring
+- **Start MVP locally or in cloud** and validate startup for all components
+- **Run smoke tests** on core user flows
+- **Monitor runtime logs and health checks**
+- **Record local or cloud readiness status** and unresolved blockers
 
-**Agents:** `documentation:documentation`, `development:developer`
-
-### Stage 6: Deployment & Validation
-- **Deploy to staging** environment
-- **Run smoke tests** and validation
-- **Deploy to production** (if approved)
-- **Monitor and verify** MVP metrics
-
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`, `development:developer`, `review:reviewer`
 
 ## Usage Pattern
 
@@ -68,7 +60,7 @@ Orchestrate MVP creation for:
   * Report export (PDF/Excel)
   * Basic scheduling
 - Target: 4-week timeline
-- Deploy to: Azure Container Apps
+- Runtime target: Local or cloud run + monitoring
 ```
 
 ## Feature Breakdown Example
@@ -100,7 +92,7 @@ This skill opens an **MVP development canvas** in GitHub Copilot App showing:
 - **Progress dashboard** tracking completion across stages
 - **Team collaboration** panel for assignments and comments
 - **Integration buttons** to switch to `csharp-coding:coding` agent for implementation
-- **Status indicators** for each component (planning, in-progress, testing, deployed)
+- **Status indicators** for each component (planning, in-progress, testing, running)
 
 ## Integration Points
 
