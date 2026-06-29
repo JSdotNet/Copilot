@@ -1,11 +1,11 @@
 ---
 name: orch-bug
-description: 'Orchestrate bug resolution workflow from triage through deployment using GitHub Copilot App canvas. Manages bug lifecycle including reproduction, root cause analysis, TDD fix implementation (test first), verification, and production deployment. Prioritizes speed for critical issues with automated handoffs to csharp-coding for TDD.'
+description: 'Orchestrate bug resolution workflow from triage through local run and monitoring using GitHub Copilot App canvas. Manages bug lifecycle including reproduction, root cause analysis, TDD fix implementation (test first), verification, and local runtime validation.'
 ---
 
 # Orchestrate Bug Resolution
 
-Execute a complete bug fix workflow from identification through production deployment using test-driven development (TDD) approach.
+Execute a complete bug fix workflow from identification through local runtime validation using test-driven development (TDD) approach.
 
 ## Workflow Stages
 
@@ -56,32 +56,23 @@ Execute a complete bug fix workflow from identification through production deplo
 
 **Agents:** `review:reviewer`, `csharp-coding:coding`
 
-### Stage 6: Documentation & Communication
-- **Update changelog** with bug fix details
-- **Document workaround** if applicable
-- **Create incident post-mortem** (for critical bugs)
-- **Update documentation** if behavior changed
-- **Notify affected users** (if applicable)
-
-**Agents:** `documentation:documentation`, `product-owner:product-owner`
-
-### Stage 7: Deployment & Monitoring
-- **Merge PR** (immediately for critical)
-- **Build and create patch release** if needed
-- **Deploy to production** (expedited for critical)
-- **Monitor closely** for 24+ hours post-deployment
-- **Collect feedback** from users
+### Stage 6: Local Run & Monitoring
+- **Run fixed build locally** in reproduction-like conditions
+- **Execute local smoke tests** for impacted flows
+- **Monitor logs and health metrics** for regression signals
+- **Capture runtime evidence** (logs, screenshots, traces)
+- **Confirm issue closure criteria** before handoff
 
 **Agents:** `csharp-coding:coding`, `development:developer`
 
 ## Severity Levels & Response Times
 
-| Severity | Description | Response | Deploy |
-|----------|-------------|----------|--------|
-| Critical | System down, data loss, security | Immediate | ASAP |
-| High | Major feature broken, significant impact | 2-4 hours | Same day |
-| Medium | Feature degraded, workaround exists | 1-2 days | Next release |
-| Low | Minor issue, cosmetic, edge case | 1 week | Normal cycle |
+| Severity | Description | Response | Local Validation |
+|----------|-------------|----------|------------------|
+| Critical | System down, data loss, security | Immediate | Immediate local verification |
+| High | Major feature broken, significant impact | 2-4 hours | Same day local run + monitoring |
+| Medium | Feature degraded, workaround exists | 1-2 days | Local verification in current sprint |
+| Low | Minor issue, cosmetic, edge case | 1 week | Local verification in normal cycle |
 
 ## Usage Pattern
 
@@ -92,19 +83,18 @@ Orchestrate bug fix for:
 - Affected versions: 2.1.0, 2.1.1
 - Root cause: Insufficient input sanitization
 - Fix type: Hotfix
-- Deploy target: Production (same day)
+- Runtime target: Local run + monitoring
 ```
 
-## Critical Bug Hotfix Process
+## Critical Bug Fast-Track Process
 
 ```
-1. Branch: hotfix/bug-id (from latest production tag)
+1. Branch: hotfix/bug-id
 2. Fix: Minimal changes, test thoroughly
 3. PR: Immediate review (no waiting)
-4. Merge: Direct to main and develop
-5. Release: Create v2.1.2-hotfix
-6. Deploy: To production immediately
-7. Monitor: Intensive for 24 hours
+4. Validate: Reproduction test + regression suite
+5. Run locally: Verify startup and impacted flows
+6. Monitor: Logs/health until stability confirmed
 ```
 
 ## Canvas Interface
@@ -120,8 +110,7 @@ This skill opens a **bug resolution canvas** in GitHub Copilot App showing:
   - Regression test coverage
 - **Integration buttons** to switch to `csharp-coding:coding` agent for TDD
 - **Hotfix fast-track** for critical bugs
-- **Deployment gates** and monitoring dashboard
-- **Communication timeline** for stakeholders
+- **Local validation gates** and monitoring dashboard
 
 ## TDD Workflow Visualization
 
@@ -139,8 +128,8 @@ Canvas displays the TDD cycle:
 - **Development Plugin**: Root cause analysis and planning
 - **csharp-coding Plugin**: Switch to coding agent for TDD implementation
 - **Review Plugin**: Quality and security validation
-- **GitHub Copilot App**: Canvas-based bug tracking and deployment orchestration
-- **GitHub Issues**: Bug tracking and stakeholder communication
+- **GitHub Copilot App**: Canvas-based bug tracking and local validation orchestration
+- **GitHub Issues**: Bug tracking
 
 ## Reference
 

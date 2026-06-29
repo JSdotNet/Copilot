@@ -7,27 +7,31 @@ Installable GitHub Copilot App plugin for creating Pull Requests across JSdotNet
 This plugin provides specialized skills for GitHub Copilot App users who need to:
 
 1. **Create Pull Requests** efficiently in any JSdotNet organization repository
-2. **Orchestrate Development Tasks** with canvas interfaces including:
-   - Project setup with .github folder initialization
+2. **Orchestrate Development Tasks** with local-first canvas interfaces including:
+   - Project setup with `.github` folder initialization
    - MVP creation and sprint planning
    - Package/dependency updates with security scanning
    - Aspire upgrade orchestration with plan refinement and feature adoption
    - Feature development lifecycle management
    - Bug triage with test-driven development (TDD)
+   - Module creation inside existing projects
+   - New service creation in existing projects
 
-Each orchestration skill opens an interactive canvas in GitHub Copilot App and coordinates multiple agents from other plugins (development, architecture, documentation, product-owner, csharp-coding, review) to execute complete workflows with minimal manual intervention.
+Each orchestration skill opens an interactive canvas in GitHub Copilot App and coordinates multiple agents from other plugins (development, architecture, product-owner, csharp-coding, review) to execute complete workflows with minimal manual intervention.
 
 ## Includes
 
 ### Skills
 
 - `skills/pr-jsdotnet/SKILL.md` - Create PRs across all JSdotNet organization repositories
-- `skills/orch-project-setup/SKILL.md` - Setup .github folder, guidelines, and Aspire scaffolding
-- `skills/orch-create-mvp/SKILL.md` - MVP development from planning to deployment (canvas)
-- `skills/orch-update-packages/SKILL.md` - Safe, coordinated dependency updates (canvas)
+- `skills/orch-setup/SKILL.md` - Setup `.github` folder, guidelines, and Aspire scaffolding
+- `skills/orch-create-mvp/SKILL.md` - MVP development from planning to local run and monitoring (canvas)
+- `skills/orch-update-packages/SKILL.md` - Safe, coordinated dependency updates with local validation (canvas)
 - `skills/orch-aspire-update/SKILL.md` - Plan-first Aspire upgrade and new feature adoption (canvas)
-- `skills/orch-feature/SKILL.md` - Feature development lifecycle management (canvas)
-- `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow (canvas)
+- `skills/orch-feature/SKILL.md` - Feature development lifecycle management with local validation (canvas)
+- `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with local monitoring (canvas)
+- `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
+- `skills/orch-create-service/SKILL.md` - Create and wire a new service in an existing project (canvas)
 
 ## Install
 
@@ -40,7 +44,7 @@ copilot plugin list
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- In the command palette: `orch-project-setup`, `orch-create-mvp`, `orch-aspire-update`, `orch-feature`, `orch-bug`
+- In the command palette: `orch-setup`, `orch-create-mvp`, `orch-aspire-update`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -51,18 +55,19 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 - **TDD Bug Fixes** - Solve bugs by creating tests first with csharp-coding agent
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
 - **Project Guidelines** - Uses project-guideline-MCP for consistent standards
+- **Local-First Validation** - Workflows focus on local run, health checks, and monitoring
 - **Multi-Repository** - PR creation works across all JSdotNet organization repos
-- **Automated Handoffs** - Seamless switching to specialized agents (csharp-coding, documentation, etc.)
+- **Automated Handoffs** - Seamless switching to specialized agents (csharp-coding, review, etc.)
 
 ## Dependencies
 
 This plugin works best with the following installed plugins:
 
 - `development` - For development planning and execution
-- `architecture` - For architecture documentation (arc42, ADRs)
+- `architecture` - For architecture guidance
 - `csharp-coding` - For code implementation with TDD
 - `product-owner` - For user stories and backlog management
-- `documentation` - For documentation generation
+- `review` - For validation and quality review
 
 Install recommended plugins:
 
@@ -71,7 +76,7 @@ copilot plugin install JSdotNet/Copilot:plugins/development
 copilot plugin install JSdotNet/Copilot:plugins/architecture
 copilot plugin install JSdotNet/Copilot:plugins/csharp-coding
 copilot plugin install JSdotNet/Copilot:plugins/product-owner
-copilot plugin install JSdotNet/Copilot:plugins/documentation
+copilot plugin install JSdotNet/Copilot:plugins/review
 ```
 
 ## Usage Examples
@@ -87,14 +92,14 @@ Invoke: pr-jsdotnet
 - Branch: already committed on feature branch
 ```
 
-### Orchestrate Project Setup
+### Orchestrate Setup
 
 ```
-Invoke: orch-project-setup
+Invoke: orch-setup
 - Repository: "MyAwesomeAPI" (already exists)
 - Setup .github folder with guidelines (project-guideline-MCP)
 - Create Aspire AppHost for distributed services
-- Initialize GitHub workflows and branch protection
+- Validate compilation and local run monitoring
 ```
 
 ### Orchestrate MVP Creation
@@ -104,7 +109,7 @@ Invoke: orch-create-mvp
 - Project: "PaymentService"
 - Core features: Payments, webhooks, reporting
 - Timeline: 4 weeks
-- Deploy to: Azure Container Apps
+- Runtime target: Local run + monitoring
 ```
 
 ### Orchestrate Package Updates
@@ -114,7 +119,7 @@ Invoke: orch-update-packages
 - Project: "CoreLibrary"
 - Update types: Security, critical patches
 - Testing: Full integration suite
-- Deployment: Staging → Production
+- Runtime target: Local run + monitoring
 ```
 
 ### Orchestrate Aspire Update
@@ -126,7 +131,7 @@ Invoke: orch-aspire-update
 - Target Aspire: latest supported
 - Refine update plan before implementation
 - Enable selected new Aspire features after upgrade
-- Record validation evidence and summary
+- Record local validation evidence and summary
 ```
 
 ### Orchestrate Feature Development
@@ -136,7 +141,7 @@ Invoke: orch-feature
 - Feature: "Role-Based Access Control"
 - Epic: "Security & Authorization"
 - Target: Next sprint
-- Deployment: Blue-green strategy
+- Runtime target: Local run + monitoring
 ```
 
 ### Orchestrate Bug Fix (with TDD)
@@ -147,7 +152,27 @@ Invoke: orch-bug
 - Severity: High
 - Root cause: Input sanitization missing
 - Approach: Create failing test first, then implement fix
-- Deploy: Production (same day hotfix)
+- Runtime target: Local run + monitoring
+```
+
+### Orchestrate Module Creation
+
+```
+Invoke: orch-create-module
+- Project: "Billing.Core"
+- Module: "InvoiceRules"
+- Scope: Domain logic + tests
+- Runtime target: Local run + monitoring
+```
+
+### Orchestrate New Service
+
+```
+Invoke: orch-create-service
+- Project: "Orders.Platform"
+- Service: "NotificationService"
+- Integration: AppHost + service discovery + health checks
+- Runtime target: Local run + monitoring
 ```
 
 ## Integration Architecture
@@ -162,28 +187,29 @@ copilot-app plugin
         ├── ↔ architecture plugin (architect agent)
         ├── ↔ csharp-coding plugin (coding agent for implementation)
         ├── ↔ product-owner plugin (product-owner agent)
-        ├── ↔ documentation plugin (documentation agent)
         └── ↔ review plugin (reviewer agent)
 ```
 
 ## Workflow Coordination Model
 
-Each orchestration skill with canvas follows a staged workflow tailored to the scenario (project setup, MVP, feature, package updates, or bug fix):
+Each orchestration skill with canvas follows a staged workflow tailored to the scenario (project setup, MVP, feature, package updates, bug fix, module creation, or service creation):
 
 1. **Opens canvas interface** in GitHub Copilot App
 2. **Planning and design stages** - Define scope, architecture, and risks
-3. **Implementation stage** - Code creation with agent handoff to `csharp-coding:coding`
-4. **Validation stages** - Unit, integration, and where applicable E2E validation with recorded outcomes
-5. **Quality and handoff stage** - Review readiness and next-step orchestration
+3. **Implementation stage** - Code creation with handoff to `csharp-coding:coding`
+4. **Validation stages** - Unit, integration, and local runtime validation with recorded outcomes
+5. **Quality stage** - Review readiness and blocker resolution
 
 Agent selection per stage is automated based on the task context.
 
 ## Skills Can Use Other Skills
 
 The orchestration skills are designed to coordinate with other plugin skills:
-- `orch-project-setup` uses the `aspire` skill from the development plugin
+
+- `orch-setup` uses the `aspire` skill from the development plugin
 - `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
+- `orch-create-service` can use `aspire` for AppHost wiring
 - All orchestration skills can invoke specialized agents and their associated skills
 - Canvas interfaces provide easy integration points for skill composition
 

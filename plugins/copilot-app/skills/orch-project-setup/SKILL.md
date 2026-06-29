@@ -1,11 +1,11 @@
 ---
-name: orch-project-setup
-description: 'Orchestrate .github setup and project scaffolding with Aspire integration and validation. Use this skill to initialize development environment, setup GitHub workflows, create project structure with Aspire AppHost, validate compilation/testing, and establish coding standards for existing repositories.'
+name: orch-setup
+description: 'Orchestrate .github setup and project scaffolding with Aspire integration and local validation. Use this skill to initialize development environment, setup repository workflows, create project structure with Aspire AppHost, validate compilation/testing, and confirm local run and monitoring for existing repositories.'
 ---
 
 # Orchestrate Project Setup
 
-Automate the complete project setup workflow for existing repositories using GitHub Copilot App canvas interface, including automated validation and testing.
+Automate the complete project setup workflow for existing repositories using GitHub Copilot App canvas interface, including automated local validation and testing.
 
 > **Note:** This skill assumes your repository already exists. It focuses on setting up the development infrastructure, guidelines, and initial scaffolding with built-in validation.
 
@@ -22,17 +22,16 @@ Automate the complete project setup workflow for existing repositories using Git
 - **Setup GitHub workflows** (CI/CD templates, branch protection, issue templates)
 - **Create `.github/copilot-settings.json`** for Copilot configuration
 
-**Agents:** `csharp-coding:coding`, `documentation:documentation`  
+**Agents:** `csharp-coding:coding`, `development:developer`  
 **MCP Server:** `project-guideline-MCP` for guideline generation
 
-### Stage 2: Architecture & Documentation
-- **Generate README.md** with project overview
-- **Create architecture documentation** (arc42 blueprint if applicable)
-- **Document development guidelines** and coding standards
-- **Set up copilot-instructions.md** for consistency
-- **Generate CONTRIBUTING.md** for single-maintainer workflow
+### Stage 2: Architecture & Planning
+- **Define target architecture** for initial setup
+- **Capture API contracts** and data model boundaries
+- **Plan integration points** across services
+- **Capture risk and assumptions** for local development
 
-**Agents:** `documentation:documentation`, `architecture:architect`
+**Agents:** `architecture:architect`, `development:development-plan`
 
 ### Stage 3: Tooling & Dependencies
 - **Install base dependencies** (frameworks, SDKs)
@@ -50,7 +49,7 @@ Automate the complete project setup workflow for existing repositories using Git
 - **Add integrations** based on project type
 - **Wire up service discovery** and health checks
 - **Configure dashboard** for local development
-- **Setup environment configuration** for development/staging/production
+- **Setup environment configuration** for local development
 
 #### Part B: Initial Project Structure & Services
 - **Create project directories** (src/, services/, tests/, docs/)
@@ -105,7 +104,7 @@ Orchestrate project setup for:
 - Type: "ASP.NET Core API with Aspire"
 - Language: C#
 - Aspire services: API, Database, Cache, Worker
-- Setup GitHub workflows and branch protection
+- Setup repository workflows and branch protection
 - Validate compilation and running application
 ```
 
@@ -131,7 +130,6 @@ This skill opens a **project setup canvas** in GitHub Copilot App showing:
 
 - **Development Plugin**: Coordinate with `development-plan` agent
 - **Architecture Plugin**: Generate arc42 blueprints
-- **Documentation Plugin**: Create project documentation
 - **project-guideline-MCP**: Generate project-specific guidelines
 - **csharp-coding Plugin**: Implementation and validation
 - **GitHub Copilot App**: Canvas-based workflow orchestration
@@ -184,4 +182,4 @@ If validation fails, the canvas displays:
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orch-project-setup/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-setup/SKILL.md`

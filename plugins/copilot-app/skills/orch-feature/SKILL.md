@@ -1,11 +1,11 @@
 ---
 name: orch-feature
-description: 'Orchestrate feature development from conception through production deployment using GitHub Copilot App canvas. Manages the complete feature lifecycle including planning, design, implementation, testing, documentation, and release. Coordinates multiple agents with automation handoffs to csharp-coding for development.'
+description: 'Orchestrate feature development from planning through local run and monitoring using GitHub Copilot App canvas. Manages the feature lifecycle across design, implementation, testing, review, and local validation with handoffs to csharp-coding for implementation.'
 ---
 
 # Orchestrate Feature Development
 
-Execute a complete feature development workflow from backlog to production using canvas interface.
+Execute a complete feature development workflow from backlog to local validation using canvas interface.
 
 ## Workflow Stages
 
@@ -22,7 +22,7 @@ Execute a complete feature development workflow from backlog to production using
 - **Design data models** and API contracts
 - **Document system changes** and impacts
 - **Plan integration points**
-- **Create deployment strategy**
+- **Define local validation strategy**
 - **Identify potential risks**
 
 **Agents:** `architecture:architect`, `development:developer`
@@ -56,10 +56,12 @@ Execute a complete feature development workflow from backlog to production using
 
 ### Stage 6: E2E Validation & Result Recording
 - **Prepare end-to-end test scenarios** from acceptance criteria
-- **Execute E2E test suite** against integrated feature flow
+- **Execute E2E test suite** against integrated local flow
+- **Run feature locally** and confirm startup stability
+- **Monitor runtime behavior** (logs, health, key endpoints)
 - **Capture evidence** (logs, screenshots, and run metadata)
 - **Record validation result** with pass/fail status per scenario
-- **Publish validation summary** for release decision input
+- **Publish validation summary** for local acceptance decision input
 
 **Agents:** `development:testing`, `csharp-coding:coding`, `review:reviewer`
 
@@ -73,8 +75,8 @@ Orchestrate feature development for:
   * Admins can create/manage roles
   * Roles have fine-grained permissions
   * Audit log tracks role changes
-- Target release: Next sprint
-- Deployment: Blue-green on production
+- Target milestone: Next sprint
+- Runtime target: Local run + monitoring
 ```
 
 ## Definition of Done Checklist
@@ -98,9 +100,10 @@ This skill opens a **feature development canvas** in GitHub Copilot App showing:
 - **Code review status** with comment threads
 - **Test coverage** visualization
 - **E2E validation panel** with scenario-level pass/fail status
+- **Local run and monitoring panel** for startup, logs, and health checks
 - **Result recording section** for logs, screenshots, and final verdict
 - **Integration buttons** to switch to `csharp-coding:coding` agent for implementation
-- **Validation export** for stakeholder sign-off
+- **Validation export** for team sign-off
 
 ## Integration Points
 

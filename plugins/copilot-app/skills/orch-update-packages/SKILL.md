@@ -1,11 +1,11 @@
 ---
 name: orch-update-packages
-description: 'Orchestrate dependency and package update workflows using GitHub Copilot App canvas. Coordinates safe, automated updates of NuGet packages, npm modules, SDKs, and tools across projects. Includes security scanning, compatibility testing, and release management with agent handoffs to csharp-coding for implementation.'
+description: 'Orchestrate dependency and package update workflows using GitHub Copilot App canvas. Coordinates safe updates of NuGet packages, npm modules, SDKs, and tools across projects with security scanning, compatibility testing, and local runtime monitoring.'
 ---
 
 # Orchestrate Update Packages
 
-Execute a complete package update workflow with validation, testing, and deployment using canvas interface.
+Execute a complete package update workflow with validation, testing, and local runtime monitoring using canvas interface.
 
 ## Workflow Stages
 
@@ -55,15 +55,15 @@ Execute a complete package update workflow with validation, testing, and deploym
 - **Review dependency changes** in PR
 - **Check for deprecated API usage**
 - **Validate performance metrics**
-- **Approve for staging deployment**
+- **Approve for local runtime validation**
 
 **Agents:** `review:reviewer`, `csharp-coding:coding`
 
-### Stage 7: Deployment & Monitoring
-- **Deploy to staging** environment
-- **Monitor application health** post-update
-- **Run smoke tests** and user scenarios
-- **Deploy to production** (if no issues detected)
+### Stage 7: Local Run & Monitoring
+- **Run the updated project locally**
+- **Monitor application health** after updates
+- **Run smoke tests** and key user scenarios
+- **Capture runtime observations** and blockers
 
 **Agents:** `development:developer`, `csharp-coding:coding`
 
@@ -74,18 +74,18 @@ Orchestrate package updates for:
 - Project: "PaymentService"
 - Update types: Security, critical patches
 - Testing: Full integration test suite
-- Deployment: Staging → Production
+- Runtime target: Local run + monitoring
 - Notify: On completion with changelog summary
 ```
 
 ## Update Categories
 
-| Category | Urgency | Testing | Deployment |
-|----------|---------|---------|-----------|
+| Category | Urgency | Testing | Local Validation |
+|----------|---------|---------|------------------|
 | Security patches | Critical | Full suite | Fast-track |
 | Bug fix patches | High | Core tests | Standard |
-| Minor versions | Medium | Full suite | Staged |
-| Major versions | Low | Extended | Careful review |
+| Minor versions | Medium | Full suite | Staged locally |
+| Major versions | Low | Extended | Careful local review |
 
 ## Canvas Interface
 
@@ -96,7 +96,7 @@ This skill opens a **package update canvas** in GitHub Copilot App showing:
 - **Compatibility impact** analysis for breaking changes
 - **Test coverage** visualization pre- and post-update
 - **Integration buttons** to switch to `csharp-coding:coding` agent for testing
-- **Deployment timeline** with staging and production gates
+- **Runtime timeline** with local validation gates
 - **Rollback plan** quick reference
 
 ## Integration Points
