@@ -7,7 +7,6 @@ Installable GitHub Copilot CLI plugin for managing preferred Copilot plugins via
 - Agent:
   - `agents/plugin-manager.agent.md`
 - Skills:
-  - `skills/use-plugin-manager/SKILL.md`
   - `skills/install-plugin/SKILL.md`
   - `skills/update-plugins/SKILL.md`
   - `skills/uninstall-plugin/SKILL.md`
