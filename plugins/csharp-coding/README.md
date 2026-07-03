@@ -9,7 +9,6 @@ A focused, single-agent plugin for writing, reviewing, optimizing, and testing C
 - Agents:
   - `agents/coding.agent.md`
 - Skills:
-  - `skills/use-coding/SKILL.md`
   - `skills/tdd/SKILL.md`
   - `skills/code-review/SKILL.md`
   - `skills/code-optimization/SKILL.md`

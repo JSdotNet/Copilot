@@ -7,7 +7,6 @@ Installable GitHub Copilot CLI plugin for product backlog authoring and issue sy
 - Agents:
   - `agents/product-owner.agent.md`
 - Skills:
-  - `skills/use-product-owner/SKILL.md`
   - `skills/write-story/SKILL.md`
   - `skills/write-epic/SKILL.md`
   - `skills/write-bug/SKILL.md`

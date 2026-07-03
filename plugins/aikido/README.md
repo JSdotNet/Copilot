@@ -8,7 +8,6 @@ and secrets, triage findings, fix security issues, and sync to GitHub Issues.
 - Agents:
   - `agents/aikido.agent.md`
 - Skills:
-  - `skills/use-aikido/SKILL.md`
   - `skills/scan-code/SKILL.md`
   - `skills/fix-security-issue/SKILL.md`
   - `skills/review-security-posture/SKILL.md`

@@ -7,7 +7,6 @@ Installable GitHub Copilot CLI plugin for development planning and execution wor
 - Agents:
   - `agents/developer.agent.md`
 - Skills:
-  - `skills/use-developer/SKILL.md`
   - `skills/aspire/SKILL.md`
   - `skills/microsoft-code-reference/SKILL.md`
   - `skills/nuget-manager/SKILL.md`

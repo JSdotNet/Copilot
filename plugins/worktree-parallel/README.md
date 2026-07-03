@@ -8,7 +8,6 @@ with per-worktree agent continuity.
 - Agent:
   - `agents/worktree.agent.md`
 - Skills:
-  - `skills/use-worktree/SKILL.md`
   - `skills/divide-work/SKILL.md`
 
 ## Scope

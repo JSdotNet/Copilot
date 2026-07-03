@@ -9,9 +9,6 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
   - `agents/spec-builder.agent.md`
   - `agents/spec-review.agent.md`
 - Skills:
-  - `skills/use-spec-plan/SKILL.md`
-  - `skills/use-spec-builder/SKILL.md`
-  - `skills/use-spec-review/SKILL.md`
   - `skills/spec-plan/SKILL.md`
   - `skills/spec-builder/SKILL.md`
   - `skills/spec-review/SKILL.md`
