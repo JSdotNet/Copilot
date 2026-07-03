@@ -33,6 +33,10 @@ Each orchestration skill opens an interactive canvas in GitHub Copilot App and c
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
 - `skills/orch-create-service/SKILL.md` - Create and wire a new service in an existing project (canvas)
 
+### Hooks
+
+- `hooks.json` - Guardrails that block the built-in PR tool for JSdotNet PRs and add recovery guidance for `gh`-based PR failures
+
 ## Install
 
 ```bash
@@ -57,6 +61,7 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 - **Project Guidelines** - Uses project-guideline-MCP for consistent standards
 - **Local-First Validation** - Workflows focus on local run, health checks, and monitoring
 - **Multi-Repository** - PR creation works across all JSdotNet organization repos
+- **PR Guardrails** - Hooks keep JSdotNet PR creation on the `gh` plus `JSDOTNET_GH_TOKEN` path
 - **Automated Handoffs** - Seamless switching to specialized agents (csharp-coding, review, etc.)
 
 ## Dependencies
@@ -83,13 +88,14 @@ copilot plugin install JSdotNet/Copilot:plugins/review
 
 ### Create a PR in JSdotNet Repository
 
-```
+```text
 Invoke: pr-jsdotnet
 - Repository: "JSdotNet/Copilot" (or any JSdotNet repo)
 - Title: "Add GitHub Copilot App integration"
 - Description: Comprehensive change summary
 - Labels: feature, copilot-app
 - Branch: already committed on feature branch
+- PR creation path: `gh pr create` with `JSDOTNET_GH_TOKEN`
 ```
 
 ### Orchestrate Setup
