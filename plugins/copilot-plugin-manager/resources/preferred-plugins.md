@@ -39,5 +39,6 @@ Two source formats are supported:
 | `architecture` | `https://github.com/<owner>/<repo>/plugins/architecture` | Architecture workflows for arc42, blueprints, ADRs, and technical debt records. |
 | `copilot-spec-builder` | `https://github.com/<owner>/<repo>/plugins/copilot-spec-builder` | GitHub customization asset authoring — agents, instructions, plugins, and skills. |
 | `copilot-plugin-manager` | `https://github.com/<owner>/<repo>/plugins/copilot-plugin-manager` | Copilot plugin lifecycle management — install, update, uninstall, list, and check for updates. |
+| `domain-design` | `https://github.com/<owner>/<repo>/plugins/domain-design` | Domain-Driven Design — bounded context discovery, ubiquitous language, domain model design, and context mapping. |
 
 > **Note:** Replace `<owner>/<repo>` with the actual GitHub repository path before using install or update skills.
