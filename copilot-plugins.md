@@ -66,6 +66,11 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app`
   - Notes: GitHub Copilot App plugin for PR creation with JSdotNet account and orchestrating development tasks (project-setup, MVP, package updates, features, bugs).
 
+- `domain-design` (`0.1.0`)
+  - Source path: `plugins/domain-design`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/domain-design`
+  - Notes: Domain-Driven Design workflows — bounded context discovery, ubiquitous language, domain model design, and context mapping.
+
 ## Skills
 
 - See [Copilot Skills](./copilot-skills.md) for skill inventory and provenance.
