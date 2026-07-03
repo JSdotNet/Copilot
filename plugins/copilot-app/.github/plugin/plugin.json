@@ -7,5 +7,6 @@
   },
   "license": "UNLICENSED",
   "keywords": ["copilot", "github", "pull-request", "orchestration", "development", "tasks", "jsdotnet"],
-  "skills": "skills/"
+  "skills": "skills/",
+  "hooks": "hooks.json"
 }
