@@ -7,7 +7,19 @@ description: 'Orchestrate creating a new service in an existing project using Gi
 
 Execute a complete workflow for adding a new service to an existing project, with local run and monitoring as the final readiness gate.
 
+## Input Expectations
+
+- Target project name and repository.
+- New service name and responsibilities.
+- API or messaging contracts for the new service.
+- Upstream and downstream dependencies.
+- Runtime validation target (e.g., local run + monitoring).
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Service Scope & Requirements
 - **Define service responsibility** and ownership boundaries
@@ -61,25 +73,26 @@ Orchestrate new service creation for:
 - Runtime target: Local run + monitoring
 ```
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens a **service creation canvas** in GitHub Copilot App showing:
+- Service project created and wired into host orchestration.
+- Service endpoints or workers implemented with core logic.
+- Unit and integration tests passing.
+- Health endpoints validated and critical flows tested.
+- Logs and runtime behavior monitored for stability.
+- Readiness status recorded with follow-up actions.
 
-- **Service scope panel** with contracts and responsibilities
-- **Integration map** for dependencies and service references
-- **Implementation tracker** for project, wiring, and configuration
-- **Testing dashboard** for unit and integration readiness
-- **Local run and monitoring panel** for startup, health, and logs
-- **Integration buttons** to switch to `csharp-coding:coding` agent
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Product Owner Plugin**: Service requirements and acceptance criteria
-- **Development Plugin**: Execution planning and integration support
-- **Architecture Plugin**: Service design and boundary decisions
-- **csharp-coding Plugin**: Service implementation and testing
-- **Review Plugin**: Quality and risk checks
-- **GitHub Copilot App**: Canvas-based orchestration and status tracking
+- Service scope panel with contracts and responsibilities
+- Integration map for dependencies and service references
+- Implementation tracker for project, wiring, and configuration
+- Testing dashboard for unit and integration readiness
+- Local run and monitoring panel for startup, health, and logs
+- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
 
 ## Skills Used
 

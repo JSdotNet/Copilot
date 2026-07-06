@@ -1,13 +1,25 @@
 ---
 name: orch-create-mvp
-description: 'Orchestrate Minimum Viable Product (MVP) creation using GitHub Copilot App canvas. Coordinates rapid development of core features across planning, implementation, testing, local run, and monitoring stages with automated handoffs.'
+description: 'Orchestrate Minimum Viable Product (MVP) creation using GitHub Copilot App canvas. Coordinates rapid development of core features across planning, implementation, testing, local run, and monitoring stages with agent handoffs.'
 ---
 
 # Orchestrate Create MVP
 
 Execute a complete MVP development workflow from planning through local run and monitoring using coordinated agents and canvas interface.
 
+## Input Expectations
+
+- Project name and description.
+- Core features list with priority order.
+- Target timeline or sprint allocation.
+- Runtime validation target (e.g., local or cloud run + monitoring).
+- Optional constraints (team size, technology preferences).
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: MVP Definition & Planning
 - **Define MVP scope** (core features, acceptance criteria)
@@ -83,25 +95,26 @@ Epic: "Reporting Engine MVP"
     └── Story: Report delivery email
 ```
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens an **MVP development canvas** in GitHub Copilot App showing:
+- MVP scope defined with prioritized feature breakdown.
+- Architecture documented with API contracts and data models.
+- Core features implemented with TDD approach.
+- Unit and integration tests passing.
+- All services start locally and report healthy status.
+- Smoke tests pass on core user flows.
+- Runtime readiness status recorded with evidence.
 
-- **MVP roadmap** with feature breakdown and timeline
-- **Sprint planner** showing task allocation and dependencies
-- **Progress dashboard** tracking completion across stages
-- **Team collaboration** panel for assignments and comments
-- **Integration buttons** to switch to `csharp-coding:coding` agent for implementation
-- **Status indicators** for each component (planning, in-progress, testing, running)
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Development Plugin**: Coordinate MVP planning with `development-plan` agent
-- **Product Owner Plugin**: Create stories and manage backlog
-- **Architecture Plugin**: Design MVP architecture
-- **csharp-coding Plugin**: Switch to coding agent for implementation sprints
-- **GitHub Copilot App**: Canvas-based workflow orchestration
-- **GitHub Issues**: Track MVP tasks and blockers
+- MVP roadmap with feature breakdown and timeline
+- Sprint planner showing task allocation and dependencies
+- Progress dashboard tracking completion across stages
+- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Status indicators for each component (planning, in-progress, testing, running)
 
 ## Reference
 

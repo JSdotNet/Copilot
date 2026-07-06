@@ -7,7 +7,19 @@ description: 'Orchestrate feature development from planning through local run an
 
 Execute a complete feature development workflow from backlog to local validation using canvas interface.
 
+## Input Expectations
+
+- Feature name and description.
+- Parent epic or project context.
+- Acceptance criteria (at least one measurable criterion).
+- Target milestone or sprint.
+- Runtime validation target (e.g., local run + monitoring).
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Feature Specification
 - **Define feature requirements** and scope
@@ -90,28 +102,26 @@ Orchestrate feature development for:
 - [ ] E2E run evidence captured (logs/screenshots)
 - [ ] Validation result recorded and shared
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens a **feature development canvas** in GitHub Copilot App showing:
+- Feature code complete and reviewed.
+- Unit tests written with coverage above 80%.
+- Integration and E2E tests passing.
+- Security scanning passed.
+- Validation evidence captured (logs, screenshots).
+- Validation result recorded with pass/fail per scenario.
 
-- **Feature specification** with acceptance criteria
-- **Development progress** tracking each stage
-- **Definition of Done** interactive checklist
-- **Code review status** with comment threads
-- **Test coverage** visualization
-- **E2E validation panel** with scenario-level pass/fail status
-- **Local run and monitoring panel** for startup, logs, and health checks
-- **Result recording section** for logs, screenshots, and final verdict
-- **Integration buttons** to switch to `csharp-coding:coding` agent for implementation
-- **Validation export** for team sign-off
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Product Owner Plugin**: Create and manage user stories
-- **Development Plugin**: Plan and execute implementation
-- **Architecture Plugin**: Design and ADR documentation
-- **csharp-coding Plugin**: Switch to coding agent for implementation and testing
-- **GitHub Copilot App**: Canvas-based feature status tracking
+- Feature specification with acceptance criteria
+- Development progress tracking each stage
+- Definition of Done interactive checklist
+- E2E validation panel with scenario-level pass/fail status
+- Local run and monitoring panel for startup, logs, and health checks
+- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
 
 ## Reference
 

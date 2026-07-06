@@ -7,7 +7,18 @@ description: 'Orchestrate arc42 architecture documentation with GitHub Copilot A
 
 Execute an arc42 documentation workflow in GitHub Copilot App canvas while keeping the architect agent independent and moving guideline retrieval into the orchestration layer.
 
+## Input Expectations
+
+- Target system or project name.
+- arc42 sections to draft or refresh (e.g., 1, 3, 9).
+- Documentation goal (e.g., refresh before restructuring).
+- Whether governed asset constraints apply.
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Context & Guideline Retrieval
 - **Clarify target sections** and documentation goals
@@ -44,22 +55,24 @@ Invoke: orch-arc42
 - Constraint: use project guideline MCP before governed asset edits
 ```
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens an **arc42 orchestration canvas** in GitHub Copilot App showing:
+- Target arc42 sections drafted or refreshed with explicit assumptions.
+- Decisions and constraints linked to retrieved guidance context.
+- Open questions recorded for user input.
+- Cross-section consistency verified.
+- Review-ready update set prepared.
 
-- **Section picker** for target arc42 sections
-- **Guideline context panel** populated from MCP lookups
-- **Draft tracker** with assumptions, risks, and cross-links
-- **Review checklist** for consistency and traceability
-- **Action buttons** to continue drafting or request review
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Architecture Plugin**: `architecture:architect` agent and `architecture-arc42-generator` skill
-- **Review Plugin**: Consistency review and follow-up findings
-- **GitHub Copilot App**: Canvas-based stage tracking and review flow
-- **JSdotNet Guidelines MCP**: Guideline and ADR retrieval before governed asset work
+- Section picker for target arc42 sections
+- Guideline context panel populated from MCP lookups
+- Draft tracker with assumptions, risks, and cross-links
+- Review checklist for consistency and traceability
+- Action buttons to continue drafting or request review
 
 ## Reference
 

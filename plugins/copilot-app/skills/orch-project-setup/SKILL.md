@@ -9,11 +9,23 @@ Automate the complete project setup workflow for existing repositories using Git
 
 > **Note:** This skill assumes your repository already exists. It focuses on setting up the development infrastructure, guidelines, and initial scaffolding with built-in validation.
 
+## Input Expectations
+
+- Repository name (must already exist on GitHub).
+- Project type (e.g., ASP.NET Core API with Aspire).
+- Language and framework preferences.
+- Aspire services to include (API, Database, Cache, Worker).
+- Whether to set up repository workflows and branch protection.
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: GitHub Folder Setup (Foundation)
 - **Initialize `.github/` directory structure** with recommended layouts
-- **Generate project guidelines** using `project-guideline-MCP` server:
+- **Generate project guidelines** using `jsdotnet-project-guidelines-mcpserver`:
   - Coding standards and patterns
   - Git workflow conventions
   - Review guidelines
@@ -23,7 +35,7 @@ Automate the complete project setup workflow for existing repositories using Git
 - **Create `.github/copilot-settings.json`** for Copilot configuration
 
 **Agents:** `csharp-coding:coding`, `development:developer`  
-**MCP Server:** `project-guideline-MCP` for guideline generation
+**MCP Server:** `jsdotnet-project-guidelines-mcpserver` for guideline generation
 
 ### Stage 2: Architecture & Planning
 - **Define target architecture** for initial setup
@@ -42,7 +54,10 @@ Automate the complete project setup workflow for existing repositories using Git
 **Agents:** `csharp-coding:coding`, `development:developer`
 
 ### Stage 4: Aspire AppHost & Project Scaffolding
-**Combined Stage** — Stages 4 & 5 merged (they are interdependent)
+
+This stage combines AppHost creation and initial project scaffolding because they are
+interdependent — the example service references AppHost configuration, service
+discovery, and health checks.
 
 #### Part A: Aspire AppHost Creation
 - **Create AppHost project** for service orchestration
@@ -60,13 +75,10 @@ Automate the complete project setup workflow for existing repositories using Git
 - **Create first unit tests** as examples
 - **Setup test data fixtures**
 
-**Rationale:** AppHost and initial services are tightly coupled. The example service references the AppHost configuration, service discovery setup, and health checks created in the AppHost project. Separating them would create circular dependencies.
-
 **Agents:** `csharp-coding:coding`, `development:developer`  
 **Skills Used:** `aspire` skill from development plugin
 
 ### Stage 5: Build & Test Validation
-**NEW STAGE** — Ensure project is ready for development
 
 - **Compile all projects** to verify no build errors
 - **Run unit test suite** to verify test framework works
@@ -108,45 +120,33 @@ Orchestrate project setup for:
 - Validate compilation and running application
 ```
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens a **project setup canvas** in GitHub Copilot App showing:
+- `.github/` directory fully initialized with instructions, workflows, and Copilot configuration.
+- Aspire AppHost and ServiceDefaults projects created.
+- Example service wired to AppHost with health checks.
+- All projects compile without errors.
+- Unit and integration tests passing.
+- AppHost starts without errors and dashboard is accessible.
+- All services report healthy status.
+- Runtime validation evidence recorded and attached to report.
 
-- **Progress tracker** for each workflow stage
-- **Checklist** of setup tasks
-- **Generated files preview** (.github structure, guidelines, scaffolding)
-- **Configuration options** (Aspire services, integrations, tooling)
-- **Validation status** during Stage 5 and Stage 6 (real-time console output)
-- **Health indicators** for each component:
-  - Build status (compiling...)
-  - Test status (running tests...)
-  - Application status (running AppHost...)
-  - Recording status (collecting validation evidence...)
-  - Service health (checking endpoints...)
-- **Action buttons** to generate, preview, apply, or re-validate
-- **Validation report** with detailed results
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Development Plugin**: Coordinate with `development-plan` agent
-- **Architecture Plugin**: Generate arc42 blueprints
-- **project-guideline-MCP**: Generate project-specific guidelines
-- **csharp-coding Plugin**: Implementation and validation
-- **GitHub Copilot App**: Canvas-based workflow orchestration
-
-## Key Benefits
-
-- **No manual setup** - Automated .github folder creation
-- **Guideline-driven** - Uses project-guideline-MCP for consistent standards
-- **Aspire-ready** - Immediate support for distributed applications
-- **Integrated services** - AppHost and initial services created together
-- **Validated setup** - Automatic verification that everything compiles and runs
-- **Visible progress** - Canvas shows real-time status during validation
-- **Ready to develop** - After completion, developers can immediately start coding
+- Progress tracker for each workflow stage
+- Checklist of setup tasks
+- Generated files preview (.github structure, guidelines, scaffolding)
+- Configuration options (Aspire services, integrations, tooling)
+- Health indicators for build, test, application, and service status
+- Action buttons to generate, preview, apply, or re-validate
+- Validation report with detailed results
 
 ## Validation Stage Details
 
-The **Stage 5: Validation** is critical for ensuring the project is ready:
+The validation stages (5 and 6) ensure the project is ready for development:
 
 ### Build Validation
 ```
@@ -182,4 +182,4 @@ If validation fails, the canvas displays:
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orch-setup/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-project-setup/SKILL.md`
