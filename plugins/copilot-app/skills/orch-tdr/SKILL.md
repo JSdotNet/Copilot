@@ -1,5 +1,5 @@
 ---
-name: orch-architecture-tdr
+name: orch-tdr
 description: 'Orchestrate technical debt record creation in GitHub Copilot App canvas. Uses the architecture:architect agent for debt documentation and `jsdotnet-project-guidelines-mcpserver` to ground the record in project guidance and related decisions.'
 ---
 
@@ -47,7 +47,7 @@ Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retr
 ## Usage Pattern
 
 ```text
-Invoke: orch-architecture-tdr
+Invoke: orch-tdr
 - Debt: "Architecture guidance retrieval is inconsistent across plugin workflows"
 - Scope: "copilot-app orchestration skills"
 - Goal: capture impact, remediation path, and related decisions
@@ -75,4 +75,4 @@ Invoke: orch-architecture-tdr
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orch-architecture-tdr/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-tdr/SKILL.md`

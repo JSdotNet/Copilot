@@ -34,9 +34,9 @@ Each orchestration skill coordinates multiple agents from other plugins (develop
 - `skills/orch-aspire-update/SKILL.md` - Plan-first Aspire upgrade and new feature adoption (canvas)
 - `skills/orch-architecture/SKILL.md` - General architecture orchestration with the architect agent (canvas)
 - `skills/orch-arc42/SKILL.md` - arc42 documentation orchestration with guideline retrieval (canvas)
-- `skills/orch-architecture-blueprint/SKILL.md` - Architecture blueprint orchestration with traceability review (canvas)
-- `skills/orch-architecture-adr/SKILL.md` - ADR orchestration with guideline and ADR retrieval (canvas)
-- `skills/orch-architecture-tdr/SKILL.md` - TDR orchestration with guideline and ADR retrieval (canvas)
+- `skills/orch-blueprint/SKILL.md` - Architecture blueprint orchestration with traceability review (canvas)
+- `skills/orch-adr/SKILL.md` - ADR orchestration with guideline and ADR retrieval (canvas)
+- `skills/orch-tdr/SKILL.md` - TDR orchestration with guideline and ADR retrieval (canvas)
 - `skills/orch-feature/SKILL.md` - Feature development lifecycle management with local validation (canvas)
 - `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with local monitoring (canvas)
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
@@ -57,7 +57,7 @@ copilot plugin list
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- - In the command palette: `orch-setup`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-architecture-blueprint`, `orch-architecture-adr`, `orch-architecture-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
+- - In the command palette: `orch-setup`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -171,7 +171,7 @@ Invoke: orch-arc42
 ### Orchestrate Architecture Blueprint
 
 ```text
-Invoke: orch-architecture-blueprint
+Invoke: orch-blueprint
 - System: "Copilot App plugin ecosystem"
 - Goal: refresh component boundaries and traceability
 - Use `jsdotnet-project-guidelines-mcpserver` before governed asset edits
@@ -180,7 +180,7 @@ Invoke: orch-architecture-blueprint
 ### Orchestrate ADR
 
 ```text
-Invoke: orch-architecture-adr
+Invoke: orch-adr
 - Decision: "Should architecture orchestration own MCP guideline retrieval?"
 - Scope: "Architecture and copilot-app plugins"
 - Goal: capture decision, trade-offs, and follow-up
@@ -189,7 +189,7 @@ Invoke: orch-architecture-adr
 ### Orchestrate TDR
 
 ```text
-Invoke: orch-architecture-tdr
+Invoke: orch-tdr
 - Debt: "Architecture guidance retrieval is inconsistent across plugin workflows"
 - Scope: "copilot-app orchestration skills"
 - Goal: capture remediation path and related decisions
@@ -272,9 +272,9 @@ The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
 - `orch-architecture` uses the `architecture:architect` agent directly after MCP-based context gathering
 - `orch-arc42` uses `architecture-arc42-generator` after MCP-based context gathering
-- `orch-architecture-blueprint` uses `architecture-blueprint-generator` after MCP-based context gathering
-- `orch-architecture-adr` uses `create-architectural-decision-record` after MCP-based context gathering
-- `orch-architecture-tdr` uses `create-technical-debt-record` after MCP-based context gathering
+- `orch-blueprint` uses `architecture-blueprint-generator` after MCP-based context gathering
+- `orch-adr` uses `create-architectural-decision-record` after MCP-based context gathering
+- `orch-tdr` uses `create-technical-debt-record` after MCP-based context gathering
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
 - `orch-create-service` can use `aspire` for AppHost wiring
 - All orchestration skills can invoke specialized agents (with user approval) and their associated skills

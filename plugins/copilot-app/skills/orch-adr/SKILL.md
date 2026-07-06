@@ -1,5 +1,5 @@
 ---
-name: orch-architecture-adr
+name: orch-adr
 description: 'Orchestrate ADR creation in GitHub Copilot App canvas. Uses the architecture:architect agent for decision documentation and `jsdotnet-project-guidelines-mcpserver` to retrieve relevant project guidance and existing ADR context first.'
 ---
 
@@ -47,7 +47,7 @@ Execute an ADR workflow in GitHub Copilot App canvas with upfront MCP-based guid
 ## Usage Pattern
 
 ```text
-Invoke: orch-architecture-adr
+Invoke: orch-adr
 - Decision: "Should architecture orchestration own MCP guideline retrieval?"
 - Scope: "Architecture and copilot-app plugins"
 - Goal: capture decision, trade-offs, and downstream updates
@@ -74,4 +74,4 @@ Invoke: orch-architecture-adr
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orch-architecture-adr/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-adr/SKILL.md`

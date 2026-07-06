@@ -1,5 +1,5 @@
 ---
-name: orch-architecture-blueprint
+name: orch-blueprint
 description: 'Orchestrate architecture blueprint creation or refresh in GitHub Copilot App canvas. Uses the architecture:architect agent for blueprint work and `jsdotnet-project-guidelines-mcpserver` to ground governed asset changes in project guidance.'
 ---
 
@@ -48,7 +48,7 @@ Execute a blueprint workflow in GitHub Copilot App canvas with MCP-guided contex
 ## Usage Pattern
 
 ```text
-Invoke: orch-architecture-blueprint
+Invoke: orch-blueprint
 - System: "Copilot App plugin ecosystem"
 - Goal: refresh the architecture blueprint after plugin boundary changes
 - Focus: dependencies, boundaries, traceability, and risks
@@ -76,4 +76,4 @@ Invoke: orch-architecture-blueprint
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orch-architecture-blueprint/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-blueprint/SKILL.md`
