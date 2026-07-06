@@ -7,7 +7,19 @@ description: 'Orchestrate dependency and package update workflows using GitHub C
 
 Execute a complete package update workflow with validation, testing, and local runtime monitoring using canvas interface.
 
+## Input Expectations
+
+- Project name and location.
+- Update scope (security, critical patches, minor, major).
+- Testing strategy (core tests, full suite, extended).
+- Runtime validation target (e.g., local run + monitoring).
+- Notification preferences on completion.
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Dependency Analysis
 - **Scan all dependencies** for updates available
@@ -87,25 +99,27 @@ Orchestrate package updates for:
 | Minor versions | Medium | Full suite | Staged locally |
 | Major versions | Low | Extended | Careful local review |
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens a **package update canvas** in GitHub Copilot App showing:
+- Dependency scan completed with CVE severity levels.
+- Updates categorized and prioritized.
+- Packages updated with lockfiles verified.
+- Full test suite passing after updates.
+- Security scanning completed with no new vulnerabilities.
+- Application runs locally with healthy status.
+- Changelog summary generated.
 
-- **Dependency scan results** with CVE severity levels
-- **Update recommendations** grouped by category and priority
-- **Compatibility impact** analysis for breaking changes
-- **Test coverage** visualization pre- and post-update
-- **Integration buttons** to switch to `csharp-coding:coding` agent for testing
-- **Runtime timeline** with local validation gates
-- **Rollback plan** quick reference
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Development Plugin**: Use `nuget-manager` and package update skills
-- **C# Coding Plugin**: Switch to coding agent for implementation and testing
-- **Review Plugin**: Security and quality validation
-- **Architecture Plugin**: Impact analysis on system design
-- **GitHub Copilot App**: Canvas-based workflow orchestration and notifications
+- Dependency scan results with CVE severity levels
+- Update recommendations grouped by category and priority
+- Compatibility impact analysis for breaking changes
+- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Runtime timeline with local validation gates
+- Rollback plan quick reference
 
 ## Reference
 

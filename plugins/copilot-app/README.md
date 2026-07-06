@@ -20,7 +20,7 @@ This plugin provides specialized skills for GitHub Copilot App users who need to
    - Module creation inside existing projects
    - New service creation in existing projects
 
-Each orchestration skill opens an interactive canvas in GitHub Copilot App and coordinates multiple agents from other plugins (development, architecture, product-owner, csharp-coding, review) to execute complete workflows with minimal manual intervention.
+Each orchestration skill coordinates multiple agents from other plugins (development, architecture, product-owner, csharp-coding, review) to execute complete workflows. Agent transitions require explicit user approval. Cross-plugin agents are recommended but not required — skills degrade gracefully when optional plugins are missing.
 
 ## Includes
 
@@ -62,14 +62,14 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 
 ## Key Features
 
-- **Canvas Interfaces** - Interactive workflow orchestration in GitHub Copilot App
+- **Canvas Interfaces** - Interactive workflow orchestration in GitHub Copilot App (planned)
 - **TDD Bug Fixes** - Solve bugs by creating tests first with csharp-coding agent
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
 - **Project Guidelines** - Uses `jsdotnet-project-guidelines-mcpserver` for consistent standards
 - **Local-First Validation** - Workflows focus on local run, health checks, and monitoring
 - **Multi-Repository** - PR creation works across all JSdotNet organization repos
 - **PR Guardrails** - Hooks keep JSdotNet PR creation on the `gh` plus `JSDOTNET_GH_TOKEN` path
-- **Automated Handoffs** - Seamless switching to specialized agents (csharp-coding, review, etc.)
+- **Approval-Based Handoffs** - Agent transitions require explicit user approval
 
 ## Dependencies
 
@@ -243,15 +243,15 @@ copilot-app plugin
 
 ## Workflow Coordination Model
 
-Each orchestration skill with canvas follows a staged workflow tailored to the scenario (project setup, MVP, feature, package updates, bug fix, module creation, or service creation):
+Each orchestration skill follows a staged workflow tailored to the scenario (project setup, MVP, feature, package updates, bug fix, module creation, or service creation):
 
-1. **Opens canvas interface** in GitHub Copilot App
-2. **Planning and design stages** - Define scope, architecture, and risks
-3. **Implementation stage** - Code creation with handoff to `csharp-coding:coding`
-4. **Validation stages** - Unit, integration, and local runtime validation with recorded outcomes
-5. **Quality stage** - Review readiness and blocker resolution
+1. **Planning and design stages** - Define scope, architecture, and risks
+2. **Implementation stage** - Code creation with handoff to `csharp-coding:coding` (with approval)
+3. **Validation stages** - Unit, integration, and local runtime validation with recorded outcomes
+4. **Quality stage** - Review readiness and blocker resolution
 
-Agent selection per stage is automated based on the task context.
+Agent selection per stage is recommended based on task context. All agent transitions
+require explicit user approval per the repository handoff policy.
 
 ## Skills Can Use Other Skills
 
@@ -265,8 +265,8 @@ The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-architecture-tdr` uses `create-technical-debt-record` after MCP-based context gathering
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
 - `orch-create-service` can use `aspire` for AppHost wiring
-- All orchestration skills can invoke specialized agents and their associated skills
-- Canvas interfaces provide easy integration points for skill composition
+- All orchestration skills can invoke specialized agents (with user approval) and their associated skills
+- Canvas interfaces are planned for future interactive orchestration
 
 ## Reinstall After Changes
 

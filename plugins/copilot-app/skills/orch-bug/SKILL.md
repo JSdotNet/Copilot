@@ -7,7 +7,20 @@ description: 'Orchestrate bug resolution workflow from triage through local run 
 
 Execute a complete bug fix workflow from identification through local runtime validation using test-driven development (TDD) approach.
 
+## Input Expectations
+
+- Bug description and reproduction steps.
+- Severity level (critical, high, medium, low).
+- Affected versions or environments.
+- Root cause hypothesis (if known).
+- Fix type (hotfix or standard).
+- Runtime validation target (e.g., local run + monitoring).
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Bug Triage & Analysis
 - **Reproduce the bug** following provided steps
@@ -97,39 +110,27 @@ Orchestrate bug fix for:
 6. Monitor: Logs/health until stability confirmed
 ```
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens a **bug resolution canvas** in GitHub Copilot App showing:
+- Root cause documented.
+- Failing test created that reproduces the bug.
+- Minimal fix implemented; test passes.
+- Regression tests added.
+- No side effects in existing functionality.
+- Local runtime evidence captured (logs, traces).
+- Validation result recorded with pass/fail status.
 
-- **Bug triage panel** with severity and priority assessment
-- **Root cause investigation** workspace with logs and traces
-- **Test-driven fix workflow** showing:
-  - Failing test creation
-  - Fix implementation progress
-  - Test passing confirmation
-  - Regression test coverage
-- **Integration buttons** to switch to `csharp-coding:coding` agent for TDD
-- **Hotfix fast-track** for critical bugs
-- **Local validation gates** and monitoring dashboard
+## Canvas Interface (Planned)
 
-## TDD Workflow Visualization
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-```
-Canvas displays the TDD cycle:
-1. [Red] Write failing test that reproduces bug
-2. [Green] Implement minimal fix to make test pass  
-3. [Refactor] Clean up code while tests stay green
-4. [Verify] Add regression tests for long-term prevention
-```
-
-## Integration Points
-
-- **Product Owner Plugin**: Bug reporting and triage
-- **Development Plugin**: Root cause analysis and planning
-- **csharp-coding Plugin**: Switch to coding agent for TDD implementation
-- **Review Plugin**: Quality and security validation
-- **GitHub Copilot App**: Canvas-based bug tracking and local validation orchestration
-- **GitHub Issues**: Bug tracking
+- Bug triage panel with severity and priority assessment
+- Root cause investigation workspace with logs and traces
+- TDD workflow showing red → green → refactor cycle
+- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Hotfix fast-track for critical bugs
+- Local validation gates and monitoring dashboard
 
 ## Reference
 

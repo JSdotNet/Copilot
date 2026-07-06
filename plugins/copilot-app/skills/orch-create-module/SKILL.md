@@ -7,7 +7,19 @@ description: 'Orchestrate creating a new module in an existing project using Git
 
 Execute a complete workflow for adding a new module to an existing project using a local-first validation approach.
 
+## Input Expectations
+
+- Target project name and location.
+- Module name and purpose.
+- Public interfaces and expected consumers.
+- Dependencies on existing modules or services.
+- Runtime validation target (e.g., local run + monitoring).
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Module Scope & Contract
 - **Define module purpose** and boundaries
@@ -60,25 +72,26 @@ Orchestrate module creation for:
 - Runtime target: Local run + monitoring
 ```
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens a **module creation canvas** in GitHub Copilot App showing:
+- Module created following project patterns and naming conventions.
+- Unit and integration tests passing for module behavior.
+- Module wired into project configuration and dependency graph.
+- Project runs locally with module enabled.
+- Validation evidence recorded (logs, health checks).
+- Readiness status documented.
 
-- **Module scope panel** with contracts and boundaries
-- **Architecture checklist** for structure and dependencies
-- **Implementation tracker** across files and tasks
-- **Test and quality dashboard** for module-specific coverage
-- **Local run and monitoring panel** for logs, health, and smoke checks
-- **Integration buttons** to switch to `csharp-coding:coding` agent
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Product Owner Plugin**: Scope definition and acceptance criteria
-- **Development Plugin**: Planning and implementation coordination
-- **Architecture Plugin**: Module boundaries and integration design
-- **csharp-coding Plugin**: Coding and test implementation
-- **Review Plugin**: Quality and risk-focused review
-- **GitHub Copilot App**: Canvas-based orchestration and tracking
+- Module scope panel with contracts and boundaries
+- Architecture checklist for structure and dependencies
+- Implementation tracker across files and tasks
+- Test and quality dashboard for module-specific coverage
+- Local run and monitoring panel for logs, health, and smoke checks
+- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
 
 ## Reference
 

@@ -7,7 +7,19 @@ description: 'Orchestrate .NET Aspire upgrades with a plan-first workflow in Git
 
 Execute a complete Aspire update workflow using canvas interface, starting with a plan, refining it, then implementing and adopting new features safely.
 
+## Input Expectations
+
+- Repository or project name.
+- Current Aspire version.
+- Target Aspire version.
+- New Aspire features to adopt (if any).
+- Constraints (e.g., preserve local developer workflow stability).
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Baseline & Plan Creation
 - **Inventory current Aspire stack** (packages, SDK constraints, AppHost integrations)
@@ -75,24 +87,27 @@ Orchestrate Aspire update for:
 - [ ] Runtime health validated on updated AppHost
 - [ ] Validation evidence recorded and report published
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens an **Aspire update canvas** in GitHub Copilot App showing:
+- Baseline inventory documented.
+- Update plan created and refined with risk controls.
+- Aspire packages and integrations upgraded.
+- Selected new features enabled and configured.
+- Build and tests pass after upgrade.
+- Runtime health validated on updated AppHost.
+- Validation evidence recorded and report published.
 
-- **Plan board** (initial plan and refined plan side-by-side)
-- **Upgrade batch tracker** with progress and blockers
-- **Feature adoption checklist** for newly enabled Aspire capabilities
-- **Validation dashboard** for build/test/runtime status
-- **Recording panel** for logs, screenshots, and final verdict
-- **Integration buttons** to switch to `csharp-coding:coding` agent for implementation
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Development Plugin**: Planning and staged execution coordination
-- **csharp-coding Plugin**: Coding agent for upgrade and migration implementation
-- **Architecture Plugin**: Breaking-change and design impact review
-- **Review Plugin**: Validation and risk-focused review
-- **GitHub Copilot App**: Canvas-based orchestration and evidence tracking
+- Plan board (initial plan and refined plan side-by-side)
+- Upgrade batch tracker with progress and blockers
+- Feature adoption checklist for newly enabled Aspire capabilities
+- Validation dashboard for build/test/runtime status
+- Recording panel for logs, screenshots, and final verdict
+- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
 
 ## Reference
 

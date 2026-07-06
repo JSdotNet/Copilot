@@ -7,7 +7,17 @@ description: 'Orchestrate ADR creation in GitHub Copilot App canvas. Uses the ar
 
 Execute an ADR workflow in GitHub Copilot App canvas with upfront MCP-based guidance retrieval and architecture-agent drafting.
 
+## Input Expectations
+
+- Decision statement and affected scope.
+- Goal for the ADR (e.g., capture trade-offs, downstream updates).
+- Whether existing ADRs or recommendations should be referenced.
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Decision Context Retrieval
 - **Clarify the decision statement** and affected scope
@@ -43,22 +53,24 @@ Invoke: orch-architecture-adr
 - Goal: capture decision, trade-offs, and downstream updates
 ```
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens an **ADR orchestration canvas** in GitHub Copilot App showing:
+- ADR drafted with context, alternatives, and selected option.
+- Rationale and trade-offs documented.
+- Consequences, risks, and rollback notes captured.
+- Naming and status consistency verified against existing ADRs.
+- Follow-up actions identified (blueprint, arc42, or TDR updates).
 
-- **Decision statement panel** with drivers and constraints
-- **Guideline context panel** populated from MCP lookups
-- **Alternatives tracker** for selected and rejected options
-- **Traceability checklist** for impacted architecture artifacts
-- **Review controls** for publishing the ADR draft
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Architecture Plugin**: `architecture:architect` agent and `create-architectural-decision-record` skill
-- **Review Plugin**: Traceability and consistency review
-- **GitHub Copilot App**: Canvas-based ADR orchestration
-- **JSdotNet Guidelines MCP**: Guidance and ADR retrieval before governed asset work
+- Decision statement panel with drivers and constraints
+- Guideline context panel populated from MCP lookups
+- Alternatives tracker for selected and rejected options
+- Traceability checklist for impacted architecture artifacts
+- Review controls for publishing the ADR draft
 
 ## Reference
 

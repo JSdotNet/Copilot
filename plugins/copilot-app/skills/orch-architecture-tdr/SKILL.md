@@ -7,7 +7,17 @@ description: 'Orchestrate technical debt record creation in GitHub Copilot App c
 
 Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retrieval first and the architect agent handling the documentation work.
 
+## Input Expectations
+
+- Debt item description and affected scope.
+- Goal for the TDR (e.g., capture impact, remediation path).
+- Whether related ADRs or recommendations should be referenced.
+
 ## Workflow Stages
+
+> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
+> not installed, skip the stage or perform it manually and continue with remaining
+> stages. All agent transitions require explicit user approval before switching.
 
 ### Stage 1: Debt Context Retrieval
 - **Clarify the debt item** and affected scope
@@ -43,22 +53,25 @@ Invoke: orch-architecture-tdr
 - Goal: capture impact, remediation path, and related decisions
 ```
 
-## Canvas Interface
+## Output Expectations
 
-This skill opens a **TDR orchestration canvas** in GitHub Copilot App showing:
+- Debt origin and current impact described.
+- Severity, ownership, and remediation window captured.
+- Record linked to retrieved guidance and related architecture artifacts.
+- Follow-up work documented to reduce or retire the debt.
+- Impact statements verified across delivery, quality, and operations.
+- Review-ready TDR prepared with actionable remediation path.
 
-- **Debt summary panel** with scope and impact
-- **Guideline context panel** populated from MCP lookups
-- **Remediation tracker** for owner, severity, and timing
-- **Traceability checklist** for linked architecture artifacts
-- **Review controls** for publishing the TDR draft
+## Canvas Interface (Planned)
 
-## Integration Points
+> Canvas panels described below represent the target experience. No canvas extensions
+> are implemented yet. The skill currently operates through standard chat interaction.
 
-- **Architecture Plugin**: `architecture:architect` agent and `create-technical-debt-record` skill
-- **Review Plugin**: Debt framing and risk review
-- **GitHub Copilot App**: Canvas-based TDR orchestration
-- **JSdotNet Guidelines MCP**: Guidance and ADR retrieval before governed asset work
+- Debt summary panel with scope and impact
+- Guideline context panel populated from MCP lookups
+- Remediation tracker for owner, severity, and timing
+- Traceability checklist for linked architecture artifacts
+- Review controls for publishing the TDR draft
 
 ## Reference
 
