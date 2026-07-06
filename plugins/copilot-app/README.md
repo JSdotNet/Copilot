@@ -12,6 +12,9 @@ This plugin provides specialized skills for GitHub Copilot App users who need to
    - MVP creation and sprint planning
    - Package/dependency updates with security scanning
    - Aspire upgrade orchestration with plan refinement and feature adoption
+   - arc42 documentation orchestration with MCP-guided context gathering
+   - Architecture blueprint orchestration with traceability review
+   - ADR and TDR orchestration with guideline and ADR retrieval
    - Feature development lifecycle management
    - Bug triage with test-driven development (TDD)
    - Module creation inside existing projects
@@ -28,6 +31,10 @@ Each orchestration skill opens an interactive canvas in GitHub Copilot App and c
 - `skills/orch-create-mvp/SKILL.md` - MVP development from planning to local run and monitoring (canvas)
 - `skills/orch-update-packages/SKILL.md` - Safe, coordinated dependency updates with local validation (canvas)
 - `skills/orch-aspire-update/SKILL.md` - Plan-first Aspire upgrade and new feature adoption (canvas)
+- `skills/orch-arc42/SKILL.md` - arc42 documentation orchestration with guideline retrieval (canvas)
+- `skills/orch-architecture-blueprint/SKILL.md` - Architecture blueprint orchestration with traceability review (canvas)
+- `skills/orch-architecture-adr/SKILL.md` - ADR orchestration with guideline and ADR retrieval (canvas)
+- `skills/orch-architecture-tdr/SKILL.md` - TDR orchestration with guideline and ADR retrieval (canvas)
 - `skills/orch-feature/SKILL.md` - Feature development lifecycle management with local validation (canvas)
 - `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with local monitoring (canvas)
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
@@ -48,7 +55,7 @@ copilot plugin list
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- In the command palette: `orch-setup`, `orch-create-mvp`, `orch-aspire-update`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
+- In the command palette: `orch-setup`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-arc42`, `orch-architecture-blueprint`, `orch-architecture-adr`, `orch-architecture-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -58,7 +65,7 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 - **Canvas Interfaces** - Interactive workflow orchestration in GitHub Copilot App
 - **TDD Bug Fixes** - Solve bugs by creating tests first with csharp-coding agent
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
-- **Project Guidelines** - Uses project-guideline-MCP for consistent standards
+- **Project Guidelines** - Uses `jsdotnet-project-guidelines-mcpserver` for consistent standards
 - **Local-First Validation** - Workflows focus on local run, health checks, and monitoring
 - **Multi-Repository** - PR creation works across all JSdotNet organization repos
 - **PR Guardrails** - Hooks keep JSdotNet PR creation on the `gh` plus `JSDOTNET_GH_TOKEN` path
@@ -103,7 +110,7 @@ Invoke: pr-jsdotnet
 ```
 Invoke: orch-setup
 - Repository: "MyAwesomeAPI" (already exists)
-- Setup .github folder with guidelines (project-guideline-MCP)
+- Setup .github folder with guidelines (`jsdotnet-project-guidelines-mcpserver`)
 - Create Aspire AppHost for distributed services
 - Validate compilation and local run monitoring
 ```
@@ -138,6 +145,43 @@ Invoke: orch-aspire-update
 - Refine update plan before implementation
 - Enable selected new Aspire features after upgrade
 - Record local validation evidence and summary
+```
+
+### Orchestrate arc42 Documentation
+
+```text
+Invoke: orch-arc42
+- System: "Copilot plugin monorepo"
+- Sections: 1, 3, and 9
+- Goal: refresh architecture documentation before plugin restructuring
+- Use `jsdotnet-project-guidelines-mcpserver` before governed asset edits
+```
+
+### Orchestrate Architecture Blueprint
+
+```text
+Invoke: orch-architecture-blueprint
+- System: "Copilot App plugin ecosystem"
+- Goal: refresh component boundaries and traceability
+- Use `jsdotnet-project-guidelines-mcpserver` before governed asset edits
+```
+
+### Orchestrate ADR
+
+```text
+Invoke: orch-architecture-adr
+- Decision: "Should architecture orchestration own MCP guideline retrieval?"
+- Scope: "Architecture and copilot-app plugins"
+- Goal: capture decision, trade-offs, and follow-up
+```
+
+### Orchestrate TDR
+
+```text
+Invoke: orch-architecture-tdr
+- Debt: "Architecture guidance retrieval is inconsistent across plugin workflows"
+- Scope: "copilot-app orchestration skills"
+- Goal: capture remediation path and related decisions
 ```
 
 ### Orchestrate Feature Development
@@ -191,6 +235,7 @@ copilot-app plugin
     └── orch-* skills (with canvas interfaces)
         ├── ↔ development plugin (development-plan, developer agents)
         ├── ↔ architecture plugin (architect agent)
+        ├── ↔ jsdotnet-project-guidelines-mcpserver (guideline and ADR retrieval)
         ├── ↔ csharp-coding plugin (coding agent for implementation)
         ├── ↔ product-owner plugin (product-owner agent)
         └── ↔ review plugin (reviewer agent)
@@ -214,6 +259,10 @@ The orchestration skills are designed to coordinate with other plugin skills:
 
 - `orch-setup` uses the `aspire` skill from the development plugin
 - `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
+- `orch-arc42` uses `architecture-arc42-generator` after MCP-based context gathering
+- `orch-architecture-blueprint` uses `architecture-blueprint-generator` after MCP-based context gathering
+- `orch-architecture-adr` uses `create-architectural-decision-record` after MCP-based context gathering
+- `orch-architecture-tdr` uses `create-technical-debt-record` after MCP-based context gathering
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
 - `orch-create-service` can use `aspire` for AppHost wiring
 - All orchestration skills can invoke specialized agents and their associated skills
