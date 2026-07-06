@@ -12,6 +12,7 @@ This plugin provides specialized skills for GitHub Copilot App users who need to
    - MVP creation and sprint planning
    - Package/dependency updates with security scanning
    - Aspire upgrade orchestration with plan refinement and feature adoption
+   - General architecture orchestration with the architect agent and MCP-guided context gathering
    - arc42 documentation orchestration with MCP-guided context gathering
    - Architecture blueprint orchestration with traceability review
    - ADR and TDR orchestration with guideline and ADR retrieval
@@ -31,6 +32,7 @@ Each orchestration skill opens an interactive canvas in GitHub Copilot App and c
 - `skills/orch-create-mvp/SKILL.md` - MVP development from planning to local run and monitoring (canvas)
 - `skills/orch-update-packages/SKILL.md` - Safe, coordinated dependency updates with local validation (canvas)
 - `skills/orch-aspire-update/SKILL.md` - Plan-first Aspire upgrade and new feature adoption (canvas)
+- `skills/orch-architecture/SKILL.md` - General architecture orchestration with the architect agent (canvas)
 - `skills/orch-arc42/SKILL.md` - arc42 documentation orchestration with guideline retrieval (canvas)
 - `skills/orch-architecture-blueprint/SKILL.md` - Architecture blueprint orchestration with traceability review (canvas)
 - `skills/orch-architecture-adr/SKILL.md` - ADR orchestration with guideline and ADR retrieval (canvas)
@@ -55,7 +57,7 @@ copilot plugin list
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- In the command palette: `orch-setup`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-arc42`, `orch-architecture-blueprint`, `orch-architecture-adr`, `orch-architecture-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
+- - In the command palette: `orch-setup`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-architecture-blueprint`, `orch-architecture-adr`, `orch-architecture-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -145,6 +147,15 @@ Invoke: orch-aspire-update
 - Refine update plan before implementation
 - Enable selected new Aspire features after upgrade
 - Record local validation evidence and summary
+```
+
+### Orchestrate General Architecture Work
+
+```text
+Invoke: orch-architecture
+- Goal: evaluate and document the architecture impact of a plugin boundary change
+- Scope: "architecture and copilot-app plugins"
+- Output: proposal with risks, trade-offs, and recommended follow-up artifacts
 ```
 
 ### Orchestrate arc42 Documentation
@@ -259,6 +270,7 @@ The orchestration skills are designed to coordinate with other plugin skills:
 
 - `orch-setup` uses the `aspire` skill from the development plugin
 - `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
+- `orch-architecture` uses the `architecture:architect` agent directly after MCP-based context gathering
 - `orch-arc42` uses `architecture-arc42-generator` after MCP-based context gathering
 - `orch-architecture-blueprint` uses `architecture-blueprint-generator` after MCP-based context gathering
 - `orch-architecture-adr` uses `create-architectural-decision-record` after MCP-based context gathering
