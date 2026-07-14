@@ -5,8 +5,15 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "agent", "ddd", "domain-driven-design", "bounded-context", "domain-model"],
+  "keywords": [
+    "copilot",
+    "agent",
+    "ddd",
+    "domain-driven-design",
+    "bounded-context",
+    "domain-model"
+  ],
   "agents": "agents/",
-  "skills": "skills/"
+  "skills": "skills/",
+  "license": "MIT"
 }

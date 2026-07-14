@@ -5,8 +5,15 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "agent", "architecture", "arc42", "adr", "tdr"],
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "architecture",
+    "arc42",
+    "adr",
+    "tdr"
+  ],
   "agents": "agents/",
   "skills": "skills/"
 }
