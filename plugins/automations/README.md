@@ -16,6 +16,7 @@ Each skill is a self-contained workflow prompt that can be invoked directly in c
 | `automation: performance-review` | Identify 10 perf improvements, implement the best one, open a PR | `code-optimization`, `code-review`, `delegate-to-coding`, `tdd`, `aspire-logging` skills |
 | `automation: review` | Full automated review cycle: TODOs, suggestions, and code review; optionally creates GitHub issues | `todo-review`, `suggestion-review`, `code-review`, `create-github-issue` skills |
 | `automation: weekly-cost-analysis` | Retrieve `/chronicle cost-tips` and produce weekly cost report | Chronicle (`/chronicle cost-tips`) |
+| `automation: week-starter` | Fetch updates for Aspire and GitHub Copilot App (and any extra topics) and produce a weekly digest | Web access |
 
 ## Install
 
@@ -44,6 +45,16 @@ Label: sprint-42
 Use the update-open-sessions skill.
 Source branch: main
 Strategy: rebase
+```
+
+```
+Use the automation: week-starter skill.
+```
+
+```
+Use the automation: week-starter skill.
+Topics: aspire, github-copilot-app, my-extra-topic
+Look-back: 14
 ```
 
 ## Extending
