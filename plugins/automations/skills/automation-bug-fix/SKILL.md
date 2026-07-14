@@ -21,11 +21,13 @@ enters the full triage → root-cause → TDD-fix → review → local-run workf
 - GitHub repository in `owner/repo` format (required).
 - Additional label filters to narrow the set — e.g. `critical`, `sprint-42` (optional;
   default: `bug` only).
-- Assignee filter: GitHub username or `@me` (optional; default: all assignees).
-- Maximum sessions to start in one run (default: `5`; prevents accidental mass creation).
+- Maximum sessions to start in one run (default: `3`; prevents accidental mass creation).
 - Severity hint for `orch-bug`: `critical`, `high`, `medium`, or `low`
   (optional; default: derived from issue labels when present, otherwise `medium`).
 - Base branch for new sessions (default: repository default branch).
+
+> Issues are fetched regardless of current assignee. After a session is created,
+> the issue is automatically assigned to `@me` and labelled `in-progress`.
 
 ## Skill Dependencies
 
@@ -46,7 +48,7 @@ This skill orchestrates the following installed skills:
      --json number,title,body,labels,assignees,milestone,url
    ```
 
-2. Present the full list to the user:
+2. Present the full list to the user — include **all** unassigned and assigned issues:
 
    | # | Title | Labels | Assignees | Milestone |
    |---|-------|--------|-----------|-----------|
@@ -75,8 +77,8 @@ This skill orchestrates the following installed skills:
 
    Do not proceed until the user confirms.
 
-7. If the total exceeds the configured maximum, warn the user and ask them to reduce
-   the selection or raise the limit.
+7. If the total exceeds the configured maximum of **3**, warn the user and ask them
+   to reduce the selection or raise the limit.
 
 ### Phase 4 — Create Sessions
 
@@ -114,17 +116,34 @@ This skill orchestrates the following installed skills:
    Propose a plan first. Wait for user approval before writing any code.
    ```
 
-   e. After each session is created, output the session name and ID so the user
+   e. Immediately after the session is created, claim the issue:
+
+      ```bash
+      # Assign to current user
+      gh issue edit <number> --repo <owner/repo> --add-assignee "@me"
+
+      # Mark as in progress
+      gh issue edit <number> --repo <owner/repo> --add-label "in-progress"
+      ```
+
+      If the `in-progress` label does not yet exist in the repository, create it first:
+
+      ```bash
+      gh label create "in-progress" --repo <owner/repo> --color "0075ca" \
+        --description "Issue is actively being worked on"
+      ```
+
+   f. After each session is created, output the session name and ID so the user
       can navigate to it.
 
 ### Phase 5 — Summary
 
 9. Output a summary table:
 
-   | Issue | Title | Severity | Session | Status |
-   |-------|-------|----------|---------|--------|
-   | #42 | `Login fails with special chars` | High | `#42 — Login fails…` | `orch-bug` — waiting for plan approval |
-   | #37 | `NPE on empty cart` | — | — | Skipped (session exists) |
+   | Issue | Title | Severity | Assigned | Label | Session | Status |
+   |-------|-------|----------|----------|-------|---------|--------|
+   | #42 | `Login fails with special chars` | High | `@me` | `in-progress` | `#42 — Login fails…` | `orch-bug` — waiting for plan approval |
+   | #37 | `NPE on empty cart` | — | — | — | — | Skipped (session exists) |
 
 10. Remind the user that each session is in plan mode — review and approve the
     `orch-bug` plan in each session before the agent begins implementation.
@@ -132,12 +151,18 @@ This skill orchestrates the following installed skills:
 ## Output
 
 - One Copilot session per confirmed bug issue, driven by `orch-bug`.
-- Summary table with issue, severity, session name, and status.
+- Each confirmed issue assigned to `@me` and labelled `in-progress`.
+- Summary table with issue, severity, assignment, label, session name, and status.
 - No duplicate sessions created.
 
 ## Notes
 
+- Issues are fetched regardless of current assignee; assignment to `@me` happens
+  after session creation, not before.
+- The `in-progress` label is created automatically if it does not exist.
 - Sessions are created sequentially to avoid rate limits.
+- Hard default maximum is **3 sessions per run** per repository. Raise it explicitly
+  only when needed to avoid runaway session creation.
 - If the `orch-bug` skill is not installed, the session still starts with the full
   bug context in the kickoff prompt; the agent will perform the stages manually
   without the structured orchestration wrapper.
