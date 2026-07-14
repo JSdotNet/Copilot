@@ -5,8 +5,15 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "plugin", "install", "update", "uninstall", "management"],
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "plugin",
+    "install",
+    "update",
+    "uninstall",
+    "management"
+  ],
   "agents": "agents/",
   "skills": "skills/"
 }

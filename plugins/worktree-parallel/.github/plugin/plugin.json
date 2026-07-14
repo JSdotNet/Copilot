@@ -5,8 +5,15 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "worktree", "parallel", "isolation", "workflow", "branching"],
+  "keywords": [
+    "copilot",
+    "worktree",
+    "parallel",
+    "isolation",
+    "workflow",
+    "branching"
+  ],
   "agents": "agents/",
-  "skills": "skills/"
+  "skills": "skills/",
+  "license": "MIT"
 }

@@ -5,8 +5,17 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "product-owner", "jira", "github-issues", "backlog", "story", "epic", "bug"],
+  "keywords": [
+    "copilot",
+    "product-owner",
+    "jira",
+    "github-issues",
+    "backlog",
+    "story",
+    "epic",
+    "bug"
+  ],
   "agents": "agents/",
-  "skills": "skills/"
+  "skills": "skills/",
+  "license": "MIT"
 }

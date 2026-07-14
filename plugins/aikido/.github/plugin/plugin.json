@@ -5,8 +5,17 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "security", "aikido", "sast", "vulnerabilities", "secrets", "scanning", "iac"],
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "security",
+    "aikido",
+    "sast",
+    "vulnerabilities",
+    "secrets",
+    "scanning",
+    "iac"
+  ],
   "agents": "agents/",
   "skills": "skills/"
 }

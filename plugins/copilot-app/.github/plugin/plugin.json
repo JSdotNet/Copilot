@@ -5,8 +5,16 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "github", "pull-request", "orchestration", "development", "tasks", "jsdotnet"],
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "github",
+    "pull-request",
+    "orchestration",
+    "development",
+    "tasks",
+    "jsdotnet"
+  ],
   "skills": "skills/",
   "hooks": "hooks.json"
 }

@@ -5,8 +5,15 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "agent", "development", "planning", "implementation", "execution"],
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "development",
+    "planning",
+    "implementation",
+    "execution"
+  ],
   "agents": "agents/",
   "skills": "skills/",
   "hooks": "hooks.json"

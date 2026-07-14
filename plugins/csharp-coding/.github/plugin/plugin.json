@@ -5,8 +5,17 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "agent", "csharp", "dotnet", "coding", "tdd", "review", "optimization"],
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "csharp",
+    "dotnet",
+    "coding",
+    "tdd",
+    "review",
+    "optimization"
+  ],
   "agents": "agents/",
   "skills": "skills/"
 }

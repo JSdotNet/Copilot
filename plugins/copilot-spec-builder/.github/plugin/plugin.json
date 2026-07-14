@@ -5,8 +5,16 @@
   "author": {
     "name": "Job Schepers"
   },
-  "license": "UNLICENSED",
-  "keywords": ["copilot", "github", "agent", "instruction", "plugin", "skill", "markdown"],
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "github",
+    "agent",
+    "instruction",
+    "plugin",
+    "skill",
+    "markdown"
+  ],
   "agents": "agents/",
   "skills": "skills/",
   "hooks": "hooks.json"
