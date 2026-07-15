@@ -33,13 +33,16 @@ Use when the user needs to define integration contracts, design event flows betw
    - **Communication pattern** — synchronous (request-response), asynchronous (fire-and-forget), or event-driven (publish-subscribe).
    - **Data contract** — what data crosses the boundary and in what shape.
    - **Failure handling** — what happens when the interaction fails (retry, compensating action, circuit breaker).
-4. Produce interaction diagrams using Mermaid sequence or flowchart syntax.
+4. Apply `instructions/diagrams/ddd-diagram-instructions.md` and use skill `context-interaction-diagram` to produce:
+   - A Context Interaction Overview diagram showing all participating contexts, ACL translators, and integration mechanisms.
+   - One ACL Translation diagram per anti-corruption layer showing upstream and downstream term mappings.
 5. Update bounded context files with integration contracts following `instructions/output/domain-documentation-structure-instructions.md`.
 
 ## Output
 
 - Updated bounded context files with Integration Contracts sections.
-- Interaction diagrams (Mermaid) showing event flows and command paths.
+- Context Interaction Overview diagram (`flowchart LR`) in `domain.md`.
+- ACL Translation diagrams (`flowchart LR`) in relevant bounded context files.
 - Anti-corruption layer mapping tables where applicable.
 
 ## Quality Checks

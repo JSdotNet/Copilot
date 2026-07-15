@@ -12,6 +12,7 @@ Installable GitHub Copilot CLI plugin for Domain-Driven Design workflows.
   - `skills/domain-interaction-model/SKILL.md`
   - `skills/domain-model-design/SKILL.md`
   - `skills/aggregate-diagram/SKILL.md`
+  - `skills/context-interaction-diagram/SKILL.md`
   - `skills/domain-event-flow/SKILL.md`
   - `skills/subdomain-landscape/SKILL.md`
 - Instructions:

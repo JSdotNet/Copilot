@@ -71,6 +71,7 @@ Your goal is to collaborate with domain experts and developers to produce clear,
 - Define integration events, commands, and queries that cross context boundaries.
 - Specify anti-corruption layers and translation mappings.
 - Document communication patterns (synchronous, asynchronous, event-driven).
+- Use skill `context-interaction-diagram` to produce a Context Interaction Overview diagram and ACL Translation diagrams after integration contracts are defined.
 
 ### Domain Model Design
 
@@ -86,6 +87,7 @@ Your goal is to collaborate with domain experts and developers to produce clear,
 - Use skill `aggregate-diagram` to visualise the tactical model of a bounded context as a Mermaid `classDiagram`.
 - Use skill `domain-event-flow` to visualise process flows as Mermaid `sequenceDiagram` blocks.
 - Use skill `subdomain-landscape` to visualise the subdomain classification as a Mermaid `flowchart TD`.
+- Use skill `context-interaction-diagram` to visualise integration contracts, communication patterns, and ACL translators as Mermaid `flowchart LR` diagrams.
 - Propose diagram generation after completing a design step where a visual would aid review or communication.
 - Never produce diagrams in isolation; diagrams must be embedded in the relevant domain artifact file.
 

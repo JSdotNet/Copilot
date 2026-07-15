@@ -139,6 +139,63 @@ flowchart TD
 - Bounded contexts: rectangle `[ContextName]`.
 - External systems: stadium shape `([SystemName])`.
 
+## Context Interaction Diagram Conventions (`flowchart LR`)
+
+Use `flowchart LR` for two diagram types produced by the `context-interaction-diagram` skill.
+
+### Context Interaction Overview
+
+Show all bounded contexts and the mechanisms that connect them in a single overview diagram.
+
+#### Node Shapes
+
+| Shape | Syntax | Represents |
+|---|---|---|
+| Rectangle | `[ContextName]` | Bounded context |
+| Hexagon | `{ACL: TranslatorName}` | Anti-corruption layer translator |
+| Stadium | `([SystemName])` | External system |
+
+#### Edge Labels
+
+Edge labels must include two parts separated by a slash: the mechanism name and the communication pattern abbreviation.
+
+- Communication pattern abbreviations: `sync`, `async`, `event`.
+- Example: `OrderPlaced / event` or `GetCustomer / sync`.
+
+#### Example
+
+```mermaid
+flowchart LR
+    Orders[Order Management]
+    Inventory[Inventory]
+    Payment([Payment Gateway])
+    ACL{ACL: Payment Translator}
+
+    Orders -->|OrderPlaced / event| Inventory
+    Orders -->|InitiatePayment / sync| ACL
+    ACL -->|ChargeRequest / sync| Payment
+    Payment -->|PaymentConfirmed / async| ACL
+    ACL -->|PaymentProcessed / async| Orders
+```
+
+### ACL Translation Diagram
+
+Show how a single upstream concept is translated to the downstream model by the ACL.
+
+Use three nodes in a left-to-right chain: upstream context → ACL translator → downstream context. Label each edge with the term used on that side of the boundary.
+
+#### Example
+
+```mermaid
+flowchart LR
+    Upstream[Payment Gateway]
+    ACL{ACL: Payment Translator}
+    Downstream[Order Management]
+
+    Upstream -->|"ChargeResult { status, transactionId }"| ACL
+    ACL -->|"PaymentOutcome { outcome, reference }"| Downstream
+```
+
 ## Context Map Diagram Conventions
 
-Refer to `instructions/ddd/strategic-design-instructions.md` for context map diagram conventions. Context map diagrams are produced by the `context-mapping` skill and use `flowchart LR` syntax.
+Refer to `instructions/ddd/strategic-design-instructions.md` for context map diagram conventions. Context map diagrams are produced by the `context-mapping` skill and use `flowchart LR` syntax with relationship pattern labels on edges.
