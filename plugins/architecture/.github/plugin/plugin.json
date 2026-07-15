@@ -1,7 +1,7 @@
 {
   "name": "architecture",
-  "description": "Copilot plugin for architecture documentation, blueprints, ADRs, technical debt records, and C4 diagrams.",
-  "version": "0.2.0",
+  "description": "Copilot plugin for architecture documentation, blueprints, ADRs, technical debt records, and architecture diagrams (C4, sequence, state machine, deployment).",
+  "version": "0.3.0",
   "author": {
     "name": "Job Schepers"
   },
@@ -15,7 +15,10 @@
     "tdr",
     "c4",
     "c4-model",
-    "diagram"
+    "diagram",
+    "sequence-diagram",
+    "state-diagram",
+    "deployment-diagram"
   ],
   "agents": "agents/",
   "skills": "skills/"

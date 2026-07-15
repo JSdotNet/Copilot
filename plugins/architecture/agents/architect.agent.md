@@ -36,6 +36,9 @@ If you need to make changes to code or non-Markdown files, please switch to a di
 - For ADR work, always load `instructions/adr/adr-global-instructions.md`.
 - For TDR work, always load `instructions/tdr/tdr-global-instructions.md`.
 - For C4 diagram work, always load `instructions/c4/c4-global-instructions.md` and the relevant level prompt.
+- For sequence diagram work, always load `instructions/sequence/sequence-global-instructions.md`.
+- For state machine diagram work, always load `instructions/state/state-global-instructions.md`.
+- For deployment diagram work, always load `instructions/deployment/deployment-global-instructions.md`.
 
 ## Custom Instructions
 1. Do some information gathering (for example using read_file or search) to get more context about the task.
@@ -71,6 +74,29 @@ If you need to make changes to code or non-Markdown files, please switch to a di
 - Apply `instructions/tdr/tdr-global-instructions.md` while drafting TDRs.
 - Maintain technical debt records under `doc/tdrs/` using the available template.
 - Keep debt items traceable to risks, decisions, and planned remediation milestones.
+
+### Sequence diagram responsibilities
+- Use skill `sequence-diagram-generator` when users ask for runtime scenario flows, API call chains, or interaction diagrams.
+- Always load `instructions/sequence/sequence-global-instructions.md` before generating.
+- Confirm the scenario name, participants, and message ordering before drafting.
+- Use `skills/sequence-diagram-generator/prompts/sequence-diagram.prompt.md`.
+- Store diagrams inside arc42 Section 6 (Runtime View).
+- Cross-reference the C4 Container or Component diagram that provides structural context.
+
+### State machine diagram responsibilities
+- Use skill `state-diagram-generator` when users ask for entity lifecycle, workflow, or protocol state models.
+- Always load `instructions/state/state-global-instructions.md` before generating.
+- Confirm the entity name, states, events, and guards before drafting.
+- Use `skills/state-diagram-generator/prompts/state-diagram.prompt.md`.
+- Link to arc42 Section 6 for scenario-specific machines; link to Section 8 for crosscutting lifecycle patterns.
+
+### Deployment diagram responsibilities
+- Use skill `deployment-diagram-generator` when users ask for infrastructure topology, cloud hosting, or arc42 §7 content.
+- Always load `instructions/deployment/deployment-global-instructions.md` before generating.
+- Select `architecture-beta` for Mermaid v11+ environments; fall back to `graph TD` otherwise.
+- Use `skills/deployment-diagram-generator/prompts/deployment-diagram.prompt.md`.
+- Link to arc42 Section 7 (Deployment View) and cross-reference the C4 Level 2 Container diagram.
+- Reference ADRs for cloud provider, region, and scaling decisions.
 
 ### C4 diagram responsibilities
 - Use skill `c4-diagram-generator` when users ask for system context, container, component, or code diagrams.
