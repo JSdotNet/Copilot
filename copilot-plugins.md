@@ -17,6 +17,7 @@ Track GitHub Copilot plugins used by this repository so team members can install
 | `awesome-copilot` | `awesome-copilot` | Meta discovery plugin for finding and generating curated Copilot resources. |
 | `csharp-dotnet-development` | `awesome-copilot` | C#/.NET development guidance plugin. |
 | `testing-automation` | `awesome-copilot` | Testing workflows and automation guidance plugin. |
+| `impeccable` | `awesome-copilot` | Frontend design and UI-craft skill (impeccable.style). Used by the `ux-design` plugin when installed. Requires Node 18+ for automation scripts; falls back to design guidance without it. |
 | `azure` | `awesome-copilot` | Azure skills and MCP workflows plugin. |
 | `azure-cloud-development` | `awesome-copilot` | Azure architecture and IaC development plugin. |
 | `project-planning` | `awesome-copilot` | Planning support for epics, feature breakdown, and implementation planning workflows. |

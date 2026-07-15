@@ -28,6 +28,7 @@ Two source formats are supported:
 | `project-planning` | `project-planning@awesome-copilot` | Planning support for epics, feature breakdown, and delivery planning. |
 | `software-engineering-team` | `software-engineering-team@awesome-copilot` | Multi-role engineering plugin covering architecture, implementation, QA, and DevOps. |
 | `technical-spike` | `technical-spike@awesome-copilot` | Research and assumption-validation workflows before committing to implementation. |
+| `impeccable` | `impeccable@awesome-copilot` | Frontend design and UI-craft skill by Paul Bakaus (impeccable.style). Optional Node 18+ for automation scripts; falls back to design guidance without it. |
 
 ---
 

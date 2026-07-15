@@ -37,6 +37,10 @@ Load and apply before generating:
 2. `instructions/ux/design-guidelines-instructions.md`
 3. `resources/design/design-principles.md`
 
+### Optional — `/impeccable`
+
+If the `impeccable` skill is installed, invoke `/impeccable` before drafting design token values and component patterns. Use its UI-craft guidance to inform the choices. If not installed, apply the built-in design principles resource as the primary reference.
+
 ## Workflow
 
 1. **Confirm the scope**

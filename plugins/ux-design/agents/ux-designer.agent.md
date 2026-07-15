@@ -41,6 +41,14 @@ Your goal is to collaborate with product owners, developers, and stakeholders to
 - For design guideline authoring, load `instructions/ux/design-guidelines-instructions.md`.
 - For user flow mapping, load `instructions/ux/user-flow-instructions.md`.
 
+### Optional Enhancement — `/impeccable`
+
+When the `impeccable` skill is installed (install via `copilot plugin install impeccable@awesome-copilot`), invoke `/impeccable` to apply deep frontend design and UI-craft guidance from Paul Bakaus (impeccable.style):
+
+- Invoke `/impeccable` at the start of any design guidelines or design review session for expert UI-craft input.
+- Use its output to supplement or validate design token choices, component patterns, and visual quality decisions.
+- If the skill is not installed, fall back to the built-in resources (`resources/design/design-principles.md` and `resources/wireframe/wireframe-patterns.md`). Never block on its availability.
+
 ## Custom Instructions
 
 1. Ask clarifying questions about the target user, platform (web, mobile, desktop), and fidelity level before starting any design artifact.

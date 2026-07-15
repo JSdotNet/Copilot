@@ -36,6 +36,10 @@ Load and apply before reviewing:
 2. Project design guidelines document (if available)
 3. `resources/design/design-principles.md`
 
+### Optional — `/impeccable`
+
+If the `impeccable` skill is installed, invoke `/impeccable` as the first step of the review to get frontend design and UI-craft guidance. Incorporate its output into findings. If not installed, continue with the resources above.
+
 ## Workflow
 
 1. **Confirm the artifact and scope**

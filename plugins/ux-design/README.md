@@ -89,3 +89,13 @@ Invoke a specific skill to start a guided workflow:
 - **architecture** — hand off UX decisions to the `architect` agent to record them as ADRs or incorporate UX constraints into arc42 sections.
 - **documentation** — hand off design artifacts to the `documentation` agent to wrap them in How-To guides, Explanations, or Proposals.
 - **product-owner** — use the `product-owner` plugin to link wireframes and flows to epics and user stories.
+
+## Optional Enhancement — impeccable
+
+Install the `impeccable` skill from `awesome-copilot` to get deep frontend design and UI-craft guidance (by Paul Bakaus, impeccable.style):
+
+```bash
+copilot plugin install impeccable@awesome-copilot
+```
+
+When installed, the `ux-designer` agent and the `ux-design-review` and `ux-design-guidelines` skills will automatically invoke `/impeccable` for expert UI-craft input. Without it, the plugin falls back to its built-in design principles and wireframe pattern resources. Node 18+ on your PATH is required for impeccable's optional automation scripts.
