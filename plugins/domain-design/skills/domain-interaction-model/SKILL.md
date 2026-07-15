@@ -33,13 +33,13 @@ Use when the user needs to define integration contracts, design event flows betw
    - **Communication pattern** — synchronous (request-response), asynchronous (fire-and-forget), or event-driven (publish-subscribe).
    - **Data contract** — what data crosses the boundary and in what shape.
    - **Failure handling** — what happens when the interaction fails (retry, compensating action, circuit breaker).
-4. Produce interaction diagrams using Mermaid sequence or flowchart syntax.
+4. Produce interaction diagrams using Mermaid sequence or flowchart syntax. Use skill `domain-interaction-diagram` for detailed diagram generation.
 5. Update bounded context files with integration contracts following `instructions/output/domain-documentation-structure-instructions.md`.
 
 ## Output
 
 - Updated bounded context files with Integration Contracts sections.
-- Interaction diagrams (Mermaid) showing event flows and command paths.
+- Interaction diagrams (Mermaid) produced by skill `domain-interaction-diagram`.
 - Anti-corruption layer mapping tables where applicable.
 
 ## Quality Checks
