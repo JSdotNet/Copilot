@@ -1,9 +1,9 @@
 ---
-name: context-interaction-diagram
+name: domain-interaction-diagram
 description: 'Generate Mermaid flowchart diagrams that visualise integration contracts, communication patterns, and anti-corruption layer mappings between bounded contexts.'
 ---
 
-# Context Interaction Diagram
+# Domain Interaction Diagram
 
 Use this skill to produce integration diagrams that show how bounded contexts communicate — what crosses each boundary, by which mechanism, and through which integration pattern.
 
@@ -25,7 +25,7 @@ Use after `domain-interaction-model` has defined integration contracts, or when 
    - The mechanism: integration event, command, query, or shared data.
    - The communication pattern: synchronous, asynchronous, or event-driven.
    - The ACL translator name (if an anti-corruption layer is present).
-3. Produce a **Context Interaction Overview** diagram using `flowchart LR` following `instructions/diagrams/ddd-diagram-instructions.md`:
+3. Produce a **Domain Interaction Overview** diagram using `flowchart LR` following `instructions/diagrams/ddd-diagram-instructions.md`:
    - One rectangle node per bounded context.
    - One hexagon node per ACL translator between contexts.
    - Labelled directional edges showing the mechanism and communication pattern.
@@ -33,12 +33,12 @@ Use after `domain-interaction-model` has defined integration contracts, or when 
 4. For each anti-corruption layer, produce a dedicated **ACL Translation** diagram using `flowchart LR` following `instructions/diagrams/ddd-diagram-instructions.md`:
    - Show the upstream concept, the ACL translator, and the downstream concept as three nodes.
    - Label the upstream edge with the upstream term and the downstream edge with the translated term.
-5. Insert the Context Interaction Overview diagram into `domain.md` under a **Context Interaction Overview** section.
+5. Insert the Domain Interaction Overview diagram into `domain.md` under a **Domain Interaction Overview** section.
 6. Insert each ACL Translation diagram into the relevant bounded context file under its Integration Contracts section.
 
 ## Output
 
-- `domain.md` updated with a Context Interaction Overview `flowchart LR` diagram.
+- `domain.md` updated with a Domain Interaction Overview `flowchart LR` diagram.
 - Relevant bounded context files updated with ACL Translation `flowchart LR` diagrams where anti-corruption layers exist.
 
 ## Quality Checks

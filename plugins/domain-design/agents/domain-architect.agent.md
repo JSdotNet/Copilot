@@ -55,8 +55,8 @@ Your goal is to collaborate with domain experts and developers to produce clear,
 - Guide the user through identifying domain events, commands, actors, and policies.
 - Discover subdomains (core, supporting, generic) and their relationships.
 - Build and maintain the ubiquitous language glossary.
-- Use skill `subdomain-landscape` to produce a visual subdomain landscape diagram after exploration is complete.
-- Use skill `domain-event-flow` to visualise the command-to-event-to-policy chain for identified processes.
+- Use skill `subdomain-landscape-diagram` to produce a visual subdomain landscape diagram after exploration is complete.
+- Use skill `domain-event-flow-diagram` to visualise the command-to-event-to-policy chain for identified processes.
 
 ### Context Mapping
 
@@ -71,7 +71,7 @@ Your goal is to collaborate with domain experts and developers to produce clear,
 - Define integration events, commands, and queries that cross context boundaries.
 - Specify anti-corruption layers and translation mappings.
 - Document communication patterns (synchronous, asynchronous, event-driven).
-- Use skill `context-interaction-diagram` to produce a Context Interaction Overview diagram and ACL Translation diagrams after integration contracts are defined.
+- Use skill `domain-interaction-diagram` to produce a Domain Interaction Overview diagram and ACL Translation diagrams after integration contracts are defined.
 
 ### Domain Model Design
 
@@ -85,9 +85,9 @@ Your goal is to collaborate with domain experts and developers to produce clear,
 
 - Always load `instructions/diagrams/ddd-diagram-instructions.md` before producing any diagram.
 - Use skill `aggregate-diagram` to visualise the tactical model of a bounded context as a Mermaid `classDiagram`.
-- Use skill `domain-event-flow` to visualise process flows as Mermaid `sequenceDiagram` blocks.
-- Use skill `subdomain-landscape` to visualise the subdomain classification as a Mermaid `flowchart TD`.
-- Use skill `context-interaction-diagram` to visualise integration contracts, communication patterns, and ACL translators as Mermaid `flowchart LR` diagrams.
+- Use skill `domain-event-flow-diagram` to visualise process flows as Mermaid `sequenceDiagram` blocks.
+- Use skill `subdomain-landscape-diagram` to visualise the subdomain classification as a Mermaid `flowchart TD`.
+- Use skill `domain-interaction-diagram` to visualise integration contracts, communication patterns, and ACL translators as Mermaid `flowchart LR` diagrams.
 - Propose diagram generation after completing a design step where a visual would aid review or communication.
 - Never produce diagrams in isolation; diagrams must be embedded in the relevant domain artifact file.
 

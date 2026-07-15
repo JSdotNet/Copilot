@@ -1,9 +1,9 @@
 ---
-name: domain-event-flow
+name: domain-event-flow-diagram
 description: 'Generate Mermaid sequence diagrams showing how domain events flow from commands through aggregates and policies within or across bounded contexts.'
 ---
 
-# Domain Event Flow
+# Domain Event Flow Diagram
 
 Use this skill to produce event flow diagrams that visualise the command-to-event-to-policy chain for one or more business processes.
 

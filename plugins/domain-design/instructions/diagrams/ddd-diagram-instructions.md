@@ -141,9 +141,9 @@ flowchart TD
 
 ## Context Interaction Diagram Conventions (`flowchart LR`)
 
-Use `flowchart LR` for two diagram types produced by the `context-interaction-diagram` skill.
+Use `flowchart LR` for two diagram types produced by the `domain-interaction-diagram` skill.
 
-### Context Interaction Overview
+### Domain Interaction Overview
 
 Show all bounded contexts and the mechanisms that connect them in a single overview diagram.
 

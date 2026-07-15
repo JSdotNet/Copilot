@@ -1,9 +1,9 @@
 ---
-name: subdomain-landscape
+name: subdomain-landscape-diagram
 description: 'Generate a Mermaid landscape diagram showing subdomains classified by type (core, supporting, generic) with their bounded contexts.'
 ---
 
-# Subdomain Landscape
+# Subdomain Landscape Diagram
 
 Use this skill to produce a high-level visual of the domain's subdomain landscape, classifying each subdomain and its bounded contexts by type.
 
