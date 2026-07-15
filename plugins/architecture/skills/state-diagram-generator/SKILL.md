@@ -34,6 +34,7 @@ Use when the user asks to:
 5. Generate the Mermaid `stateDiagram-v2` with labelled transitions and composite states where needed.
 6. Write a prose summary (2–4 sentences) explaining the lifecycle, key guards, and any side effects.
 7. Add traceability notes to arc42 §6 or §8 and the related domain model.
+8. Run `scripts/generate-diagram-svgs.ps1 -Path <directory-of-output-file>` from the plugin root to generate an SVG alongside the Markdown output.
 
 ## Output
 
@@ -52,3 +53,4 @@ Use when the user asks to:
 - [ ] Diagram embedded in a fenced `mermaid` code block.
 - [ ] Prose summary present.
 - [ ] Traceability links to arc42 §6 or §8 and related domain artifacts present.
+- [ ] SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

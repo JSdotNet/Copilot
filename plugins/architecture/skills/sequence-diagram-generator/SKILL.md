@@ -34,6 +34,7 @@ Use when the user asks to:
 6. Add `alt`/`opt`/`loop` fragments for conditionals and error paths.
 7. Write a prose summary (2–4 sentences) explaining key ordering decisions and error handling.
 8. Add traceability notes to arc42 §6 and the related C4 diagram.
+9. Run `scripts/generate-diagram-svgs.ps1 -Path <directory-of-output-file>` from the plugin root to generate an SVG alongside the Markdown output.
 
 ## Output
 
@@ -52,3 +53,4 @@ Use when the user asks to:
 - [ ] Diagram embedded in a fenced `mermaid` code block.
 - [ ] Prose summary present.
 - [ ] Traceability links to arc42 §6 and related C4 diagram present.
+- [ ] SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

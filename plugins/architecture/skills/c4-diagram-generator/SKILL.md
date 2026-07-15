@@ -34,6 +34,7 @@ Use when the user asks to:
 6. Write a prose summary (3–5 sentences) explaining the diagram's key design decisions.
 7. Add traceability notes linking the diagram to relevant arc42 sections, ADRs, or blueprint artifacts.
 8. List open questions or assumptions explicitly.
+9. Run `scripts/generate-diagram-svgs.ps1 -Path <directory-of-output-file>` from the plugin root to generate an SVG alongside the Markdown output.
 
 ## Prompt Pack
 
@@ -60,3 +61,4 @@ Use when the user asks to:
 - [ ] Diagram is embedded in a fenced `mermaid` code block.
 - [ ] Prose summary accompanies the diagram.
 - [ ] Traceability links are present where relevant.
+- [ ] SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

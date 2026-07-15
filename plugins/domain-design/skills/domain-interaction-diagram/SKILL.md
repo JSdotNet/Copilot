@@ -35,6 +35,7 @@ Use after `domain-interaction-model` has defined integration contracts, or when 
    - Label the upstream edge with the upstream term and the downstream edge with the translated term.
 5. Insert the Domain Interaction Overview diagram into `domain.md` under a **Domain Interaction Overview** section.
 6. Insert each ACL Translation diagram into the relevant bounded context file under its Integration Contracts section.
+7. Run `scripts/generate-diagram-svgs.ps1 -Path <directory-of-output-file>` from the plugin root to generate SVG files alongside the Markdown output.
 
 ## Output
 
@@ -48,3 +49,4 @@ Use after `domain-interaction-model` has defined integration contracts, or when 
 - Edge labels identify the mechanism (event name, command name, or query name) and communication pattern (sync/async/event-driven).
 - No context node exposes internal aggregate structure; only integration contracts cross the boundary.
 - ACL Translation diagrams use ubiquitous language terms on both sides of the translation.
+- SVG file(s) generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

@@ -34,6 +34,7 @@ Use after `domain-exploration` or `domain-model-design` has identified commands,
    - Policy triggers: fire-and-forget arrows (`--)`).
 5. Store diagrams in `domain.md` under a **Domain Event Flows** section, or in the relevant bounded context file under a **Domain Event Flows** subsection.
 6. Produce one diagram per significant process; do not combine unrelated processes in a single diagram.
+7. Run `scripts/generate-diagram-svgs.ps1 -Path <directory-of-output-file>` from the plugin root to generate SVG files alongside the Markdown output.
 
 ## Output
 
@@ -47,3 +48,4 @@ Use after `domain-exploration` or `domain-model-design` has identified commands,
 - Cross-context event flows show bounded context boundaries using `Note over` separators.
 - Policies that react to events and produce new commands are explicitly shown.
 - Diagram participant names use ubiquitous language, not technical identifiers.
+- SVG file(s) generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

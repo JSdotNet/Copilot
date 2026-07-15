@@ -31,6 +31,7 @@ Use after `domain-exploration` has produced `domain.md` with a subdomain overvie
 5. If context map relationships are available, add simplified directional edges between bounded context nodes (direction only, no pattern labels, to keep the landscape readable).
 6. External systems referenced by any bounded context appear as stadium-shape nodes `([SystemName])` outside the subgraphs.
 7. Insert or update the diagram in `domain.md` under a **Subdomain Landscape** section, positioned above the Bounded Context Map section.
+8. Run `scripts/generate-diagram-svgs.ps1 -Path <directory-of-domain.md>` from the plugin root to generate an SVG alongside the Markdown output.
 
 ## Output
 
@@ -43,3 +44,4 @@ Use after `domain-exploration` has produced `domain.md` with a subdomain overvie
 - The three subdomain type subgraphs are clearly labelled.
 - The diagram is consistent with the Bounded Context Index in `domain.md`.
 - No pattern labels clutter the landscape; relationship detail belongs on the context map.
+- SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

@@ -35,6 +35,7 @@ Use after `domain-model-design` has produced a bounded context file with aggrega
    - Use dashed dependency (`..>`) labelled `raises` for domain events emitted by an aggregate.
 4. Insert the diagram into the bounded context file under an **Aggregate Diagram** subsection within the Aggregates section.
 5. Confirm with the user before overwriting an existing diagram.
+6. Run `scripts/generate-diagram-svgs.ps1 -Path <directory-of-bounded-context-file>` from the plugin root to generate an SVG alongside the Markdown output.
 
 ## Output
 
@@ -47,3 +48,4 @@ Use after `domain-model-design` has produced a bounded context file with aggrega
 - Value objects are differentiated from entities by the `<<ValueObject>>` annotation.
 - Domain events are shown as separate nodes connected to their emitting aggregate.
 - The diagram accurately reflects the bounded context file content.
+- SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.
