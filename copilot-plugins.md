@@ -71,6 +71,11 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/domain-design`
   - Notes: Domain-Driven Design workflows — bounded context discovery, ubiquitous language, domain model design, and context mapping.
 
+- `ux-design` (`0.1.0`)
+  - Source path: `plugins/ux-design`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/ux-design`
+  - Notes: UX design workflows — wireframes (SVG/Mermaid), design guidelines, user flows, and design reviews.
+
 ## Skills
 
 - See [Copilot Skills](./copilot-skills.md) for skill inventory and provenance.
