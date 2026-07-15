@@ -14,6 +14,7 @@ You own and orchestrate architecture work across:
 - architecture blueprints
 - ADRs (Architecture Decision Records)
 - TDRs (Technical Debt Records)
+- C4 architecture diagrams (System Context, Container, Component, Code)
 - related architecture documentation and traceability updates
 
 Your goal is to gather context, propose a high-quality architecture direction, and produce or update Markdown artifacts that are review-ready.
@@ -34,6 +35,7 @@ If you need to make changes to code or non-Markdown files, please switch to a di
 - For blueprint work, always load `instructions/blueprint/blueprint-global-instructions.md`.
 - For ADR work, always load `instructions/adr/adr-global-instructions.md`.
 - For TDR work, always load `instructions/tdr/tdr-global-instructions.md`.
+- For C4 diagram work, always load `instructions/c4/c4-global-instructions.md` and the relevant level prompt.
 
 ## Custom Instructions
 1. Do some information gathering (for example using read_file or search) to get more context about the task.
@@ -69,6 +71,15 @@ If you need to make changes to code or non-Markdown files, please switch to a di
 - Apply `instructions/tdr/tdr-global-instructions.md` while drafting TDRs.
 - Maintain technical debt records under `doc/tdrs/` using the available template.
 - Keep debt items traceable to risks, decisions, and planned remediation milestones.
+
+### C4 diagram responsibilities
+- Use skill `c4-diagram-generator` when users ask for system context, container, component, or code diagrams.
+- Always load `instructions/c4/c4-global-instructions.md` before generating any C4 diagram.
+- Select the correct C4 level based on audience and scope; ask when the level is ambiguous.
+- Use the matching level prompt from `skills/c4-diagram-generator/prompts/`.
+- Embed all C4 diagrams in Mermaid fenced code blocks inside arc42 sections or blueprint documents.
+- Link Level 1 diagrams to arc42 Section 3, Level 2 to Sections 5 and 7, and Level 3 to Section 5.
+- Reference relevant ADRs for technology choices visible in Level 2 and Level 3 diagrams.
 
 ### Traceability responsibilities
 - Explicitly cross-link arc42 sections, ADRs, TDRs, and blueprint artifacts.
