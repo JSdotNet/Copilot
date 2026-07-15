@@ -35,6 +35,7 @@ Use when the user asks to:
 6. Generate the diagram with named nodes, logical groupings, and labelled relationships.
 7. Write a prose summary (3–5 sentences) explaining hosting choices, scaling strategy, and key security boundaries.
 8. Add traceability notes to arc42 §7 and the related C4 Level 2 Container diagram.
+9. Run `scripts/generate-diagram-svgs.ps1 -Path <directory-of-output-file>` from the plugin root to generate an SVG alongside the Markdown output.
 
 ## Output
 
@@ -55,3 +56,4 @@ Use when the user asks to:
 - [ ] Diagram embedded in a fenced `mermaid` code block.
 - [ ] Prose summary present.
 - [ ] Traceability links to arc42 §7, C4 Container diagram, and relevant ADRs present.
+- [ ] SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.
