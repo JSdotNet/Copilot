@@ -77,6 +77,16 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/ux-design`
   - Notes: UX design workflows — wireframes (SVG/Mermaid), design guidelines, user flows, and design reviews.
 
+- `product-owner` (`0.1.0`)
+  - Source path: `plugins/product-owner`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/product-owner`
+  - Notes: Product Owner backlog authoring (epics, stories, bugs) with optional Jira synchronization. GitHub issue sync requires the `github-issues` plugin.
+
+- `github-issues` (`0.1.0`)
+  - Source path: `plugins/github-issues`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/github-issues`
+  - Notes: GitHub issue synchronization — create and update GitHub issues from approved Markdown backlog artifacts. Works standalone or alongside the `product-owner` plugin.
+
 ## Skills
 
 - See [Copilot Skills](./copilot-skills.md) for skill inventory and provenance.

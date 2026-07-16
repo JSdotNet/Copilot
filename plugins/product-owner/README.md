@@ -1,6 +1,6 @@
 # product-owner
 
-Installable GitHub Copilot CLI plugin for product backlog authoring and issue synchronization workflows.
+Installable GitHub Copilot CLI plugin for product backlog authoring with optional Jira synchronization.
 
 ## Includes
 
@@ -12,31 +12,28 @@ Installable GitHub Copilot CLI plugin for product backlog authoring and issue sy
   - `skills/write-bug/SKILL.md`
   - `skills/create-jira-ticket/SKILL.md`
   - `skills/update-jira-ticket/SKILL.md`
-  - `skills/create-github-issue/SKILL.md`
-  - `skills/update-github-issue/SKILL.md`
 - Instructions:
   - `instructions/stories.instructions.md`
   - `instructions/epics.instructions.md`
   - `instructions/bugs.instructions.md`
   - `instructions/jira-sync.instructions.md`
-  - `instructions/github-issues-sync.instructions.md`
   - `instructions/agent-handoff.instructions.md`
   - `instructions/markdown.instructions.md`
 
 ## Scope
 
 - Product Owner concerns: backlog writing and refinement for epics, stories, and bugs.
-- Jira concerns: create/update Jira issues from approved backlog artifacts.
-- GitHub concerns: create/update GitHub issues from approved backlog artifacts.
+- Jira concerns: create/update Jira issues from approved backlog artifacts (optional use).
 - Backlog artifacts use the `.wip/work/<module>/` convention with `epic-`, `story-`, and `bug-` file prefixes.
 - Keep responsibilities separated by agent:
   - Use `product-owner` for writing and refining backlog content.
   - Use `jira` for Jira sync operations and field mapping.
-  - Use `github-issues` for GitHub issue sync operations and field mapping.
+  - Use `github-issues` (separate plugin) for GitHub issue sync operations.
 
 ## Optional Integrations
 
 - Architecture handoff (`architect`) is optional and requires the `architecture` plugin to be installed.
+- GitHub issue sync (`github-issues` agent) is optional and requires the `github-issues` plugin to be installed.
 
 ## Agent Visibility
 

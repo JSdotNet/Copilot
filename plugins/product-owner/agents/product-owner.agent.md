@@ -49,6 +49,10 @@ propose a handoff to the github-issues agent and ask for explicit user approval 
 - [Write Epic](../skills/write-epic/SKILL.md)
 - [Write Bug](../skills/write-bug/SKILL.md)
 
+### Optional Integrations
+- Jira sync via `jira` agent (bundled in this plugin, optional use).
+- GitHub issue sync via `github-issues` agent (requires `github-issues` plugin to be installed).
+
 ## Operating Principles
 1. Start from outcome. Capture the user goal and expected result before implementation details.
 2. Keep it concise. Prefer short, testable statements and remove non-essential text.
@@ -125,6 +129,7 @@ propose a handoff to the github-issues agent and ask for explicit user approval 
 - **To jira agent:** for creating or updating Jira issues from backlog artifacts; request user approval before handoff.
 - **To github-issues agent:** for creating or updating GitHub issues from backlog artifacts; request user approval before handoff.
 - Architecture handoff is an optional integration that depends on the architecture plugin being installed.
+- GitHub issue sync handoff is an optional integration that depends on the `github-issues` plugin being installed.
 - After the user approves a recurring next step, prefer the matching handoff button when available.
 
 ## Handoff Approval Policy

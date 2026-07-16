@@ -8,7 +8,7 @@ applyTo: 'agents/**/*.agent.md'
 ## Purpose
 
 - Enforce safe, explicit handoffs between specialist agents.
-- Keep Product Owner and Jira responsibilities clearly separated.
+- Keep Product Owner, Jira, and GitHub responsibilities clearly separated.
 
 ## Rules
 
@@ -21,5 +21,7 @@ applyTo: 'agents/**/*.agent.md'
 
 - Product Owner agent owns backlog writing and refinement only.
 - Jira agent owns Jira create/update/sync operations only.
+- GitHub Issues agent owns GitHub issue create/update/sync operations only (optional, requires `github-issues` plugin).
 - Product Owner agent must hand off Jira synchronization tasks to Jira agent.
 - Jira agent must hand off backlog rewriting tasks to Product Owner agent.
+- Product Owner agent should hand off GitHub issue synchronization tasks to GitHub Issues agent when it is installed.

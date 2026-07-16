@@ -1,14 +1,13 @@
 {
-  "name": "product-owner",
-  "description": "Copilot plugin for product backlog authoring with optional Jira synchronization workflows.",
+  "name": "github-issues",
+  "description": "Copilot plugin for creating and updating GitHub issues from Markdown backlog artifacts.",
   "version": "0.1.0",
   "author": {
     "name": "Job Schepers"
   },
   "keywords": [
     "copilot",
-    "product-owner",
-    "jira",
+    "github-issues",
     "backlog",
     "story",
     "epic",
