@@ -15,21 +15,27 @@ loads the Jira story, inspects the codebase domain layer for existing aggregates
 and delegates to the `story-review-domain` skill to validate domain model alignment and
 ubiquitous language usage.
 
+## Required Plugins
+
+- **`product-owner`** — provides `create-jira-ticket` and `update-jira-ticket` skills.
+  All Jira interactions in this automation are delegated exclusively to those skills.
+  Do not use Jira MCP tools directly; all Jira knowledge, field mapping, and API
+  conventions are owned by the `product-owner` plugin.
+
 ## Inputs
 
 - **Story identifier**: Jira story key (e.g., `FIN-123`) or pasted story content.
 - **Codebase path**: root path of the Fincent codebase (optional; scans domain layer only).
 - **Ubiquitous language source**: path to glossary or domain documentation (optional).
-- **Update Jira**: `true` or `false` (default) — whether to post review findings back as a
-  Jira comment.
+- **Update Jira**: `true` or `false` (default) — whether to sync review findings back to
+  Jira via the `update-jira-ticket` skill.
 
 ## Dependencies
 
-This automation requires the following to be available:
-
-| Dependency | Source | Purpose |
-|-----------|--------|---------|
-| Jira story content | Jira API | Primary review target |
+| Dependency | Provided by | Purpose |
+|-----------|-------------|---------|
+| Jira story content | `product-owner` → `create-jira-ticket` | Primary review target |
+| Jira write-back | `product-owner` → `update-jira-ticket` | Sync review findings to story |
 | Codebase — domain layer | Codebase (`**/Domain/**`, `**/Aggregates/**`) | Verify existing aggregates and events |
 | Ubiquitous language glossary | Domain documentation or codebase | Term validation |
 | Bounded context map | Architecture documentation or domain-design plugin | Context ownership |
@@ -40,7 +46,9 @@ This automation requires the following to be available:
 
 ### Phase 1 — Context Loading
 
-1. Retrieve the full story from Jira, including title, description, and acceptance criteria.
+1. Use the `create-jira-ticket` skill from the `product-owner` plugin to retrieve the full
+   story content for the provided story key. Let that skill handle all Jira field mapping
+   and API interaction.
 2. Scan the codebase domain layer for:
    - Existing aggregates, entities, and value objects related to the story scope.
    - Domain events (classes implementing `IDomainEvent` or equivalent).
@@ -68,10 +76,11 @@ This automation requires the following to be available:
 
 ### Phase 4 — Jira Update (Optional)
 
-8. If `update Jira` is enabled, post the review result as a structured Jira comment with:
-   - The completed domain checklist.
-   - Domain readiness classification.
-   - Correction proposals for all gaps.
+8. If `update Jira` is enabled:
+   - Write the review findings (domain checklist, readiness classification, and correction
+     proposals) back to the story artifact file.
+   - Use the `update-jira-ticket` skill from the `product-owner` plugin to sync the updated
+     content to Jira. Let that skill own all field mapping, comment formatting, and API calls.
 
 ### Phase 5 — Summary
 
@@ -85,7 +94,7 @@ This automation requires the following to be available:
 
 - Completed Domain Architect story review with checklist and domain readiness verdict.
 - Corrected ubiquitous language terms and aggregate/event names.
-- Jira comment posted (if enabled).
+- Jira updated via `update-jira-ticket` (if enabled).
 - Summary table.
 
 ## Notes
@@ -94,3 +103,5 @@ This automation requires the following to be available:
   `**/Events/**`). Do not scan infrastructure or application layers for domain concepts.
 - If no codebase path is provided, the review relies solely on the story content and
   flags any domain references that cannot be verified.
+- Never reproduce Jira field names, project keys, custom field IDs, or API call details
+  in this skill. All such knowledge lives in the `product-owner` plugin.
