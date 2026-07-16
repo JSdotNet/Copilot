@@ -96,9 +96,16 @@ Jira skill. Never reproduce that knowledge in this skill.
 
 8. Output a completion summary:
 
-   | Story | Complexity | Effort | Uncertainty | Suggested Points | Split Needed |
-   |-------|-----------|--------|-------------|-----------------|-------------|
+   | Story | Current Jira Points | New Estimate | Δ | Split Needed | Jira Updated |
+   |-------|--------------------|--------------|----|-------------|-------------|
    | FIN-123 | — | — | — | — | — |
+
+   - **Δ** (drift column): leave blank when no existing estimate was found; show the
+     difference (e.g., `+2`, `-1`, `=`) when an existing estimate was present.
+   - When the new estimate differs from the current Jira value, highlight the drift
+     prominently so the team can decide whether to revise the existing estimate manually.
+   - The Jira ticket is **never updated** when an estimate already exists; the new
+     estimate is always a suggestion in that case.
 
 ## Output
 
