@@ -72,6 +72,10 @@ Jira skill. Never reproduce that knowledge in this skill.
 
 ### Phase 3 — Estimation
 
+> **Gate**: Only proceed if the story passed the DOR pre-check in Phase 1.
+> If the story was flagged as **not estimable**, stop here — output the DOR gap report
+> and do not produce a story point estimate.
+
 6. Use the `story-point-estimation` skill with the loaded context to:
    - Score Complexity, Effort, and Uncertainty (each 1–5) with explicit reasoning.
    - Map the factor sum to a Fibonacci point value.
