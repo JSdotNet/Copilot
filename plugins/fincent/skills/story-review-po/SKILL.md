@@ -7,6 +7,20 @@ description: >
 
 # Story Review — Product Owner
 
+## Agent Discovery
+
+This skill targets a **Product Owner agent** — an agent focused on backlog authoring,
+user stories, epics, and acceptance criteria.
+
+To locate one:
+
+1. Check installed agents for an agent whose description includes terms such as
+   "product owner", "backlog", "story", "epics", or "acceptance criteria".
+2. If a matching agent is found, activate it before running this skill.
+3. If no matching agent is found, continue with the default active agent.
+
+The skill works independently of any specific agent name or plugin.
+
 ## Purpose and Trigger Conditions
 
 Use this skill when a product owner or team member wants to validate whether a Fincent user story
@@ -14,14 +28,14 @@ is well-formed, clear, and ready for team refinement from a business and backlog
 
 ## Input Expectations
 
-- The user story to review (Jira link, ID, or pasted content).
+- The user story to review (Jira key, link, or pasted content).
 - Optional: target sprint or release context.
 - Optional: linked epic or initiative.
 
 ## Workflow
 
-1. Load the story content. If only a Jira ID is provided, ask the user to paste the story text
-   or retrieve it via the `create-jira-ticket` context.
+1. Load the story content. If only a Jira key is provided and a Jira retrieval skill is
+   available, use it to fetch the story. Otherwise ask the user to paste the story text.
 2. Load `resources/dor.md` to apply the Fincent Definition of Ready.
 3. Load `resources/templates/story-review-checklist.md` (Product Owner section).
 4. Evaluate the story against each Product Owner criterion:

@@ -15,12 +15,21 @@ This automation loads the Jira story, inspects the codebase for affected modules
 complexity signals, retrieves historical reference stories for calibration, and delegates
 to the `story-point-estimation` skill to produce a reasoned Fibonacci estimate.
 
-## Required Plugins
+## Jira Skill Discovery
 
-- **`product-owner`** — provides `create-jira-ticket` and `update-jira-ticket` skills.
-  All Jira interactions in this automation are delegated exclusively to those skills.
-  Do not use Jira MCP tools directly; all Jira knowledge, field mapping, and API
-  conventions are owned by the `product-owner` plugin.
+Before executing any Jira operation, discover what Jira skills are available:
+
+1. Check installed skills for skills whose name or description mentions "jira".
+2. Identify a **retrieval-capable** Jira skill — one that can fetch an existing issue.
+3. Identify an **update-capable** Jira skill — one that can sync content back to an
+   existing issue (including estimate fields).
+4. If no retrieval skill is found: ask the user to paste the story content directly and
+   skip automated Jira fetch and reference story retrieval.
+5. If no update skill is found and `update Jira` is enabled: skip write-back and note
+   in the output that no Jira update skill was available.
+
+All Jira field mapping, project keys, and API conventions are owned by the discovered
+Jira skill. Never reproduce that knowledge in this skill.
 
 ## Inputs
 
@@ -30,15 +39,15 @@ to the `story-point-estimation` skill to produce a reasoned Fibonacci estimate.
   for calibration (optional).
 - **Point scale**: `fibonacci` (default: 1, 2, 3, 5, 8, 13, 21) or `t-shirt` (XS, S, M, L, XL).
 - **Update Jira**: `true` or `false` (default) — whether to write the estimate back to Jira
-  via the `update-jira-ticket` skill.
+  via the discovered update skill.
 
 ## Dependencies
 
 | Dependency | Provided by | Purpose |
 |-----------|-------------|---------|
-| Jira story content | `product-owner` → `create-jira-ticket` | Primary estimation target |
-| Reference stories with estimates | `product-owner` → `create-jira-ticket` | Calibration against historical velocity |
-| Jira write-back | `product-owner` → `update-jira-ticket` | Sync estimate and reasoning to story |
+| Jira story content | Discovered Jira retrieval skill | Primary estimation target |
+| Reference stories with estimates | Discovered Jira retrieval skill | Calibration against historical velocity |
+| Jira write-back | Discovered Jira update skill | Sync estimate and reasoning to story |
 | Codebase — affected modules | Codebase scan | Complexity and effort signals |
 | Definition of Ready | `resources/dor.md` | Confirm story is ready before estimating |
 | Story review checklist | `resources/templates/story-review-checklist.md` | Estimation section |
@@ -47,23 +56,23 @@ to the `story-point-estimation` skill to produce a reasoned Fibonacci estimate.
 
 ### Phase 1 — DOR Pre-Check
 
-1. Use the `create-jira-ticket` skill from the `product-owner` plugin to retrieve the full
-   story content for the provided story key. Let that skill handle all Jira field mapping
-   and API interaction.
-2. Run a quick DOR pre-check against `resources/dor.md`. If critical DOR criteria are missing,
+1. Run Jira Skill Discovery (see above).
+2. Use the discovered retrieval skill to fetch the full story content. Let that skill
+   handle all Jira field mapping and API interaction.
+3. Run a quick DOR pre-check against `resources/dor.md`. If critical DOR criteria are missing,
    flag the story as **not estimable** and recommend completing the PO review first.
 
 ### Phase 2 — Context Loading
 
-3. If the story passes the DOR pre-check:
+4. If the story passes the DOR pre-check:
    - Scan the codebase for modules, services, or components referenced in the story.
-   - Use the `create-jira-ticket` skill to retrieve reference stories from Jira if provided,
-     including their content for calibration context. Let that skill handle all Jira interaction.
-4. Load `resources/templates/story-review-checklist.md` (estimation section).
+   - If reference stories were provided and a retrieval skill is available, use it to fetch
+     those stories for calibration context.
+5. Load `resources/templates/story-review-checklist.md` (estimation section).
 
 ### Phase 3 — Estimation
 
-5. Use the `story-point-estimation` skill with the loaded context to:
+6. Use the `story-point-estimation` skill with the loaded context to:
    - Score Complexity, Effort, and Uncertainty (each 1–5) with explicit reasoning.
    - Map the factor sum to a Fibonacci point value.
    - Calibrate against reference stories if available.
@@ -71,15 +80,14 @@ to the `story-point-estimation` skill to produce a reasoned Fibonacci estimate.
 
 ### Phase 4 — Jira Update (Optional)
 
-6. If `update Jira` is enabled:
+7. If `update Jira` is enabled and an update skill was discovered:
    - Write the estimate and three-factor reasoning back to the story artifact file.
-   - Use the `update-jira-ticket` skill from the `product-owner` plugin to sync the updated
-     content to Jira. Let that skill own all field mapping, estimate field updates, and API calls.
-   - If a split is recommended, add split suggestions to the artifact before syncing.
+   - Use the discovered update skill to sync the content to Jira.
+   - If a split is recommended, include split suggestions in the artifact before syncing.
 
 ### Phase 5 — Summary
 
-7. Output a completion summary:
+8. Output a completion summary:
 
    | Story | Complexity | Effort | Uncertainty | Suggested Points | Split Needed |
    |-------|-----------|--------|-------------|-----------------|-------------|
@@ -91,15 +99,13 @@ to the `story-point-estimation` skill to produce a reasoned Fibonacci estimate.
 - Suggested story point value on the configured scale.
 - Split recommendation with proposed sub-story titles (if applicable).
 - Calibration note referencing any used reference stories.
-- Jira updated via `update-jira-ticket` (if enabled).
+- Jira updated via discovered update skill (if enabled and available).
 
 ## Notes
 
 - Estimation is only reliable on stories that meet the Fincent DOR. Stories failing the
   DOR pre-check are returned with an explanation instead of an estimate.
-- Jira integration (FIN payment rail), regulatory APIs, and cross-team dependencies are
-  automatically treated as uncertainty boosters (minimum Uncertainty score: 3).
+- Jira integrations, regulatory APIs, and cross-team dependencies are automatically
+  treated as uncertainty boosters (minimum Uncertainty score: 3).
 - This automation estimates a single story per run. For batch estimation, invoke it once
   per story or use the planning session workflow.
-- Never reproduce Jira field names, project keys, custom field IDs, or API call details
-  in this skill. All such knowledge lives in the `product-owner` plugin.

@@ -7,6 +7,21 @@ description: >
 
 # Story Review — Domain Architect
 
+## Agent Discovery
+
+This skill targets a **Domain Architect agent** — an agent focused on domain-driven design,
+bounded contexts, ubiquitous language, and domain modelling.
+
+To locate one:
+
+1. Check installed agents for an agent whose description includes terms such as
+   "domain", "domain architect", "DDD", "domain-driven", "bounded context", or
+   "domain model".
+2. If a matching agent is found, activate it before running this skill.
+3. If no matching agent is found, continue with the default active agent.
+
+The skill works independently of any specific agent name or plugin.
+
 ## Purpose and Trigger Conditions
 
 Use this skill when a domain architect or domain expert needs to evaluate whether a story is
@@ -15,14 +30,15 @@ bounded context boundaries and invariants.
 
 ## Input Expectations
 
-- The user story to review (Jira link, ID, or pasted content).
+- The user story to review (Jira key, link, or pasted content).
 - Optional: domain model documentation or bounded context map.
 - Optional: ubiquitous language glossary.
 - Optional: codebase location for domain layer inspection.
 
 ## Workflow
 
-1. Load the story content. If only a Jira ID is provided, ask the user to paste the story.
+1. Load the story content. If only a Jira key is provided and a Jira retrieval skill is
+   available, use it to fetch the story. Otherwise ask the user to paste the story text.
 2. Load `resources/dor.md` to apply the Fincent Definition of Ready (domain section).
 3. Load `resources/templates/story-review-checklist.md` (Domain Architect section).
 4. Evaluate each Domain Architect criterion:

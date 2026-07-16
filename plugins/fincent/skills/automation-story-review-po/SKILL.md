@@ -15,12 +15,22 @@ This automation gathers all required dependencies — Jira story content, Defini
 and any linked epic — then delegates to the `story-review-po` skill and produces an
 actionable review result.
 
-## Required Plugins
+## Jira Skill Discovery
 
-- **`product-owner`** — provides `create-jira-ticket` and `update-jira-ticket` skills.
-  All Jira interactions in this automation are delegated exclusively to those skills.
-  Do not use Jira MCP tools directly; all Jira knowledge, field mapping, and API
-  conventions are owned by the `product-owner` plugin.
+Before executing any Jira operation, discover what Jira skills are available:
+
+1. Check installed skills for skills whose name or description mentions "jira".
+2. Identify a **retrieval-capable** Jira skill — one that can fetch an existing issue
+   (e.g., descriptions include "retrieve", "read", or "upload an existing ticket").
+3. Identify an **update-capable** Jira skill — one that can sync content back to an
+   existing issue.
+4. If no retrieval skill is found: ask the user to paste the story content directly and
+   skip automated Jira fetch.
+5. If no update skill is found and `update Jira` is enabled: skip write-back and note
+   in the output that no Jira update skill was available.
+
+All Jira field mapping, project keys, and API conventions are owned by the discovered
+Jira skill. Never reproduce that knowledge in this skill.
 
 ## Inputs
 
@@ -34,9 +44,9 @@ actionable review result.
 
 | Dependency | Provided by | Purpose |
 |-----------|-------------|---------|
-| Jira story content | `product-owner` → `create-jira-ticket` | Primary review target |
-| Linked epic | `product-owner` → `create-jira-ticket` | Validate story-to-epic alignment |
-| Jira write-back | `product-owner` → `update-jira-ticket` | Post review findings to Jira |
+| Jira story content | Discovered Jira retrieval skill | Primary review target |
+| Linked epic | Discovered Jira retrieval skill | Validate story-to-epic alignment |
+| Jira write-back | Discovered Jira update skill | Post review findings to Jira |
 | Definition of Ready | `resources/dor.md` | Review criteria baseline |
 | Story review checklist | `resources/templates/story-review-checklist.md` | Checklist template |
 
@@ -44,36 +54,35 @@ actionable review result.
 
 ### Phase 1 — Context Loading
 
-1. Use the `create-jira-ticket` skill from the `product-owner` plugin to retrieve the full
-   story content for the provided story key. Let that skill handle all Jira field mapping
-   and API interaction.
-2. Load `resources/dor.md`.
-3. Load `resources/templates/story-review-checklist.md`.
+1. Run Jira Skill Discovery (see above).
+2. Use the discovered retrieval skill to fetch the full story content. Let that skill
+   handle all Jira field mapping and API interaction.
+3. Load `resources/dor.md`.
+4. Load `resources/templates/story-review-checklist.md`.
 
 ### Phase 2 — Story Review
 
-4. Use the `story-review-po` skill with the loaded context to:
+5. Use the `story-review-po` skill with the loaded context to:
    - Evaluate all Product Owner checklist criteria.
    - Classify each as ✅, ⚠️, or ❌.
    - Produce the overall readiness classification.
 
 ### Phase 3 — Auto-Fix Suggestions (Optional)
 
-5. If `auto-fix suggestions` is enabled, for each ⚠️ or ❌ finding:
+6. If `auto-fix suggestions` is enabled, for each ⚠️ or ❌ finding:
    - Propose a specific corrected version of the story text or acceptance criterion.
    - Mark each suggestion clearly as a proposed change, not a final update.
 
 ### Phase 4 — Jira Update (Optional)
 
-6. If `update Jira` is enabled:
+7. If `update Jira` is enabled and an update skill was discovered:
    - Write the review result (checklist, classification, and next steps) back to the story
      artifact file.
-   - Use the `update-jira-ticket` skill from the `product-owner` plugin to sync the updated
-     content to Jira. Let that skill own all field mapping, comment formatting, and API calls.
+   - Use the discovered update skill to sync the content to Jira.
 
 ### Phase 5 — Summary
 
-7. Output a completion summary:
+8. Output a completion summary:
 
    | Category | Items reviewed | Ready | Needs refinement | Not ready |
    |----------|---------------|-------|-----------------|-----------|
@@ -83,13 +92,11 @@ actionable review result.
 
 - Completed Product Owner story review with checklist and classification.
 - Auto-fix suggestions for each gap (if enabled).
-- Jira updated via `update-jira-ticket` (if enabled).
+- Jira updated via discovered update skill (if enabled and available).
 - Summary table.
 
 ## Notes
 
 - This automation runs `story-review-po` only. For architecture and domain review, use the
   corresponding automation skills.
-- If the story does not yet exist in Jira, paste the story content directly as input.
-- Never reproduce Jira field names, project keys, custom field IDs, or API call details
-  in this skill. All such knowledge lives in the `product-owner` plugin.
+- If no Jira skill is installed, paste the story content directly as input.

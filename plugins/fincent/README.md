@@ -45,21 +45,18 @@ and a matching automation skill for each.
 
 ### Required Plugin
 
-All Jira interactions are delegated to the **`product-owner`** plugin. Install it alongside
-this plugin:
+All Jira interactions are handled by a **discovered Jira skill**. The automation skills
+scan installed skills at runtime for one that can retrieve, create, or update Jira issues.
+No specific plugin name is required; any installed plugin providing Jira integration works.
+
+The recommended source is the **`product-owner`** plugin:
 
 ```bash
 copilot plugin install JSdotNet/Copilot:plugins/product-owner
 ```
 
-The `product-owner` plugin provides:
-
-- `create-jira-ticket` — story retrieval and new ticket creation (owns all Jira field mapping,
-  project keys, custom fields, and MCP tool calls).
-- `update-jira-ticket` — estimate field updates and review write-back (owns all Jira API conventions).
-
-Fincent automation skills never call Jira MCP tools directly. All Jira knowledge lives in
-the `product-owner` plugin.
+If no Jira skill is found at runtime, the automations fall back gracefully: they ask the
+user to paste story content directly and skip Jira write-back steps.
 
 ### Other Dependencies
 
