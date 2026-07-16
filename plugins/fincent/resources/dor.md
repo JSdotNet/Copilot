@@ -1,53 +1,54 @@
 # Fincent Definition of Ready (DOR)
 
-A story is **Ready** for sprint refinement when all of the following criteria are met.
+A story may only be included in a sprint when **all** applicable criteria below are met.
+This applies to all story types: features, bugs, and support requests.
 
-## Mandatory Criteria
+## Story Description
 
-### 1. Business Value
+- The story describes functionality that can be tested independently.
+- The story is written from the end-user perspective, preferably in the format:
+  *"As a [user], I want [functionality], so that [benefit]."*
+- The title is a concise, clear summary of the story — not identical to the description.
+- The description is in the story field itself, not in the comments.
+- The description is not a copy of an email or customer message.
+- The description is specific: no vague formulations such as "it might be useful if..." or
+  "an idea could be...".
 
-- The story has a clear, stated business value or user benefit.
-- The value is linked to an epic or initiative goal.
+## Scope and Context
 
-### 2. User Story Format
+- The story is linked to an epic, if it is part of larger functionality.
+- The story is linked to a version, so it can be bundled as a release.
+- For modifications to an existing situation: screenshots and/or links of the current state
+  are attached.
 
-- Written in the format: *As a [role], I want [goal], so that [benefit].*
-- Role, goal, and benefit are specific and unambiguous.
+## Refinement
 
-### 3. Acceptance Criteria
+- The story is refined: the development team has reviewed and where necessary supplemented
+  or adjusted it.
+- The story has a team estimate (in story points or hours).
+- A story must not exceed **12 hours** or the equivalent in story points. If it is larger,
+  it must be split.
 
-- At minimum two acceptance criteria are defined.
-- Each criterion is testable and unambiguous.
-- Criteria are written in Given/When/Then or bullet format.
+## Design
 
-### 4. Scope and Boundaries
+- If the story contains a UI component: the design is available in Figma and the link is
+  included in the story.
+- Interactions and animations are worked out in the design (if applicable).
 
-- Out-of-scope items are explicitly stated.
-- The story does not span multiple bounded contexts without an explicit integration point defined.
+## Bugs
 
-### 5. Dependencies
+A bug contains a clear description of what is going wrong and what the desired result is.
+Preferably a bug also contains a reproduction path. Other helpful context includes:
 
-- All known dependencies (other stories, services, third parties) are identified.
-- Blocking dependencies are flagged with a link to the blocking item.
+- Link to the page
+- Screenshot(s)
+- Required conditions (logged in / logged out, user role, etc.)
+- Steps to reproduce the bug
+- Device type
+- Browser and version
+- Operating system and version
 
-### 6. Size Estimate
+## Optional (recommended)
 
-- The story has been sized (story points or T-shirt size).
-- Stories larger than 8 points are split or flagged for breakdown.
-
-### 7. Domain Alignment
-
-- Domain terminology matches the Fincent ubiquitous language glossary.
-- The affected bounded context is identified.
-
-## Optional Enrichments (recommended)
-
-- Mockups or wireframes are attached or linked.
-- A spike or research outcome is referenced if technical uncertainty was high.
-- Relevant architecture decision records (ADRs) are linked.
-
-## Enabler Feature Check
-
-- If the story requires infrastructure, platform, or architectural work before it can be delivered,
-  an **Enabler Story** or **Enabler Feature** is created and linked.
-- Enabler types: Architecture Enabler, Infrastructure Enabler, Research Spike.
+- Happy flow and edge cases (error handling, external API integrations) are described.
+- Deviating behavior on mobile is mentioned.

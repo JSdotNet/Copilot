@@ -38,10 +38,10 @@ How complex is the logic, domain, or integration involved?
 How much work is required regardless of complexity?
 
 - 1: < 2 hours of implementation.
-- 2: Half a day of implementation.
-- 3: One to two days of implementation.
-- 4: Three to four days of implementation.
-- 5: Close to or exceeding a full sprint for one developer.
+- 2: Half a day (~4 hours).
+- 3: One day (~8 hours) — approaching the DOR size limit.
+- 4: Up to 12 hours — at the DOR size limit; consider splitting.
+- 5: Exceeds 12 hours — **must be split** before the story can enter a sprint.
 
 ### Factor 3 — Uncertainty / Risk (1–5)
 
@@ -70,22 +70,25 @@ How much is unknown or risky about delivery?
    | 15        | 21 (consider splitting) |
 
 5. Compare against reference stories if provided; adjust if the calibration differs.
-6. Flag stories scoring 13 or 21 points for mandatory split discussion.
+6. Flag stories where the estimate exceeds **12 hours** (or the equivalent story points) for
+   mandatory split discussion — this is a hard DOR constraint.
 7. Summarise the estimate with the reasoning behind each factor score.
 
 ## Output Expectations
 
 - Factor scores with explicit rationale for each.
-- Suggested story point value on the Fibonacci scale.
-- Split recommendation if the story is above 8 points.
+- Suggested story point or hour estimate.
+- Split recommendation if the estimate exceeds 12 hours or equivalent.
 - Calibration note if reference stories were used.
 
 ## Quality Checks
 
-- Never estimate without reading the acceptance criteria.
+- Never estimate without reading the story description and any acceptance criteria.
 - Uncertainty is never scored 1 unless the team has an identical delivered story as reference.
 - Stories touching external Fincent integrations (payment rails, regulatory APIs) are never
   scored below 3 for uncertainty without explicit justification.
+- Stories exceeding 12 hours are always flagged — do not produce a final estimate for them
+  without a split recommendation.
 
 ## References
 
