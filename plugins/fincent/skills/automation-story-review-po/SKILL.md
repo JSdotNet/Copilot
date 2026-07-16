@@ -1,102 +1,103 @@
 ---
 name: automation: story review — product owner
 description: >
-  Automated Product Owner story review for Fincent. Loads the story from Jira, applies the
-  Fincent DOR, and runs the story-review-po skill with full context. Use before backlog
-  refinement to surface and fix story quality issues automatically.
+  Automated Product Owner story review for Fincent. Queries all stories in a given Jira
+  status, applies the Fincent DOR to each, and produces a consolidated readiness report.
+  Use before backlog refinement to surface and fix story quality issues automatically.
 ---
 
 # Automation: Story Review — Product Owner
 
 ## Purpose
 
-Orchestrate a fully contextualised Product Owner story review for a Fincent user story.
-This automation gathers all required dependencies — Jira story content, Definition of Ready,
-and any linked epic — then delegates to the `story-review-po` skill and produces an
-actionable review result.
+Run a batch Product Owner review across all Fincent stories in a specified Jira status.
+For each story, the automation loads the content, applies the DOR, delegates to the
+`story-review-po` skill, and produces a consolidated readiness report for the full set.
 
 ## Jira Skill Discovery
 
 Before executing any Jira operation, discover what Jira skills are available:
 
 1. Check installed skills for skills whose name or description mentions "jira".
-2. Identify a **retrieval-capable** Jira skill — one that can fetch an existing issue
-   (e.g., descriptions include "retrieve", "read", or "upload an existing ticket").
-3. Identify an **update-capable** Jira skill — one that can sync content back to an
+2. Identify a **query-capable** Jira skill — one that can search or list issues by status
+   or filter (e.g., descriptions include "search", "query", "list", or "filter").
+3. Identify a **retrieval-capable** Jira skill — one that can fetch a single existing issue.
+4. Identify an **update-capable** Jira skill — one that can sync content back to an
    existing issue.
-4. If no retrieval skill is found: ask the user to paste the story content directly and
-   skip automated Jira fetch.
-5. If no update skill is found and `update Jira` is enabled: skip write-back and note
-   in the output that no Jira update skill was available.
+5. If no query or retrieval skill is found: ask the user to paste story content for a
+   single-story fallback run.
+6. If no update skill is found and `update Jira` is enabled: skip write-back per story
+   and note it in the output.
 
-All Jira field mapping, project keys, and API conventions are owned by the discovered
-Jira skill. Never reproduce that knowledge in this skill.
+All Jira field mapping, project keys, status values, and API conventions are owned by
+the discovered Jira skill. Never reproduce that knowledge in this skill.
 
 ## Inputs
 
-- **Story identifier**: Jira story key (e.g., `FIN-123`) or pasted story content.
-- **Auto-fix suggestions**: `true` (default) or `false` — whether to propose rewritten
-  acceptance criteria or story text for ⚠️ and ❌ findings.
+- **Jira status**: the status to query (e.g., `Ready for Refinement`, `Backlog`, `To Do`).
+  All stories currently in this status are included in the run.
+- **Story type filter**: `all` (default), `feature`, `bug`, or `support` — limit the batch
+  to a specific story type.
+- **Auto-fix suggestions**: `true` (default) or `false` — whether to propose corrections
+  for ⚠️ and ❌ findings per story.
 - **Update Jira**: `true` or `false` (default) — whether to write review findings back
-  to Jira after review.
+  to each story in Jira after review.
 
 ## Dependencies
 
 | Dependency | Provided by | Purpose |
 |-----------|-------------|---------|
-| Jira story content | Discovered Jira retrieval skill | Primary review target |
-| Linked epic | Discovered Jira retrieval skill | Validate story-to-epic alignment |
-| Jira write-back | Discovered Jira update skill | Post review findings to Jira |
+| Story list | Discovered Jira query skill | All stories in the target status |
+| Story content | Discovered Jira retrieval skill | Per-story review target |
+| Jira write-back | Discovered Jira update skill | Post review findings per story |
 | Definition of Ready | `resources/dor.md` | Review criteria baseline |
 | Story review checklist | `resources/templates/story-review-checklist.md` | Checklist template |
 
 ## Workflow
 
-### Phase 1 — Context Loading
+### Phase 1 — Story List
 
 1. Run Jira Skill Discovery (see above).
-2. Use the discovered retrieval skill to fetch the full story content. Let that skill
-   handle all Jira field mapping and API interaction.
-3. Load `resources/dor.md`.
-4. Load `resources/templates/story-review-checklist.md`.
+2. Use the discovered query skill to retrieve all stories in the specified status.
+   Let that skill own the query, filter, and pagination logic.
+3. Load `resources/dor.md` and `resources/templates/story-review-checklist.md` once
+   for the entire batch.
+4. Present the story count to the user and confirm before proceeding.
 
-### Phase 2 — Story Review
+### Phase 2 — Per-Story Review (repeat for each story)
 
-5. Use the `story-review-po` skill with the loaded context to:
-   - Evaluate all Product Owner checklist criteria.
+5. Use the discovered retrieval skill to fetch the full story content.
+6. Use the `story-review-po` skill with the loaded context to:
+   - Determine story type (feature / bug / support request).
+   - Evaluate all applicable DOR criteria.
    - Classify each as ✅, ⚠️, or ❌.
-   - Produce the overall readiness classification.
+   - Produce the readiness classification for this story.
+7. If `auto-fix suggestions` is enabled, propose corrections for each ⚠️ or ❌ finding.
+8. If `update Jira` is enabled and an update skill was discovered: sync the review
+   findings back to this story in Jira.
 
-### Phase 3 — Auto-Fix Suggestions (Optional)
+### Phase 3 — Consolidated Summary
 
-6. If `auto-fix suggestions` is enabled, for each ⚠️ or ❌ finding:
-   - Propose a specific corrected version of the story text or acceptance criterion.
-   - Mark each suggestion clearly as a proposed change, not a final update.
+9. Output a consolidated batch summary after all stories are processed:
 
-### Phase 4 — Jira Update (Optional)
+   | Story | Title | Type | Ready | Needs Refinement | Not Ready | Jira Updated |
+   |-------|-------|------|-------|-----------------|-----------|-------------|
+   | FIN-123 | — | — | ✅ | | | — |
+   | FIN-124 | — | — | | ⚠️ | | — |
+   | FIN-125 | — | — | | | ❌ | — |
 
-7. If `update Jira` is enabled and an update skill was discovered:
-   - Write the review result (checklist, classification, and next steps) back to the story
-     artifact file.
-   - Use the discovered update skill to sync the content to Jira.
-
-### Phase 5 — Summary
-
-8. Output a completion summary:
-
-   | Category | Items reviewed | Ready | Needs refinement | Not ready |
-   |----------|---------------|-------|-----------------|-----------|
-   | PO Review | 10 | — | — | — |
+10. List all ❌ stories first, then ⚠️, then ✅, so the team can prioritise fixes.
 
 ## Output
 
-- Completed Product Owner story review with checklist and classification.
+- Per-story DOR review with checklist classification.
 - Auto-fix suggestions for each gap (if enabled).
-- Jira updated via discovered update skill (if enabled and available).
-- Summary table.
+- Jira updated per story via discovered update skill (if enabled and available).
+- Consolidated batch summary table sorted by readiness.
 
 ## Notes
 
-- This automation runs `story-review-po` only. For architecture and domain review, use the
-  corresponding automation skills.
-- If no Jira skill is installed, paste the story content directly as input.
+- Run this automation before a refinement session to get the full batch into shape.
+- For architecture and domain review, use the corresponding automation skills.
+- If no Jira query skill is installed, fall back to a single-story run by pasting
+  story content directly.
