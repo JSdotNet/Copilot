@@ -85,8 +85,11 @@ Jira skill. Never reproduce that knowledge in this skill.
 ### Phase 4 — Jira Update (Optional)
 
 7. If `update Jira` is enabled and an update skill was discovered:
-   - Write the estimate and three-factor reasoning back to the story artifact file.
-   - Use the discovered update skill to sync the content to Jira.
+   - Check whether the story already has a story point estimate set in Jira.
+   - If an estimate already exists: skip the Jira update, output the new estimate as a
+     suggestion only, and inform the user that the existing estimate was not overwritten.
+   - If no estimate exists: write the estimate and three-factor reasoning back to the story
+     artifact file and use the discovered update skill to sync the content to Jira.
    - If a split is recommended, include split suggestions in the artifact before syncing.
 
 ### Phase 5 — Summary
