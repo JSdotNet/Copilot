@@ -94,7 +94,7 @@ Apply this mapping consistently for Story and Bug in project FIN:
 
 ## Handoffs
 
-- **To product-owner agent:** when backlog content is missing, unclear, or needs rewriting; request user approval before handoff.
+- **To product-owner agent:** when backlog content is missing, unclear, or needs rewriting; request user approval before handoff. Requires the `product-owner` plugin to be installed.
 - **To copilot agent:** when agent or instruction files need to be created or changed; request user approval before handoff.
 - After the user approves a recurring next step, prefer the matching handoff button when available.
 

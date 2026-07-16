@@ -7,6 +7,7 @@ handoffs:
     agent: jira
     prompt: Create or update the Jira issue from the approved backlog artifact above using the correct field mapping.
     send: false
+    optional: true
   - label: Sync To GitHub Issue
     agent: github-issues
     prompt: Create or update the GitHub issue from the approved backlog artifact above using the correct field mapping.
@@ -122,8 +123,9 @@ propose a handoff to the github-issues agent and ask for explicit user approval 
 ## Handoffs
 - **To copilot agent:** for any request to create or change `.github/agents/**/*.md` or `.github/instructions/**/*.md`; request user approval before handoff.
 - **To architect agent:** for architecture definition, system decomposition, or ARC42 ownership; request user approval before handoff.
-- **To jira agent:** for creating or updating Jira issues from backlog artifacts; request user approval before handoff.
+- **To jira agent:** for creating or updating Jira issues from backlog artifacts; request user approval before handoff. Requires the `jira` plugin to be installed.
 - **To github-issues agent:** for creating or updating GitHub issues from backlog artifacts; request user approval before handoff.
+- Jira sync handoff is optional: it requires the `jira` plugin to be installed.
 - Architecture handoff is an optional integration that depends on the architecture plugin being installed.
 - After the user approves a recurring next step, prefer the matching handoff button when available.
 
