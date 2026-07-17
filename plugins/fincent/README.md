@@ -72,6 +72,7 @@ flowchart LR
 |-------|---------|
 | `sprint-report` | Sprint report: completed vs scope, untested, by epic |
 | `automation-sprint-report` | Batch sprint reports for multiple sprints / a release |
+| `release-report` | Release report: delivered vs scope, deferred, by epic, release notes draft |
 | `demo-presentation` | Generate a Fincent Review demo presentation (PPTX structure) |
 
 ## Resources
