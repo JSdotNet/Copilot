@@ -3,8 +3,8 @@
     {
       "name": "review",
       "path": "./plugins/review",
-      "description": "Review workflows focused on TODO items, targeted questions, and future improvements.",
-      "version": "0.1.0"
+      "description": "Reusable review skills (TODO-driven, question-driven, improvement-driven) for any agent and any artifact type — code, stories, documentation, architecture, and more.",
+      "version": "0.2.0"
     }
   ]
 }

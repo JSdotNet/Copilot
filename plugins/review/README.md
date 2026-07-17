@@ -1,23 +1,36 @@
 # review
 
-Installable GitHub Copilot CLI plugin for structured review workflows.
+Installable GitHub Copilot CLI plugin providing reusable review skills for any agent.
+
+## Design
+
+The review plugin ships **skills only** — no dedicated agent. Any agent (csharp-coding, documentation, product-owner, architecture, etc.) can invoke the review skills directly. The calling agent supplies domain knowledge about the review target; the skills drive the structured review workflow.
 
 ## Includes
 
-- Agent:
-  - `agents/reviewer.agent.md`
 - Skills:
-  - `skills/todo-review/SKILL.md`
-  - `skills/question-review/SKILL.md`
-  - `skills/suggestion-review/SKILL.md`
+  - `skills/todo-review/SKILL.md` — TODO-driven review for any artifact
+  - `skills/question-review/SKILL.md` — question-driven review for any artifact
+  - `skills/suggestion-review/SKILL.md` — improvement-suggestion review for any artifact
 - Hooks:
   - `hooks.json` (session-start finding quality guardrail prompt)
 
 ## Scope
 
-- TODO-based review to convert TODO notes into concrete review findings.
-- Question-based review to evaluate artifacts against explicit review questions.
-- Suggestion-based review to identify future improvements and extension opportunities.
+These skills work with any review target:
+
+- **Code** — source files, modules, pull requests
+- **User stories** — acceptance criteria, scope, edge cases
+- **Documentation** — how-tos, explanations, articles, READMEs
+- **Architecture** — ADRs, blueprints, C4 diagrams
+- **Configuration** — plugin manifests, CI/CD workflows
+- Any other artifact
+
+### Review modes
+
+- **TODO-based review** — converts TODO notes into concrete findings and next actions.
+- **Question-based review** — evaluates artifacts against explicit review questions with evidence.
+- **Suggestion-based review** — identifies future improvements and extension opportunities.
 
 ## Install
 
