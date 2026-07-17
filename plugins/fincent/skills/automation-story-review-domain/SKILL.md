@@ -1,110 +1,98 @@
 ---
 name: automation: story review — domain architect
 description: >
-  Automated domain architect story review for Fincent. Queries all stories in a given Jira
-  status, inspects the codebase domain layer, and runs the story-review-domain skill on
-  each to validate ubiquitous language, bounded context ownership, aggregate alignment,
-  and domain events.
+  Run right before a domain review session: finds all FIN Jira tickets in a given status
+  for a Fincent team, inspects the codebase domain layer for each, and posts a structured
+  domain readiness comment on every ticket. Use when preparing a domain architect review session.
 ---
 
 # Automation: Story Review — Domain Architect
 
-## Purpose
+**Meant to be run before a domain review session.** Batch variant of `story-review-domain`.
+It sweeps all tickets in a given Jira status, derives a codebase-grounded domain assessment
+for each, and posts it as a comment — so the domain architect walks into the session with
+findings already on every ticket.
 
-Run a batch domain review across all Fincent stories in a specified Jira status.
-For each story, the automation inspects the codebase domain layer for existing aggregates
-and events, then delegates to the `story-review-domain` skill to validate domain model
-alignment and ubiquitous language usage.
+## Finding the tickets
 
-## Jira Skill Discovery
+Query Jira via `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql`:
 
-Before executing any Jira operation, discover what Jira skills are available:
+- cloudId: `innovadis.atlassian.net`
+- JQL: `project = FIN AND status = "{status}" AND "Fincent Team" = "Team B" ORDER BY updated DESC`
+- Default team is **Team B**; substitute if the user names another.
+- Fetch `fields: ["summary", "status", "description", "comment"]`.
+- Paginate with `nextPageToken` if needed.
 
-1. Check installed skills for skills whose name or description mentions "jira".
-2. Identify a **query-capable** Jira skill — one that can search or list issues by status.
-3. Identify a **retrieval-capable** Jira skill — one that can fetch a single existing issue.
-4. Identify an **update-capable** Jira skill — one that can sync content back to an
-   existing issue.
-5. If no query or retrieval skill is found: ask the user to paste story content for a
-   single-story fallback run.
-6. If no update skill is found and `update Jira` is enabled: skip write-back and note
-   it in the output.
+Report the list of found tickets (key + summary) before proceeding.
 
-All Jira field mapping, project keys, and API conventions are owned by the discovered
-Jira skill. Never reproduce that knowledge in this skill.
+## Skip tickets already reviewed
 
-## Inputs
+Check existing comments:
 
-- **Jira status**: the status to query (e.g., `Ready for Refinement`, `Backlog`, `To Do`).
-  All stories currently in this status are included in the run.
-- **Codebase path**: root path of the Fincent codebase (optional; scans domain layer only).
-- **Ubiquitous language source**: path to glossary or domain documentation (optional).
-- **Update Jira**: `true` or `false` (default) — whether to sync review findings back to
-  each story in Jira via the discovered update skill.
+- If a `## 🧩 Domein Review` comment already exists and the description hasn't materially
+  changed, skip the ticket and note this in the final report.
+- If stale (>7 days old or description changed), post a fresh comment for today's date.
 
-## Dependencies
+## Analyzing each ticket
 
-| Dependency | Provided by | Purpose |
-|-----------|-------------|---------|
-| Story list | Discovered Jira query skill | All stories in the target status |
-| Story content | Discovered Jira retrieval skill | Per-story review target |
-| Jira write-back | Discovered Jira update skill | Sync review findings per story |
-| Codebase — domain layer | Codebase (`**/Domain/**`, `**/Aggregates/**`) | Verify existing aggregates and events |
-| Ubiquitous language glossary | Domain documentation or codebase | Term validation |
-| Bounded context map | Architecture documentation or domain-design plugin | Context ownership |
-| Definition of Ready | `resources/dor.md` | Review criteria baseline |
-| Story review checklist | `resources/templates/story-review-checklist.md` | Checklist template |
+For every remaining ticket, produce a domain review as described in `story-review-domain` —
+evaluate ubiquitous language, bounded context ownership, aggregate alignment, domain events,
+and domain policies by inspecting the codebase domain layer. Don't invent decisions.
 
-## Workflow
+### Fan out with subagents
 
-### Phase 1 — Story List and Shared Context
+Analyze tickets **in parallel**: launch one `Explore` subagent per ticket in a single
+message, each prompted with the ticket key, summary, full description, and the instruction to:
 
-1. Run Jira Skill Discovery (see above).
-2. Use the discovered query skill to retrieve all stories in the specified status.
-   Let that skill own the query, filter, and pagination logic.
-3. Scan the codebase domain layer once for the entire batch:
-   - Existing aggregates, entities, and value objects.
-   - Domain events (classes implementing `IDomainEvent` or equivalent).
-   - Domain policies and business rules.
-4. Load the ubiquitous language glossary and bounded context map if available.
-5. Load `resources/dor.md` and `resources/templates/story-review-checklist.md`.
-6. Present the story count to the user and confirm before proceeding.
+1. Locate the relevant bounded context, aggregate roots, value objects, domain events, and
+   policies in `**/Domain/**`, `**/Aggregates/**`, `**/Events/**`.
+2. Return analysis sections (ubiquitous language, bounded context ownership, aggregate
+   alignment, domain events, domain policies) as raw markdown with concrete code references.
 
-### Phase 2 — Per-Story Review (repeat for each story)
+You (the main loop) review each result for plausibility, then post.
+**Subagents must not post to Jira themselves** — all posting stays in the main loop.
 
-7. Use the discovered retrieval skill to fetch the full story content.
-8. Use the `story-review-domain` skill with the loaded context to:
-   - Validate all business terms against the ubiquitous language.
-   - Confirm bounded context ownership and aggregate alignment.
-   - Identify domain events produced or consumed.
-   - Detect domain invariant or policy violations.
-   - Classify each criterion as ✅, ⚠️, or ❌.
-9. For each ⚠️ or ❌ finding, propose corrected terms, names, or model adjustments.
-10. If `update Jira` is enabled and an update skill was discovered: sync the review
-    findings back to this story in Jira.
+## Posting the comments
 
-### Phase 3 — Consolidated Summary
+Post one comment per ticket via `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue`
+with `contentFormat: "markdown"`. **Post directly — no approval step.** Write in Dutch.
+Update in place via `commentId` rather than stacking near-duplicates.
 
-11. Output a consolidated batch summary after all stories are processed:
+```markdown
+## 🧩 Domein Review — {date}
+_Automatische analyse op basis van ticket + domeinlaag codebase._
 
-    | Story | Title | Domain Ready | Needs Clarification | Misaligned | Jira Updated |
-    |-------|-------|-------------|--------------------|-----------|----|
-    | FIN-123 | — | ✅ | | | — |
-    | FIN-124 | — | | ⚠️ | | — |
-    | FIN-125 | — | | | ❌ | — |
+### Bevindingen
+| Criterium | Beoordeling | Toelichting |
+|-----------|-------------|-------------|
+| Ubiquitous language | ✅/⚠️/❌ | … |
+| Bounded context eigenaarschap | ✅/⚠️/❌ | … |
+| Aggregate alignment | ✅/⚠️/❌ | … |
+| Domain events | ✅/⚠️/❌ | … |
+| Domain policies | ✅/⚠️/❌ | … |
 
-12. List all ❌ stories first, then ⚠️, then ✅.
+### Uitkomst
+**{✅ Domain ready / ⚠️ Needs clarification / ❌ Domain misalignment}**: {rationale}
 
-## Output
+### Correcties
+- **{term}** → **{correct term}**: {toelichting}
+```
 
-- Per-story domain review with checklist and domain readiness verdict.
-- Corrected ubiquitous language terms and aggregate/event names per story.
-- Jira updated per story via discovered update skill (if enabled and available).
-- Consolidated batch summary table sorted by readiness.
+## Working rules
 
-## Notes
+- The domain layer scan (`**/Domain/**`, `**/Aggregates/**`, `**/Events/**`) context is
+  shared across all subagents for the batch.
+- Every domain term in the story is verified against the ubiquitous language — never assume.
+- Aggregate boundaries are confirmed or flagged — never assumed.
+- Domain events are always in past tense; any deviation is flagged as ⚠️.
+- One comment per ticket per run; re-runs update via `commentId`.
+- After the sweep, report back with a table sorted ❌ first, then ⚠️, then ✅:
 
-- The codebase scan is performed once for the batch and scoped to the domain layer
-  (`**/Domain/**`, `**/Aggregates/**`, `**/Events/**`).
-- If no codebase path is provided, the review relies solely on story content and flags
-  unverifiable domain references explicitly.
+  | Ticket | Samenvatting | Uitkomst | Commentaar id / reden voor overslaan |
+  |--------|-------------|---------|--------------------------------------|
+
+## Tools used
+
+- `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql` — find the team's tickets.
+- `Explore` subagents — one per ticket, inspect domain layer and draft analysis.
+- `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` — post (or update) each domain review comment.

@@ -1,123 +1,110 @@
 ---
 name: automation: story point estimation
 description: >
-  Automated story point estimation for Fincent. Queries all stories in a given Jira status,
-  inspects the codebase for affected components, and runs the story-point-estimation skill
-  on each unestimated story. Produces a consolidated estimation report.
+  Run before sprint planning: finds all FIN Jira tickets in a given status for a Fincent team,
+  checks DOR readiness for each, explores the codebase for complexity signals, and posts a
+  structured estimation comment. Only writes the story points field for tickets that have no
+  estimate yet. Use when preparing sprint planning or sizing a backlog.
 ---
 
 # Automation: Story Point Estimation
 
-## Purpose
+**Meant to be run before sprint planning.** Batch variant of `story-point-estimation`.
+It sweeps all tickets in a given Jira status, checks DOR readiness, explores the codebase
+for affected modules, estimates each story, and posts the reasoning as a comment. Only
+writes the story points field when it is currently empty.
 
-Run a batch story point estimation across all Fincent stories in a specified Jira status.
-For each story, the automation checks DOR readiness, inspects the codebase for complexity
-signals, applies calibration from reference stories, and delegates to the
-`story-point-estimation` skill to produce a reasoned Fibonacci estimate.
+## Finding the tickets
 
-## Jira Skill Discovery
+Query Jira via `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql`:
 
-Before executing any Jira operation, discover what Jira skills are available:
+- cloudId: `innovadis.atlassian.net`
+- JQL: `project = FIN AND status = "{status}" AND "Fincent Team" = "Team B" ORDER BY updated DESC`
+- Default team is **Team B**; substitute if the user names another.
+- Fetch `fields: ["summary", "status", "description", "comment", "story_points", "customfield_10016"]`.
+- Paginate with `nextPageToken` if needed.
 
-1. Check installed skills for skills whose name or description mentions "jira".
-2. Identify a **query-capable** Jira skill — one that can search or list issues by status.
-3. Identify a **retrieval-capable** Jira skill — one that can fetch a single existing issue.
-4. Identify an **update-capable** Jira skill — one that can sync content back to an
-   existing issue (including estimate fields).
-5. If no query or retrieval skill is found: ask the user to paste story content for a
-   single-story fallback run.
-6. If no update skill is found and `update Jira` is enabled: skip write-back and note
-   it in the output.
+Report the list of found tickets (key + summary + current estimate) to the user before
+proceeding, and confirm.
 
-All Jira field mapping, project keys, and API conventions are owned by the discovered
-Jira skill. Never reproduce that knowledge in this skill.
+## Skip already-estimated tickets (default behaviour)
 
-## Inputs
+By default, skip stories that already have a story points value in Jira. Still compute the
+new estimate for those stories to detect drift, but do not update the field — note the
+divergence in the final report instead.
 
-- **Jira status**: the status to query (e.g., `Ready for Refinement`, `Backlog`, `To Do`).
-  All stories currently in this status are included in the run.
-- **Skip estimated**: `true` (default) or `false` — skip stories that already have an
-  estimate in Jira; still report drift when the new estimate differs.
-- **Codebase path**: root path of the Fincent codebase (optional; scans affected modules).
-- **Reference stories**: comma-separated list of Jira keys of previously estimated stories
-  for calibration (optional).
-- **Point scale**: `fibonacci` (default: 1, 2, 3, 5, 8, 13, 21) or `t-shirt` (XS, S, M, L, XL).
-- **Update Jira**: `true` or `false` (default) — write estimates back to Jira for stories
-  that do not yet have one.
+If the user wants to re-estimate everything (e.g. a story was significantly changed),
+they can explicitly disable this for the run.
 
-## Dependencies
+## Per-ticket workflow
 
-| Dependency | Provided by | Purpose |
-|-----------|-------------|---------|
-| Story list | Discovered Jira query skill | All stories in the target status |
-| Story content | Discovered Jira retrieval skill | Per-story estimation target |
-| Reference stories | Discovered Jira retrieval skill | Calibration against historical velocity |
-| Jira write-back | Discovered Jira update skill | Sync estimate and reasoning per story |
-| Codebase — affected modules | Codebase scan | Complexity and effort signals |
-| Definition of Ready | `resources/dor.md` | Confirm story is ready before estimating |
-| Story review checklist | `resources/templates/story-review-checklist.md` | Estimation section |
+For each ticket in the batch:
 
-## Workflow
+### 1. DOR pre-check
+Evaluate against `resources/dor.md`. If critical DOR criteria are missing (no description,
+no acceptance criteria, no epic link), flag as **not estimable**, record the gaps, and
+skip to the next ticket. Do not produce an estimate.
 
-### Phase 1 — Story List and Shared Context
+### 2. Codebase exploration
+Launch one `Explore` (or `general-purpose`) subagent per ticket **in parallel**:
+- Locate the modules, services, aggregates, and endpoints the story touches.
+- Assess code surface: new implementation, extension, or refactor?
+- Surface any notable integration or cross-context dependencies.
 
-1. Run Jira Skill Discovery (see above).
-2. Use the discovered query skill to retrieve all stories in the specified status.
-   Let that skill own the query, filter, and pagination logic.
-3. If reference stories were provided, use the retrieval skill to fetch them for
-   calibration context.
-4. Load `resources/dor.md` and `resources/templates/story-review-checklist.md` once.
-5. Present the story count to the user and confirm before proceeding.
+Return findings as raw markdown; the main loop uses them for factor scoring. **Subagents
+must not post to Jira themselves** — all posting stays in the main loop.
 
-### Phase 2 — Per-Story Estimation (repeat for each story)
+### 3. Estimation (only after DOR passes)
+Apply the three-factor model from `story-point-estimation`:
+- Complexity, Effort, Uncertainty each scored 1–5.
+- Map factor sum to Fibonacci estimate.
+- Calibrate against reference stories if provided by the user.
+- Flag stories where effort exceeds 12 hours for mandatory split.
 
-6. Use the discovered retrieval skill to fetch the full story content.
-7. Run the DOR pre-check against `resources/dor.md`:
-   - If critical DOR criteria are missing: flag as **not estimable**, record the gaps,
-     and continue to the next story. Do not produce an estimate.
+### 4. Write to Jira
+Post the estimation reasoning via
+`mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` for every estimated story.
 
-   > **Gate**: Only proceed to estimation if the story passed the DOR pre-check.
+**Only if the story's story points field is currently empty:** update the field via
+`mcp__claude_ai_Atlassian_Rovo__editJiraIssue`.
 
-8. Check whether the story already has an estimate in Jira:
-   - If an estimate exists and `skip estimated` is `true`: skip estimation for this story.
-     Record the existing estimate for drift comparison if the skill is still run.
-   - If no estimate exists: proceed to estimation.
+## Posting the comments
 
-9. Scan the codebase for modules or components referenced in this story.
-10. Use the `story-point-estimation` skill with the loaded context to:
-    - Score Complexity, Effort, and Uncertainty (each 1–5) with explicit reasoning.
-    - Map the factor sum to an estimate on the configured scale.
-    - Calibrate against reference stories if available.
-    - Flag stories exceeding 12 hours / equivalent points for split discussion.
-11. If `update Jira` is enabled and an update skill was discovered:
-    - Only update if no estimate currently exists in Jira.
-    - Use the discovered update skill to sync the estimate to Jira.
+Use `contentFormat: "markdown"`. **Post directly — no approval step.** Write in Dutch.
+Update in place via `commentId` on re-runs.
 
-### Phase 3 — Consolidated Summary
+```markdown
+## 📊 Schatting — {date}
 
-12. Output a consolidated batch summary after all stories are processed:
+| Factor | Score | Toelichting |
+|--------|-------|-------------|
+| Complexiteit | {1–5} | … |
+| Inspanning | {1–5} | … |
+| Onzekerheid | {1–5} | … |
+| **Totaal** | **{sum}** | |
 
-    | Story | Title | DOR Ready | Current Points | New Estimate | Δ | Split Needed | Jira Updated |
-    |-------|-------|-----------|---------------|--------------|---|-------------|-------------|
-    | FIN-123 | — | ✅ | — | 5 | — | No | Yes |
-    | FIN-124 | — | ✅ | 3 | 5 | +2 | No | No (existed) |
-    | FIN-125 | — | ❌ | — | — | — | — | No (not ready) |
+**Schatting**: {N} story points
+**Huidig in Jira**: {current value or "—"}
+**Δ**: {difference or "—"} {⚠️ if |Δ| > 2}
+**Split vereist**: {Ja / Nee}
+```
 
-    - **Δ**: difference between the new estimate and the current Jira value; blank when no
-      prior estimate. Highlight rows where `|Δ| > 2` for team review.
-    - Stories not estimable due to DOR gaps are listed last with their gap summary.
+## Working rules
 
-## Output
+- DOR gate is hard: no estimate is produced for stories failing critical readiness criteria.
+- Existing Jira estimate is never overwritten — only empty fields are updated.
+- When `|Δ| > 2`, highlight the row in the final report table.
+- Stories touching Fincent integrations (payment rails, regulatory APIs) score minimum
+  Uncertainty 3 without explicit justification.
+- One comment per ticket per run; re-runs on the same day update via `commentId`.
+- After the sweep, report back with a table (not-estimable first, then split-needed, then ✅):
 
-- Per-story three-factor estimate with explicit reasoning.
-- Split recommendations for stories exceeding the 12-hour DOR limit.
-- Consolidated batch summary with drift column.
-- Jira estimates updated for previously unestimated stories (if enabled and available).
+  | Ticket | Samenvatting | DOR | Huidig | Nieuw | Δ | Split | Bijgewerkt |
+  |--------|-------------|-----|--------|-------|---|-------|-----------|
 
-## Notes
+## Tools used
 
-- Estimation is only reliable on stories that meet the Fincent DOR. Stories failing the
-  DOR pre-check are recorded but not estimated.
-- Jira integrations, regulatory APIs, and cross-team dependencies are automatically
-  treated as uncertainty boosters (minimum Uncertainty score: 3).
-- The codebase scan is per-story but shares the same process for the full batch.
+- `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql` — find the team's tickets.
+- `Explore` / `general-purpose` subagents — one per ticket, locate code and assess complexity.
+- `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` — post estimation reasoning.
+- `mcp__claude_ai_Atlassian_Rovo__editJiraIssue` — update story points field (only when empty).

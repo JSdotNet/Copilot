@@ -1,111 +1,113 @@
 ---
 name: automation: story review — pre-refinement
 description: >
-  Automated pre-refinement story review for Fincent. Queries all stories in a given Jira
-  status, retrieves architecture documentation and ADRs, and runs the
-  story-review-pre-refinement skill on each. Identifies architectural gaps and drafts
-  enabler stories when needed.
+  Run right before a pre-refinement or architecture review session: finds all FIN Jira
+  tickets in a given status for a Fincent team, explores the codebase for each, and posts
+  a structured architectural readiness comment on every ticket. Drafts and creates enabler
+  stories when needed. Use when preparing an architecture pre-refinement session.
 ---
 
 # Automation: Story Review — Pre-Refinement
 
-## Purpose
+**Meant to be run before a pre-refinement session.** Batch variant of
+`story-review-pre-refinement`. It sweeps all tickets in a given Jira status, derives a
+codebase-grounded architectural assessment for each, posts it as a comment, and optionally
+creates enabler tickets — so the architect walks into the session with findings on every ticket.
 
-Run a batch pre-refinement architecture review across all Fincent stories in a specified
-Jira status. For each story, the automation loads the content and architecture context,
-delegates to the `story-review-pre-refinement` skill, and produces a consolidated
-architectural readiness report with any required enabler story drafts.
+## Finding the tickets
 
-## Jira Skill Discovery
+Query Jira via `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql`:
 
-Before executing any Jira operation, discover what Jira skills are available:
+- cloudId: `innovadis.atlassian.net`
+- JQL: `project = FIN AND status = "{status}" AND "Fincent Team" = "Team B" ORDER BY updated DESC`
+- Default team is **Team B**; substitute if the user names another.
+- Fetch `fields: ["summary", "status", "description", "comment"]`.
+- Paginate with `nextPageToken` if needed.
 
-1. Check installed skills for skills whose name or description mentions "jira".
-2. Identify a **query-capable** Jira skill — one that can search or list issues by status.
-3. Identify a **retrieval-capable** Jira skill — one that can fetch a single existing issue.
-4. Identify a **create-capable** Jira skill — one that can create a new issue (for enabler
-   tickets).
-5. Identify an **update-capable** Jira skill — one that can sync content back to an
-   existing issue.
-6. If no query or retrieval skill is found: ask the user to paste story content for a
-   single-story fallback run.
-7. If no create/update skill is found and `update Jira` is enabled: skip write-back and
-   note it in the output.
+Report the list of found tickets (key + summary) before proceeding.
 
-All Jira field mapping, project keys, and API conventions are owned by the discovered
-Jira skill. Never reproduce that knowledge in this skill.
+## Skip tickets already reviewed
 
-## Inputs
+Check existing comments:
 
-- **Jira status**: the status to query (e.g., `Ready for Refinement`, `Backlog`, `To Do`).
-  All stories currently in this status are included in the run.
-- **Architecture context path**: path to architecture documentation folder (optional).
-- **Draft enabler stories**: `true` (default) or `false` — whether to draft enabler stories
-  when the review identifies infrastructure or architecture prerequisites.
-- **Update Jira**: `true` or `false` (default) — whether to sync review findings and create
-  enabler tickets in Jira via the discovered skills.
+- If a `## 🏗️ Architectuur Review` comment already exists and the description hasn't
+  materially changed, skip the ticket and note this in the final report.
+- If stale (>7 days old or description changed), post a fresh comment for today's date.
 
-## Dependencies
+## Analyzing each ticket
 
-| Dependency | Provided by | Purpose |
-|-----------|-------------|---------|
-| Story list | Discovered Jira query skill | All stories in the target status |
-| Story content | Discovered Jira retrieval skill | Per-story review target |
-| Jira write-back | Discovered Jira update skill | Sync review findings per story |
-| Enabler ticket creation | Discovered Jira create skill | Create enabler stories in Jira |
-| Architecture documentation | Codebase / architecture folder | Architectural fit and context |
-| ADRs (Architecture Decision Records) | Codebase `.wip/` or architecture plugin | Confirm decisions are in place |
-| Definition of Ready | `resources/dor.md` | Review criteria baseline |
-| Story review checklist | `resources/templates/story-review-checklist.md` | Checklist template |
+For every remaining ticket, produce a self-derived architectural assessment exactly as
+described in `story-review-pre-refinement`. Load `resources/dor.md` and architecture
+documentation once for the batch. Don't invent decisions or attendees.
 
-## Workflow
+### Fan out with subagents
 
-### Phase 1 — Story List and Shared Context
+Analyze tickets **in parallel**: launch one `Explore` (or `general-purpose`) subagent
+per ticket in a single message, each prompted with the ticket key, summary, full description,
+and the instruction to:
 
-1. Run Jira Skill Discovery (see above).
-2. Use the discovered query skill to retrieve all stories in the specified status.
-   Let that skill own the query, filter, and pagination logic.
-3. Load architecture documentation and relevant ADRs once for the entire batch.
-4. Load `resources/dor.md` and `resources/templates/story-review-checklist.md`.
-5. Present the story count to the user and confirm before proceeding.
+1. Locate the relevant bounded context, aggregates, commands/queries, endpoints, and
+   integration points in the codebase.
+2. Return analysis sections (bounded context fit, technical assumptions, architecture risks,
+   enabler check, security/compliance) as raw markdown with concrete code references
+   (`path:line` or type/method names).
 
-### Phase 2 — Per-Story Review (repeat for each story)
+You (the main loop) review each result for plausibility, enrich if needed, then post.
+**Subagents must not post to Jira themselves** — all posting stays in the main loop.
 
-6. Use the discovered retrieval skill to fetch the full story content.
-7. Use the `story-review-pre-refinement` skill with the loaded context to:
-   - Evaluate all Pre-Refinement checklist criteria (bounded context, assumptions, risks,
-     enabler check, security, and compliance).
-   - Classify each as ✅, ⚠️, or ❌.
-   - Determine whether an enabler story is required.
-8. If an enabler is identified and `draft enabler stories` is enabled:
-   - Draft the enabler story artifact (title, type, description, acceptance scope).
-   - Save the draft as a `.wip/` artifact.
-9. If `update Jira` is enabled:
-   - Use the discovered update skill to sync findings back to this story.
-   - Use the discovered create skill to create the enabler ticket (if drafted).
+## Posting the comments
 
-### Phase 3 — Consolidated Summary
+Post one comment per ticket via `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue`
+with `contentFormat: "markdown"`. **Post directly — no approval step.** Write in Dutch.
+Update in place via `commentId` rather than stacking near-duplicates.
 
-10. Output a consolidated batch summary after all stories are processed:
+```markdown
+## 🏗️ Architectuur Review — {date}
+_Automatische analyse op basis van ticket + codebase._
 
-    | Story | Title | Arch Ready | Conditional | Blocked | Enabler Drafted | Jira Updated |
-    |-------|-------|-----------|------------|---------|----------------|-------------|
-    | FIN-123 | — | ✅ | | | No | — |
-    | FIN-124 | — | | ⚠️ | | No | — |
-    | FIN-125 | — | | | ❌ | Yes | — |
+### Bevindingen
+| Criterium | Beoordeling | Toelichting |
+|-----------|-------------|-------------|
+| Bounded context fit | ✅/⚠️/❌ | … |
+| Technische aannames | ✅/⚠️/❌ | … |
+| Architectuurrisico | ✅/⚠️/❌ | … |
+| Enabler vereist | ✅/⚠️/❌ | … |
+| Beveiliging & compliance | ✅/⚠️/❌ | … |
 
-11. List all ❌ stories first, then ⚠️, then ✅.
+### Uitkomst
+**{✅ Architecturally ready / ⚠️ Conditionally ready / ❌ Not ready}**: {rationale}
 
-## Output
+### Enabler story (indien vereist)
+- **Titel**: …
+- **Type**: Enabler Story / Enabler Feature
+- **Scope**: …
 
-- Per-story Pre-Refinement review with checklist and architectural readiness verdict.
-- Enabler story draft artifacts saved to `.wip/` (if applicable).
-- Jira stories updated and enabler tickets created via discovered skills (if enabled).
-- Consolidated batch summary table sorted by readiness.
+### Risico's & aannames
+- …
+```
 
-## Notes
+## Creating enabler stories
 
-- Financial domain compliance (PSD2, GDPR, AML) checks are always included.
-- Architecture documentation is loaded once and shared across all stories in the batch.
-- If no architecture documentation is provided, the review uses best-effort reasoning and
-  flags missing context explicitly per story.
+When a ticket needs an enabler and the user has confirmed creation:
+
+- Create the enabler via `mcp__claude_ai_Atlassian_Rovo__createJiraIssue` with
+  project `FIN`, type `Story`, and a clear title and description.
+- Add a comment on the original ticket referencing the new enabler key.
+
+## Working rules
+
+- Architecture documentation and relevant ADRs are loaded once and shared across subagents.
+- Financial domain compliance (PSD2, GDPR, AML) is always checked for every ticket.
+- A too-vague ticket still gets a comment listing what is missing architecturally.
+- One comment per ticket per run; re-runs update via `commentId`.
+- After the sweep, report back with a table sorted ❌ first, then ⚠️, then ✅:
+
+  | Ticket | Samenvatting | Uitkomst | Enabler aangemaakt | Commentaar id / reden voor overslaan |
+  |--------|-------------|---------|-------------------|--------------------------------------|
+
+## Tools used
+
+- `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql` — find the team's tickets.
+- `Explore` / `general-purpose` subagents — one per ticket, locate code and draft analysis.
+- `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` — post (or update) each review comment.
+- `mcp__claude_ai_Atlassian_Rovo__createJiraIssue` — create enabler stories (when applicable).
