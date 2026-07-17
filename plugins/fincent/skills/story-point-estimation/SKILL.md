@@ -3,14 +3,23 @@ name: story-point-estimation
 description: >
   Estimate story points for a Fincent user story using a structured three-factor model
   (complexity, effort, uncertainty) calibrated against team velocity and reference stories.
+  Requires PO review, pre-refinement review, and domain review to have passed first.
 ---
 
 # Story Point Estimation
 
+## Pipeline Gate
+
+> **Prerequisite**: The story must have passed all three preceding reviews:
+> `story-review-po` (✅ or ⚠️), `story-review-pre-refinement` (✅ or ⚠️), and
+> `story-review-domain` (✅ or ⚠️).
+> If any result is ❌, return **Not estimable** immediately — list the blocking issues
+> and do not produce an estimate until they are resolved.
+
 ## Purpose and Trigger Conditions
 
-Use this skill when a team member, scrum master, or product owner needs a structured story
-point estimate for a Fincent user story, either before or during sprint planning.
+Use this skill after a story has cleared all three reviews. Run before sprint planning
+to produce a reasoned, calibrated Fibonacci estimate.
 
 ## Input Expectations
 
@@ -56,9 +65,12 @@ How much is unknown or risky about delivery?
 ## Workflow
 
 1. Load the story content.
-2. If available, load reference stories for calibration.
-3. Score each factor (1–5) with explicit reasoning for each score.
-4. Map the factor scores to a Fibonacci story point value:
+2. **Gate check**: Confirm all three review results (PO, pre-refinement, domain) are ✅ or ⚠️.
+   If any is ❌, stop and output:
+   > ❌ **Not estimable** — the following issues must be resolved first: {list blockers}.
+3. If available, load reference stories for calibration.
+4. Score each factor (1–5) with explicit reasoning for each score.
+5. Map the factor scores to a Fibonacci story point value:
 
    | Factor Sum | Suggested Points |
    |-----------|-----------------|
@@ -69,10 +81,10 @@ How much is unknown or risky about delivery?
    | 13–14     | 13              |
    | 15        | 21 (consider splitting) |
 
-5. Compare against reference stories if provided; adjust if the calibration differs.
-6. Flag stories where the estimate exceeds **12 hours** (or the equivalent story points) for
+6. Compare against reference stories if provided; adjust if the calibration differs.
+7. Flag stories where the estimate exceeds **12 hours** (or the equivalent story points) for
    mandatory split discussion — this is a hard DOR constraint.
-7. Summarise the estimate with the reasoning behind each factor score.
+8. Summarise the estimate with the reasoning behind each factor score.
 
 ## Output Expectations
 

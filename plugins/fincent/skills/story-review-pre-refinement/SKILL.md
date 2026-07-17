@@ -3,20 +3,27 @@ name: story-review-pre-refinement
 description: >
   Review a Fincent user story before sprint refinement: assess architectural readiness,
   identify hidden technical risks, determine if enabler stories are needed, and confirm
-  the story is implementable as scoped.
+  the story is implementable as scoped. Requires PO review to have passed first.
 ---
 
 # Story Review — Pre-Refinement (Architect)
 
+## Pipeline Gate
+
+> **Prerequisite**: The story must have passed the `story-review-po` skill first.
+> If no PO review result is available, run `story-review-po` before proceeding.
+> If the PO review result is ❌, return **Not ready for pre-refinement** immediately —
+> do not proceed with this review until the PO issues are resolved.
+
 ## Purpose and Trigger Conditions
 
-Use this skill when an architect or tech lead needs to evaluate a story before it enters
-sprint refinement. The focus is on technical feasibility, architectural fit, and identifying
-infrastructure or enabler work that must precede delivery.
+Use this skill after a story has passed PO review. The focus is on technical feasibility,
+architectural fit, and identifying infrastructure or enabler work that must precede delivery.
 
 ## Input Expectations
 
 - The user story to review (Jira key, link, or pasted content).
+- PO review result (✅ or ⚠️ required to proceed).
 - Optional: architecture documentation or ADR links.
 - Optional: existing enabler stories or spikes.
 
@@ -24,9 +31,10 @@ infrastructure or enabler work that must precede delivery.
 
 1. Load the story content. If only a Jira key is provided and a Jira retrieval skill is
    available, use it to fetch the story. Otherwise ask the user to paste the story text.
-2. Load `resources/dor.md` to apply the Fincent Definition of Ready (architecture section).
-3. Load `resources/templates/story-review-checklist.md` (Pre-Refinement section).
-4. Evaluate each Pre-Refinement criterion:
+2. **Gate check**: Confirm the PO review result. If ❌, stop and output:
+   > ❌ **Not ready for pre-refinement** — PO review must pass first. Resolve the
+   > following PO issues before re-running this review: {list PO findings}.
+3. Evaluate each Pre-Refinement criterion:
 
    ### Bounded Context Fit
    - Does the story belong to a single bounded context?
@@ -50,74 +58,27 @@ infrastructure or enabler work that must precede delivery.
    - Are there security or regulatory implications (e.g., PSD2, GDPR, AML) that must
      be addressed before delivery?
 
-5. Classify each criterion as ✅, ⚠️, or ❌.
-6. Produce overall readiness classification:
-   - ✅ **Architecturally ready** — no blockers; the story can enter refinement.
+4. Classify each criterion as ✅, ⚠️, or ❌.
+5. Produce overall readiness classification:
+   - ✅ **Architecturally ready** — no blockers; the story can proceed to domain review.
    - ⚠️ **Conditionally ready** — proceed with noted conditions or parallel enabler work.
-   - ❌ **Not ready** — architectural gaps block delivery; list required actions before refinement.
-7. If an enabler is needed, draft a brief enabler story description with title, type, and scope.
+   - ❌ **Not ready** — architectural gaps block delivery; resolve before domain review.
+6. If an enabler is needed, draft a brief enabler story description with title, type, and scope.
 
 ## Output Expectations
 
-- Completed Pre-Refinement section of the story review checklist.
 - Overall architectural readiness classification with rationale.
 - Enabler story draft (if applicable) with: title, enabler type, and acceptance scope.
 - Prioritised list of architectural actions if the story is not ready.
+- Clear next step: proceed to `story-review-domain` or resolve blockers first.
 
 ## Quality Checks
 
 - The review focuses on architecture and feasibility — do not rewrite business acceptance criteria.
 - Enabler identification is always explicit; never assume the team will discover the need later.
 - Security and compliance implications are never skipped for Fincent stories.
+- If PO review result is ❌, the output is a gate failure — not an architectural review.
 
 ## References
 
 - `resources/dor.md` — Fincent Definition of Ready
-- `resources/templates/story-review-checklist.md` — review checklist
-
-   ### Bounded Context Fit
-   - Does the story belong to a single bounded context?
-   - Are cross-context integrations explicitly defined with integration contracts?
-
-   ### Technical Assumptions
-   - Are there hidden assumptions about infrastructure, APIs, or external services?
-   - Are non-functional requirements (performance, security, scalability) identified?
-
-   ### Architecture Risk
-   - Does the story require architectural decisions that are not yet made?
-   - Are there risks that need a spike before delivery?
-
-   ### Enabler Check
-   - Does the story require infrastructure, platform, or foundational architecture work
-     before it can be delivered by a feature team?
-   - If yes: flag the need for an **Enabler Story** or **Enabler Feature** and describe
-     the scope of the enabler.
-
-   ### Security and Compliance
-   - Are there security or regulatory implications (e.g., PSD2, GDPR, AML) that must
-     be addressed before delivery?
-
-5. Classify each criterion as ✅, ⚠️, or ❌.
-6. Produce overall readiness classification:
-   - ✅ **Architecturally ready** — no blockers; the story can enter refinement.
-   - ⚠️ **Conditionally ready** — proceed with noted conditions or parallel enabler work.
-   - ❌ **Not ready** — architectural gaps block delivery; list required actions before refinement.
-7. If an enabler is needed, draft a brief enabler story description with title, type, and scope.
-
-## Output Expectations
-
-- Completed Pre-Refinement section of the story review checklist.
-- Overall architectural readiness classification with rationale.
-- Enabler story draft (if applicable) with: title, enabler type, and acceptance scope.
-- Prioritised list of architectural actions if the story is not ready.
-
-## Quality Checks
-
-- The review focuses on architecture and feasibility — do not rewrite business acceptance criteria.
-- Enabler identification is always explicit; never assume the team will discover the need later.
-- Security and compliance implications are never skipped for Fincent stories.
-
-## References
-
-- `resources/dor.md` — Fincent Definition of Ready
-- `resources/templates/story-review-checklist.md` — review checklist

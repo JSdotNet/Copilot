@@ -3,9 +3,17 @@ name: story-review-domain
 description: >
   Review a Fincent user story from the Domain Architect perspective: validate ubiquitous
   language, bounded context ownership, aggregate alignment, domain events, and DDD correctness.
+  Requires PO review and pre-refinement review to have passed first.
 ---
 
 # Story Review — Domain Architect
+
+## Pipeline Gate
+
+> **Prerequisite**: The story must have passed both `story-review-po` (✅ or ⚠️) and
+> `story-review-pre-refinement` (✅ or ⚠️) first.
+> If either result is ❌, return **Not ready for domain review** immediately — list the
+> unresolved issues and do not proceed with this review.
 
 ## Purpose and Trigger Conditions
 
@@ -24,7 +32,10 @@ bounded context boundaries and invariants.
 
 1. Load the story content. If only a Jira key is provided and a Jira retrieval skill is
    available, use it to fetch the story. Otherwise ask the user to paste the story text.
-2. Evaluate each Domain Architect criterion:
+2. **Gate check**: Confirm PO review result (✅ or ⚠️) and pre-refinement result (✅ or ⚠️).
+   If either is ❌, stop and output:
+   > ❌ **Not ready for domain review** — resolve the following issues first: {list blockers}.
+3. Evaluate each Domain Architect criterion:
 
    ### Ubiquitous Language
    - Does the story use terms from the Fincent ubiquitous language glossary?
@@ -59,10 +70,11 @@ bounded context boundaries and invariants.
 
 ## Output Expectations
 
-- Completed Domain Architect section of the story review checklist.
+- Per-criterion domain finding with verdict ✅, ⚠️, or ❌.
 - Overall domain readiness classification with rationale.
 - Corrected ubiquitous language terms and aggregate/event names where applicable.
 - Prioritised list of domain corrections if the story is not ready.
+- Clear next step: proceed to `story-point-estimation` or resolve domain blockers first.
 
 ## Quality Checks
 
