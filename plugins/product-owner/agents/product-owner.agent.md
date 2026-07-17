@@ -46,8 +46,8 @@ use the `create-github-issue` or `update-github-issue` skills from the `github` 
 - [Write Bug](../skills/write-bug/SKILL.md)
 
 ### Optional Integrations
-- Jira sync via `jira` agent (bundled in this plugin, optional use).
-- GitHub issue sync via `github` agent (requires `github` plugin to be installed).
+- Jira sync via `jira` agent (requires `jira` plugin to be installed).
+- GitHub issue sync via `github` plugin skills (requires `github` plugin to be installed).
 
 ## Operating Principles
 1. Start from outcome. Capture the user goal and expected result before implementation details.

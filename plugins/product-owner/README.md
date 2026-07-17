@@ -1,6 +1,6 @@
 # product-owner
 
-Installable GitHub Copilot CLI plugin for product backlog authoring with optional Jira synchronization.
+Installable GitHub Copilot CLI plugin for product backlog authoring. Write epics, stories, and bugs as Markdown artifacts.
 
 ## Includes
 
@@ -10,35 +10,27 @@ Installable GitHub Copilot CLI plugin for product backlog authoring with optiona
   - `skills/write-story/SKILL.md`
   - `skills/write-epic/SKILL.md`
   - `skills/write-bug/SKILL.md`
-  - `skills/create-jira-ticket/SKILL.md`
-  - `skills/update-jira-ticket/SKILL.md`
 - Instructions:
   - `instructions/stories.instructions.md`
   - `instructions/epics.instructions.md`
   - `instructions/bugs.instructions.md`
-  - `instructions/jira-sync.instructions.md`
   - `instructions/agent-handoff.instructions.md`
   - `instructions/markdown.instructions.md`
 
 ## Scope
 
 - Product Owner concerns: backlog writing and refinement for epics, stories, and bugs.
-- Jira concerns: create/update Jira issues from approved backlog artifacts (optional use).
 - Backlog artifacts use the `.wip/work/<module>/` convention with `epic-`, `story-`, and `bug-` file prefixes.
-- Keep responsibilities separated by agent:
+- Keep responsibilities separated:
   - Use `product-owner` for writing and refining backlog content.
-  - Use `jira` for Jira sync operations and field mapping.
-  - Use `github` (separate plugin) for GitHub issue sync operations.
+  - Use `jira` plugin for Jira sync operations and field mapping (optional).
+  - Use `github` plugin for GitHub issue sync operations (optional).
 
 ## Optional Integrations
 
 - Architecture handoff (`architect`) is optional and requires the `architecture` plugin to be installed.
-- GitHub issue sync (`github` agent) is optional and requires the `github` plugin to be installed.
-
-## Agent Visibility
-
-- Only `product-owner` is publicly exposed by this plugin.
-- Specialist agents under `agents-internal/` are internal implementation assets and are not exposed directly.
+- Jira sync requires the `jira` plugin to be installed (`copilot plugin install JSdotNet/Copilot:plugins/jira`).
+- GitHub issue sync requires the `github` plugin to be installed (`copilot plugin install JSdotNet/Copilot:plugins/github`).
 
 ## Resources
 

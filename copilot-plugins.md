@@ -80,7 +80,12 @@ Track GitHub Copilot plugins used by this repository so team members can install
 - `product-owner` (`0.1.0`)
   - Source path: `plugins/product-owner`
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/product-owner`
-  - Notes: Product Owner backlog authoring (epics, stories, bugs) with optional Jira synchronization. GitHub issue sync requires the `github` plugin.
+  - Notes: Product Owner backlog authoring — epics, stories, and bugs as Markdown artifacts. Jira sync requires the `jira` plugin. GitHub issue sync requires the `github` plugin.
+
+- `jira` (`0.1.0`)
+  - Source path: `plugins/jira`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/jira`
+  - Notes: Jira issue synchronization — create and update Jira issues from approved Markdown backlog artifacts. Works standalone or alongside the `product-owner` plugin.
 
 - `github` (`0.1.0`)
   - Source path: `plugins/github`

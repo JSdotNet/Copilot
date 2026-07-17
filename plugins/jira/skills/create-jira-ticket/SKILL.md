@@ -6,6 +6,12 @@ user-invocable: true
 
 # Create Jira Ticket (Upload Only)
 
+## Prerequisites
+
+Requires the **Atlassian MCP server** (`mcp_atlassian`) to be connected. The following MCP tool is called:
+
+- `mcp_atlassian_jira_create_issue`
+
 ## Purpose
 
 Use this skill only to upload a ticket that is already fully written in a Markdown file.
