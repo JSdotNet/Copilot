@@ -20,7 +20,6 @@ applyTo: 'agents/**/*.agent.md'
 ## Scope Split
 
 - Product Owner agent owns backlog writing and refinement only.
-- Jira agent owns Jira create/update/sync operations only. Requires the `jira` plugin to be installed.
 - GitHub Issues agent owns GitHub issue sync operations only.
-- Product Owner agent must hand off Jira synchronization tasks to the Jira agent when the `jira` plugin is available.
+- Jira sync is handled via the `create-jira-ticket` and `update-jira-ticket` skills (requires the `jira` plugin to be installed).
 - If the `jira` plugin is not installed, inform the user and do not attempt Jira operations.

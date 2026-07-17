@@ -13,7 +13,6 @@
     "epic",
     "bug"
   ],
-  "agents": "agents/",
   "skills": "skills/",
   "license": "MIT"
 }
