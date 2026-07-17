@@ -31,8 +31,9 @@ This applies to all story types: features, bugs, and support requests.
 
 ## Design
 
-- If the story contains a UI component: the design is available in Figma and the link is
-  included in the story.
+- If the story contains a UI component: design images (screens/mockups) must be included
+  directly in the story. A Figma link alone is not sufficient; images are mandatory.
+  A Figma link is optional but recommended alongside the images.
 - Interactions and animations are worked out in the design (if applicable).
 
 ## Bugs
