@@ -6,6 +6,12 @@ user-invocable: true
 
 # Update Jira Ticket
 
+## Prerequisites
+
+Requires the **Atlassian MCP server** (`mcp_atlassian`) to be connected. The following MCP tool is called:
+
+- `mcp_atlassian_jira_update_issue`
+
 ## Purpose
 
 Use this skill only to update a Jira issue that already exists.
