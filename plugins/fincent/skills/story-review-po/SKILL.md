@@ -61,8 +61,9 @@ is well-formed, clear, and ready for team refinement from a business and backlog
    - Does the story stay within the 12-hour limit? If larger, flag for splitting.
 
    ### Design (UI stories only)
-   - Are design images (screens/mockups) included directly in the story?
-   - Is a Figma link provided? (Optional, but required when no images are attached.)
+   - Are design images (screens/mockups) included directly in the story? (Always mandatory,
+     even when a Figma link is also attached.)
+   - Is a Figma link provided? (Optional — never a substitute for images.)
    - Are interactions and animations worked out in the design?
 
    ### Bug-specific criteria (bugs only)

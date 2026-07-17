@@ -37,7 +37,7 @@ Applies to all story types: features, bugs, and support requests.
 | # | Criterion | Status | Notes |
 |---|-----------|--------|-------|
 | 13 | Design images (screens/mockups) included directly in the story | | |
-| 14 | Figma link provided (optional, but required if no images attached) | | |
+| 14 | Figma link provided (optional, but images are always required regardless) | | |
 | 15 | Interactions and animations worked out in design | | |
 
 ## Bug Review (additional criteria for bugs)

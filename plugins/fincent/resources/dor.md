@@ -32,8 +32,9 @@ This applies to all story types: features, bugs, and support requests.
 ## Design
 
 - If the story contains a UI component: design images (screens/mockups) must be included
-  directly in the story. A Figma link alone is not sufficient; images are mandatory.
-  A Figma link is optional but recommended alongside the images.
+  directly in the story. This is mandatory — a Figma link does not replace images, even
+  when a Figma link is also provided.
+  A Figma link is optional and can be added in addition to the images.
 - Interactions and animations are worked out in the design (if applicable).
 
 ## Bugs
