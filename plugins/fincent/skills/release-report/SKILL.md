@@ -97,16 +97,7 @@ All bug-type stories delivered in this release:
 |-----|---------|--------|------|--------|
 | FIN-xxx | … | N | … | … |
 
-### 6. Not Tested Yet
-
-Delivered stories that are Done in development but have no test evidence, are marked as
-"In Testing", or carry a `needs-testing` label:
-
-| Key | Summary | Points | Epic | Tester |
-|-----|---------|--------|------|--------|
-| FIN-xxx | … | N | … | … |
-
-### 7. Release Notes Draft
+### 6. Release Notes Draft
 
 Produce a stakeholder-facing "What's New" section based on the delivered epics and stories.
 Write in plain business language — no Jira keys or technical jargon. Group by epic or theme.
@@ -124,8 +115,6 @@ Example format:
 - Delivered means status is Done or Closed; anything else is deferred.
 - Delivery rate is calculated from the original scope only; late additions are noted in
   Scope Changes but excluded from the rate denominator.
-- "Untested" means: status is Done/Closed but no linked test execution, status is
-  "In Testing" / "Awaiting Verification", or a `needs-testing` label is present.
 - Group every section by epic — never mix stories from different epics in the same table.
 - Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `—`.
 - After producing the report, present a one-paragraph executive summary suitable for
