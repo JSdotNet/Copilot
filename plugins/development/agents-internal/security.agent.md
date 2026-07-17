@@ -1,7 +1,7 @@
 ---
 description: Security review specialist for identifying vulnerabilities and security risks in implementation changes.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'terminal/runInTerminal']
 ---
 
 # Security Agent

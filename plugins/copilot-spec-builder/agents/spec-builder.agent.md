@@ -1,7 +1,7 @@
 ---
 description: Execution specialist for implementing approved customization plans into concrete Markdown assets.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'vscode/memory', 'agent', 'vscode/askQuestions']
+tools: ['read/readFile', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'vscode/memory', 'agent', 'vscode/askQuestions', 'terminal/runInTerminal']
 agents: ['Explore']
 handoffs:
   - label: Review

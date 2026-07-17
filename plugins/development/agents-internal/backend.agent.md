@@ -1,7 +1,7 @@
 ---
 description: Backend implementation specialist for domain, application, infrastructure, and API layers in approved plans.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'terminal/runInTerminal']
 ---
 
 # Backend Agent

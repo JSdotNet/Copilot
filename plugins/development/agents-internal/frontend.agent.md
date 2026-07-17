@@ -1,7 +1,7 @@
 ---
 description: Frontend implementation specialist for UI delivery aligned with approved plans and API contracts.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'terminal/runInTerminal']
 ---
 
 # Frontend Agent
