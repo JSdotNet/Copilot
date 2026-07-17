@@ -53,8 +53,8 @@ Also query stories that were **removed from the release** (had this fixVersion t
 |-------|-------|
 | Release | {release name} |
 | Teams | All teams |
-| Status | Released / In Progress |
-| Release date | {date or "TBD"} |
+| Release date | {date} |
+| Preproduction release date | {date or "TBD"} |
 | Sprints covered | {sprint names} |
 | Original scope | {N} stories / {N} points |
 | Delivered | {N} stories / {N} points |
