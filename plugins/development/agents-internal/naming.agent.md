@@ -1,7 +1,7 @@
 ---
 description: Naming specialist for consistent domain, API, and code identifier naming decisions.
 model: claude-haiku-4.5
-tools: ['read/readFile', 'search/codebase', 'search']
+tools: ['read/readFile', 'search/codebase', 'search', 'terminal/runInTerminal']
 ---
 
 # Naming Agent

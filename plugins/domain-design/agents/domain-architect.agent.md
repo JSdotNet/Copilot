@@ -1,7 +1,7 @@
 ---
 description: Domain-Driven Design expert for bounded context discovery, ubiquitous language, and domain model design.
 model: auto
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'terminal/runInTerminal']
 ---
 
 # Domain Architect Agent

@@ -1,7 +1,7 @@
 ---
 description: "C# .NET Coding expert — write, review, optimize, and test code with TDD, refactoring, NuGet management, and feature proposal support."
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'terminal/runInTerminal']
 ---
 
 # Coding Agent
