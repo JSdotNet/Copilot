@@ -24,9 +24,7 @@ bounded context boundaries and invariants.
 
 1. Load the story content. If only a Jira key is provided and a Jira retrieval skill is
    available, use it to fetch the story. Otherwise ask the user to paste the story text.
-2. Load `resources/dor.md` to apply the Fincent Definition of Ready (domain section).
-3. Load `resources/templates/story-review-checklist.md` (Domain Architect section).
-4. Evaluate each Domain Architect criterion:
+2. Evaluate each Domain Architect criterion:
 
    ### Ubiquitous Language
    - Does the story use terms from the Fincent ubiquitous language glossary?
@@ -52,12 +50,12 @@ bounded context boundaries and invariants.
    - Does the story introduce or modify a domain policy or business rule?
    - Is the rule modelled at the domain layer (not leaking into application or infrastructure)?
 
-5. Classify each criterion as ✅, ⚠️, or ❌.
-6. Produce overall domain readiness classification:
+3. Classify each criterion as ✅, ⚠️, or ❌.
+4. Produce overall domain readiness classification:
    - ✅ **Domain ready** — story is correctly modelled and can proceed.
    - ⚠️ **Needs clarification** — domain alignment issues require discussion before refinement.
    - ❌ **Domain misalignment** — the story contradicts domain model; must be reworked.
-7. Provide concrete corrections for each ⚠️ or ❌ finding.
+5. Provide concrete corrections for each ⚠️ or ❌ finding.
 
 ## Output Expectations
 
@@ -72,8 +70,3 @@ bounded context boundaries and invariants.
 - Aggregate boundaries are never assumed — they are confirmed or flagged.
 - Domain events are always in past tense and named in business language.
 - Do not duplicate PO or architecture concerns — stay focused on domain correctness.
-
-## References
-
-- `resources/dor.md` — Fincent Definition of Ready
-- `resources/templates/story-review-checklist.md` — review checklist
