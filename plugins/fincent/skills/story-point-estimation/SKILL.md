@@ -3,7 +3,7 @@ name: story-point-estimation
 description: >
   Estimate story points for a Fincent user story using a structured three-factor model
   (complexity, effort, uncertainty) calibrated against team velocity and reference stories.
-  Requires PO review, pre-refinement review, and domain review to have passed first.
+  Requires PO review, dev review, and domain review to have passed first.
 ---
 
 # Story Point Estimation
@@ -11,7 +11,7 @@ description: >
 ## Pipeline Gate
 
 > **Prerequisite**: The story must have passed all three preceding reviews:
-> `story-review-po` (✅ or ⚠️), `story-review-pre-refinement` (✅ or ⚠️), and
+> `story-review-po` (✅ or ⚠️), `story-review-dev` (✅ or ⚠️), and
 > `story-review-domain` (✅ or ⚠️).
 > If any result is ❌, return **Not estimable** immediately — list the blocking issues
 > and do not produce an estimate until they are resolved.
@@ -65,7 +65,7 @@ How much is unknown or risky about delivery?
 ## Workflow
 
 1. Load the story content.
-2. **Gate check**: Confirm all three review results (PO, pre-refinement, domain) are ✅ or ⚠️.
+2. **Gate check**: Confirm all three review results (PO, dev, domain) are ✅ or ⚠️.
    If any is ❌, stop and output:
    > ❌ **Not estimable** — the following issues must be resolved first: {list blockers}.
 3. If available, load reference stories for calibration.

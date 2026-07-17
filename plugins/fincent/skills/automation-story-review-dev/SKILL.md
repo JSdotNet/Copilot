@@ -1,19 +1,19 @@
 ---
-name: automation: story review — pre-refinement
+name: automation: story review — dev
 description: >
-  Automated pre-refinement story review for Fincent. Queries all stories in a given Jira
+  Automated dev story review for Fincent. Queries all stories in a given Jira
   status, retrieves architecture documentation and ADRs, and runs the
-  story-review-pre-refinement skill on each. Identifies architectural gaps and drafts
+  story-review-dev skill on each. Identifies architectural gaps and drafts
   enabler stories when needed.
 ---
 
-# Automation: Story Review — Pre-Refinement
+# Automation: Story Review — Dev
 
 ## Purpose
 
-Run a batch pre-refinement architecture review across all Fincent stories in a specified
+Run a batch dev architecture review across all Fincent stories in a specified
 Jira status. For each story, the automation loads the content and architecture context,
-delegates to the `story-review-pre-refinement` skill, and produces a consolidated
+delegates to the `story-review-dev` skill, and produces a consolidated
 architectural readiness report with any required enabler story drafts.
 
 ## Jira Skill Discovery
@@ -72,7 +72,7 @@ Jira skill. Never reproduce that knowledge in this skill.
 ### Phase 2 — Per-Story Review (repeat for each story)
 
 6. Use the discovered retrieval skill to fetch the full story content.
-7. Use the `story-review-pre-refinement` skill with the loaded context to:
+7. Use the `story-review-dev` skill with the loaded context to:
    - Evaluate all Pre-Refinement checklist criteria (bounded context, assumptions, risks,
      enabler check, security, and compliance).
    - Classify each as ✅, ⚠️, or ❌.

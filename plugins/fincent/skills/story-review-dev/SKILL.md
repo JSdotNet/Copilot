@@ -1,18 +1,18 @@
 ---
-name: story-review-pre-refinement
+name: story-review-dev
 description: >
   Review a Fincent user story before sprint refinement: assess architectural readiness,
   identify hidden technical risks, determine if enabler stories are needed, and confirm
   the story is implementable as scoped. Requires PO review to have passed first.
 ---
 
-# Story Review — Pre-Refinement (Architect)
+# Story Review — Dev (Architect)
 
 ## Pipeline Gate
 
 > **Prerequisite**: The story must have passed both `story-review-po` (✅ or ⚠️) and
 > `story-review-domain` (✅ or ⚠️) first.
-> If either result is ❌, return **Not ready for pre-refinement** immediately — list the
+> If either result is ❌, return **Not ready for dev review** immediately — list the
 > unresolved issues and do not proceed with this review.
 
 ## Purpose and Trigger Conditions
@@ -34,7 +34,7 @@ that must precede delivery.
    available, use it to fetch the story. Otherwise ask the user to paste the story text.
 2. **Gate check**: Confirm PO review result (✅ or ⚠️) and domain review result (✅ or ⚠️).
    If either is ❌, stop and output:
-   > ❌ **Not ready for pre-refinement** — resolve the following issues first: {list blockers}.
+   > ❌ **Not ready for dev review** — resolve the following issues first: {list blockers}.
 3. Evaluate each Pre-Refinement criterion:
 
    ### Bounded Context Fit

@@ -3,7 +3,7 @@ name: story-review-domain
 description: >
   Review a Fincent user story from the Domain Architect perspective: validate ubiquitous
   language, bounded context ownership, aggregate alignment, domain events, and DDD correctness.
-  Requires PO review and pre-refinement review to have passed first.
+  Requires PO review and dev review to have passed first.
 ---
 
 # Story Review — Domain Architect
@@ -74,7 +74,7 @@ bounded context boundaries and invariants.
 - Overall domain readiness classification with rationale.
 - Corrected ubiquitous language terms and aggregate/event names where applicable.
 - Prioritised list of domain corrections if the story is not ready.
-- Clear next step: proceed to `story-review-pre-refinement` or resolve domain blockers first.
+- Clear next step: proceed to `story-review-dev` or resolve domain blockers first.
 
 ## Quality Checks
 
