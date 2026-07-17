@@ -9,6 +9,10 @@ This applies to all story types: features, bugs, and support requests.
 - The story is written from the end-user perspective, preferably in the format:
   *"As a [user], I want [functionality], so that [benefit]."*
 - The title is a concise, clear summary of the story — not identical to the description.
+- The title does not contain an open question (no `?` or question phrasing such as
+  "Should we…", "How to…", "Is it possible to…").
+- The title does not mention a specific person by name (stories are team-owned, not
+  person-owned).
 - The description is in the story field itself, not in the comments.
 - The description is not a copy of an email or customer message.
 - The description is specific: no vague formulations such as "it might be useful if..." or

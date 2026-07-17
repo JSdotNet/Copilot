@@ -12,9 +12,11 @@ Applies to all story types: features, bugs, and support requests.
 | 1 | Functionality is independently testable | | |
 | 2 | Written from end-user perspective (As a / I want / So that format) | | |
 | 3 | Title is a concise summary, not identical to the description | | |
-| 4 | Description is in the story field, not in comments | | |
-| 5 | Description is not a copy of an email or customer message | | |
-| 6 | Description is specific — no vague or conditional wording | | |
+| 4 | Title does not contain an open question (no "?" or question phrasing) | | |
+| 5 | Title does not mention a specific person by name | | |
+| 6 | Description is in the story field, not in comments | | |
+| 7 | Description is not a copy of an email or customer message | | |
+| 8 | Description is specific — no vague or conditional wording | | |
 
 ### Scope and Context
 

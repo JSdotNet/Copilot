@@ -45,6 +45,8 @@ is well-formed, clear, and ready for team refinement from a business and backlog
    - Is the functionality independently testable?
    - Is it written from the end-user perspective in As a / I want / So that format?
    - Is the title a concise summary, distinct from the description?
+   - Does the title contain an open question (`?` or question phrasing)? → ❌ if yes.
+   - Does the title mention a specific person by name? → ❌ if yes.
    - Is the description in the story field itself (not in comments)?
    - Is the description original — not a copy of an email or customer message?
    - Is the description specific, with no vague or conditional wording?
