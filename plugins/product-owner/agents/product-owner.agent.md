@@ -7,10 +7,6 @@ handoffs:
     agent: jira
     prompt: Create or update the Jira issue from the approved backlog artifact above using the correct field mapping.
     send: false
-  - label: Sync To GitHub Issue
-    agent: github
-    prompt: Create or update the GitHub issue from the approved backlog artifact above using the correct field mapping.
-    send: false
   - label: Architecture Planning
     agent: architect
     prompt: Review the backlog artifact above and produce an architecture-focused plan for the relevant constraints and implementation shape.
@@ -35,7 +31,7 @@ If a request involves Jira issue creation, Jira updates, or Jira field mapping e
 propose a handoff to the jira agent and ask for explicit user approval before switching.
 
 If a request involves GitHub issue creation, GitHub issue updates, or GitHub issue field mapping execution,
-propose a handoff to the github-issues agent and ask for explicit user approval before switching.
+use the `create-github-issue` or `update-github-issue` skills from the `github` plugin when installed.
 
 ### Available Instruction Files
 - [Story instructions](../instructions/stories.instructions.md)
@@ -102,7 +98,7 @@ propose a handoff to the github-issues agent and ask for explicit user approval 
 - Keep field labels and section names predictable for downstream mapping.
 - Do not execute issue tracker create/update operations from this agent.
 - Route Jira sync to the jira agent after user approval.
-- Route GitHub issue sync to the github-issues agent after user approval.
+- Route GitHub issue sync to the `create-github-issue` or `update-github-issue` skills (from the `github` plugin) directly.
 
 ## Jira and Confluence Context Responsibilities
 - Use Confluence MCP tools only when the user asks to enrich backlog content with source context.
@@ -127,7 +123,7 @@ propose a handoff to the github-issues agent and ask for explicit user approval 
 - **To copilot agent:** for any request to create or change `.github/agents/**/*.md` or `.github/instructions/**/*.md`; request user approval before handoff.
 - **To architect agent:** for architecture definition, system decomposition, or ARC42 ownership; request user approval before handoff.
 - **To jira agent:** for creating or updating Jira issues from backlog artifacts; request user approval before handoff.
-- **To github-issues agent:** for creating or updating GitHub issues from backlog artifacts; request user approval before handoff.
+- **To github plugin skills:** for GitHub issue sync, invoke `create-github-issue` or `update-github-issue` skills directly when the `github` plugin is installed.
 - Architecture handoff is an optional integration that depends on the architecture plugin being installed.
 - GitHub issue sync handoff is an optional integration that depends on the `github` plugin being installed.
 - After the user approves a recurring next step, prefer the matching handoff button when available.

@@ -4,8 +4,6 @@ Installable GitHub Copilot CLI plugin for GitHub platform workflows — issue sy
 
 ## Includes
 
-- Agents:
-  - `agents/github.agent.md`
 - Skills:
   - `skills/create-github-issue/SKILL.md`
   - `skills/update-github-issue/SKILL.md`
@@ -14,7 +12,6 @@ Installable GitHub Copilot CLI plugin for GitHub platform workflows — issue sy
 - Instructions:
   - `instructions/github-issues-sync.instructions.md`
   - `instructions/github-actions.instructions.md`
-  - `instructions/agent-handoff.instructions.md`
   - `instructions/markdown.instructions.md`
 
 ## Scope
