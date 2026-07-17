@@ -37,14 +37,13 @@ the discovered Jira skill. Never reproduce that knowledge in this skill.
 
 Use the discovered query-capable Jira skill with the following JQL:
 
-- JQL: `project = FIN AND fixVersion = "{release name}" AND "Fincent Team" = "Team B" ORDER BY issuetype ASC, epic ASC, status ASC`
+- JQL: `project = FIN AND fixVersion = "{release name}" ORDER BY issuetype ASC, epic ASC, status ASC`
 - Fields: summary, status, issuetype, epic, story points, labels, assignee, fixVersions, sprints.
 - Paginate if needed.
-- If the user names a different team, substitute in the JQL.
 
 Also query stories that were **removed from the release** (had this fixVersion then lost it):
 
-- JQL: `project = FIN AND fixVersion was "{release name}" AND fixVersion != "{release name}" AND "Fincent Team" = "Team B"`
+- JQL: `project = FIN AND fixVersion was "{release name}" AND fixVersion != "{release name}"`
 
 ## Report structure
 
@@ -53,7 +52,7 @@ Also query stories that were **removed from the release** (had this fixVersion t
 | Field | Value |
 |-------|-------|
 | Release | {release name} |
-| Team | Team B (or named team) |
+| Teams | All teams |
 | Status | Released / In Progress |
 | Release date | {date or "TBD"} |
 | Sprints covered | {sprint names} |
