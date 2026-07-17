@@ -1,17 +1,19 @@
 ---
 name: question-review
-description: Run a structured review driven by explicit user questions and provide direct answers with evidence and follow-up actions.
+description: Run a structured review driven by explicit user questions against any artifact (code, stories, documentation, architecture, etc.) and provide direct answers with evidence and follow-up actions.
 ---
 
 # Question Review Skill
 
 ## Purpose and Trigger Conditions
 
-Use this skill when the user provides a set of review questions and wants direct, evidence-backed answers.
+Use this skill when the user provides a set of review questions and wants direct, evidence-backed answers about any artifact — including source code, user stories, documentation, architecture documents, configuration files, or any other review target.
+
+The calling agent provides the domain knowledge about the review target; this skill drives the question-driven review workflow.
 
 ## Input Expectations
 
-- Review target location (file, folder, or document set).
+- Review target location (file, folder, or document set) and its type (code, story, docs, architecture, etc.).
 - One or more review questions.
 - Optional response format preferences.
 

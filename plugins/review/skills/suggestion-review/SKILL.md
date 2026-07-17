@@ -1,18 +1,20 @@
 ---
 name: suggestion-review
-description: Run a future-improvement review that proposes practical suggestions to improve, extend, or harden existing assets.
+description: Run a future-improvement review that proposes practical suggestions to improve, extend, or harden any artifact (code, stories, documentation, architecture, etc.).
 ---
 
 # Suggestion Review Skill
 
 ## Purpose and Trigger Conditions
 
-Use this skill when the user asks for future improvements, extension ideas, or practical suggestions beyond current scope.
+Use this skill when the user asks for future improvements, extension ideas, or practical suggestions beyond current scope for any artifact — including source code, user stories, documentation, architecture documents, configuration files, or any other review target.
+
+The calling agent provides the domain knowledge about the review target; this skill drives the suggestion-focused review workflow.
 
 ## Input Expectations
 
-- Review target location (file, folder, or document set).
-- Improvement objective (quality, maintainability, speed, usability, or scalability).
+- Review target location (file, folder, or document set) and its type (code, story, docs, architecture, etc.).
+- Improvement objective (quality, maintainability, speed, usability, clarity, scalability, or completeness).
 - Optional constraints (budget, timeline, complexity, or team capacity).
 
 ## Workflow
