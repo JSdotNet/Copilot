@@ -7,20 +7,6 @@ description: >
 
 # Story Review — Product Owner
 
-## Agent Discovery
-
-This skill targets a **Product Owner agent** — an agent focused on backlog authoring,
-user stories, epics, and acceptance criteria.
-
-To locate one:
-
-1. Check installed agents for an agent whose description includes terms such as
-   "product owner", "backlog", "story", "epics", or "acceptance criteria".
-2. If a matching agent is found, activate it before running this skill.
-3. If no matching agent is found, continue with the default active agent.
-
-The skill works independently of any specific agent name or plugin.
-
 ## Purpose and Trigger Conditions
 
 Use this skill when a product owner or team member wants to validate whether a Fincent user story

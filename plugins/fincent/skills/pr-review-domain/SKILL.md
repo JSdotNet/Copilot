@@ -9,20 +9,6 @@ description: >
 
 # PR Review — Domain Architect
 
-## Agent Discovery
-
-This skill targets a **Domain Architect agent** — an agent focused on domain-driven design,
-bounded contexts, ubiquitous language, and domain modelling.
-
-To locate one:
-
-1. Check installed agents for an agent whose description includes terms such as
-   "domain", "domain architect", "DDD", "domain-driven", "bounded context", or "domain model".
-2. If a matching agent is found, activate it before running this skill.
-3. If no matching agent is found, continue with the default active agent.
-
-The skill works independently of any specific agent name or plugin.
-
 ## Purpose and Trigger Conditions
 
 Use this skill when a pull request touches the Fincent domain layer — aggregates, entities,

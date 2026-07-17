@@ -9,20 +9,6 @@ description: >
 
 # PR Review — Architecture
 
-## Agent Discovery
-
-This skill targets an **Architect agent** — an agent focused on software architecture,
-technical design, system boundaries, and feasibility assessment.
-
-To locate one:
-
-1. Check installed agents for an agent whose description includes terms such as
-   "architect", "architecture", "technical design", "system design", or "feasibility".
-2. If a matching agent is found, activate it before running this skill.
-3. If no matching agent is found, continue with the default active agent.
-
-The skill works independently of any specific agent name or plugin.
-
 ## Purpose and Trigger Conditions
 
 Use this skill when a pull request touches architectural boundaries, cross-cutting concerns,
