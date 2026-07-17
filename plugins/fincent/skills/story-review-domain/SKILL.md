@@ -3,96 +3,92 @@ name: story-review-domain
 description: >
   Review a Fincent user story from the Domain Architect perspective: validate ubiquitous
   language, bounded context ownership, aggregate alignment, domain events, and DDD correctness.
-  Fetches the ticket, inspects the codebase domain layer, and posts a structured domain
-  review comment directly.
 ---
 
 # Story Review — Domain Architect
 
-Use this skill to evaluate a `FIN-XXXX` ticket for domain model correctness —
-ubiquitous language, bounded context ownership, aggregate alignment, and domain events.
-It fetches the ticket, inspects the codebase domain layer, and posts the finding.
+## Agent Discovery
 
-## Jira project
+This skill targets a **Domain Architect agent** — an agent focused on domain-driven design,
+bounded contexts, ubiquitous language, and domain modelling.
 
-- Project key: `FIN`
-- cloudId: `innovadis.atlassian.net`
+To locate one:
 
-## Goals
+1. Check installed agents for an agent whose description includes terms such as
+   "domain", "domain architect", "DDD", "domain-driven", "bounded context", or
+   "domain model".
+2. If a matching agent is found, activate it before running this skill.
+3. If no matching agent is found, continue with the default active agent.
 
-- Load the ticket via `mcp__claude_ai_Atlassian_Rovo__getJiraIssue` with
-  `fields: ["summary", "status", "description", "comment"]`.
-  Confirm the right `FIN-XXXX` key before proceeding.
-- **Explore the codebase domain layer** (`**/Domain/**`, `**/Aggregates/**`,
-  `**/Events/**`) for existing aggregates, entities, value objects, domain events, and
-  domain policies. Use an `Explore` subagent — return conclusions and concrete code
-  references, not file dumps.
-- Load `resources/dor.md` and `resources/templates/story-review-checklist.md`.
-- Evaluate each Domain Architect criterion (see below).
-- Post the result via `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue`.
+The skill works independently of any specific agent name or plugin.
 
-## Review criteria
+## Purpose and Trigger Conditions
 
-### Ubiquitous Language
-- Does the story use terms from the Fincent ubiquitous language?
-- Non-standard or ambiguous terms that could cause translation issues?
+Use this skill when a domain architect or domain expert needs to evaluate whether a story is
+correctly modelled against the Fincent domain, uses correct ubiquitous language, and respects
+bounded context boundaries and invariants.
 
-### Bounded Context Ownership
-- Which bounded context owns this story?
-- Is ownership unambiguous, or does it straddle multiple contexts?
-- Integration contract defined when applicable?
+## Input Expectations
 
-### Aggregate and Entity Alignment
-- Which aggregate root is affected?
-- Does the story respect aggregate boundaries and invariants?
+- The user story to review (Jira key, link, or pasted content).
+- Optional: domain model documentation or bounded context map.
+- Optional: ubiquitous language glossary.
+- Optional: codebase location for domain layer inspection.
 
-### Domain Events
-- Which domain events does this story produce or consume?
-- Event names in past-tense ubiquitous language form (e.g., `PaymentInitiated`)?
-- Event consumers identified?
+## Workflow
 
-### Domain Policies and Rules
-- Does the story introduce or modify a domain policy or business rule?
-- Is the rule modelled at the domain layer (not leaking into application or infrastructure)?
+1. Load the story content. If only a Jira key is provided and a Jira retrieval skill is
+   available, use it to fetch the story. Otherwise ask the user to paste the story text.
+2. Load `resources/dor.md` to apply the Fincent Definition of Ready (domain section).
+3. Load `resources/templates/story-review-checklist.md` (Domain Architect section).
+4. Evaluate each Domain Architect criterion:
 
-## Posting the comment
+   ### Ubiquitous Language
+   - Does the story use terms from the Fincent ubiquitous language glossary?
+   - Are any non-standard or ambiguous terms used that could cause translation issues between
+     business and engineering?
 
-Use `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` with
-`contentFormat: "markdown"`. **Post directly — no approval step.** The user can
-request edits afterwards; update in place via `commentId`.
+   ### Bounded Context Ownership
+   - Which bounded context owns this story?
+   - Is ownership unambiguous, or does the story straddle multiple contexts?
+   - Is the integration contract between contexts defined if applicable?
 
-Only include sections that have content — omit empty headings.
+   ### Aggregate and Entity Alignment
+   - Which aggregate root is affected?
+   - Does the story respect aggregate boundaries and invariants?
+   - Are referenced entities within the aggregate's responsibility?
 
-```markdown
-## 🧩 Domein Review — {date}
-_Analyse op basis van ticket + domeinlaag codebase._
+   ### Domain Events
+   - Which domain events does this story produce or consume?
+   - Are event names in past-tense ubiquitous language form (e.g., `PaymentInitiated`)?
+   - Are event consumers identified?
 
-### Bevindingen
-| Criterium | Beoordeling | Toelichting |
-|-----------|-------------|-------------|
-| Ubiquitous language | ✅/⚠️/❌ | … |
-| Bounded context eigenaarschap | ✅/⚠️/❌ | … |
-| Aggregate alignment | ✅/⚠️/❌ | … |
-| Domain events | ✅/⚠️/❌ | … |
-| Domain policies | ✅/⚠️/❌ | … |
+   ### Domain Policies and Rules
+   - Does the story introduce or modify a domain policy or business rule?
+   - Is the rule modelled at the domain layer (not leaking into application or infrastructure)?
 
-### Uitkomst
-**{✅ Domain ready / ⚠️ Needs clarification / ❌ Domain misalignment}**: {rationale}
+5. Classify each criterion as ✅, ⚠️, or ❌.
+6. Produce overall domain readiness classification:
+   - ✅ **Domain ready** — story is correctly modelled and can proceed.
+   - ⚠️ **Needs clarification** — domain alignment issues require discussion before refinement.
+   - ❌ **Domain misalignment** — the story contradicts domain model; must be reworked.
+7. Provide concrete corrections for each ⚠️ or ❌ finding.
 
-### Correcties
-- **{term}** → **{correct term}**: {toelichting}
-```
+## Output Expectations
 
-## Working rules
+- Completed Domain Architect section of the story review checklist.
+- Overall domain readiness classification with rationale.
+- Corrected ubiquitous language terms and aggregate/event names where applicable.
+- Prioritised list of domain corrections if the story is not ready.
 
-- Every domain term in the story is verified against the ubiquitous language — never assume.
-- Aggregate boundaries are confirmed or flagged — never assumed.
-- Domain events are always in past tense; any deviation is flagged as ⚠️.
+## Quality Checks
+
+- Every domain term in the story is verified against the ubiquitous language.
+- Aggregate boundaries are never assumed — they are confirmed or flagged.
+- Domain events are always in past tense and named in business language.
 - Do not duplicate PO or architecture concerns — stay focused on domain correctness.
-- After posting, report back with ticket key, comment id, and overall domain verdict.
 
-## Tools used
+## References
 
-- `mcp__claude_ai_Atlassian_Rovo__getJiraIssue` — load ticket.
-- `Explore` subagent — inspect the codebase domain layer.
-- `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` — post (or update) the review comment.
+- `resources/dor.md` — Fincent Definition of Ready
+- `resources/templates/story-review-checklist.md` — review checklist

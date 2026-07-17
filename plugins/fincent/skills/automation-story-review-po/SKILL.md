@@ -1,88 +1,103 @@
 ---
 name: automation: story review — product owner
 description: >
-  Run right before backlog refinement: finds all FIN Jira tickets in a given status for a
-  Fincent team, evaluates each against the DOR from a Product Owner perspective, and posts a
-  structured readiness comment on every ticket. Use when preparing a refinement session or
-  when asked to batch-review story quality.
+  Automated Product Owner story review for Fincent. Queries all stories in a given Jira
+  status, applies the Fincent DOR to each, and produces a consolidated readiness report.
+  Use before backlog refinement to surface and fix story quality issues automatically.
 ---
 
 # Automation: Story Review — Product Owner
 
-**Meant to be run before a refinement session or backlog grooming.** Batch variant of
-`story-review-po`. Instead of one ticket, it sweeps all tickets in a given Jira status,
-evaluates each against the Fincent DOR from a PO perspective, and posts a readiness
-comment — so the team walks into the session with findings already on every ticket.
+## Purpose
 
-## Finding the tickets
+Run a batch Product Owner review across all Fincent stories in a specified Jira status.
+For each story, the automation loads the content, applies the DOR, delegates to the
+`story-review-po` skill, and produces a consolidated readiness report for the full set.
 
-Query Jira via `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql`:
+## Jira Skill Discovery
 
-- cloudId: `innovadis.atlassian.net`
-- JQL: `project = FIN AND status = "{status}" AND "Fincent Team" = "Team B" ORDER BY updated DESC`
-- Default team is **Team B**; if the user names another team, substitute it in the JQL.
-- Fetch `fields: ["summary", "status", "description", "comment", "issuetype"]`.
-- Paginate with `nextPageToken` if there are more results.
+Before executing any Jira operation, discover what Jira skills are available:
 
-Report the list of found tickets (key + summary + type) to the user before proceeding.
+1. Check installed skills for skills whose name or description mentions "jira".
+2. Identify a **query-capable** Jira skill — one that can search or list issues by status
+   or filter (e.g., descriptions include "search", "query", "list", or "filter").
+3. Identify a **retrieval-capable** Jira skill — one that can fetch a single existing issue.
+4. Identify an **update-capable** Jira skill — one that can sync content back to an
+   existing issue.
+5. If no query or retrieval skill is found: ask the user to paste story content for a
+   single-story fallback run.
+6. If no update skill is found and `update Jira` is enabled: skip write-back per story
+   and note it in the output.
 
-## Skip tickets already reviewed
+All Jira field mapping, project keys, status values, and API conventions are owned by
+the discovered Jira skill. Never reproduce that knowledge in this skill.
 
-Before reviewing a ticket, check its existing comments:
+## Inputs
 
-- If a `## 📋 PO Review` comment already exists and the ticket description hasn't
-  materially changed since, skip the ticket and note this in the final report.
-- If the earlier review is stale (description changed, or comment is more than 7 days old),
-  post a fresh comment for today's date.
+- **Jira status**: the status to query (e.g., `Ready for Refinement`, `Backlog`, `To Do`).
+  All stories currently in this status are included in the run.
+- **Story type filter**: `all` (default), `feature`, `bug`, or `support` — limit the batch
+  to a specific story type.
+- **Auto-fix suggestions**: `true` (default) or `false` — whether to propose corrections
+  for ⚠️ and ❌ findings per story.
+- **Update Jira**: `true` or `false` (default) — whether to write review findings back
+  to each story in Jira after review.
 
-## Reviewing each ticket
+## Dependencies
 
-For each remaining ticket, apply all applicable DOR criteria from `resources/dor.md` and
-`resources/templates/story-review-checklist.md` (Product Owner section):
+| Dependency | Provided by | Purpose |
+|-----------|-------------|---------|
+| Story list | Discovered Jira query skill | All stories in the target status |
+| Story content | Discovered Jira retrieval skill | Per-story review target |
+| Jira write-back | Discovered Jira update skill | Post review findings per story |
+| Definition of Ready | `resources/dor.md` | Review criteria baseline |
+| Story review checklist | `resources/templates/story-review-checklist.md` | Checklist template |
 
-- Determine story type: feature, bug, or support request.
-- Apply all applicable Story Description, Scope & Context, Refinement, Design (UI only),
-  and Bug criteria.
-- Classify each criterion as ✅, ⚠️, or ❌.
-- Derive overall readiness and concrete improvement suggestions for ⚠️ and ❌.
+## Workflow
 
-PO review does not require codebase exploration — all assessment is based on the ticket
-content and DOR.
+### Phase 1 — Story List
 
-## Posting the comments
+1. Run Jira Skill Discovery (see above).
+2. Use the discovered query skill to retrieve all stories in the specified status.
+   Let that skill own the query, filter, and pagination logic.
+3. Load `resources/dor.md` and `resources/templates/story-review-checklist.md` once
+   for the entire batch.
+4. Present the story count to the user and confirm before proceeding.
 
-Post one comment per ticket via `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue`
-with `contentFormat: "markdown"`. **Post directly — no approval step.** Write in Dutch.
-Update in place via `commentId` rather than stacking near-duplicates.
+### Phase 2 — Per-Story Review (repeat for each story)
 
-```markdown
-## 📋 PO Review — {date}
+5. Use the discovered retrieval skill to fetch the full story content.
+6. Use the `story-review-po` skill with the loaded context to:
+   - Determine story type (feature / bug / support request).
+   - Evaluate all applicable DOR criteria.
+   - Classify each as ✅, ⚠️, or ❌.
+   - Produce the readiness classification for this story.
+7. If `auto-fix suggestions` is enabled, propose corrections for each ⚠️ or ❌ finding.
+8. If `update Jira` is enabled and an update skill was discovered: sync the review
+   findings back to this story in Jira.
 
-### Bevindingen
-| Criterium | Beoordeling | Toelichting |
-|-----------|-------------|-------------|
-| Onafhankelijk testbaar | ✅/⚠️/❌ | … |
-| User story format | ✅/⚠️/❌ | … |
-| … | … | … |
+### Phase 3 — Consolidated Summary
 
-### Uitkomst
-**{✅ Ready / ⚠️ Needs refinement / ❌ Not ready}**: {rationale}
+9. Output a consolidated batch summary after all stories are processed:
 
-### Verbeterpunten
-- {concrete improvement}
-```
+   | Story | Title | Type | Ready | Needs Refinement | Not Ready | Jira Updated |
+   |-------|-------|------|-------|-----------------|-----------|-------------|
+   | FIN-123 | — | — | ✅ | | | — |
+   | FIN-124 | — | — | | ⚠️ | | — |
+   | FIN-125 | — | — | | | ❌ | — |
 
-## Working rules
+10. List all ❌ stories first, then ⚠️, then ✅, so the team can prioritise fixes.
 
-- Inapplicable sections (Design for non-UI, Bug criteria for features) are skipped — not ❌.
-- Each ⚠️ or ❌ always has a concrete improvement suggestion.
-- One comment per ticket per run; re-runs on the same day update via `commentId`.
-- After the sweep, report back with a table sorted ❌ first, then ⚠️, then ✅:
+## Output
 
-  | Ticket | Samenvatting | Type | Uitkomst | Commentaar id / reden voor overslaan |
-  |--------|-------------|------|---------|--------------------------------------|
+- Per-story DOR review with checklist classification.
+- Auto-fix suggestions for each gap (if enabled).
+- Jira updated per story via discovered update skill (if enabled and available).
+- Consolidated batch summary table sorted by readiness.
 
-## Tools used
+## Notes
 
-- `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql` — find the team's tickets.
-- `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` — post (or update) each review comment.
+- Run this automation before a refinement session to get the full batch into shape.
+- For architecture and domain review, use the corresponding automation skills.
+- If no Jira query skill is installed, fall back to a single-story run by pasting
+  story content directly.

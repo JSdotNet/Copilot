@@ -2,115 +2,95 @@
 name: story-point-estimation
 description: >
   Estimate story points for a Fincent user story using a structured three-factor model
-  (complexity, effort, uncertainty). Fetches the ticket, confirms DOR readiness, explores
-  the codebase for affected modules, and posts the estimation reasoning as a comment.
-  Only writes the story points field when it is currently empty.
+  (complexity, effort, uncertainty) calibrated against team velocity and reference stories.
 ---
 
 # Story Point Estimation
 
-Use this skill to produce a structured story point estimate for a `FIN-XXXX` ticket.
-It fetches the ticket, confirms DOR readiness, runs the three-factor model, and posts the
-reasoning as a comment. If the story points field is empty, it also updates it directly.
+## Purpose and Trigger Conditions
 
-## Jira project
+Use this skill when a team member, scrum master, or product owner needs a structured story
+point estimate for a Fincent user story, either before or during sprint planning.
 
-- Project key: `FIN`
-- cloudId: `innovadis.atlassian.net`
+## Input Expectations
 
-## Goals
+- The user story to estimate (Jira link, ID, or pasted content).
+- Optional: reference stories with known point values for calibration.
+- Optional: codebase context (affected modules, services, or components).
+- Optional: team velocity or point scale (Fibonacci by default: 1, 2, 3, 5, 8, 13, 21).
 
-- Load the ticket via `mcp__claude_ai_Atlassian_Rovo__getJiraIssue` with
-  `fields: ["summary", "status", "description", "comment", "story_points", "customfield_10016"]`.
-  Read the current story points value — if one exists, do not overwrite it; report divergence
-  in the comment instead.
-- Confirm DOR readiness from `resources/dor.md`. If the story fails critical criteria
-  (no description, no acceptance criteria, no epic link), stop and post a
-  "not estimable" comment listing the gaps.
-- **Explore the codebase** for the modules, services, aggregates, and endpoints the story
-  touches. Use an `Explore` or `general-purpose` subagent to ground the effort and
-  complexity scoring in what the code actually looks like.
-- Apply the three-factor model (see below).
-- Post reasoning via `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue`.
-- If no current estimate exists: update the field via
-  `mcp__claude_ai_Atlassian_Rovo__editJiraIssue`.
+## Estimation Model
 
-## Estimation model
+Use the three-factor model from `resources/templates/story-review-checklist.md`:
 
 ### Factor 1 — Complexity (1–5)
-How complex is the logic, domain, or integration?
-- 1: Trivial, no logic, minimal code impact.
+
+How complex is the logic, domain, or integration involved?
+
+- 1: Trivial change, no logic, minimal code impact.
 - 2: Simple logic, single component, well-understood domain.
 - 3: Moderate logic, touches multiple components or a domain rule.
 - 4: Complex logic, cross-context integration, or new domain concept.
 - 5: Highly complex, novel domain territory, or significant algorithm work.
 
 ### Factor 2 — Effort (1–5)
+
 How much work is required regardless of complexity?
-- 1: < 2 hours.
-- 2: ~4 hours (half a day).
-- 3: ~8 hours (one day) — approaching DOR limit.
-- 4: Up to 12 hours — at the DOR limit; consider splitting.
+
+- 1: < 2 hours of implementation.
+- 2: Half a day (~4 hours).
+- 3: One day (~8 hours) — approaching the DOR size limit.
+- 4: Up to 12 hours — at the DOR size limit; consider splitting.
 - 5: Exceeds 12 hours — **must be split** before the story can enter a sprint.
 
 ### Factor 3 — Uncertainty / Risk (1–5)
-How much is unknown or risky?
+
+How much is unknown or risky about delivery?
+
 - 1: Fully understood; no unknowns.
 - 2: Minor unknowns; team has handled similar before.
 - 3: Some unknowns; spike may be needed.
 - 4: Significant unknowns; dependency on external parties or unclear requirements.
 - 5: High uncertainty; story may need to be split after discovery.
 
-### Factor sum → Fibonacci estimate
+## Workflow
 
-| Sum  | Points |
-|------|--------|
-| 3–5  | 1–2    |
-| 6–8  | 3      |
-| 9–10 | 5      |
-| 11–12 | 8     |
-| 13–14 | 13    |
-| 15   | 21 (split) |
+1. Load the story content.
+2. If available, load reference stories for calibration.
+3. Score each factor (1–5) with explicit reasoning for each score.
+4. Map the factor scores to a Fibonacci story point value:
 
-## Posting the comment
+   | Factor Sum | Suggested Points |
+   |-----------|-----------------|
+   | 3–5       | 1–2             |
+   | 6–8       | 3               |
+   | 9–10      | 5               |
+   | 11–12     | 8               |
+   | 13–14     | 13              |
+   | 15        | 21 (consider splitting) |
 
-Use `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` with
-`contentFormat: "markdown"`. **Post directly — no approval step.**
+5. Compare against reference stories if provided; adjust if the calibration differs.
+6. Flag stories where the estimate exceeds **12 hours** (or the equivalent story points) for
+   mandatory split discussion — this is a hard DOR constraint.
+7. Summarise the estimate with the reasoning behind each factor score.
 
-```markdown
-## 📊 Schatting — {date}
+## Output Expectations
 
-| Factor | Score | Toelichting |
-|--------|-------|-------------|
-| Complexiteit | {1–5} | … |
-| Inspanning | {1–5} | … |
-| Onzekerheid | {1–5} | … |
-| **Totaal** | **{sum}** | |
+- Factor scores with explicit rationale for each.
+- Suggested story point or hour estimate.
+- Split recommendation if the estimate exceeds 12 hours or equivalent.
+- Calibration note if reference stories were used.
 
-**Schatting**: {N} story points
-**Huidig in Jira**: {current value or "—"}
-**Δ**: {difference or "—"} {⚠️ if |Δ| > 2}
-**Split vereist**: {Ja / Nee}
-```
+## Quality Checks
 
-## Working rules
-
-- **Never estimate without reading the full story description and acceptance criteria.**
-- DOR gate is hard: no estimate is produced for stories failing critical readiness criteria.
-- Existing Jira estimate is never overwritten — only empty fields are updated.
-- When the new estimate diverges from the existing value by more than 2 points, highlight
-  with ⚠️ in the comment.
+- Never estimate without reading the story description and any acceptance criteria.
 - Uncertainty is never scored 1 unless the team has an identical delivered story as reference.
-- Stories touching Fincent integrations (payment rails, regulatory APIs) score minimum
-  Uncertainty 3 without explicit justification.
-- Stories exceeding 12 hours always get a split recommendation — never omit it.
-- After posting, report back with ticket key, comment id, estimate, and whether the field
-  was updated.
+- Stories touching external Fincent integrations (payment rails, regulatory APIs) are never
+  scored below 3 for uncertainty without explicit justification.
+- Stories exceeding 12 hours are always flagged — do not produce a final estimate for them
+  without a split recommendation.
 
-## Tools used
+## References
 
-- `mcp__claude_ai_Atlassian_Rovo__getJiraIssue` — load ticket and current estimate.
-- `Explore` / `general-purpose` subagent — locate the code the story touches.
-- `mcp__claude_ai_Atlassian_Rovo__addCommentToJiraIssue` — post the estimation comment.
-- `mcp__claude_ai_Atlassian_Rovo__editJiraIssue` — update the story points field (only
-  when currently empty).
+- `resources/templates/story-review-checklist.md` — estimation section
+- `resources/dor.md` — story readiness criteria (a story must meet DOR before estimation is reliable)
