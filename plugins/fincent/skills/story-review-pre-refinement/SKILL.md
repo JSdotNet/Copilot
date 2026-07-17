@@ -10,20 +10,21 @@ description: >
 
 ## Pipeline Gate
 
-> **Prerequisite**: The story must have passed the `story-review-po` skill first.
-> If no PO review result is available, run `story-review-po` before proceeding.
-> If the PO review result is ❌, return **Not ready for pre-refinement** immediately —
-> do not proceed with this review until the PO issues are resolved.
+> **Prerequisite**: The story must have passed both `story-review-po` (✅ or ⚠️) and
+> `story-review-domain` (✅ or ⚠️) first.
+> If either result is ❌, return **Not ready for pre-refinement** immediately — list the
+> unresolved issues and do not proceed with this review.
 
 ## Purpose and Trigger Conditions
 
-Use this skill after a story has passed PO review. The focus is on technical feasibility,
-architectural fit, and identifying infrastructure or enabler work that must precede delivery.
+Use this skill after a story has passed both PO review and domain review. The focus is on
+technical feasibility, architectural fit, and identifying infrastructure or enabler work
+that must precede delivery.
 
 ## Input Expectations
 
 - The user story to review (Jira key, link, or pasted content).
-- PO review result (✅ or ⚠️ required to proceed).
+- PO review result (✅ or ⚠️) and domain review result (✅ or ⚠️) required to proceed.
 - Optional: architecture documentation or ADR links.
 - Optional: existing enabler stories or spikes.
 
@@ -31,9 +32,9 @@ architectural fit, and identifying infrastructure or enabler work that must prec
 
 1. Load the story content. If only a Jira key is provided and a Jira retrieval skill is
    available, use it to fetch the story. Otherwise ask the user to paste the story text.
-2. **Gate check**: Confirm the PO review result. If ❌, stop and output:
-   > ❌ **Not ready for pre-refinement** — PO review must pass first. Resolve the
-   > following PO issues before re-running this review: {list PO findings}.
+2. **Gate check**: Confirm PO review result (✅ or ⚠️) and domain review result (✅ or ⚠️).
+   If either is ❌, stop and output:
+   > ❌ **Not ready for pre-refinement** — resolve the following issues first: {list blockers}.
 3. Evaluate each Pre-Refinement criterion:
 
    ### Bounded Context Fit
@@ -70,7 +71,7 @@ architectural fit, and identifying infrastructure or enabler work that must prec
 - Overall architectural readiness classification with rationale.
 - Enabler story draft (if applicable) with: title, enabler type, and acceptance scope.
 - Prioritised list of architectural actions if the story is not ready.
-- Clear next step: proceed to `story-review-domain` or resolve blockers first.
+- Clear next step: proceed to `story-point-estimation` or resolve blockers first.
 
 ## Quality Checks
 

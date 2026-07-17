@@ -10,10 +10,10 @@ description: >
 
 ## Pipeline Gate
 
-> **Prerequisite**: The story must have passed both `story-review-po` (✅ or ⚠️) and
-> `story-review-pre-refinement` (✅ or ⚠️) first.
-> If either result is ❌, return **Not ready for domain review** immediately — list the
-> unresolved issues and do not proceed with this review.
+> **Prerequisite**: The story must have passed the `story-review-po` skill first.
+> If no PO review result is available, run `story-review-po` before proceeding.
+> If the PO review result is ❌, return **Not ready for domain review** immediately —
+> do not proceed with this review until the PO issues are resolved.
 
 ## Purpose and Trigger Conditions
 
@@ -32,9 +32,9 @@ bounded context boundaries and invariants.
 
 1. Load the story content. If only a Jira key is provided and a Jira retrieval skill is
    available, use it to fetch the story. Otherwise ask the user to paste the story text.
-2. **Gate check**: Confirm PO review result (✅ or ⚠️) and pre-refinement result (✅ or ⚠️).
-   If either is ❌, stop and output:
-   > ❌ **Not ready for domain review** — resolve the following issues first: {list blockers}.
+2. **Gate check**: Confirm the PO review result is ✅ or ⚠️.
+   If ❌, stop and output:
+   > ❌ **Not ready for domain review** — resolve the following PO issues first: {list blockers}.
 3. Evaluate each Domain Architect criterion:
 
    ### Ubiquitous Language
@@ -74,7 +74,7 @@ bounded context boundaries and invariants.
 - Overall domain readiness classification with rationale.
 - Corrected ubiquitous language terms and aggregate/event names where applicable.
 - Prioritised list of domain corrections if the story is not ready.
-- Clear next step: proceed to `story-point-estimation` or resolve domain blockers first.
+- Clear next step: proceed to `story-review-pre-refinement` or resolve domain blockers first.
 
 ## Quality Checks
 

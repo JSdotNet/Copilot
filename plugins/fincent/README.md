@@ -12,10 +12,10 @@ stops the pipeline and must be resolved before proceeding.
 flowchart TD
     A([Story]) --> B[story-review-po\nPO Review]
     B -->|❌ Not ready| B_STOP([Stop — fix PO issues])
-    B -->|✅/⚠️| C[story-review-pre-refinement\nArchitecture Review]
-    C -->|❌ Not ready| C_STOP([Stop — fix architecture issues])
-    C -->|✅/⚠️| D[story-review-domain\nDomain Review]
-    D -->|❌ Misaligned| D_STOP([Stop — fix domain issues])
+    B -->|✅/⚠️| C[story-review-domain\nDomain Review]
+    C -->|❌ Misaligned| C_STOP([Stop — fix domain issues])
+    C -->|✅/⚠️| D[story-review-pre-refinement\nArchitecture Review]
+    D -->|❌ Not ready| D_STOP([Stop — fix architecture issues])
     D -->|✅/⚠️| E[story-point-estimation\nEstimation]
     E --> F([Ready for Sprint])
 
@@ -42,8 +42,8 @@ flowchart LR
 | Skill | Gate | Purpose |
 |-------|------|---------|
 | `story-review-po` | — | Validate story format, DOR basics, title quality |
-| `story-review-pre-refinement` | PO ✅/⚠️ | Architecture fit, risks, enabler check |
-| `story-review-domain` | PO ✅/⚠️ + Arch ✅/⚠️ | Ubiquitous language, aggregates, domain events |
+| `story-review-domain` | PO ✅/⚠️ | Ubiquitous language, aggregates, domain events |
+| `story-review-pre-refinement` | PO ✅/⚠️ + Domain ✅/⚠️ | Architecture fit, risks, enabler check |
 | `story-point-estimation` | All three ✅/⚠️ | Three-factor Fibonacci estimate |
 
 ### PR Review Skills (independent)
