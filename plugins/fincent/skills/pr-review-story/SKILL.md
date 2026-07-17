@@ -1,5 +1,5 @@
 ---
-name: pr-vs-story
+name: pr-review-story
 description: >
   Verify that a pull request fully delivers what was promised in its linked Fincent story.
   Checks scope coverage (all acceptance criteria implemented), no out-of-scope changes,

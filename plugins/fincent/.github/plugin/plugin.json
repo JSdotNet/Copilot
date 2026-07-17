@@ -19,7 +19,7 @@
     "pr-review",
     "sprint-report",
     "demo-presentation",
-    "pr-vs-story"
+    "pr-review-story"
   ],
   "skills": "skills/",
   "license": "MIT"
