@@ -4,7 +4,7 @@
       "name": "review",
       "path": "./plugins/review",
       "description": "Reusable review skills (TODO-driven, question-driven, improvement-driven) for any agent and any artifact type — code, stories, documentation, architecture, and more.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     }
   ]
 }

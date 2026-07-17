@@ -12,6 +12,7 @@ The review plugin ships **skills only** — no dedicated agent. Any agent (cshar
   - `skills/todo-review/SKILL.md` — TODO-driven review for any artifact
   - `skills/question-review/SKILL.md` — question-driven review for any artifact
   - `skills/suggestion-review/SKILL.md` — improvement-suggestion review for any artifact
+  - `skills/pr-remarks-review/SKILL.md` — triage and address open PR review remarks
 - Hooks:
   - `hooks.json` (session-start finding quality guardrail prompt)
 
@@ -31,6 +32,7 @@ These skills work with any review target:
 - **TODO-based review** — converts TODO notes into concrete findings and next actions.
 - **Question-based review** — evaluates artifacts against explicit review questions with evidence.
 - **Suggestion-based review** — identifies future improvements and extension opportunities.
+- **PR remarks review** — triages open PR review comments into Fix / Discuss / Decline / Defer, drafts reviewer replies, and produces a resolution summary.
 
 ## Install
 
