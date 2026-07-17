@@ -62,6 +62,14 @@ flowchart LR
 | `automation-story-review-domain` | Batch domain review with codebase inspection |
 | `automation-story-point-estimation` | Batch estimation with drift reporting |
 
+### Reporting & Presentation Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `sprint-report` | Sprint report: completed vs scope, untested, by epic |
+| `automation-sprint-report` | Batch sprint reports for multiple sprints / a release |
+| `demo-presentation` | Generate a Fincent Review demo presentation (PPTX structure) |
+
 ## Resources
 
 - `resources/dor.md` — Fincent Definition of Ready (the shared readiness baseline)
