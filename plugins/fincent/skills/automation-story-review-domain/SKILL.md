@@ -2,9 +2,8 @@
 name: automation: story review — domain architect
 description: >
   Automated domain architect story review for Fincent. Queries all stories in a given Jira
-  status, inspects the codebase domain layer, and runs the story-review-domain skill on
-  each to validate ubiquitous language, bounded context ownership, aggregate alignment,
-  and domain events.
+  status and runs the story-review-domain skill on each to validate ubiquitous language,
+  bounded context ownership, aggregate alignment, and domain events.
 ---
 
 # Automation: Story Review — Domain Architect
@@ -12,9 +11,8 @@ description: >
 ## Purpose
 
 Run a batch domain review across all Fincent stories in a specified Jira status.
-For each story, the automation inspects the codebase domain layer for existing aggregates
-and events, then delegates to the `story-review-domain` skill to validate domain model
-alignment and ubiquitous language usage.
+For each story, the automation delegates to the `story-review-domain` skill to validate
+domain model alignment and ubiquitous language usage.
 
 ## Jira Skill Discovery
 
@@ -37,7 +35,6 @@ Jira skill. Never reproduce that knowledge in this skill.
 
 - **Jira status**: the status to query (e.g., `Ready for Refinement`, `Backlog`, `To Do`).
   All stories currently in this status are included in the run.
-- **Codebase path**: root path of the Fincent codebase (optional; scans domain layer only).
 - **Ubiquitous language source**: path to glossary or domain documentation (optional).
 - **Update Jira**: `true` or `false` (default) — whether to sync review findings back to
   each story in Jira via the discovered update skill.
@@ -49,8 +46,7 @@ Jira skill. Never reproduce that knowledge in this skill.
 | Story list | Discovered Jira query skill | All stories in the target status |
 | Story content | Discovered Jira retrieval skill | Per-story review target |
 | Jira write-back | Discovered Jira update skill | Sync review findings per story |
-| Codebase — domain layer | Codebase (`**/Domain/**`, `**/Aggregates/**`) | Verify existing aggregates and events |
-| Ubiquitous language glossary | Domain documentation or codebase | Term validation |
+| Ubiquitous language glossary | Domain documentation | Term validation |
 | Bounded context map | Architecture documentation or domain-design plugin | Context ownership |
 | Definition of Ready | `resources/dor.md` | Review criteria baseline |
 | Story review checklist | `resources/templates/story-review-checklist.md` | Checklist template |
@@ -62,11 +58,7 @@ Jira skill. Never reproduce that knowledge in this skill.
 1. Run Jira Skill Discovery (see above).
 2. Use the discovered query skill to retrieve all stories in the specified status.
    Let that skill own the query, filter, and pagination logic.
-3. Scan the codebase domain layer once for the entire batch:
-   - Existing aggregates, entities, and value objects.
-   - Domain events (classes implementing `IDomainEvent` or equivalent).
-   - Domain policies and business rules.
-4. Load the ubiquitous language glossary and bounded context map if available.
+3. Load the ubiquitous language glossary and bounded context map if available.
 5. Load `resources/dor.md` and `resources/templates/story-review-checklist.md`.
 6. Present the story count to the user and confirm before proceeding.
 
@@ -104,7 +96,6 @@ Jira skill. Never reproduce that knowledge in this skill.
 
 ## Notes
 
-- The codebase scan is performed once for the batch and scoped to the domain layer
-  (`**/Domain/**`, `**/Aggregates/**`, `**/Events/**`).
-- If no codebase path is provided, the review relies solely on story content and flags
-  unverifiable domain references explicitly.
+- Domain review is based on story content, ubiquitous language glossary, and domain
+  documentation only. Codebase inspection is not part of this review — that is reserved
+  for the technical review (`story-review-dev`).

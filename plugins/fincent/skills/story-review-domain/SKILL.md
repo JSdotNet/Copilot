@@ -26,7 +26,6 @@ bounded context boundaries and invariants.
 - The user story to review (Jira key, link, or pasted content).
 - Optional: domain model documentation or bounded context map.
 - Optional: ubiquitous language glossary.
-- Optional: codebase location for domain layer inspection.
 
 ## Workflow
 

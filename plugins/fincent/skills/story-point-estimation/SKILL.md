@@ -25,7 +25,6 @@ to produce a reasoned, calibrated Fibonacci estimate.
 
 - The user story to estimate (Jira link, ID, or pasted content).
 - Optional: reference stories with known point values for calibration.
-- Optional: codebase context (affected modules, services, or components).
 - Optional: team velocity or point scale (Fibonacci by default: 1, 2, 3, 5, 8, 13, 21).
 
 ## Estimation Model

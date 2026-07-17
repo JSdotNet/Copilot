@@ -1,9 +1,9 @@
 ---
 name: automation: story point estimation
 description: >
-  Automated story point estimation for Fincent. Queries all stories in a given Jira status,
-  inspects the codebase for affected components, and runs the story-point-estimation skill
-  on each unestimated story. Produces a consolidated estimation report.
+  Automated story point estimation for Fincent. Queries all stories in a given Jira status
+  and runs the story-point-estimation skill on each unestimated story. Produces a
+  consolidated estimation report.
 ---
 
 # Automation: Story Point Estimation
@@ -11,9 +11,9 @@ description: >
 ## Purpose
 
 Run a batch story point estimation across all Fincent stories in a specified Jira status.
-For each story, the automation checks DOR readiness, inspects the codebase for complexity
-signals, applies calibration from reference stories, and delegates to the
-`story-point-estimation` skill to produce a reasoned Fibonacci estimate.
+For each story, the automation checks DOR readiness, applies calibration from reference
+stories, and delegates to the `story-point-estimation` skill to produce a reasoned
+Fibonacci estimate.
 
 ## Jira Skill Discovery
 
@@ -38,7 +38,6 @@ Jira skill. Never reproduce that knowledge in this skill.
   All stories currently in this status are included in the run.
 - **Skip estimated**: `true` (default) or `false` — skip stories that already have an
   estimate in Jira; still report drift when the new estimate differs.
-- **Codebase path**: root path of the Fincent codebase (optional; scans affected modules).
 - **Reference stories**: comma-separated list of Jira keys of previously estimated stories
   for calibration (optional).
 - **Point scale**: `fibonacci` (default: 1, 2, 3, 5, 8, 13, 21) or `t-shirt` (XS, S, M, L, XL).
@@ -53,7 +52,6 @@ Jira skill. Never reproduce that knowledge in this skill.
 | Story content | Discovered Jira retrieval skill | Per-story estimation target |
 | Reference stories | Discovered Jira retrieval skill | Calibration against historical velocity |
 | Jira write-back | Discovered Jira update skill | Sync estimate and reasoning per story |
-| Codebase — affected modules | Codebase scan | Complexity and effort signals |
 | Definition of Ready | `resources/dor.md` | Confirm story is ready before estimating |
 | Story review checklist | `resources/templates/story-review-checklist.md` | Estimation section |
 
@@ -83,13 +81,12 @@ Jira skill. Never reproduce that knowledge in this skill.
      Record the existing estimate for drift comparison if the skill is still run.
    - If no estimate exists: proceed to estimation.
 
-9. Scan the codebase for modules or components referenced in this story.
-10. Use the `story-point-estimation` skill with the loaded context to:
+9. Use the `story-point-estimation` skill with the loaded context to:
     - Score Complexity, Effort, and Uncertainty (each 1–5) with explicit reasoning.
     - Map the factor sum to an estimate on the configured scale.
     - Calibrate against reference stories if available.
     - Flag stories exceeding 12 hours / equivalent points for split discussion.
-11. If `update Jira` is enabled and an update skill was discovered:
+10. If `update Jira` is enabled and an update skill was discovered:
     - Only update if no estimate currently exists in Jira.
     - Use the discovered update skill to sync the estimate to Jira.
 
@@ -120,4 +117,6 @@ Jira skill. Never reproduce that knowledge in this skill.
   DOR pre-check are recorded but not estimated.
 - Jira integrations, regulatory APIs, and cross-team dependencies are automatically
   treated as uncertainty boosters (minimum Uncertainty score: 3).
-- The codebase scan is per-story but shares the same process for the full batch.
+- Codebase inspection is not performed during estimation — that is reserved for the
+  technical review (`story-review-dev`). Estimation is based on story content and
+  reference stories only.
