@@ -14,7 +14,7 @@ flowchart TD
     B -->|❌ Not ready| B_STOP([Stop — fix PO issues])
     B -->|✅/⚠️| C[story-review-domain\nDomain Review]
     C -->|❌ Misaligned| C_STOP([Stop — fix domain issues])
-    C -->|✅/⚠️| D[story-review-dev\nArchitecture Review]
+    C -->|✅/⚠️| D[story-review-dev\nTechnical Review]
     D -->|❌ Not ready| D_STOP([Stop — fix architecture issues])
     D -->|✅/⚠️| E[story-point-estimation\nEstimation]
     E --> F([Ready for Sprint])
@@ -46,7 +46,7 @@ flowchart LR
 |-------|------|---------|
 | `story-review-po` | — | Validate story format, DOR basics, title quality |
 | `story-review-domain` | PO ✅/⚠️ | Ubiquitous language, aggregates, domain events |
-| `story-review-dev` | PO ✅/⚠️ + Domain ✅/⚠️ | Architecture fit, risks, enabler check |
+| `story-review-dev` | PO ✅/⚠️ + Domain ✅/⚠️ | Technical review: fit, risks, enabler check |
 | `story-point-estimation` | All three ✅/⚠️ | Three-factor Fibonacci estimate |
 
 ### PR Review Skills (independent)
@@ -62,7 +62,7 @@ flowchart LR
 | Skill | Purpose |
 |-------|---------|
 | `automation-story-review-po` | Batch PO review across all stories in a status |
-| `automation-story-review-dev` | Batch architecture review with enabler drafting |
+| `automation-story-review-dev` | Batch technical review with enabler drafting |
 | `automation-story-review-domain` | Batch domain review with codebase inspection |
 | `automation-story-point-estimation` | Batch estimation with drift reporting |
 
