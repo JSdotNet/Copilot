@@ -25,14 +25,17 @@ flowchart TD
     style F fill:#8f8,stroke:#080
 ```
 
-PR reviews run independently, parallel to the pipeline:
+PR reviews run independently, parallel to the pipeline. `pr-vs-story` verifies delivery
+against the story; `pr-review-domain` and `pr-review-architecture` verify code quality:
 
 ```mermaid
 flowchart LR
-    PR([Pull Request]) --> PA[pr-review-architecture\nArchitecture Review]
-    PR --> PD[pr-review-domain\nDomain Review]
-    PA --> MERGE([Merge decision])
-    PD --> MERGE
+    PR([Pull Request]) --> PD[pr-review-domain\nDomain Review]
+    PR --> PA[pr-review-architecture\nArchitecture Review]
+    PR --> PS[pr-vs-story\nStory Coverage]
+    PD --> MERGE([Merge decision])
+    PA --> MERGE
+    PS --> MERGE
 ```
 
 ## Skills
@@ -52,6 +55,7 @@ flowchart LR
 |-------|---------|
 | `pr-review-architecture` | Layer boundaries, ADR compliance, NFRs, security |
 | `pr-review-domain` | Domain layer purity, event naming, aggregate design |
+| `pr-vs-story` | Verify PR delivers all story acceptance criteria; flag out-of-scope changes |
 
 ### Automation Skills (batch-by-Jira-status)
 

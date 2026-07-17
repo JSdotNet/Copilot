@@ -12,15 +12,21 @@ Generate a structured sprint report for a `FIN` sprint. The report compares the 
 sprint scope (stories committed at sprint start) against the final state, groups stories
 by epic, and surfaces untested items.
 
-## Jira project
+## Jira Skill Discovery
 
-- Project key: `FIN`
-- cloudId: `innovadis.atlassian.net`
+Before executing any Jira operation, discover what Jira skills are available:
+
+1. Check installed skills for skills whose name or description mentions "jira".
+2. Identify a **query-capable** skill — can search or list issues by sprint/filter.
+3. Identify a **retrieval-capable** skill — can fetch a single existing issue.
+4. If no query skill is found: ask the user to paste story content manually.
+
+All Jira field mapping, project keys, status values, and API conventions are owned by
+the discovered Jira skill. Never reproduce that knowledge in this skill.
 
 ## Goals
 
-- Load all stories that were in the sprint at its start via
-  `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql`.
+- Load all stories that were in the sprint at its start using the discovered Jira skill.
 - Determine the original scope (stories added before or at sprint start).
 - Classify each story by its final status.
 - Group by epic.
@@ -28,12 +34,11 @@ by epic, and surfaces untested items.
 
 ## Finding the sprint stories
 
-Use `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql`:
+Use the discovered query-capable Jira skill with the following JQL:
 
-- cloudId: `innovadis.atlassian.net`
 - JQL: `project = FIN AND sprint = "{sprint name}" AND "Fincent Team" = "Team B" ORDER BY epic ASC, status ASC`
-- Fetch `fields: ["summary", "status", "issuetype", "epic", "story_points", "customfield_10016", "labels", "assignee", "fixVersions"]`.
-- Paginate with `nextPageToken` if needed.
+- Fields: summary, status, issuetype, epic, story points, labels, assignee, fixVersions.
+- Paginate if needed.
 - If the user names a different team, substitute in the JQL.
 
 Also query stories that were **removed from the sprint** (added then removed) if accessible:
@@ -110,5 +115,5 @@ All bug-type stories in the sprint, completed or not:
 
 ## Tools used
 
-- `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql` — fetch sprint stories.
-- `mcp__claude_ai_Atlassian_Rovo__getJiraIssue` — fetch individual story detail when needed.
+- Discovered query-capable Jira skill — fetch sprint stories via JQL.
+- Discovered retrieval-capable Jira skill — fetch individual story detail when needed.

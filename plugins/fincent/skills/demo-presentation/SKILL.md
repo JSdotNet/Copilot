@@ -33,28 +33,46 @@ The template has 13 slides in the following order:
 
 Generate one Markdown section per slide, clearly labelled.
 
-## Jira project
+## Jira Skill Discovery
 
-- Project key: `FIN`
-- cloudId: `innovadis.atlassian.net`
+Before executing any Jira operation, discover what Jira skills are available:
+
+1. Check installed skills for skills whose name or description mentions "jira".
+2. Identify a **query-capable** skill — can search or list issues by sprint/filter.
+3. Identify a **retrieval-capable** skill — can fetch a single existing issue.
+4. If no query skill is found: ask the user to provide sprint data manually.
+
+All Jira field mapping, project keys, and API conventions are owned by the discovered
+Jira skill.
 
 ## Data fetching
 
-Use `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql`:
+Use the discovered query-capable Jira skill with the following JQL queries:
 
+**Completed stories this sprint:**
 ```
-JQL: project = FIN AND sprint = "{sprint name}" AND status = Done
-     AND "Fincent Team" = "Team B"
-     ORDER BY issuetype ASC, epic ASC
+project = FIN AND sprint = "{sprint name}" AND status = Done
+AND "Fincent Team" = "Team B"
+ORDER BY issuetype ASC, epic ASC
 ```
 
-Also fetch:
-- Next sprint stories: `sprint in openSprints() AND "Fincent Team" = "Team B"`
-- Release scope: `fixVersion = "{release}" AND project = FIN`
-- Open bugs (not completed): `project = FIN AND issuetype = Bug AND sprint = "{sprint name}" AND status != Done`
+**Next sprint preview:**
+```
+sprint in openSprints() AND "Fincent Team" = "Team B"
+```
 
-Fields to fetch: `summary`, `issuetype`, `status`, `epic`, `assignee`, `customfield_10016`,
-`fixVersions`, `description`, `labels`.
+**Release scope:**
+```
+fixVersion = "{release}" AND project = FIN
+```
+
+**Open bugs (not completed):**
+```
+project = FIN AND issuetype = Bug AND sprint = "{sprint name}" AND status != Done
+```
+
+Fields to request: summary, issuetype, status, epic, assignee, story points,
+fixVersions, description, labels.
 
 ## Presentation generation
 
@@ -204,5 +222,5 @@ If no information is available, write: *"Geen bijzonderheden vanuit implementati
 
 ## Tools used
 
-- `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql` — fetch sprint / release stories.
-- `mcp__claude_ai_Atlassian_Rovo__getJiraIssue` — fetch story detail for demo notes.
+- Discovered query-capable Jira skill — fetch sprint, release, and next-sprint stories.
+- Discovered retrieval-capable Jira skill — fetch story detail for demo notes.

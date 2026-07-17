@@ -70,5 +70,5 @@ beneath the consolidated table, separated by `---`.
 
 ## Tools used
 
-- `mcp__claude_ai_Atlassian_Rovo__searchJiraIssuesUsingJql` — resolve releases/sprints.
+- Discovered query-capable Jira skill — resolve releases/sprints via JQL.
 - Parallel subagents via `sprint-report` skill for individual sprint data.

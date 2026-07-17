@@ -18,7 +18,8 @@
     "backlog",
     "pr-review",
     "sprint-report",
-    "demo-presentation"
+    "demo-presentation",
+    "pr-vs-story"
   ],
   "skills": "skills/",
   "license": "MIT"
