@@ -21,7 +21,7 @@ applyTo: 'agents/**/*.agent.md'
 
 - Product Owner agent owns backlog writing and refinement only.
 - Jira agent owns Jira create/update/sync operations only.
-- GitHub Issues agent owns GitHub issue create/update/sync operations only (optional, requires `github-issues` plugin).
+- GitHub Issues agent owns GitHub issue create/update/sync operations only (optional, requires `github` plugin).
 - Product Owner agent must hand off Jira synchronization tasks to Jira agent.
 - Jira agent must hand off backlog rewriting tasks to Product Owner agent.
 - Product Owner agent should hand off GitHub issue synchronization tasks to GitHub Issues agent when it is installed.

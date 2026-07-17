@@ -1,5 +1,5 @@
 ---
-description: Approval-first handoff policy for GitHub Issues plugin agents.
+description: Approval-first handoff policy for GitHub plugin agents.
 applyTo: 'agents/**/*.agent.md'
 ---
 
@@ -8,7 +8,7 @@ applyTo: 'agents/**/*.agent.md'
 ## Purpose
 
 - Enforce safe, explicit handoffs between specialist agents.
-- Keep GitHub Issues synchronization clearly separated from backlog authoring.
+- Keep GitHub platform workflows clearly separated from backlog authoring.
 
 ## Rules
 
@@ -19,6 +19,6 @@ applyTo: 'agents/**/*.agent.md'
 
 ## Scope Split
 
-- GitHub Issues agent owns GitHub issue create/update/sync operations only.
-- GitHub Issues agent must hand off backlog drafting and rewriting tasks to Product Owner agent.
-- Product Owner agent must hand off GitHub issue synchronization tasks to GitHub Issues agent.
+- GitHub agent owns all GitHub platform operations: issue sync, GitHub Actions, Dependabot, and pull requests.
+- GitHub agent must hand off backlog drafting and rewriting tasks to Product Owner agent.
+- Product Owner agent must hand off GitHub platform operations to GitHub agent.

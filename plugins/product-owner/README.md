@@ -28,12 +28,12 @@ Installable GitHub Copilot CLI plugin for product backlog authoring with optiona
 - Keep responsibilities separated by agent:
   - Use `product-owner` for writing and refining backlog content.
   - Use `jira` for Jira sync operations and field mapping.
-  - Use `github-issues` (separate plugin) for GitHub issue sync operations.
+  - Use `github` (separate plugin) for GitHub issue sync operations.
 
 ## Optional Integrations
 
 - Architecture handoff (`architect`) is optional and requires the `architecture` plugin to be installed.
-- GitHub issue sync (`github-issues` agent) is optional and requires the `github-issues` plugin to be installed.
+- GitHub issue sync (`github` agent) is optional and requires the `github` plugin to be installed.
 
 ## Agent Visibility
 

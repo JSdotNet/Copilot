@@ -1,0 +1,20 @@
+{
+  "name": "github",
+  "description": "Copilot plugin for GitHub platform workflows — issue sync, pull requests, GitHub Actions CI/CD, and Dependabot configuration.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "keywords": [
+    "copilot",
+    "github",
+    "github-issues",
+    "github-actions",
+    "dependabot",
+    "pull-request",
+    "ci-cd"
+  ],
+  "agents": "agents/",
+  "skills": "skills/",
+  "license": "MIT"
+}

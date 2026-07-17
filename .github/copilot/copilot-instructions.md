@@ -150,6 +150,29 @@ If explicit guidance is missing:
 
 While scanning, remove redundant guidance and keep only the highest-signal rule set for the task.
 
+## Awesome Copilot Reference
+
+Before authoring a new plugin, agent, skill, or instruction file, check the Awesome Copilot
+community collection for existing samples, patterns, or inspiration:
+
+- Website (search + filter): <https://awesome-copilot.github.com>
+- Machine-readable index: <https://awesome-copilot.github.com/llms.txt>
+- GitHub repository: <https://github.com/github/awesome-copilot>
+
+**When to check Awesome Copilot:**
+
+- Creating a new skill for a well-known tool or workflow domain (CI/CD, cloud, testing, etc.).
+- Looking for agent frontmatter patterns for a specific tool category.
+- Finding instruction file templates for common frameworks or languages.
+- Identifying whether an installable plugin already covers the requested scope.
+
+**How to use findings:**
+
+- Adapt samples to fit this repository's naming conventions, plugin structure, and authoring standards.
+- Cite the Awesome Copilot source in a `> **Awesome Copilot reference:**` note inside the skill or agent file when relevant.
+- Never copy content verbatim; always adjust to the local context and constraints.
+- If a relevant plugin already exists in the marketplace, prefer referencing it in the new asset rather than duplicating its content.
+
 ## Scope Boundaries
 
 This repository primarily defines Copilot customization assets, not runtime application source code.
