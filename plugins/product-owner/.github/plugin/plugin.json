@@ -1,6 +1,6 @@
 {
   "name": "product-owner",
-  "description": "Copilot plugin for product backlog authoring and GitHub issue synchronization workflows.",
+  "description": "Copilot plugin for product backlog authoring — epics, stories, and bugs as Markdown artifacts.",
   "version": "0.1.0",
   "author": {
     "name": "Job Schepers"
@@ -8,7 +8,6 @@
   "keywords": [
     "copilot",
     "product-owner",
-    "github-issues",
     "backlog",
     "story",
     "epic",
