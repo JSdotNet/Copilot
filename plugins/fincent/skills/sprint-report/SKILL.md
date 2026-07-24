@@ -1,16 +1,16 @@
 ---
 name: sprint-report
 description: >
-  Generate a sprint report for a Fincent sprint: what was completed vs the original sprint
-  scope, what was not completed, what has not been tested yet, and a breakdown by epic.
-  Use after a sprint ends or during the sprint review.
+  Generate a sprint report for a Fincent sprint: what was completed (including items in
+  test or beyond) vs the original sprint scope, what was not completed, and a breakdown
+  by epic. Use after a sprint ends or during the sprint review.
 ---
 
 # Sprint Report
 
 Generate a structured sprint report for a `FIN` sprint. The report compares the original
 sprint scope (stories committed at sprint start) against the final state, groups stories
-by epic, and surfaces untested items.
+by epic, and includes untested items inside the completed section.
 
 ## Jira Skill Discovery
 
@@ -29,6 +29,8 @@ the discovered Jira skill. Never reproduce that knowledge in this skill.
 - Load all stories that were in the sprint at its start using the discovered Jira skill.
 - Determine the original scope (stories added before or at sprint start).
 - Classify each story by its final status.
+- Any story with status **Test, Acceptatie klant, Done, Closed**, or any status at or
+  beyond Test in the workflow is considered **completed** for this report.
 - Group by epic.
 - Output a structured report in the sections below.
 
@@ -54,39 +56,34 @@ Also query stories that were **removed from the sprint** (added then removed) if
 | Team | Team B (or named team) |
 | Period | {start date} – {end date} |
 | Original scope | {N} stories / {N} points |
-| Completed | {N} stories / {N} points |
+| Completed | {N} stories / {N} points (includes items in Test or beyond) |
 | Not completed | {N} stories / {N} points |
 | Completion rate | {%} |
-| Untested | {N} stories |
 
 ### 2. Completed — by Epic
+
+Stories that are **completed** (status is Test, Acceptatie klant, Done, or beyond).
+Include the actual status in the State column so it is clear which items are still
+awaiting testing vs fully done.
 
 For each epic that had completed stories in this sprint:
 
 #### {Epic name}
 
-| Key | Summary | Points | Type |
-|-----|---------|--------|------|
-| FIN-xxx | … | N | Feature/Bug/Support |
+| Key | Summary | Points | Type | State |
+|-----|---------|--------|------|-------|
+| FIN-xxx | … | N | Feature/Bug/Support | Done / Test / Acceptatie klant |
 
 ### 3. Not Completed (original scope)
 
-Stories that were in the sprint at start but were **not completed** (not Done):
+Stories that were in the sprint at start but are **not yet completed** (status is earlier
+than Test — e.g. Open, Just in, Ready, In Progress, Analyze):
 
 | Key | Summary | Status | Points | Epic | Reason (if known) |
 |-----|---------|--------|--------|------|-------------------|
 | FIN-xxx | … | In Progress | N | … | … |
 
-### 4. Not Tested Yet
-
-Stories that are Done in development but have no test evidence, are marked as "In Testing",
-or have a label/status indicating testing is pending:
-
-| Key | Summary | Points | Epic | Tester |
-|-----|---------|--------|------|--------|
-| FIN-xxx | … | N | … | … |
-
-### 5. Scope Changes
+### 4. Scope Changes
 
 Stories added to or removed from the sprint after it started (if detectable):
 
@@ -95,7 +92,7 @@ Stories added to or removed from the sprint after it started (if detectable):
 | FIN-xxx | … | Added mid-sprint | N | … |
 | FIN-yyy | … | Removed | N | … |
 
-### 6. Bugs
+### 5. Bugs
 
 All bug-type stories in the sprint, completed or not:
 
@@ -106,8 +103,11 @@ All bug-type stories in the sprint, completed or not:
 
 - Original scope is determined from stories in the sprint at start; mid-sprint additions
   are flagged in Scope Changes, not counted in the original completion rate.
-- "Untested" means: status is Done/Closed but no linked test execution, or status is
-  "In Testing" / "Awaiting Verification", or a `needs-testing` label is present.
+- **Completed** means status is Test, Acceptatie klant, Done, Closed, or any status at
+  or beyond Test in the team's workflow. These items are shown in section 2 with their
+  actual State so readers can distinguish fully done from still-in-testing items.
+- **Not Completed** means status is earlier than Test (e.g. Open, Just in, Ready,
+  In Progress, Analyze).
 - Group every section by epic — never mix stories from different epics in the same table.
 - Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `—`.
 - After producing the report, present a one-paragraph narrative summary suitable for

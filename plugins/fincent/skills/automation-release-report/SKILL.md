@@ -43,9 +43,9 @@ JQL: project = FIN AND fixVersion in releasedVersions()
 
 ### Trend Summary
 
-| Release | Original Scope | Delivered | Delivery Rate | Deferred | Bug Fixes |
-|---------|---------------|-----------|---------------|----------|-----------|
-| pre-2025.1 | N pts | N pts | % | N pts | N |
+| Release | Original Scope | Delivered | Delivered Points | Delivery Rate | Deferred |
+|---------|---------------|-----------|-----------------|---------------|----------|
+| pre-2025.1 | N | N | N pts | % | N |
 | pre-2025.2 | … | … | … | … | … |
 
 Include a short trend observation below the table, for example:

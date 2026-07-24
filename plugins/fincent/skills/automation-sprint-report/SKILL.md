@@ -46,12 +46,12 @@ JQL `sprint in closedSprints() AND ... updated >= "{start}" AND updated <= "{end
 
 ### Trend Summary
 
-| Sprint | Scope | Completed | Completion % | Not Tested | Bugs |
-|--------|-------|-----------|--------------|------------|------|
-| Sprint 42 - Xanthic | N | N | % | N | N |
+| Sprint | Scope | Completed | Completed Points | Completion % | Not Tested |
+|--------|-------|-----------|-----------------|--------------|------------|
+| Sprint 42 - Xanthic | N | N | N | % | N |
 | Sprint 43 - Yellow | … | … | … | … | … |
 
-Include a short trend observation below the table, e.g.:
+Include a short trend observation below the table focusing on the sprint's own progress, e.g.:
 > Completion rate improved from 78 % → 91 % over the last three sprints.
 > Untested stories decreased by 40 %.
 
