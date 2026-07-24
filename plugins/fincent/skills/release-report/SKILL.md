@@ -1,9 +1,10 @@
 ---
 name: release-report
 description: >
-  Generate a release report for a Fincent fixVersion: what was delivered, what was deferred,
-  a breakdown by epic, bug fixes, and a draft of release notes suitable for stakeholders.
-  Use after a release is shipped or to prepare the release sign-off.
+  Generate a release report for a Fincent fixVersion: what was delivered (including items
+  in test or beyond), what was deferred, a breakdown by epic, bug fixes, and a draft of
+  release notes suitable for stakeholders. Use after a release is shipped or to prepare
+  the release sign-off.
 ---
 
 # Release Report
@@ -28,8 +29,10 @@ the discovered Jira skill. Never reproduce that knowledge in this skill.
 
 - Load all stories targeted for the release using the discovered Jira skill.
 - Classify each story by its final delivery status.
+- Any story with status **Test, Acceptatie klant, Done, Closed**, or any status at or
+  beyond Test in the workflow is considered **delivered** for this report.
 - Group by epic.
-- Identify deferred items (in scope but not shipped with this release).
+- Identify deferred items (in scope but status earlier than Test).
 - Output a structured report in the sections below.
 - Produce a release notes draft suitable for stakeholders.
 
@@ -57,24 +60,29 @@ Also query stories that were **removed from the release** (had this fixVersion t
 | Preproduction release date | {date or "TBD"} |
 | Sprints covered | {sprint names} |
 | Original scope | {N} stories / {N} points |
-| Delivered | {N} stories / {N} points |
+| Delivered | {N} stories / {N} points (includes items in Test or beyond) |
 | Deferred | {N} stories / {N} points |
 | Delivery rate | {%} |
 | Bug fixes | {N} |
 
 ### 2. Delivered — by Epic
 
-For each epic that had delivered (Done/Closed) stories in this release:
+Stories that are **delivered** (status is Test, Acceptatie klant, Done, or beyond).
+Include the actual status in the State column so it is clear which items are still
+awaiting testing vs fully done.
+
+For each epic that had delivered stories in this release:
 
 #### {Epic name}
 
-| Key | Summary | Points | Type |
-|-----|---------|--------|------|
-| FIN-xxx | … | N | Feature/Bug/Support |
+| Key | Summary | Points | Type | State |
+|-----|---------|--------|------|-------|
+| FIN-xxx | … | N | Feature/Bug/Support | Done / Test / Acceptatie klant |
 
 ### 3. Deferred (not shipped)
 
-Stories that were targeted for this release but were **not completed** (not Done/Closed):
+Stories that were targeted for this release but are **not yet delivered** (status is
+earlier than Test — e.g. Open, Just in, Ready, In Progress, Analyze):
 
 | Key | Summary | Status | Points | Epic | Reason (if known) |
 |-----|---------|--------|--------|------|-------------------|
@@ -112,7 +120,11 @@ Example format:
 
 ## Working rules
 
-- Delivered means status is Done or Closed; anything else is deferred.
+- **Delivered** means status is Test, Acceptatie klant, Done, Closed, or any status at
+  or beyond Test in the team's workflow. These items are shown in section 2 with their
+  actual State so readers can distinguish fully done from still-in-testing items.
+- **Deferred** means status is earlier than Test (e.g. Open, Just in, Ready, In Progress,
+  Analyze).
 - Delivery rate is calculated from the original scope only; late additions are noted in
   Scope Changes but excluded from the rate denominator.
 - Group every section by epic — never mix stories from different epics in the same table.
