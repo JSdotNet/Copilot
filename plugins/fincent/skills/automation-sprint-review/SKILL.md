@@ -54,11 +54,13 @@ Execute the three phases **sequentially** — each phase uses output from the pr
 
 Run the `sprint-report` skill for each requested sprint and team.
 Collect the full sprint report output (completed stories, bugs, scope changes).
+Save the complete report as `sprint-report-{sprint-name}.md` in the working directory.
 
 ### Phase 2 — Release Report
 
 Run the `release-report` skill for the resolved fixVersion.
 Use the latest fixVersion (released or unreleased). Do not restrict to final releases.
+Save the complete report as `release-report-{release-name}.md` in the working directory.
 
 ### Phase 3 — Demo Presentation (PowerPoint)
 
@@ -84,19 +86,41 @@ If multiple sprints are requested, produce one combined `.pptx` covering all spr
 
 ## Output
 
-The automation produces three artifacts:
+The automation produces three file artifacts saved to the working directory:
 
-1. **Sprint report** — full Markdown report per sprint (displayed in chat).
-2. **Release report** — full Markdown release report (displayed in chat).
-3. **Demo presentation** — `.pptx` file saved to disk.
+1. **Sprint report** — Markdown file: `sprint-report-{sprint-name}.md`
+2. **Release report** — Markdown file: `release-report-{release-name}.md`
+3. **Demo presentation** — PowerPoint file: `demo-{sprint-name}.pptx`
+
+After all phases complete, present a **summary** that includes:
+
+- A brief status per phase (success or failure with error).
+- A clickable link to each produced file using a relative path.
+
+Example summary:
+
+```
+## Sprint Review Complete
+
+| Phase | Status | Artifact |
+|-------|--------|----------|
+| Sprint Report | ✅ Done | [sprint-report-sprint-a-xanadu.md](./sprint-report-sprint-a-xanadu.md) |
+| Release Report | ✅ Done | [release-report-release-2026.32.0.md](./release-report-release-2026.32.0.md) |
+| Demo Presentation | ✅ Done | [demo-sprint-a-xanadu.pptx](./demo-sprint-a-xanadu.pptx) |
+```
+
+If multiple sprints are requested, produce one file per artifact type covering all sprints
+(use the combined sprint names or first sprint name in the filename).
 
 ## Working Rules
 
 - Run phases sequentially: sprint-report → release-report → demo-presentation.
+- Save every phase result as a file — never only display in chat.
 - Use the latest fixVersion even if it is unreleased; do not skip it.
 - The demo presentation must be a `.pptx` file, not Markdown.
 - Use Dutch language for slide content (the Fincent Review template is Dutch).
-- If a phase fails, report the error and continue with subsequent phases where possible.
+- After all phases finish, always present the summary table with links to all artifacts.
+- If a phase fails, report the error in the summary table and continue with subsequent phases where possible.
 - Do not post anything to Jira.
 
 ## Tools Used
