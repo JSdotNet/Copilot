@@ -12,6 +12,12 @@ Generate a structured sprint report for a `FIN` sprint. The report compares the 
 sprint scope (stories committed at sprint start) against the final state, groups stories
 by epic, and includes untested items inside the completed section.
 
+## Jira Setup Reference
+
+Refer to `plugins/fincent/resources/jira-setup.md` for the Fincent Jira project
+configuration including the status flow, custom fields, fix version naming, labels,
+and epic ordering conventions.
+
 ## Jira Skill Discovery
 
 Before executing any Jira operation, discover what Jira skills are available:
@@ -66,38 +72,42 @@ Stories that are **completed** (status is Test, Acceptatie klant, Done, or beyon
 Include the actual status in the State column so it is clear which items are still
 awaiting testing vs fully done.
 
-For each epic that had completed stories in this sprint:
+For each epic that had completed stories in this sprint, create an epic sub-section.
+Always place the **No epic** group last, after all named epics.
 
 #### {Epic name}
 
-| Key | Summary | Points | Type | State |
-|-----|---------|--------|------|-------|
-| FIN-xxx | … | N | Feature/Bug/Support | Done / Test / Acceptatie klant |
+| Key | Summary | Points | Type | Labels | State |
+|-----|---------|--------|------|--------|-------|
+| FIN-xxx | … | N | Feature/Bug/Support | label1, label2 | Done / Test / Acceptatie klant |
 
 ### 3. Not Completed (original scope)
 
 Stories that were in the sprint at start but are **not yet completed** (status is earlier
-than Test — e.g. Open, Just in, Ready, In Progress, Analyze):
+than Test — e.g. Open, Just in, Ready, In Progress, Analyze).
+Always place the **No epic** group last.
 
-| Key | Summary | Status | Points | Epic | Reason (if known) |
-|-----|---------|--------|--------|------|-------------------|
-| FIN-xxx | … | In Progress | N | … | … |
+| Key | Summary | Status | Points | Epic | Labels | Reason (if known) |
+|-----|---------|--------|--------|------|--------|-------------------|
+| FIN-xxx | … | In Progress | N | … | … | … |
 
 ### 4. Scope Changes
 
 Stories added to or removed from the sprint after it started (if detectable):
 
-| Key | Summary | Direction | Points | Reason |
-|-----|---------|-----------|--------|--------|
-| FIN-xxx | … | Added mid-sprint | N | … |
-| FIN-yyy | … | Removed | N | … |
+| Key | Summary | Direction | Points | Labels | Reason |
+|-----|---------|-----------|--------|--------|--------|
+| FIN-xxx | … | Added mid-sprint | N | … | … |
+| FIN-yyy | … | Removed | N | … | … |
 
-### 5. Bugs
+### 5. Bugs (sprint-only, not in Completed)
 
-All bug-type stories in the sprint, completed or not:
+Bug-type stories in the sprint that are **not yet completed** (status before Test).
+Bugs that are already completed appear in section 2 — do not duplicate them here.
+Always place the **No epic** group last.
 
-| Key | Summary | Status | Points | Epic |
-|-----|---------|--------|--------|------|
+| Key | Summary | Status | Points | Epic | Labels |
+|-----|---------|--------|--------|------|--------|
 
 ## Working rules
 
@@ -109,7 +119,12 @@ All bug-type stories in the sprint, completed or not:
 - **Not Completed** means status is earlier than Test (e.g. Open, Just in, Ready,
   In Progress, Analyze).
 - Group every section by epic — never mix stories from different epics in the same table.
-- Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `—`.
+- Always render the **No epic** group as the last epic sub-section in every grouped section.
+- Include labels in every issue row when present; omit the cell content when the issue
+  has no labels.
+- Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `?`.
+- Do not duplicate bugs: completed bugs appear only in section 2; section 5 lists only
+  bugs that are not yet completed.
 - After producing the report, present a one-paragraph narrative summary suitable for
   pasting into a sprint retrospective or stakeholder email.
 

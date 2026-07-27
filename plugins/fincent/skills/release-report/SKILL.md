@@ -13,6 +13,12 @@ Generate a structured release report for a `FIN` release (`fixVersion`). The rep
 the original release scope against what was actually delivered, groups stories by epic, surfaces
 deferred items, and produces a stakeholder-ready release notes draft.
 
+## Jira Setup Reference
+
+Refer to `plugins/fincent/resources/jira-setup.md` for the Fincent Jira project
+configuration including the status flow, custom fields, fix version naming, labels,
+and epic ordering conventions.
+
 ## Jira Skill Discovery
 
 Before executing any Jira operation, discover what Jira skills are available:
@@ -71,39 +77,42 @@ Stories that are **delivered** (status is Test, Acceptatie klant, Done, or beyon
 Include the actual status in the State column so it is clear which items are still
 awaiting testing vs fully done.
 
-For each epic that had delivered stories in this release:
+For each epic that had delivered stories in this release, create an epic sub-section.
+Always place the **No epic** group last, after all named epics.
 
 #### {Epic name}
 
-| Key | Summary | Points | Type | State |
-|-----|---------|--------|------|-------|
-| FIN-xxx | … | N | Feature/Bug/Support | Done / Test / Acceptatie klant |
+| Key | Summary | Points | Type | Labels | State |
+|-----|---------|--------|------|--------|-------|
+| FIN-xxx | … | N | Feature/Bug/Support | label1, label2 | Done / Test / Acceptatie klant |
 
 ### 3. Deferred (not shipped)
 
 Stories that were targeted for this release but are **not yet delivered** (status is
-earlier than Test — e.g. Open, Just in, Ready, In Progress, Analyze):
+earlier than Test — e.g. Open, Just in, Ready, In Progress, Analyze).
+Always place the **No epic** group last.
 
-| Key | Summary | Status | Points | Epic | Reason (if known) |
-|-----|---------|--------|--------|------|-------------------|
-| FIN-xxx | … | In Progress | N | … | … |
+| Key | Summary | Status | Points | Epic | Labels | Reason (if known) |
+|-----|---------|--------|--------|------|--------|-------------------|
+| FIN-xxx | … | In Progress | N | … | … | … |
 
 ### 4. Scope Changes
 
 Stories added to or removed from the release after the release was opened (if detectable):
 
-| Key | Summary | Direction | Points | Reason |
-|-----|---------|-----------|--------|--------|
-| FIN-xxx | … | Added late | N | … |
-| FIN-yyy | … | Removed | N | … |
+| Key | Summary | Direction | Points | Labels | Reason |
+|-----|---------|-----------|--------|--------|--------|
+| FIN-xxx | … | Added late | N | … | … |
+| FIN-yyy | … | Removed | N | … | … |
 
 ### 5. Bug Fixes
 
-All bug-type stories delivered in this release:
+All bug-type stories delivered in this release.
+Always place the **No epic** group last.
 
-| Key | Summary | Points | Epic | Sprint |
-|-----|---------|--------|------|--------|
-| FIN-xxx | … | N | … | … |
+| Key | Summary | Points | Epic | Labels | Sprint |
+|-----|---------|--------|------|--------|--------|
+| FIN-xxx | … | N | … | … | … |
 
 ### 6. Release Notes Draft
 
@@ -128,7 +137,10 @@ Example format:
 - Delivery rate is calculated from the original scope only; late additions are noted in
   Scope Changes but excluded from the rate denominator.
 - Group every section by epic — never mix stories from different epics in the same table.
-- Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `—`.
+- Always render the **No epic** group as the last epic sub-section in every grouped section.
+- Include labels in every issue row when present; omit the cell content when the issue
+  has no labels.
+- Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `?`.
 - After producing the report, present a one-paragraph executive summary suitable for
   pasting into a release email or stakeholder update.
 

@@ -11,6 +11,12 @@ description: >
 Fetch and generate sprint reports for multiple `FIN` sprints in parallel, then produce a
 consolidated summary comparing completion rates and trends across sprints.
 
+## Jira Setup Reference
+
+Refer to `plugins/fincent/resources/jira-setup.md` for the Fincent Jira project
+configuration including the status flow, custom fields, fix version naming, labels,
+and epic ordering conventions.
+
 Use this skill when you need reports for several sprints at once, for example at the end
 of a release cycle or to prepare a quarterly retrospective.
 
