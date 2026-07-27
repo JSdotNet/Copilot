@@ -21,15 +21,18 @@ and epic ordering conventions.
 
 ## Jira Skill Discovery
 
-Before executing any Jira operation, discover what Jira skills are available:
+When this skill is run directly, discover what Jira skills are available:
 
 1. Check installed skills for skills whose name or description mentions "jira".
 2. Identify a **query-capable** skill — can search or list issues by filter/JQL.
 3. Identify a **retrieval-capable** skill — can fetch a single existing issue.
 4. If no query skill is found: ask the user to paste story content manually.
 
+If this skill is invoked by an orchestration skill such as `automation-sprint-review`,
+prefer the caller-provided Jira capability context instead of rediscovering Jira skills.
+
 All Jira field mapping, project keys, status values, and API conventions are owned by
-the discovered Jira skill. Never reproduce that knowledge in this skill.
+the selected Jira skill. Never reproduce that knowledge in this skill.
 
 ## Goals
 
@@ -41,6 +44,9 @@ the discovered Jira skill. Never reproduce that knowledge in this skill.
 - Identify deferred items (in scope but status earlier than Test).
 - Output a structured report in the sections below.
 - Produce a release notes draft suitable for stakeholders.
+
+This skill owns the release-report logic: release scope analysis, delivery classification,
+epic grouping, release-note drafting, and report rendering.
 
 ## Finding the release stories
 
@@ -70,6 +76,21 @@ Also query stories that were **removed from the release** (had this fixVersion t
 | Deferred | {N} stories / {N} points |
 | Delivery rate | {%} |
 | Bug fixes | {N} |
+
+### 1a. Supporting Metrics
+
+Add two compact tables directly after the release summary:
+
+| Status | Count |
+|--------|-------|
+| Acceptatie klant | N |
+| Test | N |
+| Done | N |
+
+| Type | Count |
+|------|-------|
+| Bug | N |
+| Story | N |
 
 ### 2. Delivered — by Epic
 
@@ -126,6 +147,16 @@ Example format:
 >
 > **Bug Fixes**
 > Resolved {N} issues, including {one notable fix if present}.
+
+## Required output fidelity
+
+- Every issue listing in sections 2 through 5 must be rendered as a **Markdown table**.
+- Do **not** replace grouped issue tables with bullet lists.
+- Always include the `Points` column and the `Labels` column where defined in the section.
+- Use `?` when story points are missing.
+- Use `-` when labels are absent.
+- Preserve the exact Jira status text in `State` / `Status`.
+- When sprint information is available, include all covered sprint names in the release summary.
 
 ## Working rules
 

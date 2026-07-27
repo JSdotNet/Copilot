@@ -14,6 +14,10 @@ Generate a demo presentation for a Fincent sprint review based on the Fincent Re
 PPTX template. The output is a structured Markdown document that mirrors every slide
 in the template; it can be presented directly or used to fill in the PPTX.
 
+This skill owns the presentation logic: turning sprint-review information into slide
+content, ordering that content into the Fincent review structure, and preparing material
+that can be written into the PPTX template.
+
 ## Template File
 
 The PowerPoint template is located at:
@@ -45,46 +49,33 @@ The template has 13 slides in the following order:
 
 Generate one Markdown section per slide, clearly labelled.
 
-## Jira Skill Discovery
+## Preferred input source
 
-Before executing any Jira operation, discover what Jira skills are available:
+Use existing report artifacts only.
 
-1. Check installed skills for skills whose name or description mentions "jira".
-2. Identify a **query-capable** skill — can search or list issues by sprint/filter.
-3. Identify a **retrieval-capable** skill — can fetch a single existing issue.
-4. If no query skill is found: ask the user to provide sprint data manually.
+When this skill is invoked by `automation-sprint-review`, the caller should pass:
 
-All Jira field mapping, project keys, and API conventions are owned by the discovered
-Jira skill.
+- one or more generated sprint reports
+- the generated release report
+- the resolved sprint names
+- the resolved release name
+- the team
 
-## Data fetching
+Use those report artifacts as the **primary source** for slide content.
 
-Use the discovered query-capable Jira skill with the following JQL queries:
+If the required report artifacts are missing, stop and ask the caller or user to provide
+them. Do not access Jira from this skill.
 
-**Completed stories this sprint:**
-```
-project = FIN AND sprint = "{sprint name}" AND status = Done
-AND "Fincent Team" = "Team B"
-ORDER BY issuetype ASC, epic ASC
-```
+## Data sources
 
-**Next sprint preview:**
-```
-sprint in openSprints() AND "Fincent Team" = "Team B"
-```
+### Primary source: sprint and release reports
 
-**Release scope:**
-```
-fixVersion = "{release}" AND project = FIN
-```
+When sprint and release report artifacts are provided, extract slide content from them:
 
-**Open bugs (not completed):**
-```
-project = FIN AND issuetype = Bug AND sprint = "{sprint name}" AND status != Done
-```
-
-Fields to request: summary, issuetype, status, epic, assignee, story points,
-fixVersions, description, labels.
+- completed stories and bugs from the sprint report(s)
+- epic grouping from the sprint report(s)
+- release acceptance and in-scope release items from the release report
+- cross-sprint themes, labels, and carry-over context when useful for presenter notes
 
 ## Presentation generation
 
@@ -144,6 +135,7 @@ For each story include:
 - Summary (short)
 - Assignee (if relevant for demo handover)
 - Any demo notes from the story description or acceptance criteria
+- Any delivery context already captured in the sprint report narrative
 
 ---
 
@@ -223,16 +215,17 @@ If no information is available, write: *"Geen bijzonderheden vanuit implementati
 - Produce the full Markdown document with all slide sections in order.
 - Each slide section uses a level-2 heading (`## Slide N — Title`).
 - After the slides, append a **Presenter Notes** section with talking points per slide.
-- Ask the user if they want to save the output as a `.md` file.
+- When called from `automation-sprint-review`, return the slide content directly so the
+  orchestration skill can save it and build the `.pptx`.
+- When run standalone, ask the user if they want to save the output as a `.md` file.
 
 ## Working rules
 
 - Use Dutch language for story summaries and slide content (the template is Dutch).
 - Abbreviate long summaries to ≤80 characters to fit a slide bullet.
 - If a piece of data (e.g. release date, next sprint) is unknown, mark it `[TODO]`.
-- Do not post anything to Jira.
+- Do not access or post anything to Jira.
 
 ## Tools used
 
-- Discovered query-capable Jira skill — fetch sprint, release, and next-sprint stories.
-- Discovered retrieval-capable Jira skill — fetch story detail for demo notes.
+- Provided sprint and release report artifacts — primary source for slide content.
