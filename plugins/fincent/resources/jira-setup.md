@@ -21,17 +21,33 @@ Shared reference for all Fincent skills that interact with Jira.
 
 ## Status Flow
 
-The Fincent workflow progresses through the following statuses in order:
+The Fincent workflow has two tracks:
+
+**Refinement track** (backlog preparation):
 
 ```
-Just in → Open → Analyze → Ready → In Progress → Test → Acceptatie klant → Done → Closed
+Just In → Analyze → Design → Pre-Refinement → Refinement → Approval
 ```
+
+**Development track** (execution):
+
+```
+Open ↔ In Progress → Ready → Test → Acceptatie Klant → Done
+```
+
+Key transitions:
+- `Open` ↔ `In Progress` (Start Issue / Stop Issue)
+- `In Progress` → `Ready` (Issue Ready)
+- `Ready` → `Test` (Ready To Test)
+- `Test` → `Acceptatie Klant` (Test To Klant)
+- `Test` → `Done` (Test To Done)
+- `Acceptatie Klant` → `Done`
 
 **Completed** (for reporting purposes) means the issue has reached **Test** or beyond:
-Test, Acceptatie klant, Done, Closed.
+Test, Acceptatie Klant, Done, Closed.
 
 **Not completed** means the issue is at a status before Test:
-Just in, Open, Analyze, Ready, In Progress.
+Just In, Open, Analyze, Design, Pre-Refinement, Refinement, Approval, Ready, In Progress.
 
 ## Labels
 
