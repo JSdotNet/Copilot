@@ -20,15 +20,18 @@ and epic ordering conventions.
 
 ## Jira Skill Discovery
 
-Before executing any Jira operation, discover what Jira skills are available:
+When this skill is run directly, discover what Jira skills are available:
 
 1. Check installed skills for skills whose name or description mentions "jira".
 2. Identify a **query-capable** skill — can search or list issues by sprint/filter.
 3. Identify a **retrieval-capable** skill — can fetch a single existing issue.
 4. If no query skill is found: ask the user to paste story content manually.
 
+If this skill is invoked by an orchestration skill such as `automation-sprint-review`,
+prefer the caller-provided Jira capability context instead of rediscovering Jira skills.
+
 All Jira field mapping, project keys, status values, and API conventions are owned by
-the discovered Jira skill. Never reproduce that knowledge in this skill.
+the selected Jira skill. Never reproduce that knowledge in this skill.
 
 ## Goals
 
@@ -40,6 +43,9 @@ the discovered Jira skill. Never reproduce that knowledge in this skill.
 - Group by epic.
 - Output a structured report in the sections below.
 
+This skill owns the sprint-report logic: data fetching, scope interpretation, completion
+classification, grouping, and report rendering.
+
 ## Finding the sprint stories
 
 Use the discovered query-capable Jira skill with the following JQL:
@@ -48,6 +54,12 @@ Use the discovered query-capable Jira skill with the following JQL:
 - Fields: summary, status, issuetype, epic, story points, labels, assignee, fixVersions.
 - Paginate if needed.
 - If the user names a different team, substitute in the JQL.
+
+Also retrieve sprint metadata when available:
+
+- sprint start date
+- sprint end date
+- sprint goal
 
 Also query stories that were **removed from the sprint** (added then removed) if accessible:
 - JQL: `project = FIN AND sprint was "{sprint name}" AND sprint != "{sprint name}" AND "Fincent Team" = "Team B"`
@@ -109,6 +121,29 @@ Always place the **No epic** group last.
 | Key | Summary | Status | Points | Epic | Labels |
 |-----|---------|--------|--------|------|--------|
 
+### 6. Sprint Goal Evaluation
+
+If the sprint goal is available, add a compact table that shows whether each goal theme was
+met and which issues support that conclusion.
+
+| Goal item | Status | Evidence |
+|-----------|--------|----------|
+| Acties voor termijnen af | Met / Partially met / Not met | FIN-5894, FIN-5889, FIN-7097 |
+
+### 7. Narrative Summary
+
+End with one short narrative paragraph suitable for a sprint retrospective or stakeholder email.
+
+## Required output fidelity
+
+- Every issue listing in sections 2 through 5 must be rendered as a **Markdown table**.
+- Do **not** replace issue tables with bullet lists, even when a section or epic contains only one item.
+- Always include the `Points` column and the `Labels` column in the issue tables.
+- Use `?` when story points are missing.
+- Use `-` when labels are absent.
+- Preserve the exact Jira status text in `State` / `Status`.
+- Keep the **No epic** group last in every grouped section.
+
 ## Working rules
 
 - Original scope is determined from stories in the sprint at start; mid-sprint additions
@@ -125,8 +160,8 @@ Always place the **No epic** group last.
 - Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `?`.
 - Do not duplicate bugs: completed bugs appear only in section 2; section 5 lists only
   bugs that are not yet completed.
-- After producing the report, present a one-paragraph narrative summary suitable for
-  pasting into a sprint retrospective or stakeholder email.
+- If sprint-goal data is available, include section 6 instead of dropping that context.
+- After producing the report, present section 7 as the final narrative summary.
 
 ## Tools used
 

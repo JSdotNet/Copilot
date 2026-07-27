@@ -23,7 +23,10 @@ If switching is not possible in the current session, stop and ask the user to re
 ## Prerequisites
 
 - `gh` CLI must be available in the shell (`gh --version`).
-- `JSDOTNET_GH_TOKEN` must be set as an environment variable with a valid PAT for the JSdotNet account that has `repo` and `pull_request` scopes.
+- JSdotNet credentials must be available through one of these sources:
+  1. `JSDOTNET_GH_TOKEN`
+  2. `COPILOT_GH_ACCOUNT_GITHUB_2E_COM_JSDOTNET`
+  3. an existing `gh` keyring login for account `JSdotNet`
 - The feature branch must already exist locally with at least one commit ahead of the base branch.
 - Target repository can be any repo in the `JSdotNet` organization, such as `JSdotNet/Copilot`.
 
@@ -48,25 +51,42 @@ Confirm you are operating as the default Copilot CLI agent with `powershell` or 
 
 ### Step 1 — Verify token availability
 
-Check that `JSDOTNET_GH_TOKEN` is set and non-empty. Stop immediately with a clear message if the token is missing; do not attempt any `gh` commands without it.
+Resolve JSdotNet credentials in this order:
+
+1. `JSDOTNET_GH_TOKEN`
+2. `COPILOT_GH_ACCOUNT_GITHUB_2E_COM_JSDOTNET`
+3. existing `gh` keyring auth for `JSdotNet`
+
+If neither environment variable is set, do **not** fail yet; continue to Step 2 and verify
+whether `gh` already has a working `JSdotNet` keyring login.
 
 ```powershell
-if ([string]::IsNullOrWhiteSpace($env:JSDOTNET_GH_TOKEN)) {
-    Write-Error "JSDOTNET_GH_TOKEN is not set. Set the token and retry."
-    exit 1
+if (-not [string]::IsNullOrWhiteSpace($env:JSDOTNET_GH_TOKEN)) {
+    $resolvedToken = $env:JSDOTNET_GH_TOKEN
+} elseif (-not [string]::IsNullOrWhiteSpace($env:COPILOT_GH_ACCOUNT_GITHUB_2E_COM_JSDOTNET)) {
+    $resolvedToken = $env:COPILOT_GH_ACCOUNT_GITHUB_2E_COM_JSDOTNET
 }
 ```
 
 ### Step 2 — Verify auth and permissions
 
-Set `GH_TOKEN` and confirm the JSdotNet token works and has organization access before attempting PR creation.
+If a token was resolved, set `GH_TOKEN` from that token and confirm it works.
+If no token was resolved, remove `GH_TOKEN`, switch `gh` to the stored `JSdotNet` keyring
+account, and confirm that account works.
 
 ```powershell
-$env:GH_TOKEN = $env:JSDOTNET_GH_TOKEN
+if (-not [string]::IsNullOrWhiteSpace($resolvedToken)) {
+    $env:GH_TOKEN = $resolvedToken
+} else {
+    Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue
+    gh auth switch -u JSdotNet
+}
 gh auth status
 ```
 
 If `gh auth status` reports an error, or the account shown is not `JSdotNet`, stop and surface the exact error. Do not proceed to PR creation.
+If neither a resolved token nor a working `JSdotNet` keyring login is available, stop with a
+clear message explaining which credential sources were checked.
 
 ### Step 3 — Push branch if needed
 
@@ -80,10 +100,16 @@ If the push fails due to authentication, ensure the remote URL uses HTTPS and th
 
 ### Step 4 — Create the PR
 
-Create the PR with `gh pr create` using the JSdotNet token, then immediately unset `GH_TOKEN`.
+Create the PR with JSdotNet credentials, then immediately unset `GH_TOKEN` when a token source
+was used.
 
 ```powershell
-$env:GH_TOKEN = $env:JSDOTNET_GH_TOKEN
+if (-not [string]::IsNullOrWhiteSpace($resolvedToken)) {
+    $env:GH_TOKEN = $resolvedToken
+} else {
+    Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue
+    gh auth switch -u JSdotNet
+}
 
 gh pr create `
   --repo JSdotNet/Copilot `
@@ -95,7 +121,8 @@ gh pr create `
 Remove-Item Env:GH_TOKEN
 ```
 
-Only set `GH_TOKEN` for this command block. Remove it immediately after to avoid contaminating subsequent `gh` calls with JSdotNet credentials.
+Only set `GH_TOKEN` for this command block when a token source is being used. Remove it
+immediately after to avoid contaminating subsequent `gh` calls with JSdotNet credentials.
 
 ### Step 5 — Confirm and sync
 
@@ -119,7 +146,7 @@ Create a PR for my feature branch with:
 Create a draft PR to get early feedback:
 - Title: "WIP: Refactor plugin architecture"
 - Labels: enhancement, work-in-progress
-- Use `JSDOTNET_GH_TOKEN` for the PR command
+- Use JSdotNet credentials for the PR command
 ```
 
 ### Create a bug fix PR
@@ -145,7 +172,8 @@ Create a PR to fix the issue:
 - Do not execute any step of this workflow from a specialized agent that lacks shell tool access; switch to the default agent first.
 - Do not rely on prompt-only account switching for PR creation.
 - Do not fall back to the built-in `create_pull_request` tool when the PR must be authored as `JSdotNet`.
-- If `JSDOTNET_GH_TOKEN` is missing, stop and ask the user to provide it; do not guess or skip the token check.
+- Prefer `JSDOTNET_GH_TOKEN` when present, then `COPILOT_GH_ACCOUNT_GITHUB_2E_COM_JSDOTNET`, then a stored `gh` keyring login for `JSdotNet`.
+- If no JSdotNet credential source works, stop and surface exactly which sources were checked.
 - If organization authorization or SSO is missing for the JSdotNet token, surface the exact `gh` error and stop.
 - Always unset `GH_TOKEN` after the PR creation command to avoid credential leakage.
 

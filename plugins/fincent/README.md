@@ -71,7 +71,7 @@ flowchart LR
 | Skill | Purpose |
 |-------|---------|
 | `sprint-report` | Sprint report: completed vs scope, untested, by epic |
-| `automation-sprint-report` | Batch sprint reports for multiple sprints / a release |
+| `automation-sprint-review` | End-to-end sprint review pipeline: sprint reports, release report, and PPTX demo deck |
 | `release-report` | Release report: delivered vs scope, deferred, by epic, release notes draft |
 | `demo-presentation` | Generate a Fincent Review demo presentation (PPTX structure) |
 
