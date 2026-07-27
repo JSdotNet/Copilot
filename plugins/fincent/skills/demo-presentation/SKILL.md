@@ -14,6 +14,18 @@ Generate a demo presentation for a Fincent sprint review based on the Fincent Re
 PPTX template. The output is a structured Markdown document that mirrors every slide
 in the template; it can be presented directly or used to fill in the PPTX.
 
+## Template File
+
+The PowerPoint template is located at:
+`plugins/fincent/resources/fincent-review-template.pptx`
+
+When generating the `.pptx` directly (e.g. via `automation-sprint-review`), open this
+file as the base presentation with `python-pptx`. The relevant slide layouts are:
+
+- `Logo foto` — cover slide (slide 1).
+- `Title and Content 2` — title, demo divider, next, release, and info slides.
+- `Onze cultuur` — content slides (tasks, bugs, and per-epic slides).
+
 ## Fincent Review PPTX slide structure
 
 The template has 13 slides in the following order:

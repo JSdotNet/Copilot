@@ -69,18 +69,35 @@ phases 1 and 2.
 
 **Output format: PowerPoint (`.pptx`)**, not Markdown.
 
-Generate the presentation as a `.pptx` file using the `python-pptx` library:
+Generate the presentation using the Fincent Review template file:
+`plugins/fincent/resources/fincent-review-template.pptx`
+
+Use `python-pptx` to clone or populate the template:
 
 1. Install `python-pptx` if not available.
-2. Create slides following the Fincent Review PPTX template structure
-   (see `demo-presentation` skill for the slide order).
-3. Apply a clean slide layout:
-   - Title slide with sprint name, team, dates, and release.
-   - Content slides with bullet lists grouped by epic.
-   - Bug slide as a table.
-   - Demo divider slide.
-   - Next sprint and release slides.
-4. Save the file as `demo-{sprint-name}.pptx` in the working directory.
+2. Open the template file as the base presentation.
+3. Follow the template slide structure (layouts and ordering):
+
+| Slide | Layout | Content |
+|-------|--------|---------|
+| 1 | `Logo foto` | Cover slide — no changes needed. |
+| 2 | `Title and Content 2` | Title slide: sprint name, team, period. |
+| 3 | `Onze cultuur` | Implementatie wensen & taken — general completed tasks. |
+| 4 | `Onze cultuur` | Bugs — bug fixes delivered this sprint. |
+| 5–N | `Onze cultuur` | **One slide per epic** — list completed stories for that epic. |
+| N+1 | `Title and Content 2` | Demo divider slide — team name, date, release. |
+| N+2 | `Title and Content 2` | Next sprint / release info. |
+| N+3 | `Title and Content 2` | Release acceptance overview. |
+| N+4 | `Onze cultuur` | Next sprint planning — preliminary epic breakdown. |
+| N+5 | `Title and Content 2` | Informatie vanuit implementaties (implementation notes). |
+
+4. **One slide per epic** — for each epic that has completed stories, create a
+   separate slide using the `Onze cultuur` layout. The slide header contains the
+   sprint name, team, and period. The epic name is the section title. List the
+   completed stories as bullet points (summary + status).
+5. Remove any template placeholder slides that are not needed (e.g. extra epic
+   slides from the template that have no matching data).
+6. Save the file as `demo-{sprint-name}.pptx` in the working directory.
 
 If multiple sprints are requested, produce one combined `.pptx` covering all sprints.
 
