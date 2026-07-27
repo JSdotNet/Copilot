@@ -12,6 +12,12 @@ description: >
 Fetch and generate release reports for multiple `FIN` fixVersions in parallel, then produce a
 consolidated summary comparing delivery rates and trends across releases.
 
+## Jira Setup Reference
+
+Refer to `plugins/fincent/resources/jira-setup.md` for the Fincent Jira project
+configuration including the status flow, custom fields, fix version naming, labels,
+and epic ordering conventions.
+
 Use this skill when you need reports for several releases at once, for example to prepare a
 quarterly overview or a year-end retrospective.
 
