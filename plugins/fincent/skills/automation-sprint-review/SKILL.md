@@ -36,6 +36,7 @@ Provide:
 
 If the user asks for active sprints, a release, or a date range, resolve **all matching
 sprints** first and keep that full resolved list for the rest of the run.
+Never continue with only the first match when more than one sprint is found.
 
 ## Orchestration responsibilities
 
@@ -87,6 +88,25 @@ project = FIN AND fixVersion is not EMPTY ORDER BY fixVersion DESC
 ```
 Then extract the highest fixVersion from the results.
 
+## Resolving all sprints (mandatory completeness check)
+
+When sprint scope is not a single explicit sprint name, resolve sprints with an exhaustive
+union strategy before phase 1:
+
+1. Resolve direct sprint matches from user input (single or multiple named sprints).
+2. When scope is inferred (active sprint(s), release, or date range), query sprint lists
+   across all relevant states (`active`, `closed`, and `future` when applicable) and paginate.
+3. Cross-check with release issues by extracting all sprint names from matching issues
+   (for example from `project = FIN AND fixVersion = "{release name}"` with team filter when used).
+4. Union and de-duplicate sprint names from all sources, then sort chronologically.
+5. If the user stated an expected sprint count (for example "2 sprints"), verify the resolved
+   list count matches that expectation before generating artifacts.
+6. If there is a mismatch or ambiguity, stop and ask for confirmation instead of silently
+   dropping unresolved sprints.
+
+Before phase 2 starts, assert that phase 1 produced one sprint report artifact per resolved
+sprint. If not, rerun phase 1 for missing sprints and only continue when the set is complete.
+
 ## Execution Plan
 
 Execute the three phases **sequentially**. Each phase must receive the outputs and context
@@ -104,6 +124,8 @@ Pass in:
 Collect the full sprint report output (completed stories, bugs, scope changes, labels,
 story points, and sprint-goal evaluation).
 Save **one file per sprint** as `sprint-report-{sprint-name}.md` in the working directory.
+If the resolved sprint list contains `N` sprints, phase 1 must output exactly `N`
+per-sprint files.
 
 If more than one sprint is included, also produce a consolidated comparison file named
 `sprint-report-overview-{first-sprint-name}.md` that contains:
