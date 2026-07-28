@@ -1,21 +1,20 @@
 ---
-name: orch-setup
-description: 'Orchestrate .github setup and project scaffolding with Aspire integration and local validation. Use this skill to initialize development environment, setup repository workflows, create project structure with Aspire AppHost, validate compilation/testing, and confirm local run and monitoring for existing repositories.'
+name: orch-project
+description: 'Orchestrate project scaffolding and development environment setup for an existing repository. Use this skill after orch-repo to initialize the .github folder, coding guidelines, Aspire AppHost, project structure, and local validation. Assumes the repository already exists and is configured.'
 ---
 
-# Orchestrate Project Setup
+# Orchestrate Project
 
-Automate the complete project setup workflow for existing repositories using GitHub Copilot App canvas interface, including automated local validation and testing.
+Automate the complete project scaffolding workflow for an existing, configured repository using GitHub Copilot App canvas interface, including automated local validation and testing.
 
-> **Note:** This skill assumes your repository already exists. It focuses on setting up the development infrastructure, guidelines, and initial scaffolding with built-in validation.
+> **Note:** This skill assumes your repository already exists and is configured (branch protection, CI/CD, templates). Use `orch-repo` first to create and configure the repository, then use this skill to set up the development project inside it.
 
 ## Input Expectations
 
-- Repository name (must already exist on GitHub).
+- Repository name (must already exist on GitHub and be configured via `orch-repo`).
 - Project type (e.g., ASP.NET Core API with Aspire).
 - Language and framework preferences.
 - Aspire services to include (API, Database, Cache, Worker).
-- Whether to set up repository workflows and branch protection.
 
 ## Workflow Stages
 
@@ -182,4 +181,4 @@ If validation fails, the canvas displays:
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orch-project-setup/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-project/SKILL.md`
