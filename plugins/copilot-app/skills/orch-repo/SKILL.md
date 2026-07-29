@@ -47,7 +47,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 - **Configure merge strategies** (squash, merge commit, rebase).
 - **Enable auto-delete of head branches** after merge.
 
-**Agents:** `development:developer`  
+**Agents:** *(default)*  
 **Tools:** `gh api`, GitHub REST API
 
 ### Stage 3: GitHub Actions Workflows
@@ -58,7 +58,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 - **Configure workflow permissions** (least-privilege token scopes).
 - **Set up environments** (development, staging, production) with required reviewers if needed.
 
-**Agents:** `development:developer`, `csharp-coding:coding`
+**Agents:** *(default)*, `csharp-coding:coding`
 
 ### Stage 4: Issue and PR Templates
 
@@ -67,7 +67,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 - **Add `CODEOWNERS`** file to assign default reviewers per file path.
 - **Configure repository labels** (bug, feature, documentation, breaking-change, etc.).
 
-**Agents:** `development:developer`
+**Agents:** *(default)*
 
 ### Stage 5: Repository Governance (Optional)
 
@@ -77,7 +77,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 - **Invite collaborators or assign teams** with appropriate permission levels.
 - **Add a `SECURITY.md`** with responsible disclosure instructions.
 
-**Agents:** `development:developer`
+**Agents:** *(default)*
 
 ## Usage Pattern
 
