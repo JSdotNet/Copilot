@@ -1,6 +1,6 @@
 ---
 name: orch-repo
-description: 'Orchestrate GitHub repository creation and configuration for a new project. Use this skill to create the repository, configure branch protection, set up CI/CD workflows, add issue and PR templates, and establish repository governance. Run orch-project after this skill to scaffold the development project.'
+description: 'Orchestrate GitHub repository creation and configuration for a new project. Use this skill to create the repository, configure branch protection, add issue and PR templates, and establish repository governance. Run orch-project after this skill to scaffold the development project.'
 ---
 
 # Orchestrate Repository
@@ -13,9 +13,8 @@ Automate the complete GitHub repository creation and configuration workflow usin
 
 - Repository name and description.
 - Repository visibility (public or private).
-- Primary language and framework (for topic tags and workflow selection).
+- Primary language and framework (for topic tags).
 - Desired branch protection rules (default branch, required reviewers, status checks).
-- CI/CD requirements (build, test, release workflows).
 - Whether to add collaborators or teams.
 
 ## Workflow Stages
@@ -50,17 +49,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 **Agents:** *(default)*  
 **Tools:** `gh api`, GitHub REST API
 
-### Stage 3: GitHub Actions Workflows
-
-- **Add CI workflow** to build and test on pull requests and pushes.
-- **Add release workflow** for versioning and publishing (if applicable).
-- **Add dependency review workflow** for supply-chain security checks.
-- **Configure workflow permissions** (least-privilege token scopes).
-- **Set up environments** (development, staging, production) with required reviewers if needed.
-
-**Agents:** *(default)*, `csharp-coding:coding`
-
-### Stage 4: Issue and PR Templates
+### Stage 3: Issue and PR Templates
 
 - **Create issue templates** (bug report, feature request, question).
 - **Create pull request template** with a standard checklist.
@@ -69,7 +58,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 **Agents:** *(default)*
 
-### Stage 5: Repository Governance (Optional)
+### Stage 4: Repository Governance (Optional)
 
 - **Configure Dependabot** for automated dependency updates and security alerts.
 - **Enable GitHub security features** (secret scanning, code scanning with CodeQL).
@@ -88,7 +77,6 @@ Orchestrate repository setup for:
 - Visibility: private
 - Language: C#
 - Branch protection: require 1 review, require CI to pass
-- CI: build + test on PR, release on tag push
 - Add collaborators: team "backend-devs" (write access)
 ```
 
@@ -96,7 +84,6 @@ Orchestrate repository setup for:
 
 - Repository created and visible on GitHub.
 - Default branch created and protected.
-- CI/CD workflows committed and running on first push.
 - Issue templates, PR template, and `CODEOWNERS` in place.
 - Dependabot and security scanning enabled.
 - Collaborators or teams invited with correct permissions.
@@ -108,11 +95,11 @@ Orchestrate repository setup for:
 |---------|------------|---------------|
 | Create GitHub repository | ✅ | ❌ |
 | Branch protection and merge rules | ✅ | ❌ |
-| CI/CD GitHub Actions workflows | ✅ | ❌ |
 | Issue and PR templates | ✅ | ❌ |
 | Repository governance (Dependabot, CodeQL) | ✅ | ❌ |
 | `.github/copilot-instructions.md` | ❌ | ✅ |
 | `.github/instructions/` coding guidelines | ❌ | ✅ |
+| GitHub Actions CI/CD workflows | ❌ | ✅ |
 | Aspire AppHost and service scaffolding | ❌ | ✅ |
 | Project directory structure (`src/`, `tests/`) | ❌ | ✅ |
 | Build and test validation | ❌ | ✅ |
@@ -127,7 +114,6 @@ Orchestrate repository setup for:
 
 - Repository configuration form (name, visibility, topics, license)
 - Branch protection rule builder
-- Workflow selector (CI, release, Dependabot, CodeQL)
 - Template and label configurator
 - Progress tracker for each workflow stage
 - Repository readiness summary with links to created resources

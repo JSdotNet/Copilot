@@ -7,7 +7,7 @@ description: 'Orchestrate project scaffolding and development environment setup 
 
 Automate the complete project scaffolding workflow for an existing, configured repository using GitHub Copilot App canvas interface, including automated local validation and testing.
 
-> **Note:** This skill assumes your repository already exists and is configured (branch protection, CI/CD, templates). Use `orch-repo` first to create and configure the repository, then use this skill to set up the development project inside it.
+> **Note:** This skill assumes your repository already exists and is configured (branch protection, templates, Dependabot). Use `orch-repo` first to create and configure the repository, then use this skill to set up the development project inside it.
 
 ## Input Expectations
 
@@ -30,7 +30,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
   - Review guidelines
   - Release procedures
 - **Create `.github/instructions/` files** for developer guidance
-- **Setup GitHub workflows** (CI/CD templates, branch protection, issue templates)
+- **Setup GitHub Actions workflows** (CI build, test, release pipelines)
 - **Create `.github/copilot-settings.json`** for Copilot configuration
 
 **Agents:** `csharp-coding:coding`, `development:developer`  
