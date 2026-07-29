@@ -79,12 +79,14 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 ### Stage 6: Issue and PR Templates
 
+- **Query `JSdotNet.MCP.Guidelines`** to retrieve recommended issue template structures, PR checklist standards, and label conventions.
 - **Create issue templates** (bug report, feature request, question).
 - **Create pull request template** with a standard checklist.
 - **Add `CODEOWNERS`** file to assign default reviewers per file path.
 - **Configure repository labels** (bug, feature, documentation, breaking-change, etc.).
 
-**Agents:** *(default)*
+**Agents:** *(default)*  
+**MCP Server:** `JSdotNet.MCP.Guidelines` for template and label conventions
 
 ### Stage 7: Repository Governance (Optional)
 
