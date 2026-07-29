@@ -30,13 +30,22 @@ Automate the complete project scaffolding workflow for an existing, configured r
   - Review guidelines
   - Release procedures
 - **Create `.github/instructions/` files** for developer guidance
-- **Setup GitHub Actions workflows** (CI build, test, release pipelines)
 - **Create `.github/copilot-settings.json`** for Copilot configuration
 
 **Agents:** `csharp-coding:coding`, `development:developer`  
 **MCP Server:** `JSdotNet.MCP.Guidelines` for guideline generation
 
-### Stage 2: Architecture & Planning
+### Stage 2: GitHub Actions Workflows
+
+- **Add CI workflow** to build and test on pull requests and pushes.
+- **Add release workflow** for versioning and publishing (if applicable).
+- **Add dependency review workflow** for supply-chain security checks.
+- **Configure workflow permissions** (least-privilege token scopes).
+- **Set up environments** (development, staging, production) with required reviewers if needed.
+
+**Agents:** `csharp-coding:coding`
+
+### Stage 3: Architecture & Planning
 - **Define target architecture** for initial setup
 - **Capture API contracts** and data model boundaries
 - **Plan integration points** across services
@@ -44,7 +53,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 **Agents:** `architecture:architect`, `development:development-plan`
 
-### Stage 3: Tooling & Dependencies
+### Stage 4: Tooling & Dependencies
 - **Install base dependencies** (frameworks, SDKs)
 - **Configure build & test pipelines**
 - **Set up linting and code quality tools**
@@ -52,7 +61,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 **Agents:** `csharp-coding:coding`, `development:developer`
 
-### Stage 4: Aspire AppHost & Project Scaffolding
+### Stage 5: Aspire AppHost & Project Scaffolding
 
 This stage combines AppHost creation and initial project scaffolding because they are
 interdependent — the example service references AppHost configuration, service
@@ -77,13 +86,13 @@ discovery, and health checks.
 **Agents:** `csharp-coding:coding`, `development:developer`  
 **Skills Used:** `aspire` skill from development plugin
 
-### Stage 5: Build & Test Validation
+### Stage 6: Build & Test Validation
 
 - **Compile all projects** to verify no build errors
 - **Run unit test suite** to verify test framework works
 - **Execute integration tests** against AppHost
 
-### Stage 6: Running Application Validation & Recording
+### Stage 7: Running Application Validation & Recording
 - **Start Aspire AppHost** (`aspire run`) and confirm startup stability
 - **Verify dashboard** is accessible and services are running
 - **Check health endpoints** of all services
