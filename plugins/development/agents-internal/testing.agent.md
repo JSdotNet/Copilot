@@ -1,7 +1,7 @@
 ---
 description: Testing specialist for writing and maintaining unit and integration tests from approved plans.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'terminal/runInTerminal']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal']
 ---
 
 # Testing Agent

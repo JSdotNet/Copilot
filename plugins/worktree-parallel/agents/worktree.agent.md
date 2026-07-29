@@ -1,7 +1,7 @@
 ---
 description: "Worktree Parallel: Orchestrate parallel work across isolated git worktrees using the active agent."
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'vscode/askQuestions', 'vscode/openFile', 'terminal/runInTerminal']
+tools: ['read/readFile', 'vscode/askQuestions', 'vscode/openFile', 'agent', 'terminal/runInTerminal']
 ---
 
 # Worktree Parallel Agent

@@ -1,7 +1,7 @@
 ---
 description: Interactive development planning agent that researches, aligns, and produces approved implementation plans for execution handoff.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'vscode/askQuestions', 'terminal/runInTerminal']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'agent', 'vscode/askQuestions', 'terminal/runInTerminal']
 agents: ['Explore']
 handoffs:
   - label: Architecture Review

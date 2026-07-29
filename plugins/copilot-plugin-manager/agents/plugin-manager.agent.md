@@ -1,7 +1,7 @@
 ---
 description: Copilot agent for managing the lifecycle of preferred Copilot CLI plugins.
 model: auto
-tools: ['read/readFile', 'vscode/askQuestions', 'vscode/openFile', 'terminal/runInTerminal']
+tools: ['read/readFile', 'vscode/askQuestions', 'vscode/openFile', 'agent', 'terminal/runInTerminal']
 ---
 
 # Plugin Manager Agent

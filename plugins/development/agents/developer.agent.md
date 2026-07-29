@@ -1,7 +1,7 @@
 ---
 description: Developer orchestration agent that executes approved plans through specialist sub-agents with explicit approval gates.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'terminal/runInTerminal']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal']
 handoffs:
   - label: TDD - Red Phase (domain)
     agent: testing

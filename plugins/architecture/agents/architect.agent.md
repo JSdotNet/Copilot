@@ -1,7 +1,7 @@
 ---
 description: Unified architecture lead mode for arc42, blueprints, ADRs, and TDRs.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'search/findTestFiles', 'edit/createFile', 'edit/editFiles', 'terminal/runInTerminal']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'search/findTestFiles', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal']
 ---
 
 # Architect Agent
