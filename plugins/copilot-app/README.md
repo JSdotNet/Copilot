@@ -8,7 +8,8 @@ This plugin provides specialized skills for GitHub Copilot App users who need to
 
 1. **Create Pull Requests** efficiently in any JSdotNet organization repository
 2. **Orchestrate Development Tasks** with local-first canvas interfaces including:
-   - Project setup with `.github` folder initialization
+   - Repository creation and configuration (`orch-repo`)
+   - Project setup with `.github` folder initialization (`orch-project`)
    - MVP creation and sprint planning
    - Package/dependency updates with security scanning
    - Aspire upgrade orchestration with plan refinement and feature adoption
@@ -28,7 +29,8 @@ Each orchestration skill coordinates multiple agents from other plugins (develop
 ### Skills
 
 - `skills/pr-jsdotnet/SKILL.md` - Create PRs across all JSdotNet organization repositories
-- `skills/orch-setup/SKILL.md` - Setup `.github` folder, guidelines, and Aspire scaffolding
+- `skills/orch-repo/SKILL.md` - Create and configure a new GitHub repository (branch protection, CI/CD, templates)
+- `skills/orch-project/SKILL.md` - Set up development project inside an existing repository (`.github/`, guidelines, Aspire scaffolding)
 - `skills/orch-create-mvp/SKILL.md` - MVP development from planning to local run and monitoring (canvas)
 - `skills/orch-update-packages/SKILL.md` - Safe, coordinated dependency updates with local validation (canvas)
 - `skills/orch-aspire-update/SKILL.md` - Plan-first Aspire upgrade and new feature adoption (canvas)
@@ -57,7 +59,7 @@ copilot plugin list
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- - In the command palette: `orch-setup`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
+- - In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -107,11 +109,22 @@ Invoke: pr-jsdotnet
 - PR creation path: `gh pr create` with `JSDOTNET_GH_TOKEN`
 ```
 
-### Orchestrate Setup
+### Orchestrate Repository Setup
 
 ```
-Invoke: orch-setup
-- Repository: "MyAwesomeAPI" (already exists)
+Invoke: orch-repo
+- Name: "MyAwesomeAPI"
+- Description: "ASP.NET Core REST API for order management"
+- Visibility: private
+- Branch protection: require 1 review, require CI to pass
+- CI: build + test on PR, release on tag push
+```
+
+### Orchestrate Project Setup
+
+```
+Invoke: orch-project
+- Repository: "MyAwesomeAPI" (already exists and is configured)
 - Setup .github folder with guidelines (`jsdotnet-project-guidelines-mcpserver`)
 - Create Aspire AppHost for distributed services
 - Validate compilation and local run monitoring
@@ -268,7 +281,8 @@ require explicit user approval per the repository handoff policy.
 
 The orchestration skills are designed to coordinate with other plugin skills:
 
-- `orch-setup` uses the `aspire` skill from the development plugin
+- `orch-repo` creates and configures the repository; `orch-project` scaffolds the development project inside it — use them sequentially
+- `orch-project` uses the `aspire` skill from the development plugin
 - `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
 - `orch-architecture` uses the `architecture:architect` agent directly after MCP-based context gathering
 - `orch-arc42` uses `architecture-arc42-generator` after MCP-based context gathering

@@ -1,21 +1,20 @@
 ---
-name: orch-setup
-description: 'Orchestrate .github setup and project scaffolding with Aspire integration and local validation. Use this skill to initialize development environment, setup repository workflows, create project structure with Aspire AppHost, validate compilation/testing, and confirm local run and monitoring for existing repositories.'
+name: orch-project
+description: 'Orchestrate project scaffolding and development environment setup for an existing repository. Use this skill after orch-repo to initialize the .github folder, coding guidelines, Aspire AppHost, project structure, and local validation. Assumes the repository already exists and is configured.'
 ---
 
-# Orchestrate Project Setup
+# Orchestrate Project
 
-Automate the complete project setup workflow for existing repositories using GitHub Copilot App canvas interface, including automated local validation and testing.
+Automate the complete project scaffolding workflow for an existing, configured repository using GitHub Copilot App canvas interface, including automated local validation and testing.
 
-> **Note:** This skill assumes your repository already exists. It focuses on setting up the development infrastructure, guidelines, and initial scaffolding with built-in validation.
+> **Note:** This skill assumes your repository already exists and is configured (README, Copilot instructions, MCP servers, branch protection, templates). Use `orch-repo` first to create and configure the repository, then use this skill to scaffold the development project inside it.
 
 ## Input Expectations
 
-- Repository name (must already exist on GitHub).
+- Repository name (must already exist on GitHub and be configured via `orch-repo`).
 - Project type (e.g., ASP.NET Core API with Aspire).
 - Language and framework preferences.
 - Aspire services to include (API, Database, Cache, Worker).
-- Whether to set up repository workflows and branch protection.
 
 ## Workflow Stages
 
@@ -25,19 +24,28 @@ Automate the complete project setup workflow for existing repositories using Git
 
 ### Stage 1: GitHub Folder Setup (Foundation)
 - **Initialize `.github/` directory structure** with recommended layouts
-- **Generate project guidelines** using `jsdotnet-project-guidelines-mcpserver`:
+- **Generate project guidelines** using `JSdotNet.MCP.Guidelines`:
   - Coding standards and patterns
   - Git workflow conventions
   - Review guidelines
   - Release procedures
 - **Create `.github/instructions/` files** for developer guidance
-- **Setup GitHub workflows** (CI/CD templates, branch protection, issue templates)
 - **Create `.github/copilot-settings.json`** for Copilot configuration
 
 **Agents:** `csharp-coding:coding`, `development:developer`  
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver` for guideline generation
+**MCP Server:** `JSdotNet.MCP.Guidelines` for guideline generation
 
-### Stage 2: Architecture & Planning
+### Stage 2: GitHub Actions Workflows
+
+- **Add CI workflow** to build and test on pull requests and pushes.
+- **Add release workflow** for versioning and publishing (if applicable).
+- **Add dependency review workflow** for supply-chain security checks.
+- **Configure workflow permissions** (least-privilege token scopes).
+- **Set up environments** (development, staging, production) with required reviewers if needed.
+
+**Agents:** `csharp-coding:coding`
+
+### Stage 3: Architecture & Planning
 - **Define target architecture** for initial setup
 - **Capture API contracts** and data model boundaries
 - **Plan integration points** across services
@@ -45,7 +53,7 @@ Automate the complete project setup workflow for existing repositories using Git
 
 **Agents:** `architecture:architect`, `development:development-plan`
 
-### Stage 3: Tooling & Dependencies
+### Stage 4: Tooling & Dependencies
 - **Install base dependencies** (frameworks, SDKs)
 - **Configure build & test pipelines**
 - **Set up linting and code quality tools**
@@ -53,7 +61,7 @@ Automate the complete project setup workflow for existing repositories using Git
 
 **Agents:** `csharp-coding:coding`, `development:developer`
 
-### Stage 4: Aspire AppHost & Project Scaffolding
+### Stage 5: Aspire AppHost & Project Scaffolding
 
 This stage combines AppHost creation and initial project scaffolding because they are
 interdependent — the example service references AppHost configuration, service
@@ -78,13 +86,13 @@ discovery, and health checks.
 **Agents:** `csharp-coding:coding`, `development:developer`  
 **Skills Used:** `aspire` skill from development plugin
 
-### Stage 5: Build & Test Validation
+### Stage 6: Build & Test Validation
 
 - **Compile all projects** to verify no build errors
 - **Run unit test suite** to verify test framework works
 - **Execute integration tests** against AppHost
 
-### Stage 6: Running Application Validation & Recording
+### Stage 7: Running Application Validation & Recording
 - **Start Aspire AppHost** (`aspire run`) and confirm startup stability
 - **Verify dashboard** is accessible and services are running
 - **Check health endpoints** of all services
@@ -182,4 +190,4 @@ If validation fails, the canvas displays:
 
 ## Reference
 
-Source skill location: `plugins/copilot-app/skills/orch-project-setup/SKILL.md`
+Source skill location: `plugins/copilot-app/skills/orch-project/SKILL.md`
