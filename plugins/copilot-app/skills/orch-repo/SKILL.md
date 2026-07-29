@@ -54,11 +54,13 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 ### Stage 4: MCP Configuration
 
+- **Query `jsdotnet-project-guidelines-mcpserver`** to retrieve recommended MCP server selections and configuration patterns for the project type.
 - **Configure MCP servers** in `.github/github-app.yml`:
   - Select and enable relevant MCP servers for the project (e.g., `jsdotnet-project-guidelines-mcpserver`, `jsdotnet-design-mcpserver`).
   - Set server-level permissions and scopes.
 
 **Agents:** *(default)*  
+**MCP Server:** `jsdotnet-project-guidelines-mcpserver` for server selection guidance  
 **Tools:** `.github/github-app.yml`
 
 ### Stage 5: Branch Protection
