@@ -7,7 +7,7 @@ description: 'Orchestrate project scaffolding and development environment setup 
 
 Automate the complete project scaffolding workflow for an existing, configured repository using GitHub Copilot App canvas interface, including automated local validation and testing.
 
-> **Note:** This skill assumes your repository already exists and is configured (branch protection, templates, Dependabot). Use `orch-repo` first to create and configure the repository, then use this skill to set up the development project inside it.
+> **Note:** This skill assumes your repository already exists and is configured (README, Copilot instructions, MCP servers, branch protection, templates). Use `orch-repo` first to create and configure the repository, then use this skill to scaffold the development project inside it.
 
 ## Input Expectations
 

@@ -1,6 +1,6 @@
 ---
 name: orch-repo
-description: 'Orchestrate GitHub repository creation and configuration for a new project. Use this skill to create the repository, configure branch protection, add issue and PR templates, and establish repository governance. Run orch-project after this skill to scaffold the development project.'
+description: 'Orchestrate GitHub repository creation and configuration for a new project. Use this skill to create the repository, expand the README, configure Copilot instructions, set up MCP servers, configure branch protection, add issue and PR templates, and establish repository governance. Run orch-project after this skill to scaffold the development project.'
 ---
 
 # Orchestrate Repository
@@ -15,6 +15,7 @@ Automate the complete GitHub repository creation and configuration workflow usin
 - Repository visibility (public or private).
 - Primary language and framework (for topic tags).
 - Desired branch protection rules (default branch, required reviewers, status checks).
+- MCP servers to enable for this repository.
 - Whether to add collaborators or teams.
 
 ## Workflow Stages
@@ -36,7 +37,18 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 - **Apply `.gitignore`** for the target language or framework.
 - **Select a license** if applicable.
 
-### Stage 2: Branch Protection
+### Stage 2: README, Instructions & MCP Configuration
+
+- **Expand `README.md`** with project description, architecture overview, setup steps, and contribution guide.
+- **Create `.github/copilot-instructions.md`** with repository-wide Copilot context (tech stack, conventions, key patterns).
+- **Configure MCP servers** in `.github/github-app.yml`:
+  - Select and enable relevant MCP servers for the project (e.g., `jsdotnet-project-guidelines-mcpserver`, `jsdotnet-design-mcpserver`).
+  - Set server-level permissions and scopes.
+- **Add any repo-level instruction files** needed before project scaffolding begins.
+
+**Agents:** *(default)*
+
+### Stage 3: Branch Protection
 
 - **Protect the default branch** with appropriate rules:
   - Require pull request reviews before merging.
@@ -49,7 +61,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 **Agents:** *(default)*  
 **Tools:** `gh api`, GitHub REST API
 
-### Stage 3: Issue and PR Templates
+### Stage 4: Issue and PR Templates
 
 - **Create issue templates** (bug report, feature request, question).
 - **Create pull request template** with a standard checklist.
@@ -58,7 +70,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 **Agents:** *(default)*
 
-### Stage 4: Repository Governance (Optional)
+### Stage 5: Repository Governance (Optional)
 
 - **Configure Dependabot** for automated dependency updates and security alerts.
 - **Enable GitHub security features** (secret scanning, code scanning with CodeQL).
@@ -83,6 +95,9 @@ Orchestrate repository setup for:
 ## Output Expectations
 
 - Repository created and visible on GitHub.
+- `README.md` expanded with project description and setup steps.
+- `.github/copilot-instructions.md` created with repository-wide Copilot context.
+- MCP servers configured in `.github/github-app.yml`.
 - Default branch created and protected.
 - Issue templates, PR template, and `CODEOWNERS` in place.
 - Dependabot and security scanning enabled.
@@ -94,10 +109,12 @@ Orchestrate repository setup for:
 | Concern | `orch-repo` | `orch-project` |
 |---------|------------|---------------|
 | Create GitHub repository | ✅ | ❌ |
+| `README.md` (project description, setup steps) | ✅ | ❌ |
+| `.github/copilot-instructions.md` (repo-wide context) | ✅ | ❌ |
+| MCP server configuration (`github-app.yml`) | ✅ | ❌ |
 | Branch protection and merge rules | ✅ | ❌ |
 | Issue and PR templates | ✅ | ❌ |
 | Repository governance (Dependabot, CodeQL) | ✅ | ❌ |
-| `.github/copilot-instructions.md` | ❌ | ✅ |
 | `.github/instructions/` coding guidelines | ❌ | ✅ |
 | GitHub Actions CI/CD workflows | ❌ | ✅ |
 | Aspire AppHost and service scaffolding | ❌ | ✅ |
@@ -113,6 +130,8 @@ Orchestrate repository setup for:
 > are implemented yet. The skill currently operates through standard chat interaction.
 
 - Repository configuration form (name, visibility, topics, license)
+- README editor with project description and setup steps
+- MCP server selector and configuration panel
 - Branch protection rule builder
 - Template and label configurator
 - Progress tracker for each workflow stage
