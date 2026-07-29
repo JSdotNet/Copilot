@@ -37,18 +37,31 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 - **Apply `.gitignore`** for the target language or framework.
 - **Select a license** if applicable.
 
-### Stage 2: README, Instructions & MCP Configuration
+### Stage 2: README
 
 - **Expand `README.md`** with project description, architecture overview, setup steps, and contribution guide.
-- **Create `.github/copilot-instructions.md`** with repository-wide Copilot context (tech stack, conventions, key patterns).
+
+**Skills:** `readme-blueprint-generator`  
+**Agents:** *(default)*
+
+### Stage 3: Copilot Instructions
+
+- **Create `.github/copilot-instructions.md`** with repository-wide Copilot context (tech stack, conventions, key patterns, agent guidance).
+- **Add any repo-level instruction files** under `.github/instructions/` needed before project scaffolding begins.
+
+**Skills:** `copilot-instructions-blueprint-generator`  
+**Agents:** *(default)*
+
+### Stage 4: MCP Configuration
+
 - **Configure MCP servers** in `.github/github-app.yml`:
   - Select and enable relevant MCP servers for the project (e.g., `jsdotnet-project-guidelines-mcpserver`, `jsdotnet-design-mcpserver`).
   - Set server-level permissions and scopes.
-- **Add any repo-level instruction files** needed before project scaffolding begins.
 
-**Agents:** *(default)*
+**Agents:** *(default)*  
+**Tools:** `.github/github-app.yml`
 
-### Stage 3: Branch Protection
+### Stage 5: Branch Protection
 
 - **Protect the default branch** with appropriate rules:
   - Require pull request reviews before merging.
@@ -61,7 +74,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 **Agents:** *(default)*  
 **Tools:** `gh api`, GitHub REST API
 
-### Stage 4: Issue and PR Templates
+### Stage 6: Issue and PR Templates
 
 - **Create issue templates** (bug report, feature request, question).
 - **Create pull request template** with a standard checklist.
@@ -70,7 +83,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 **Agents:** *(default)*
 
-### Stage 5: Repository Governance (Optional)
+### Stage 7: Repository Governance (Optional)
 
 - **Configure Dependabot** for automated dependency updates and security alerts.
 - **Enable GitHub security features** (secret scanning, code scanning with CodeQL).
