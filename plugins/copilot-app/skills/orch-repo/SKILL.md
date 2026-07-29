@@ -46,11 +46,13 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 ### Stage 3: Copilot Instructions
 
+- **Query `jsdotnet-project-guidelines-mcpserver`** to retrieve coding standards, conventions, and agent guidance relevant to the project type.
 - **Create `.github/copilot-instructions.md`** with repository-wide Copilot context (tech stack, conventions, key patterns, agent guidance).
 - **Add any repo-level instruction files** under `.github/instructions/` needed before project scaffolding begins.
 
 **Skills:** `copilot-instructions-blueprint-generator`  
-**Agents:** *(default)*
+**Agents:** *(default)*  
+**MCP Server:** `jsdotnet-project-guidelines-mcpserver` for conventions and agent guidance
 
 ### Stage 4: MCP Configuration
 
