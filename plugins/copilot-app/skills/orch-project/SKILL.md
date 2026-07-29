@@ -24,7 +24,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 ### Stage 1: GitHub Folder Setup (Foundation)
 - **Initialize `.github/` directory structure** with recommended layouts
-- **Generate project guidelines** using `jsdotnet-project-guidelines-mcpserver`:
+- **Generate project guidelines** using `JSdotNet.MCP.Guidelines`:
   - Coding standards and patterns
   - Git workflow conventions
   - Review guidelines
@@ -34,7 +34,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 - **Create `.github/copilot-settings.json`** for Copilot configuration
 
 **Agents:** `csharp-coding:coding`, `development:developer`  
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver` for guideline generation
+**MCP Server:** `JSdotNet.MCP.Guidelines` for guideline generation
 
 ### Stage 2: Architecture & Planning
 - **Define target architecture** for initial setup
