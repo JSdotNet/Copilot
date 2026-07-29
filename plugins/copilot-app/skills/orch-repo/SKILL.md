@@ -24,16 +24,18 @@ Automate the complete GitHub repository creation and configuration workflow usin
 > not installed, skip the stage or perform it manually and continue with remaining
 > stages. All agent transitions require explicit user approval before switching.
 
-### Stage 1: Repository Creation
+### Stage 1: Repository Creation *(Manual)*
 
-- **Create the GitHub repository** with name, description, and visibility.
+> Run the command below manually. The remaining stages are agent-assisted.
+
+```bash
+gh repo create <org>/<name> --description "<description>" --private --clone
+```
+
 - **Set default branch** (typically `main`) and initialize with a `README.md`.
 - **Add repository topics** relevant to the language and domain.
 - **Apply `.gitignore`** for the target language or framework.
 - **Select a license** if applicable.
-
-**Agents:** `development:developer`  
-**Tools:** `gh repo create`
 
 ### Stage 2: Branch Protection
 
