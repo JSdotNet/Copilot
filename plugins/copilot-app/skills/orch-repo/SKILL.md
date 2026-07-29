@@ -41,7 +41,6 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 - **Expand `README.md`** with project description, architecture overview, setup steps, and contribution guide.
 
-**Skills:** `readme-blueprint-generator`  
 **Agents:** `documentation:profile` *(preferred)*, *(default)*
 
 ### Stage 3: MCP Configuration
