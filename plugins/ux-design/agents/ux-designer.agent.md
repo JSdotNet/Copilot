@@ -1,7 +1,7 @@
 ---
 description: UX design expert for wireframes, design guidelines, user flows, and UI/UX reviews.
 model: auto
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'terminal/runInTerminal']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal']
 handoffs:
   - label: Document Design Decision
     agent: architect
