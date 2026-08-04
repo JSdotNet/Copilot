@@ -52,8 +52,8 @@ Each orchestration skill coordinates multiple agents from other plugins (develop
 ### Canvas Extensions
 
 - `extensions/orch-dashboard/` - Live progress and output dashboard for all `orch-*` skills. See `extensions/orch-dashboard/README.md` for the canvas action contract and install instructions.
-- `extensions/diagram-canvas/` - Mermaid diagram viewer canvas (`mermaid-diagram`), shared with the `architecture`, `domain-design`, and `ux-design` plugins. Installs and runs independently of `copilot-app` — see `extensions/diagram-canvas/README.md`.
-- `extensions/markdown-canvas/` - Markdown document preview canvas (`markdown-preview`), shared with the `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` plugins. Installs and runs independently of `copilot-app` — see `extensions/markdown-canvas/README.md`.
+- `extensions/diagram-canvas/` - Mermaid diagram viewer canvas (`mermaid-diagram`), opened by `orch-*` skills on behalf of the `architecture`, `domain-design`, and `ux-design` agents they coordinate — those plugins have no direct dependency on it. Installs and runs independently of `copilot-app` — see `extensions/diagram-canvas/README.md`.
+- `extensions/markdown-canvas/` - Markdown document preview canvas (`markdown-preview`), opened by `orch-*` skills on behalf of the `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` agents they coordinate — those plugins have no direct dependency on it. Installs and runs independently of `copilot-app` — see `extensions/markdown-canvas/README.md`.
 
 ## Install
 
@@ -89,7 +89,7 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 
 ## Key Features
 
-- **Canvas Interfaces** - Interactive orchestration progress/output dashboard (`extensions/orch-dashboard/`) driven by every `orch-*` skill, plus live Mermaid diagram (`extensions/diagram-canvas/`) and Markdown document preview (`extensions/markdown-canvas/`) canvases shared with the architecture/domain-design/ux-design/documentation/product-owner plugins
+- **Canvas Interfaces** - Interactive orchestration progress/output dashboard (`extensions/orch-dashboard/`) driven by every `orch-*` skill, plus live Mermaid diagram (`extensions/diagram-canvas/`) and Markdown document preview (`extensions/markdown-canvas/`) canvases that `orch-*` skills open on behalf of the architecture/domain-design/ux-design/documentation/product-owner agents they coordinate — those content plugins are unaware of and do not depend on either canvas extension
 - **TDD Bug Fixes** - Solve bugs by creating tests first with csharp-coding agent
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
 - **Project Guidelines** - Uses `jsdotnet-project-guidelines-mcpserver` for consistent standards

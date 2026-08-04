@@ -104,6 +104,12 @@ interaction.
   findings) so the dashboard renders QA results with evidence inline.
 - Call `finish_run` with the final status and a summary once the module
   runs locally and passes its checks.
+- During **Module Scope & Contract**, also open/update `markdown-canvas`
+  (`markdown-preview`) with the drafted acceptance criteria, and during
+  **Architecture & Design**, open/update `markdown-canvas` with the module
+  design documentation and `diagram-canvas` (`mermaid-diagram`) with any
+  accompanying Mermaid diagrams, per `instructions/canvas-usage.instructions.md`.
+  Optional; skip gracefully if not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

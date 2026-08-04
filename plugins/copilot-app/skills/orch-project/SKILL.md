@@ -164,6 +164,11 @@ interaction.
   findings) so the dashboard renders QA results with evidence inline.
 - Call `finish_run` with the final status and a summary once the project is
   scaffolded and validated locally.
+- During **Architecture & Planning**, also open/update `markdown-canvas`
+  (`markdown-preview`) with the drafted architecture documentation and
+  `diagram-canvas` (`mermaid-diagram`) with any accompanying Mermaid diagrams,
+  per `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if
+  not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

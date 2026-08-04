@@ -114,12 +114,12 @@ repo.
   - Source path: `plugins/copilot-app/extensions/diagram-canvas`
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas`
   - Canvas: `mermaid-diagram` (interactive C4/sequence/state/deployment/DDD/wireframe diagram viewer).
-  - Used by: `architecture`, `domain-design`, `ux-design`, and `copilot-app` plugins when installed alongside them. Ships inside `copilot-app` but installs and runs independently — installing `copilot-app` alone does not install it for the other plugins.
+  - Used by: `copilot-app`'s `orch-*` orchestration skills, which open/update this canvas on behalf of the `architecture`, `domain-design`, and `ux-design` agents they coordinate. Those content plugins have no direct dependency on this extension. Ships inside `copilot-app` but installs and runs independently.
 - `markdown-canvas` (`1.0.0`)
   - Source path: `plugins/copilot-app/extensions/markdown-canvas`
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`
   - Canvas: `markdown-preview` (live ADR/TDR/arc42/backlog document preview).
-  - Used by: `architecture`, `domain-design`, `ux-design`, `documentation`, `product-owner`, and `copilot-app` plugins when installed alongside them. Ships inside `copilot-app` but installs and runs independently — installing `copilot-app` alone does not install it for the other plugins.
+  - Used by: `copilot-app`'s `orch-*` orchestration skills, which open/update this canvas on behalf of the `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` agents they coordinate. Those content plugins have no direct dependency on this extension. Ships inside `copilot-app` but installs and runs independently.
 - `orch-dashboard` (`1`)
   - Source path: `plugins/copilot-app/extensions/orch-dashboard`
   - Install: `install_extension` tool with `https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard` (not `copilot plugin install` — this extension has no standalone `.github/plugin/plugin.json`).

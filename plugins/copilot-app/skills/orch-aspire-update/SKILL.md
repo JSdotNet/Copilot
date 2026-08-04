@@ -121,6 +121,9 @@ interaction.
   findings) so the dashboard renders QA results with evidence inline.
 - Call `finish_run` with the final status and a summary once the upgrade is
   validated locally.
+- During **Plan Refinement**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the refined upgrade plan, per `instructions/canvas-usage.instructions.md`.
+  Optional; skip gracefully if not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

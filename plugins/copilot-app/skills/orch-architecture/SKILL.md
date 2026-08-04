@@ -77,6 +77,10 @@ interaction.
   guidelines, findings, or review feedback.
 - Call `finish_run` with the final status and a summary once the result is
   review-ready.
+- During **Drafting & Review**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the drafted Markdown result, and `diagram-canvas` (`mermaid-diagram`) if the
+  result includes Mermaid diagrams, per `instructions/canvas-usage.instructions.md`.
+  Optional; skip gracefully if not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.
