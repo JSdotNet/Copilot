@@ -21,6 +21,7 @@ This plugin provides specialized skills for GitHub Copilot App users who need to
    - Bug triage with test-driven development (TDD)
    - Module creation inside existing projects
    - New service creation in existing projects
+   - Runtime validation (Local Run & Monitoring stages) driven by the `qa` plugin's `qa`/`qa-monitor` agents for Playwright evidence and continuous Aspire monitoring
 
 Each orchestration skill coordinates multiple agents from other plugins (development, architecture, product-owner, csharp-coding, review) to execute complete workflows. Agent transitions require explicit user approval. Cross-plugin agents are recommended but not required — skills degrade gracefully when optional plugins are missing.
 
@@ -95,6 +96,10 @@ This plugin works best with the following installed plugins:
 - `csharp-coding` - For code implementation with TDD
 - `product-owner` - For user stories and backlog management
 - `review` - For validation and quality review
+- `qa` - For runtime QA validation (Aspire + Playwright), used in the Local Run &
+  Monitoring / E2E validation stage of `orch-feature`, `orch-bug`,
+  `orch-update-packages`, `orch-create-module`, `orch-create-service`,
+  `orch-create-mvp`, `orch-project`, and `orch-aspire-update`
 
 Install recommended plugins:
 
@@ -104,6 +109,7 @@ copilot plugin install JSdotNet/Copilot:plugins/architecture
 copilot plugin install JSdotNet/Copilot:plugins/csharp-coding
 copilot plugin install JSdotNet/Copilot:plugins/product-owner
 copilot plugin install JSdotNet/Copilot:plugins/review
+copilot plugin install JSdotNet/Copilot:plugins/qa
 ```
 
 ## Usage Examples
@@ -273,7 +279,8 @@ copilot-app plugin
         ├── ↔ jsdotnet-project-guidelines-mcpserver (guideline and ADR retrieval)
         ├── ↔ csharp-coding plugin (coding agent for implementation)
         ├── ↔ product-owner plugin (product-owner agent)
-        └── ↔ review plugin (reviewer agent)
+        ├── ↔ review plugin (reviewer agent)
+        └── ↔ qa plugin (qa, qa-monitor agents used in Local Run & Monitoring / E2E validation stages)
 ```
 
 ## Workflow Coordination Model
@@ -302,6 +309,14 @@ The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-tdr` uses `create-technical-debt-record` after MCP-based context gathering
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
 - `orch-create-service` can use `aspire` for AppHost wiring
+- `orch-feature`, `orch-bug`, `orch-update-packages`, `orch-create-module`,
+  `orch-create-service`, `orch-create-mvp`, `orch-project`, and `orch-aspire-update`
+  use the `qa` plugin's `qa` agent (Playwright validation with evidence) and
+  `qa-monitor` agent (continuous Aspire log/trace/metric monitoring) in their
+  Local Run & Monitoring / E2E validation stage. Inside the GitHub Copilot App,
+  `qa-monitor` can run in a parallel child session (`create_session` + cross-session
+  messaging) while `qa` validates in the current session; otherwise the `qa` plugin's
+  `delegate-to-qa-monitor` skill provides a portable, same-session fallback.
 - All orchestration skills can invoke specialized agents (with user approval) and their associated skills
 - All orchestration skills report progress and output through the `orch-dashboard` canvas extension (`extensions/orch-dashboard/`)
 

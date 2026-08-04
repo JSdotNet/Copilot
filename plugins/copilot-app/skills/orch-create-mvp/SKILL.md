@@ -54,12 +54,14 @@ Execute a complete MVP development workflow from planning through local run and 
 **Agents:** `development:testing`, `review:reviewer`, `csharp-coding:coding`
 
 ### Stage 5: Run & Monitoring
-- **Start MVP locally or in cloud** and validate startup for all components
-- **Run smoke tests** on core user flows
-- **Monitor runtime logs and health checks**
-- **Record local or cloud readiness status** and unresolved blockers
+- **Start MVP locally or in cloud** and validate startup for all components (`qa:qa` agent's `aspire-run` skill)
+- **Validate core user flows with Playwright** — `qa:qa` runs smoke tests on core user flows, capturing screenshot/video evidence
+- **Monitor runtime logs and health checks** — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Record local or cloud readiness status** and unresolved blockers, merging Playwright evidence with monitoring findings
 
-**Agents:** `csharp-coding:coding`, `development:developer`, `review:reviewer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 

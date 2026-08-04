@@ -93,12 +93,15 @@ discovery, and health checks.
 - **Execute integration tests** against AppHost
 
 ### Stage 7: Running Application Validation & Recording
-- **Start Aspire AppHost** (`aspire run`) and confirm startup stability
+- **Start Aspire AppHost** (`aspire run`) and confirm startup stability — via `qa:qa` agent's `aspire-run` skill
 - **Verify dashboard** is accessible and services are running
 - **Check health endpoints** of all services
 - **Validate database connectivity** (if applicable)
-- **Run smoke tests** against the running application
-- **Record validation evidence** (runtime logs, endpoint results, screenshots)
+- **Run smoke tests against the running application with Playwright** — `qa:qa` drives browser-based checks, capturing screenshot/video evidence
+- **Monitor runtime logs, traces, and metrics continuously** — `qa:qa-monitor`:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Record validation evidence** (runtime logs, endpoint results, Playwright screenshots)
 - **Generate runtime validation report** with pass/fail outcomes and recommendations
 
 **Validation Checklist:**
@@ -113,7 +116,7 @@ discovery, and health checks.
 - [ ] Logs show expected output
 - [ ] Runtime validation evidence recorded and attached to report
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer` running validation manually when the `qa` plugin isn't installed
 **Output:** Build/test validation report plus runtime validation recording report
 
 ## Usage Pattern

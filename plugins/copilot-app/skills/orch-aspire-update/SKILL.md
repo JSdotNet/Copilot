@@ -57,12 +57,15 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 
 ### Stage 5: Validation & Recording
 - **Compile and test** the full solution after upgrade and feature adoption
-- **Start updated AppHost** and verify dashboard/service health
-- **Run smoke and integration checks** on critical paths
-- **Record validation evidence** (logs, health results, screenshots)
+- **Start updated AppHost** and verify dashboard/service health — via `qa:qa` agent's `aspire-run` skill
+- **Run smoke and integration checks on critical paths with Playwright** — `qa:qa` drives browser-based checks, capturing screenshot/video evidence
+- **Monitor runtime logs, traces, and metrics continuously** — `qa:qa-monitor`:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Record validation evidence** (logs, health results, Playwright screenshots)
 - **Publish upgrade validation report** with pass/fail per validation target
 
-**Agents:** `csharp-coding:coding`, `development:testing`, `review:reviewer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:testing`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 

@@ -68,14 +68,16 @@ Execute a complete feature development workflow from backlog to local validation
 
 ### Stage 6: E2E Validation & Result Recording
 - **Prepare end-to-end test scenarios** from acceptance criteria
-- **Execute E2E test suite** against integrated local flow
-- **Run feature locally** and confirm startup stability
-- **Monitor runtime behavior** (logs, health, key endpoints)
-- **Capture evidence** (logs, screenshots, and run metadata)
+- **Run feature locally** and confirm startup stability (`qa:qa` agent's `aspire-run` skill)
+- **Execute E2E scenarios with Playwright** — `qa:qa` drives the browser through each acceptance-criteria scenario, capturing screenshot/video evidence for every checkpoint and failure
+- **Monitor runtime behavior** (logs, traces, metrics) continuously during validation — `qa:qa-monitor`:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Capture evidence** (Playwright screenshots/recordings, Aspire log/trace findings, and run metadata)
 - **Record validation result** with pass/fail status per scenario
 - **Publish validation summary** for local acceptance decision input
 
-**Agents:** `development:testing`, `csharp-coding:coding`, `review:reviewer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`, `csharp-coding:coding`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 
