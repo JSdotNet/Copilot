@@ -98,14 +98,16 @@ Track GitHub Copilot plugins used by this repository so team members can install
 
 ## Canvas Extensions
 
-Canvas extensions are a separate mechanism from plugins: they add interactive UI panels
-the agent can open (`open_canvas`), rather than skills/agents/instructions. Install them
-with the `install_extension` tool (source = a GitHub repo folder or gist), not
-`copilot plugin install`.
+Canvas extensions add interactive UI panels the agent can open (`open_canvas`), rather
+than skills/agents/instructions, but they are packaged and installed the same way as any
+other local plugin — each one has its own `.github/plugin/plugin.json` with an
+`"extensions"` field (instead of `"agents"`/`"skills"`) pointing at the folder containing
+its `extension.mjs`. Install with `copilot plugin install`, same as any plugin in this
+repo.
 
 - `copilot-canvas-studio` (`1.0.0`)
   - Source path: `extensions/copilot-canvas-studio`
-  - Install: use `install_extension` with `https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio`
+  - Install: `copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio`
   - Canvases: `mermaid-diagram` (interactive C4/sequence/state/deployment/DDD/wireframe diagram viewer), `markdown-preview` (live ADR/TDR/arc42/backlog document preview).
   - Used by: `architecture`, `domain-design`, `ux-design`, `documentation`, `product-owner` plugins when installed alongside them.
 

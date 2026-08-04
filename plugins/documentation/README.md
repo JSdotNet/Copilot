@@ -125,8 +125,7 @@ Install the `copilot-canvas-studio` canvas extension to get a live, interactive 
 drafted documents instead of Markdown-only output:
 
 ```bash
-# inside the CLI, use install_extension with:
-#   url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio
 ```
 
 When installed, all documentation and profile skills render their drafted content on the

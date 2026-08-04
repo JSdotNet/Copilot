@@ -96,9 +96,10 @@ Unlike plugins (skills, agents, instructions), canvas extensions add interactive
 surfaces the agent can open in a side panel. This repository ships
 `extensions/copilot-canvas-studio`, bundling a Mermaid diagram viewer and a Markdown
 document preview used by the `architecture`, `domain-design`, `ux-design`,
-`documentation`, and `product-owner` plugins. Install it with the `install_extension` tool
-using `https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio` as
-the source, or see `extensions/copilot-canvas-studio/README.md` for details.
+`documentation`, and `product-owner` plugins. It is packaged like any other plugin (its
+own `.github/plugin/plugin.json`), so install it the same way:
+`copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio`. See
+`extensions/copilot-canvas-studio/README.md` for details.
 
 ## Project Structure
 

@@ -107,8 +107,7 @@ Install the `copilot-canvas-studio` canvas extension to get live, interactive pr
 Mermaid-based wireframes/user flows and design documents instead of Markdown-only output:
 
 ```bash
-# inside the CLI, use install_extension with:
-#   url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio
 ```
 
 When installed, Mermaid wireframes and user flows render on the `mermaid-diagram` canvas

@@ -22,18 +22,35 @@ canvas uses a small dependency-free renderer and needs no network access.
 
 ## Install
 
-As a project-scoped extension (recommended for this repository):
+This folder is a standalone plugin (it has its own `.github/plugin/plugin.json` with an
+`extensions` mapping), so install it the same way as any other plugin in this repo:
 
 ```bash
-copilot
-# inside the CLI:
-# use the install_extension tool with:
-#   url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio
-#   scope: project
+copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio
+copilot plugin list
 ```
 
-Or copy `extensions/copilot-canvas-studio/` into `.github/extensions/copilot-canvas-studio/`
-in the target repository and reload extensions.
+Reinstall after changes:
+
+```bash
+copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio
+```
+
+Uninstall:
+
+```bash
+copilot plugin uninstall copilot-canvas-studio
+```
+
+For local development/testing without installing, load it directly from disk:
+
+```bash
+copilot --plugin-dir extensions/copilot-canvas-studio
+```
+
+Alternatively, use the `install_extension` tool from within a Copilot CLI/App session with
+`url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio` for a
+user- or session-scoped install without going through `copilot plugin install`.
 
 ## Agent Usage
 
@@ -43,6 +60,7 @@ in the target repository and reload extensions.
   title/mode.
 - Both canvases expose `get_state` and `clear` actions.
 
-See `.github/instructions/canvas-usage.instructions.md` in this repository's plugins for
+See each plugin's `instructions/common/canvas-usage.instructions.md` (or
+`instructions/canvas-usage.instructions.md` where the plugin has no `common/` folder) for
 the policy on when skills should prefer opening a canvas over emitting Markdown-only
 output.
