@@ -92,6 +92,11 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/github`
   - Notes: GitHub platform workflows — issue sync from Markdown backlog artifacts, GitHub Actions CI/CD, Dependabot configuration. Works standalone or alongside the `product-owner` plugin.
 
+- `qa` (`0.1.0`)
+  - Source path: `plugins/qa`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/qa`
+  - Notes: Runtime QA validation — runs projects via .NET Aspire, validates features end-to-end with the Playwright MCP server (screenshot/video evidence), and continuously monitors Aspire MCP logs/traces during testing. Requires the Aspire MCP server and the Playwright MCP server (`@playwright/mcp`).
+
 ## Skills
 
 - See [Copilot Skills](./copilot-skills.md) for skill inventory and provenance.
