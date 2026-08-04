@@ -65,6 +65,10 @@ never just checked at the end:
 
 ### 3. Validate the Feature with Playwright MCP
 
+If an issue or ticket number/link was given as the source of truth for what to
+test, apply the `feature-test-from-issue` skill first to derive confirmed test
+scenarios from its acceptance criteria or repro steps before continuing.
+
 Apply the `playwright-validation` skill:
 
 1. Identify the critical flow(s) or acceptance criteria to validate.
@@ -112,6 +116,7 @@ Use the required wording: "I recommend handing this off to `<agent>` because `<r
 | `playwright-recording` | Continuous video/trace evidence for a multi-step flow |
 | `aspire-log-monitor` | Continuously monitor Aspire logs/traces/metrics during a test session |
 | `delegate-to-qa-monitor` | Hand off monitoring to the `qa-monitor` agent persona (same-session) |
+| `feature-test-from-issue` | Derive test scenarios from a GitHub issue or Jira ticket before validating |
 
 ## Quality Checklist
 

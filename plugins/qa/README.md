@@ -22,6 +22,7 @@ Two agent personas are included: `qa` drives the browser and produces the report
   - `skills/playwright-recording/SKILL.md` — continuous video/trace evidence for a multi-step flow
   - `skills/aspire-log-monitor/SKILL.md` — continuously monitor Aspire logs/traces/metrics during testing
   - `skills/delegate-to-qa-monitor/SKILL.md` — hand off monitoring to the `qa-monitor` agent persona
+  - `skills/feature-test-from-issue/SKILL.md` — derive test scenarios from a GitHub issue or Jira ticket (delegates fetching/updating to a GitHub or Jira skill; no GitHub/Jira-specific content here)
 - Hooks:
   - `hooks.json` (session-start reminder to always run, monitor, and record evidence)
 
@@ -37,6 +38,7 @@ see the [Setup](./agents/qa.agent.md#setup) section in the agent file.
 
 ## What the QA Agent Can Do
 
+- **Test from a GitHub issue or Jira ticket** — derive confirmed test scenarios from acceptance criteria or repro steps via `feature-test-from-issue` (delegates all fetching/updating to a GitHub or Jira plugin skill; no GitHub/Jira-specific logic lives in this plugin).
 - **Run the app under test** — start an Aspire-orchestrated solution and confirm every resource is healthy before testing begins.
 - **Validate features end-to-end** — use Playwright MCP to navigate, interact, and assert against the real running UI, not just source code.
 - **Record evidence** — capture screenshots per checkpoint/failure, or video/trace recordings for multi-step flows.
