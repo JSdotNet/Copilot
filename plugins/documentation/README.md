@@ -18,6 +18,7 @@ Covers six documentation artifact types and three profile artifact types.
 | Instruction | `instructions/profile/github.instructions.md` | GitHub profile writing rules |
 | Instruction | `instructions/profile/projects.instructions.md` | GitHub project profile writing rules |
 | Instruction | `instructions/profile/linkedin.instructions.md` | LinkedIn profile writing rules |
+| Instruction | `instructions/canvas-usage.instructions.md` | Live canvas preview policy (Markdown documents) |
 | Skill | `skills/create-howto` | Guided how-to creation workflow |
 | Skill | `skills/create-explanation` | Guided explanation creation workflow |
 | Skill | `skills/create-article` | Guided article creation workflow |
@@ -117,3 +118,17 @@ All instruction files use generic `applyTo` globs so they work in any repository
 1. Edit the relevant agent, instruction, or skill file.
 2. Re-install the plugin: `copilot plugin install JSdotNet/Copilot:plugins/documentation`
 3. Test with a sample request to confirm the change takes effect.
+
+## Optional Enhancement — Canvas Previews
+
+Install the `copilot-canvas-studio` canvas extension to get a live, interactive preview of
+drafted documents instead of Markdown-only output:
+
+```bash
+# inside the CLI, use install_extension with:
+#   url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio
+```
+
+When installed, all documentation and profile skills render their drafted content on the
+`markdown-preview` canvas (see `instructions/canvas-usage.instructions.md`). Without it,
+skills fall back to their existing Markdown file output.

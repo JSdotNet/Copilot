@@ -13,6 +13,7 @@ Installable GitHub Copilot CLI plugin for UX design workflows — wireframes, de
   - `skills/ux-user-flow/SKILL.md`
 - Instructions:
   - `instructions/common/agent-handoff.instructions.md`
+  - `instructions/common/canvas-usage.instructions.md`
   - `instructions/ux/ux-global-instructions.md`
   - `instructions/ux/wireframe-instructions.md`
   - `instructions/ux/design-guidelines-instructions.md`
@@ -99,3 +100,18 @@ copilot plugin install impeccable@awesome-copilot
 ```
 
 When installed, the `ux-designer` agent and the `ux-design-review` and `ux-design-guidelines` skills will automatically invoke `/impeccable` for expert UI-craft input. Without it, the plugin falls back to its built-in design principles and wireframe pattern resources. Node 18+ on your PATH is required for impeccable's optional automation scripts.
+
+## Optional Enhancement — Canvas Previews
+
+Install the `copilot-canvas-studio` canvas extension to get live, interactive previews of
+Mermaid-based wireframes/user flows and design documents instead of Markdown-only output:
+
+```bash
+# inside the CLI, use install_extension with:
+#   url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio
+```
+
+When installed, Mermaid wireframes and user flows render on the `mermaid-diagram` canvas
+and design guideline/review documents render on the `markdown-preview` canvas (see
+`instructions/common/canvas-usage.instructions.md`). Default SVG wireframe output is
+unaffected — the canvas cannot render raw SVG assets.

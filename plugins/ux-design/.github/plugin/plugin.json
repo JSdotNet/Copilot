@@ -1,7 +1,7 @@
 {
   "name": "ux-design",
   "description": "Copilot plugin for UX design workflows — wireframes, design guidelines, user flows, and design reviews.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Job Schepers"
   },

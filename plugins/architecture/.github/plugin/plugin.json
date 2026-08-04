@@ -1,7 +1,7 @@
 {
   "name": "architecture",
   "description": "Copilot plugin for architecture documentation, blueprints, ADRs, technical debt records, and architecture diagrams (C4, sequence, state machine, deployment).",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": {
     "name": "Job Schepers"
   },

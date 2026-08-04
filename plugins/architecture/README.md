@@ -18,6 +18,7 @@ Installable GitHub Copilot CLI plugin for architecture design and documentation 
 - Instructions:
   - `instructions/common/agent-handoff.instructions.md`
   - `instructions/common/agent-model-recommendation.instructions.md`
+  - `instructions/common/canvas-usage.instructions.md`
   - `instructions/blueprint/blueprint-global-instructions.md`
   - `instructions/adr/adr-global-instructions.md`
   - `instructions/tdr/tdr-global-instructions.md`
@@ -63,3 +64,18 @@ copilot plugin uninstall architecture
 - This plugin contains architecture-focused assets that were previously bundled in `plugins/development`.
 - This plugin is self-contained for architecture authoring workflows.
 - Install this plugin together with `plugins/development` only when cross-plugin handoff workflows are explicitly needed.
+
+## Optional Enhancement — Canvas Previews
+
+Install the `copilot-canvas-studio` canvas extension to get live, interactive previews of
+generated diagrams and documents instead of Markdown-only output:
+
+```bash
+# inside the CLI, use install_extension with:
+#   url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio
+```
+
+When installed, this plugin's diagram skills render their Mermaid output on the
+`mermaid-diagram` canvas and ADR/TDR/arc42/blueprint skills render on the
+`markdown-preview` canvas (see `instructions/common/canvas-usage.instructions.md`).
+Without it, all skills fall back to their existing Markdown/SVG file output.

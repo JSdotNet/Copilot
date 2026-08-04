@@ -18,6 +18,7 @@ Installable GitHub Copilot CLI plugin for Domain-Driven Design workflows.
 - Instructions:
   - `instructions/common/agent-handoff.instructions.md`
   - `instructions/common/agent-model-recommendation.instructions.md`
+  - `instructions/common/canvas-usage.instructions.md`
   - `instructions/ddd/ddd-global-instructions.md`
   - `instructions/ddd/strategic-design-instructions.md`
   - `instructions/ddd/tactical-design-instructions.md`
@@ -52,3 +53,18 @@ copilot plugin uninstall domain-design
 - The `architecture` plugin owns arc42, blueprints, ADRs, and TDRs.
 - Install both when you need end-to-end coverage from domain discovery through architecture documentation.
 - Handoff from `domain-architect` to `architect` is supported for recording decisions as ADRs or mapping results into arc42 sections.
+
+## Optional Enhancement — Canvas Previews
+
+Install the `copilot-canvas-studio` canvas extension to get live, interactive previews of
+generated diagrams and documents instead of Markdown-only output:
+
+```bash
+# inside the CLI, use install_extension with:
+#   url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio
+```
+
+When installed, this plugin's diagram skills render on the `mermaid-diagram` canvas and
+domain model/interaction documents render on the `markdown-preview` canvas (see
+`instructions/common/canvas-usage.instructions.md`). Without it, all skills fall back to
+their existing Markdown file output.

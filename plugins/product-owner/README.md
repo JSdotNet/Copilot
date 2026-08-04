@@ -16,6 +16,7 @@ Installable GitHub Copilot CLI plugin for product backlog authoring. Write epics
   - `instructions/bugs.instructions.md`
   - `instructions/agent-handoff.instructions.md`
   - `instructions/markdown.instructions.md`
+  - `instructions/canvas-usage.instructions.md`
 
 ## Scope
 
@@ -58,3 +59,17 @@ copilot plugin install JSdotNet/Copilot:plugins/product-owner
 ```bash
 copilot plugin uninstall product-owner
 ```
+
+## Optional Enhancement — Canvas Previews
+
+Install the `copilot-canvas-studio` canvas extension to get a live, interactive preview of
+drafted epics, stories, and bugs instead of Markdown-only output:
+
+```bash
+# inside the CLI, use install_extension with:
+#   url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio
+```
+
+When installed, backlog skills render drafted content on the `markdown-preview` canvas
+(see `instructions/canvas-usage.instructions.md`). Without it, skills fall back to their
+existing Markdown file output.
