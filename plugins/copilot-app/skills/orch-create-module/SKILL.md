@@ -83,17 +83,30 @@ Orchestrate module creation for:
 - Validation evidence recorded (logs, health checks).
 - Readiness status documented.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Module scope panel with contracts and boundaries
-- Architecture checklist for structure and dependencies
-- Implementation tracker across files and tasks
-- Test and quality dashboard for module-specific coverage
-- Local run and monitoring panel for logs, health, and smoke checks
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-create-module"` and these stages: Module Scope &
+  Contract, Architecture & Design, Module Implementation, Testing & Quality
+  Gates, Local Run & Monitoring.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. module contract,
+  design notes, or test/run results.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
+  module endpoint/flow check with `status: "pass"|"fail"|"flaky"` and
+  Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
+- Call `finish_run` with the final status and a summary once the module
+  runs locally and passes its checks.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

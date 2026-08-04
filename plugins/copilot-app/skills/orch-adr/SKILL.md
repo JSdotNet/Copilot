@@ -61,16 +61,25 @@ Invoke: orch-adr
 - Naming and status consistency verified against existing ADRs.
 - Follow-up actions identified (blueprint, arc42, or TDR updates).
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Decision statement panel with drivers and constraints
-- Guideline context panel populated from MCP lookups
-- Alternatives tracker for selected and rejected options
-- Traceability checklist for impacted architecture artifacts
-- Review controls for publishing the ADR draft
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-adr"` and these stages: Decision Context Retrieval, ADR
+  Drafting, Traceability Review.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. retrieved
+  guidelines, drafted ADR content, or traceability findings.
+- Call `finish_run` with the final status and a summary once the ADR is
+  review-ready.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

@@ -63,16 +63,25 @@ Invoke: orch-blueprint
 - Missing decisions flagged for ADR or TDR follow-up.
 - Review-ready blueprint prepared with explicit follow-up items.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Scope definition panel for audience, boundaries, and assumptions
-- Guideline context panel populated from MCP lookups
-- Component map checklist for structure and interactions
-- Traceability panel for ADR and TDR follow-up
-- Review controls for publishing a review-ready draft
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-blueprint"` and these stages: Scope & Guideline
+  Retrieval, Blueprint Drafting, Review & Traceability.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. retrieved
+  guidelines, drafted component map, or traceability findings.
+- Call `finish_run` with the final status and a summary once the blueprint
+  is review-ready.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

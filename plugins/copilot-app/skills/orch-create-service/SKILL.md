@@ -83,17 +83,31 @@ Orchestrate new service creation for:
 - Logs and runtime behavior monitored for stability.
 - Readiness status recorded with follow-up actions.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Service scope panel with contracts and responsibilities
-- Integration map for dependencies and service references
-- Implementation tracker for project, wiring, and configuration
-- Testing dashboard for unit and integration readiness
-- Local run and monitoring panel for startup, health, and logs
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-create-service"` and these stages: Service Scope &
+  Requirements, Service Architecture & Integration Design, Service
+  Implementation & Wiring, Testing & Validation Prep, Local Run &
+  Monitoring.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. service contract,
+  wiring notes, or health-check results.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
+  health-check/integration flow with `status: "pass"|"fail"|"flaky"` and
+  Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
+- Call `finish_run` with the final status and a summary once the service
+  runs locally and passes its checks.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Skills Used
 

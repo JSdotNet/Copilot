@@ -61,16 +61,25 @@ Invoke: orch-architecture
 - Internal consistency verified across scope, constraints, and traceability.
 - Review-ready result prepared with explicit follow-up actions.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Goal panel for scope, output type, and success criteria
-- Guideline context panel populated from MCP lookups
-- Architecture investigation tracker for assumptions, risks, and open questions
-- Draft and review panel for publishing a review-ready result
-- Action buttons to continue investigation, refine the draft, or request review
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-architecture"` and these stages: Goal & Guideline
+  Retrieval, Architecture Investigation, Drafting & Review.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. retrieved
+  guidelines, findings, or review feedback.
+- Call `finish_run` with the final status and a summary once the result is
+  review-ready.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

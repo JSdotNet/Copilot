@@ -107,16 +107,30 @@ Epic: "Reporting Engine MVP"
 - Smoke tests pass on core user flows.
 - Runtime readiness status recorded with evidence.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- MVP roadmap with feature breakdown and timeline
-- Sprint planner showing task allocation and dependencies
-- Progress dashboard tracking completion across stages
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
-- Status indicators for each component (planning, in-progress, testing, running)
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-create-mvp"` and these stages: MVP Definition & Planning,
+  Architecture & Design, Implementation Sprint, Testing & Quality
+  Assurance, Run & Monitoring.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. feature
+  breakdown, design decisions, or test/run results.
+- For the **Run & Monitoring** stage, also pass `scenarios` (each core
+  user-flow check with `status: "pass"|"fail"|"flaky"` and Playwright
+  evidence paths) and `monitoring` (the Aspire log/trace findings) so the
+  dashboard renders QA results with evidence inline.
+- Call `finish_run` with the final status and a summary once the MVP runs
+  locally and passes its checks.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

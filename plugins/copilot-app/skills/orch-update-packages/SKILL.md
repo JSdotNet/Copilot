@@ -111,17 +111,30 @@ Orchestrate package updates for:
 - Application runs locally with healthy status.
 - Changelog summary generated.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Dependency scan results with CVE severity levels
-- Update recommendations grouped by category and priority
-- Compatibility impact analysis for breaking changes
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
-- Runtime timeline with local validation gates
-- Rollback plan quick reference
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-update-packages"` and these stages: Dependency Analysis,
+  Update Planning, Staged Updates, Compatibility Testing, Security
+  Validation, Code Review & Quality Gates, Local Run & Monitoring.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. CVEs found, updated
+  package versions, or test/validation results.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
+  smoke-test/user-scenario check with `status: "pass"|"fail"|"flaky"` and
+  Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
+- Call `finish_run` with the final status and a summary once updates are
+  validated locally.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 
