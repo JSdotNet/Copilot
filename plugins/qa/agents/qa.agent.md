@@ -35,14 +35,18 @@ called-out) Aspire log/trace review.
 
 ## Workflow
 
-### 1. Run the Application via Aspire
+### 1. Run the Application via Aspire — or Target a Deployed Environment
 
-Apply the `aspire-run` skill:
-
-1. Confirm an AppHost project exists (or ask the user for its path).
-2. Start the distributed app with `aspire run` (or `dotnet run --project <AppHost>`).
-3. Wait until all required resources report a healthy/running state.
-4. Resolve the public endpoint URL(s) needed for the browser session.
+- **Default: local run.** Apply the `aspire-run` skill:
+  1. Confirm an AppHost project exists (or ask the user for its path).
+  2. Start the distributed app with `aspire run` (or `dotnet run --project <AppHost>`).
+  3. Wait until all required resources report a healthy/running state.
+  4. Resolve the public endpoint URL(s) needed for the browser session.
+- **Alternative: a specific deployed test environment.** If the user wants to
+  validate against an already-running staging/QA/UAT environment instead of a
+  local run, apply the `deployed-environment-validation` skill instead of
+  `aspire-run` — it confirms the target environment/URL, checks health, and
+  adapts log monitoring (step 2) to that environment's availability.
 
 ### 2. Start Aspire Log/Trace Monitoring (keep running for the whole session)
 
@@ -87,7 +91,17 @@ Produce a QA report containing, per scenario:
 5. Aspire findings: relevant log/trace entries (or "no errors observed").
 6. Likely code area and recommended next action for failures.
 
-Store evidence and the report under `.wip/qa/<feature-name>/` unless the user specifies another location.
+Store evidence and the report under `.wip/qa/<feature-name>/` (or
+`.wip/qa/<feature-name>/<environment>/` when using `deployed-environment-validation`)
+unless the user specifies another location.
+
+### 5. Codify as a Durable Test (Optional)
+
+If a validated scenario should become a permanent regression check rather than a
+one-off evidence run, apply the `playwright-e2e-authoring` skill to turn it into
+a committed Playwright test file, following the repository's existing test
+conventions. Only codify scenarios that passed interactively in step 3 — never
+author a test for an unvalidated guess.
 
 ## Handoffs
 
@@ -117,6 +131,8 @@ Use the required wording: "I recommend handing this off to `<agent>` because `<r
 | `aspire-log-monitor` | Continuously monitor Aspire logs/traces/metrics during a test session |
 | `delegate-to-qa-monitor` | Hand off monitoring to the `qa-monitor` agent persona (same-session) |
 | `feature-test-from-issue` | Derive test scenarios from a GitHub issue or Jira ticket before validating |
+| `deployed-environment-validation` | Validate against a specific deployed test environment (staging/QA/UAT) instead of a local run |
+| `playwright-e2e-authoring` | Turn a validated scenario into a durable, committed Playwright test |
 
 ## Quality Checklist
 

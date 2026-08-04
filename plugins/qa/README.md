@@ -23,6 +23,8 @@ Two agent personas are included: `qa` drives the browser and produces the report
   - `skills/aspire-log-monitor/SKILL.md` — continuously monitor Aspire logs/traces/metrics during testing
   - `skills/delegate-to-qa-monitor/SKILL.md` — hand off monitoring to the `qa-monitor` agent persona
   - `skills/feature-test-from-issue/SKILL.md` — derive test scenarios from a GitHub issue or Jira ticket (delegates fetching/updating to a GitHub or Jira skill; no GitHub/Jira-specific content here)
+  - `skills/deployed-environment-validation/SKILL.md` — validate against a specific already-deployed test environment (staging/QA/UAT) instead of a local Aspire run
+  - `skills/playwright-e2e-authoring/SKILL.md` — turn a validated scenario into a durable, committed Playwright test
 - Hooks:
   - `hooks.json` (session-start reminder to always run, monitor, and record evidence)
 
@@ -39,10 +41,11 @@ see the [Setup](./agents/qa.agent.md#setup) section in the agent file.
 ## What the QA Agent Can Do
 
 - **Test from a GitHub issue or Jira ticket** — derive confirmed test scenarios from acceptance criteria or repro steps via `feature-test-from-issue` (delegates all fetching/updating to a GitHub or Jira plugin skill; no GitHub/Jira-specific logic lives in this plugin).
-- **Run the app under test** — start an Aspire-orchestrated solution and confirm every resource is healthy before testing begins.
+- **Run the app under test** — start an Aspire-orchestrated solution and confirm every resource is healthy before testing begins, or use `deployed-environment-validation` to target a specific already-deployed staging/QA/UAT environment instead.
 - **Validate features end-to-end** — use Playwright MCP to navigate, interact, and assert against the real running UI, not just source code.
 - **Record evidence** — capture screenshots per checkpoint/failure, or video/trace recordings for multi-step flows.
 - **Monitor logs continuously** — keep Aspire log/trace/metric monitoring active for the entire session, catching backend errors a passing UI might hide, either directly or via the `qa-monitor` persona.
+- **Codify durable regression tests** — turn a scenario validated interactively into a committed, re-runnable Playwright test via `playwright-e2e-authoring`.
 - **Report findings** — structured Pass/Fail/Flaky results with severity, evidence paths, and correlated Aspire log/trace findings.
 
 ## Multi-Agent Design: Same-Session vs. True Parallel
@@ -68,7 +71,7 @@ on it. Two options are available, at different levels:
 
 ## Scope
 
-- **In scope**: runtime/E2E feature validation, exploratory and regression testing through a real browser, evidence-backed QA reporting.
+- **In scope**: runtime/E2E feature validation, exploratory and regression testing through a real browser (locally or against a deployed test environment), authoring durable Playwright E2E tests from validated scenarios, evidence-backed QA reporting.
 - **Out of scope**: writing unit/integration test code (see the `development` plugin's testing agent), architecture/security review, and implementing code fixes (the agent reports and offers a handoff instead).
 
 ## Install
