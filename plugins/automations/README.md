@@ -18,6 +18,7 @@ Each skill is a self-contained workflow prompt that can be invoked directly in c
 | `automation: bug-fix` | Pick up all open `bug`-labelled GitHub issues and start one `orch-bug` session per confirmed issue | `orch-bug` skill (`copilot-app` plugin) |
 | `automation: weekly-cost-analysis` | Retrieve `/chronicle cost-tips` and produce weekly cost report | Chronicle (`/chronicle cost-tips`) |
 | `automation: week-starter` | Fetch updates for Aspire and GitHub Copilot App (and any extra topics) and produce a weekly digest | Web access |
+| `automation: whats-new` | Check new commits, open PRs, and PR-less branches across multiple repos since the last run, correlated with Jira/GitHub tickets | `gh` CLI, optional Jira MCP tool |
 
 ## Install
 
@@ -56,6 +57,18 @@ Use the automation: week-starter skill.
 Use the automation: week-starter skill.
 Topics: aspire, github-copilot-app, my-extra-topic
 Look-back: 14
+```
+
+```
+Use the automation: whats-new skill.
+Repos: my-org/repo-a, my-org/repo-b
+```
+
+```
+Use the automation: whats-new skill.
+Repos: my-org/repo-a
+Jira base URL: https://myteam.atlassian.net
+Stale branch threshold: 21
 ```
 
 ```
