@@ -101,6 +101,31 @@ Track GitHub Copilot plugins used by this repository so team members can install
 
 - See [Copilot Skills](./copilot-skills.md) for skill inventory and provenance.
 
+## Canvas Extensions
+
+Canvas extensions add interactive UI panels the agent can open (`open_canvas`), rather
+than skills/agents/instructions, but they are packaged and installed the same way as any
+other local plugin — each one has its own `.github/plugin/plugin.json` with an
+`"extensions"` field (instead of `"agents"`/`"skills"`) pointing at the folder containing
+its `extension.mjs`. Install with `copilot plugin install`, same as any plugin in this
+repo.
+
+- `diagram-canvas` (`1.0.0`)
+  - Source path: `plugins/copilot-app/extensions/diagram-canvas`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas`
+  - Canvas: `mermaid-diagram` (interactive C4/sequence/state/deployment/DDD/wireframe diagram viewer).
+  - Used by: `copilot-app`'s `orch-*` orchestration skills, which open/update this canvas on behalf of the `architecture`, `domain-design`, and `ux-design` agents they coordinate. Those content plugins have no direct dependency on this extension. Ships inside `copilot-app` but installs and runs independently.
+- `markdown-canvas` (`1.0.0`)
+  - Source path: `plugins/copilot-app/extensions/markdown-canvas`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`
+  - Canvas: `markdown-preview` (live ADR/TDR/arc42/backlog document preview).
+  - Used by: `copilot-app`'s `orch-*` orchestration skills, which open/update this canvas on behalf of the `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` agents they coordinate. Those content plugins have no direct dependency on this extension. Ships inside `copilot-app` but installs and runs independently.
+- `orch-dashboard` (`1`)
+  - Source path: `plugins/copilot-app/extensions/orch-dashboard`
+  - Install: `install_extension` tool with `https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard` (not `copilot plugin install` — this extension has no standalone `.github/plugin/plugin.json`).
+  - Canvas: live progress/output dashboard for `copilot-app`'s `orch-*` orchestration skills.
+  - Used by: `copilot-app` plugin only.
+
 ## Team Commands
 
 ```bash

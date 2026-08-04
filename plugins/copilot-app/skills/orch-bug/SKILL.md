@@ -144,6 +144,10 @@ interaction.
   results with evidence inline.
 - Call `finish_run` with the final status and a summary once the fix is
   verified locally.
+- During **Bug Triage & Analysis**, also open/update `markdown-canvas`
+  (`markdown-preview`) with the drafted bug report content, per
+  `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not
+  installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

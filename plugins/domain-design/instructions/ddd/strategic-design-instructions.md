@@ -28,6 +28,7 @@ Before finalizing a bounded context, verify:
 - [ ] No entity in this context requires direct access to another context's internal model.
 - [ ] The context can be developed, deployed, and evolved independently.
 - [ ] The context owner (team or individual) is identified.
+- [ ] The context's deployment type is classified as **Service** (independently deployable process, e.g. a microservice) or **Module** (in-process module within a shared deployable, e.g. a modular monolith).
 
 ## Context Mapping Patterns
 
@@ -46,15 +47,30 @@ Use these relationship patterns when mapping interactions between bounded contex
 
 ## Context Map Diagram
 
-Produce context maps using Mermaid flowchart syntax. Use labels on edges to indicate the relationship pattern.
+Produce context maps using Mermaid flowchart syntax. Use labels on edges to indicate the relationship pattern (text only — do not colour edges/lines). Colour-code each bounded context **node** by its deployment type per the Color Conventions below (see `instructions/diagrams/ddd-diagram-instructions.md` for the general exception this makes to the "no hard-coded hex colours" rule).
+
+## Color Conventions
+
+Colour distinguishes bounded context deployment type at a glance; it is applied to nodes only, never to edges/lines — relationship patterns stay identifiable from the edge label text alone. Define both classes once per diagram with `classDef`, then assign each bounded context node to a class with `class <nodeId> service` / `class <nodeId> module`.
+
+| Deployment Type | Fill | Border | Font | Meaning |
+| --- | --- | --- | --- | --- |
+| Service | `#1168BD` | `#0B4884` | `#FFFFFF` | Independently deployable process (e.g. microservice) |
+| Module | `#85BBF0` | `#5D82A8` | `#000000` | In-process module within a shared deployable (e.g. modular monolith) |
 
 Example structure:
 
 ```mermaid
 flowchart LR
+    classDef service fill:#1168BD,stroke:#0B4884,color:#FFFFFF
+    classDef module fill:#85BBF0,stroke:#5D82A8,color:#000000
+
     A[Order Management] -->|Customer-Supplier| B[Inventory]
-    A -->|ACL| C[Payment Gateway]
+    A -->|Anti-Corruption Layer| C[Payment Gateway]
     B -->|Published Language| D[Warehouse]
+
+    class A,C service
+    class B,D module
 ```
 
 ## Subdomain Analysis

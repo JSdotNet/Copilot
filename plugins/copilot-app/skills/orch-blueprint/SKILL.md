@@ -79,6 +79,9 @@ interaction.
   guidelines, drafted component map, or traceability findings.
 - Call `finish_run` with the final status and a summary once the blueprint
   is review-ready.
+- During **Blueprint Drafting**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the drafted blueprint content, per `instructions/canvas-usage.instructions.md`.
+  Optional; skip gracefully if not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

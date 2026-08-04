@@ -52,6 +52,8 @@ Each orchestration skill coordinates multiple agents from other plugins (develop
 ### Canvas Extensions
 
 - `extensions/orch-dashboard/` - Live progress and output dashboard for all `orch-*` skills. See `extensions/orch-dashboard/README.md` for the canvas action contract and install instructions.
+- `extensions/diagram-canvas/` - Mermaid diagram viewer canvas (`mermaid-diagram`), opened by `orch-*` skills on behalf of the `architecture`, `domain-design`, and `ux-design` agents they coordinate — those plugins have no direct dependency on it. Installs and runs independently of `copilot-app` — see `extensions/diagram-canvas/README.md`.
+- `extensions/markdown-canvas/` - Markdown document preview canvas (`markdown-preview`), opened by `orch-*` skills on behalf of the `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` agents they coordinate — those plugins have no direct dependency on it. Installs and runs independently of `copilot-app` — see `extensions/markdown-canvas/README.md`.
 
 ## Install
 
@@ -60,12 +62,21 @@ copilot plugin install JSdotNet/Copilot:plugins/copilot-app
 copilot plugin list
 ```
 
-The plugin's skills are ready to use once installed. The canvas dashboard is
-a separate opt-in step (canvas extensions are not installed by the plugin
-mechanism): install it with the `install_extension` tool using
-`https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard`,
-choosing `project`, `user`, or `session` scope. See
-`extensions/orch-dashboard/README.md` for details.
+The plugin's skills are ready to use once installed. All three canvas extensions are
+separate opt-in steps (canvas extensions are not installed by the plugin
+mechanism itself, and each has its own install method):
+
+- `orch-dashboard`: install with the `install_extension` tool using
+  `https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard`,
+  choosing `project`, `user`, or `session` scope. See
+  `extensions/orch-dashboard/README.md` for details.
+- `diagram-canvas` and `markdown-canvas`: each has its own `.github/plugin/plugin.json`, so
+  install them the same way as any plugin, independently of each other:
+  `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas`
+  and
+  `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`.
+  See `extensions/diagram-canvas/README.md` and `extensions/markdown-canvas/README.md` for
+  details.
 
 ## Verify Installation
 
@@ -78,7 +89,7 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 
 ## Key Features
 
-- **Canvas Interfaces** - Interactive orchestration progress/output dashboard (`extensions/orch-dashboard/`) driven by every `orch-*` skill
+- **Canvas Interfaces** - Interactive orchestration progress/output dashboard (`extensions/orch-dashboard/`) driven by every `orch-*` skill, plus live Mermaid diagram (`extensions/diagram-canvas/`) and Markdown document preview (`extensions/markdown-canvas/`) canvases that `orch-*` skills open on behalf of the architecture/domain-design/ux-design/documentation/product-owner agents they coordinate — those content plugins are unaware of and do not depend on either canvas extension
 - **TDD Bug Fixes** - Solve bugs by creating tests first with csharp-coding agent
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
 - **Project Guidelines** - Uses `jsdotnet-project-guidelines-mcpserver` for consistent standards

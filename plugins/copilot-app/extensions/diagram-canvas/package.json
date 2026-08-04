@@ -1,0 +1,17 @@
+{
+  "name": "diagram-canvas",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "extension.mjs",
+  "dependencies": {
+    "@github/copilot-sdk": "latest"
+  },
+  "description": "Copilot CLI canvas extension: an interactive Mermaid diagram viewer (C4, sequence, state, deployment, DDD, wireframe diagrams) used across this repository's plugins.",
+  "keywords": [
+    "mermaid",
+    "diagram-viewer",
+    "architecture",
+    "domain-driven-design",
+    "ux-design"
+  ]
+}

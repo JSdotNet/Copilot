@@ -159,6 +159,9 @@ interaction.
   configured MCP servers, or branch protection rules applied.
 - Call `finish_run` with the final status and a summary once the repository
   is fully configured.
+- During **README**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the expanded README content, per `instructions/canvas-usage.instructions.md`.
+  Optional; skip gracefully if not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

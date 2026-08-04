@@ -66,6 +66,40 @@ Official reference: <https://c4model.com>
 - Use bracketed technology labels in container and component diagrams (e.g., `[React SPA]`, `[PostgreSQL]`).
 - Distinguish internal from external elements using the `_Ext` variants.
 
+## Color Conventions
+
+Apply this palette consistently across every C4 diagram using Mermaid's `UpdateElementStyle(alias, $bgColor="...", $fontColor="...", $borderColor="...")` directive. Color is additive — it reinforces the `_Ext` naming convention and element type, it never replaces the text label.
+
+| Element Type | Background | Border | Font | Meaning |
+| --- | --- | --- | --- | --- |
+| `Person` (internal) | `#1168BD` | `#0B4884` | `#FFFFFF` | In-scope human actor |
+| `Person_Ext` | `#999999` | `#6B6B6B` | `#FFFFFF` | External human actor |
+| `System` (in scope) | `#1168BD` | `#0B4884` | `#FFFFFF` | The system being described |
+| `System_Ext` | `#999999` | `#6B6B6B` | `#FFFFFF` | External/third-party system |
+| `Container` | `#438DD5` | `#2E6295` | `#FFFFFF` | Runnable/deployable unit |
+| `ContainerDb` | `#438DD5` | `#2E6295` | `#FFFFFF` | Data store container |
+| `Component` | `#85BBF0` | `#5D82A8` | `#000000` | Logical component inside a container |
+
+Apply the same palette to every level so a reader can tell in-scope vs. external elements at a glance regardless of which C4 level they are viewing.
+
+Note: Mermaid's C4 renderer emits no per-element ids/classes in its SVG output, so C4 diagrams are not interactively clickable in any Mermaid-based viewer (Mermaid `click` directives do not work on C4 elements). Colour is therefore the primary way to convey element type/scope at a glance for C4 diagrams regardless of how they are viewed.
+
+### Example — Level 1 with Color Convention
+
+```mermaid
+C4Context
+  title System Context — Online Banking Platform
+  Person(customer, "Bank Customer", "Manages accounts and makes payments")
+  System(banking, "Online Banking System", "Core banking platform")
+  System_Ext(email, "Email Provider", "Sends transaction notifications")
+  Rel(customer, banking, "Uses", "HTTPS")
+  Rel(banking, email, "Sends emails via", "SMTP")
+
+  UpdateElementStyle(customer, $bgColor="#1168BD", $fontColor="#FFFFFF", $borderColor="#0B4884")
+  UpdateElementStyle(banking, $bgColor="#1168BD", $fontColor="#FFFFFF", $borderColor="#0B4884")
+  UpdateElementStyle(email, $bgColor="#999999", $fontColor="#FFFFFF", $borderColor="#6B6B6B")
+```
+
 ## Preferred Notation: Mermaid C4
 
 Prefer Mermaid C4 notation for all C4 diagrams in Markdown documents. Mermaid renders natively in GitHub and GitHub Copilot chat without additional tooling.
@@ -107,6 +141,12 @@ C4Container
   Rel(spa, api, "Calls", "REST/HTTPS")
   Rel(api, db, "Reads/writes", "TCP")
   Rel(api, email, "Sends emails via", "SMTP")
+
+  UpdateElementStyle(customer, $bgColor="#1168BD", $fontColor="#FFFFFF", $borderColor="#0B4884")
+  UpdateElementStyle(spa, $bgColor="#438DD5", $fontColor="#FFFFFF", $borderColor="#2E6295")
+  UpdateElementStyle(api, $bgColor="#438DD5", $fontColor="#FFFFFF", $borderColor="#2E6295")
+  UpdateElementStyle(db, $bgColor="#438DD5", $fontColor="#FFFFFF", $borderColor="#2E6295")
+  UpdateElementStyle(email, $bgColor="#999999", $fontColor="#FFFFFF", $borderColor="#6B6B6B")
 ```
 
 ### Example — Level 3 Component
@@ -123,6 +163,12 @@ C4Component
   Rel(auth, accounts, "Delegates to")
   Rel(accounts, repo, "Uses")
   Rel(repo, db, "Reads/writes", "SQL")
+
+  UpdateElementStyle(auth, $bgColor="#85BBF0", $fontColor="#000000", $borderColor="#5D82A8")
+  UpdateElementStyle(accounts, $bgColor="#85BBF0", $fontColor="#000000", $borderColor="#5D82A8")
+  UpdateElementStyle(repo, $bgColor="#85BBF0", $fontColor="#000000", $borderColor="#5D82A8")
+  UpdateElementStyle(db, $bgColor="#438DD5", $fontColor="#FFFFFF", $borderColor="#2E6295")
+```
 ```
 
 ## Scope Guidelines
@@ -153,6 +199,7 @@ C4Component
 - [ ] All elements have a name, technology tag (if applicable), and short description.
 - [ ] All relationships are labelled with a verb phrase and protocol where relevant.
 - [ ] External elements are distinguished from internal ones using `_Ext` variants.
+- [ ] `UpdateElementStyle` is applied to every element per the documented Color Conventions palette.
 - [ ] Diagram is embedded in a fenced `mermaid` code block.
 - [ ] Prose summary accompanies every diagram.
 - [ ] Traceability links to related arc42 sections, ADRs, or blueprints are present.

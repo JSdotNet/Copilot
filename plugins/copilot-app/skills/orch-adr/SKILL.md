@@ -77,6 +77,9 @@ interaction.
   guidelines, drafted ADR content, or traceability findings.
 - Call `finish_run` with the final status and a summary once the ADR is
   review-ready.
+- During **ADR Drafting**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the drafted ADR content, per `instructions/canvas-usage.instructions.md`.
+  Optional; skip gracefully if not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

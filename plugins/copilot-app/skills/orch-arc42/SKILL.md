@@ -79,6 +79,10 @@ interaction.
   guidelines, drafted section content, or review findings.
 - Call `finish_run` with the final status and a summary once the arc42
   sections are review-ready.
+- During **Section Drafting**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the drafted arc42 section content, per
+  `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not
+  installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

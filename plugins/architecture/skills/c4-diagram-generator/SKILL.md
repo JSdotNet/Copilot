@@ -30,7 +30,7 @@ Use when the user asks to:
 2. Identify the required C4 level based on audience and scope.
 3. Load the matching level prompt from `skills/c4-diagram-generator/prompts/`.
 4. Ask focused clarifying questions only for information that is missing or conflicting.
-5. Generate the Mermaid C4 diagram with correct element types and labelled relationships.
+5. Generate the Mermaid C4 diagram with correct element types and labelled relationships, applying the Color Conventions palette from `instructions/c4/c4-global-instructions.md` via `UpdateElementStyle`.
 6. Write a prose summary (3–5 sentences) explaining the diagram's key design decisions.
 7. Add traceability notes linking the diagram to relevant arc42 sections, ADRs, or blueprint artifacts.
 8. List open questions or assumptions explicitly.
@@ -58,6 +58,7 @@ Use when the user asks to:
 - [ ] All elements have a name, technology tag (if applicable), and description.
 - [ ] All relationships are labelled with a verb phrase.
 - [ ] External systems and personas are marked as external (`_Ext`).
+- [ ] `UpdateElementStyle` color convention applied per `instructions/c4/c4-global-instructions.md`.
 - [ ] Diagram is embedded in a fenced `mermaid` code block.
 - [ ] Prose summary accompanies the diagram.
 - [ ] Traceability links are present where relevant.

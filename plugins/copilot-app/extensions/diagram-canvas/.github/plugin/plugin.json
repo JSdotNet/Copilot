@@ -1,0 +1,17 @@
+{
+  "name": "diagram-canvas",
+  "description": "Interactive Mermaid diagram viewer canvas (C4, sequence, state, deployment, DDD, wireframe diagrams) for this repository's architecture, domain-design, and ux-design plugins.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "mermaid",
+    "diagram-viewer",
+    "architecture",
+    "domain-driven-design",
+    "ux-design"
+  ],
+  "extensions": "."
+}

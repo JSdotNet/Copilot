@@ -78,6 +78,9 @@ interaction.
   guidelines, drafted TDR content, or follow-up risks.
 - Call `finish_run` with the final status and a summary once the TDR is
   review-ready.
+- During **TDR Drafting**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the drafted TDR content, per `instructions/canvas-usage.instructions.md`.
+  Optional; skip gracefully if not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
 canvas action contract.

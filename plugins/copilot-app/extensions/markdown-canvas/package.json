@@ -1,0 +1,17 @@
+{
+  "name": "markdown-canvas",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "extension.mjs",
+  "dependencies": {
+    "@github/copilot-sdk": "latest"
+  },
+  "description": "Copilot CLI canvas extension: a live Markdown document preview (ADRs, TDRs, arc42 sections, backlog items) used across this repository's plugins.",
+  "keywords": [
+    "markdown-preview",
+    "documentation",
+    "architecture",
+    "domain-driven-design",
+    "product-owner"
+  ]
+}

@@ -47,6 +47,11 @@ JSdotNet-Copilot
 |  |- review/
 |  |- copilot-plugin-manager/
 |  |- copilot-spec-builder/
+|  |- copilot-app/
+|  |  \- extensions/
+|  |     |- diagram-canvas/
+|  |     |- markdown-canvas/
+|  |     \- orch-dashboard/
 |  |- wip-convention/
 |  \- worktree-parallel/
 \- scripts/
@@ -87,6 +92,24 @@ Verify plugins are available:
 ```bash
 copilot plugin list
 ```
+
+### Canvas Extensions
+
+Unlike plugins (skills, agents, instructions), canvas extensions add interactive UI
+surfaces the agent can open in a side panel. This repository ships two independent canvas
+extensions inside `plugins/copilot-app/extensions/`: `diagram-canvas` (Mermaid diagram
+viewer) and `markdown-canvas` (Markdown document preview). Only `copilot-app`'s `orch-*`
+orchestration skills open/update these canvases directly, on behalf of the
+`architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` agents
+they coordinate — those content plugins have no direct dependency on either extension and
+work identically with or without them installed.
+Both ship inside `copilot-app` but install and run independently of it and of each other —
+install either one on its own. Each is packaged like any other
+plugin (its own `.github/plugin/plugin.json`), so install the same way:
+`copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas` and
+`copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`.
+See `plugins/copilot-app/extensions/diagram-canvas/README.md` and
+`plugins/copilot-app/extensions/markdown-canvas/README.md` for details.
 
 ## Project Structure
 
