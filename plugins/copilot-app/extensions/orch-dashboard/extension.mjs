@@ -28,6 +28,8 @@ import { EventEmitter } from "node:events";
 import { joinSession, createCanvas, CanvasError } from "@github/copilot-sdk/extension";
 import { ensureDir, writeRun, readRun, listRuns, newRunId } from "./store.mjs";
 import { renderShell } from "./render.mjs";
+import { categorizeTool, appendToolCall, summarizeInsights } from "./insight.mjs";
+import { renderReportMarkdown } from "./report.mjs";
 
 const VALID_STATUSES = ["pending", "in_progress", "done", "blocked", "skipped", "cancelled"];
 
@@ -38,6 +40,11 @@ const servers = new Map();
 // clients, regardless of which instance/action triggered the change.
 const bus = new EventEmitter();
 bus.setMaxListeners(0);
+
+// The run currently receiving tool-activity telemetry (see "Insight
+// tracking" below). Only one run is tracked live at a time — the most
+// recently started run that hasn't finished yet.
+let activeRunId = null;
 
 // Serializes read-modify-write access per runId so concurrent action calls
 // (e.g. two update_stage calls issued back-to-back) can't race each other
@@ -93,6 +100,20 @@ async function startServer(instanceId, baseDir) {
                 res.end(JSON.stringify(runs.map(summarize)));
                 return;
             }
+            const reportMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/report$/);
+            if (req.method === "GET" && reportMatch) {
+                const run = await readRun(baseDir, decodeURIComponent(reportMatch[1]));
+                if (!run) {
+                    res.statusCode = 404;
+                    res.end("not found");
+                    return;
+                }
+                const filename = `${run.skillId}-${run.id}.md`.replace(/[^a-zA-Z0-9._-]/g, "-");
+                res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+                res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+                res.end(renderReportMarkdown(run));
+                return;
+            }
             const detailMatch = url.pathname.match(/^\/api\/runs\/([^/]+)$/);
             if (req.method === "GET" && detailMatch) {
                 const run = await readRun(baseDir, decodeURIComponent(detailMatch[1]));
@@ -102,7 +123,7 @@ async function startServer(instanceId, baseDir) {
                     return;
                 }
                 res.setHeader("Content-Type", "application/json; charset=utf-8");
-                res.end(JSON.stringify(run));
+                res.end(JSON.stringify({ ...run, insightSummary: summarizeInsights(run) }));
                 return;
             }
             if (req.method === "GET" && url.pathname === "/events") {
@@ -189,8 +210,10 @@ const session = await joinSession({
                                 updatedAt: null,
                             })),
                             summary: "",
+                            insights: [],
                         };
                         await writeRun(baseDir, run);
+                        activeRunId = run.id;
                         bus.emit("update");
                         return { runId: run.id };
                     },
@@ -260,6 +283,7 @@ const session = await joinSession({
                             run.updatedAt = new Date().toISOString();
                             await writeRun(baseDir, run);
                         });
+                        if (activeRunId === runId) activeRunId = null;
                         bus.emit("update");
                         return { ok: true };
                     },
@@ -285,7 +309,7 @@ const session = await joinSession({
                         const baseDir = resolveBaseDir(session);
                         const run = await readRun(baseDir, ctx.input && ctx.input.runId);
                         if (!run) throw new CanvasError("run_not_found", `No run with id ${ctx.input && ctx.input.runId}`);
-                        return run;
+                        return { ...run, insightSummary: summarizeInsights(run) };
                     },
                 },
             ],
@@ -308,4 +332,41 @@ const session = await joinSession({
             },
         }),
     ],
+});
+
+// Insight tracking: listen to the session's own tool-call telemetry and
+// attribute each call's duration to whichever run is currently
+// "in_progress" (see resolveBaseDir/activeRunId above). Kept outside the
+// canvas action handlers because it's driven by session events, not
+// agent-invoked actions.
+const pendingToolCalls = new Map();
+session.on("tool.execution_start", (event) => {
+    const data = event && event.data;
+    if (!data || !data.toolCallId) return;
+    pendingToolCalls.set(data.toolCallId, { toolName: data.toolName, startedAt: Date.now() });
+});
+session.on("tool.execution_complete", (event) => {
+    const data = event && event.data;
+    if (!data || !data.toolCallId) return;
+    const pending = pendingToolCalls.get(data.toolCallId);
+    pendingToolCalls.delete(data.toolCallId);
+    if (!pending || !activeRunId) return;
+    const runId = activeRunId;
+    const toolName = data.toolName || pending.toolName || "unknown";
+    const durationMs = Math.max(0, Date.now() - pending.startedAt);
+    withRunLock(runId, async () => {
+        const baseDir = resolveBaseDir(session);
+        const run = await readRun(baseDir, runId);
+        if (!run) return;
+        appendToolCall(run, {
+            toolName,
+            category: categorizeTool(toolName),
+            durationMs,
+            success: data.success !== false,
+            endedAt: new Date().toISOString(),
+        });
+        await writeRun(baseDir, run);
+    })
+        .then(() => bus.emit("update"))
+        .catch(() => {});
 });

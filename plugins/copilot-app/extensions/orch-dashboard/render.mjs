@@ -106,7 +106,33 @@ export function renderShell() {
   .empty { color: var(--text-color-muted, #59636e); padding: 24px; text-align: center; }
   .summary { margin-top: 16px; padding: 10px 12px; border-radius: 6px; background: var(--background-color-muted, rgba(127,127,127,0.06)); }
   .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
   .subtitle { color: var(--text-color-muted, #59636e); font-size: 12px; margin: 0 0 16px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color-default, #d0d7de);
+    background: var(--background-color-default, #ffffff);
+    color: var(--text-color-default, #1f2328);
+    font-size: 12px;
+    font-weight: var(--font-weight-semibold, 600);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--background-color-muted, rgba(127,127,127,0.08)); }
+  .insight { margin-top: 20px; }
+  .insight h2 { font-size: var(--text-body-large, 15px); margin: 0 0 8px; }
+  .insight-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+  .insight-stat { font-size: 12px; color: var(--text-color-muted, #59636e); }
+  .insight-stat strong { display: block; font-size: 16px; color: var(--text-color-default, #1f2328); font-weight: var(--font-weight-semibold, 600); }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+  .bar-label { width: 110px; flex: none; color: var(--text-color-muted, #59636e); }
+  .bar-track { flex: 1; background: var(--background-color-muted, rgba(127,127,127,0.08)); border-radius: 4px; overflow: hidden; height: 10px; }
+  .bar-fill { height: 100%; background: var(--true-color-blue, #0969da); border-radius: 4px; }
+  .bar-value { width: 70px; flex: none; text-align: right; color: var(--text-color-muted, #59636e); }
 </style>
 </head>
 <body>
@@ -143,6 +169,41 @@ export function renderShell() {
       });
     }
 
+    function fmtDuration(ms) {
+      if (ms === null || ms === undefined) return "n/a";
+      const totalSec = Math.round(ms / 1000);
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return m > 0 ? (m + "m " + s + "s") : (s + "s");
+    }
+
+    function renderInsight(run) {
+      const insight = run.insightSummary;
+      if (!insight || !insight.totalCalls) return "";
+      const categories = Object.entries(insight.byCategory || {}).sort((a, b) => b[1] - a[1]);
+      const maxMs = Math.max(insight.thinkingMs || 0, ...categories.map((c) => c[1]), 1);
+      const bars = categories.map(([category, ms]) => (
+        '<div class="bar-row"><span class="bar-label">' + esc(category) + '</span>' +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + Math.round((ms / maxMs) * 100) + '%"></div></div>' +
+          '<span class="bar-value">' + fmtDuration(ms) + '</span></div>'
+      )).join("");
+      const thinkingBar = insight.thinkingMs !== null ? (
+        '<div class="bar-row"><span class="bar-label">Thinking (est.)</span>' +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + Math.round((insight.thinkingMs / maxMs) * 100) + '%;background:var(--text-color-muted,#59636e);"></div></div>' +
+          '<span class="bar-value">' + fmtDuration(insight.thinkingMs) + '</span></div>'
+      ) : "";
+      return (
+        '<div class="insight"><h2>Insight</h2>' +
+        '<div class="insight-stats">' +
+          '<div class="insight-stat"><strong>' + insight.totalCalls + '</strong>tool calls</div>' +
+          '<div class="insight-stat"><strong>' + fmtDuration(insight.elapsedMs) + '</strong>elapsed</div>' +
+          '<div class="insight-stat"><strong>' + fmtDuration(insight.totalToolMs) + '</strong>tool time</div>' +
+        '</div>' +
+        thinkingBar + bars +
+        '</div>'
+      );
+    }
+
     function renderDetail(run) {
       const el = document.getElementById("detail");
       if (!run) {
@@ -157,11 +218,16 @@ export function renderShell() {
         '</div>'
       )).join("");
       el.innerHTML =
-        '<div class="header-row"><h1 style="margin:0;">' + esc(run.title) + '</h1>' + badge(run.status) + '</div>' +
+        '<div class="header-row"><h1 style="margin:0;">' + esc(run.title) + '</h1>' +
+          '<div class="header-actions">' + badge(run.status) +
+            '<a class="btn" href="/api/runs/' + esc(run.id) + '/report" download>Download report</a>' +
+          '</div>' +
+        '</div>' +
         '<p class="subtitle">' + esc(run.skillId) + ' &middot; started ' + esc(new Date(run.startedAt).toLocaleString()) +
           (run.updatedAt ? ' &middot; updated ' + esc(new Date(run.updatedAt).toLocaleString()) : "") + '</p>' +
         stages +
-        (run.summary ? '<div class="summary"><strong>Summary:</strong><br/>' + esc(run.summary) + '</div>' : "");
+        (run.summary ? '<div class="summary"><strong>Summary:</strong><br/>' + esc(run.summary) + '</div>' : "") +
+        renderInsight(run);
     }
 
     async function selectRun(id) {
