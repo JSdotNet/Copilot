@@ -48,12 +48,23 @@ Each orchestration skill coordinates multiple agents from other plugins (develop
 
 - `hooks.json` - Guardrails that block the built-in PR tool for JSdotNet PRs and add recovery guidance for `gh`-based PR failures
 
+### Canvas Extensions
+
+- `extensions/orch-dashboard/` - Live progress and output dashboard for all `orch-*` skills. See `extensions/orch-dashboard/README.md` for the canvas action contract and install instructions.
+
 ## Install
 
 ```bash
 copilot plugin install JSdotNet/Copilot:plugins/copilot-app
 copilot plugin list
 ```
+
+The plugin's skills are ready to use once installed. The canvas dashboard is
+a separate opt-in step (canvas extensions are not installed by the plugin
+mechanism): install it with the `install_extension` tool using
+`https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard`,
+choosing `project`, `user`, or `session` scope. See
+`extensions/orch-dashboard/README.md` for details.
 
 ## Verify Installation
 
@@ -66,7 +77,7 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 
 ## Key Features
 
-- **Canvas Interfaces** - Interactive workflow orchestration in GitHub Copilot App (planned)
+- **Canvas Interfaces** - Interactive orchestration progress/output dashboard (`extensions/orch-dashboard/`) driven by every `orch-*` skill
 - **TDD Bug Fixes** - Solve bugs by creating tests first with csharp-coding agent
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
 - **Project Guidelines** - Uses `jsdotnet-project-guidelines-mcpserver` for consistent standards
@@ -292,7 +303,7 @@ The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
 - `orch-create-service` can use `aspire` for AppHost wiring
 - All orchestration skills can invoke specialized agents (with user approval) and their associated skills
-- Canvas interfaces are planned for future interactive orchestration
+- All orchestration skills report progress and output through the `orch-dashboard` canvas extension (`extensions/orch-dashboard/`)
 
 ## Reinstall After Changes
 

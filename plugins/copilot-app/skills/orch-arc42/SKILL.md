@@ -63,16 +63,25 @@ Invoke: orch-arc42
 - Cross-section consistency verified.
 - Review-ready update set prepared.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Section picker for target arc42 sections
-- Guideline context panel populated from MCP lookups
-- Draft tracker with assumptions, risks, and cross-links
-- Review checklist for consistency and traceability
-- Action buttons to continue drafting or request review
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-arc42"` and these stages: Context & Guideline Retrieval,
+  Section Drafting, Cross-Section Review.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. retrieved
+  guidelines, drafted section content, or review findings.
+- Call `finish_run` with the final status and a summary once the arc42
+  sections are review-ready.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

@@ -111,17 +111,26 @@ Orchestrate feature development for:
 - Validation evidence captured (logs, screenshots).
 - Validation result recorded with pass/fail per scenario.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Feature specification with acceptance criteria
-- Development progress tracking each stage
-- Definition of Done interactive checklist
-- E2E validation panel with scenario-level pass/fail status
-- Local run and monitoring panel for startup, logs, and health checks
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-feature"` and these stages: Feature Specification,
+  Architecture & Design, Implementation, Testing & Validation, Code Review &
+  Quality, E2E Validation & Result Recording.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. acceptance criteria,
+  coverage numbers, review outcome, or E2E pass/fail results.
+- Call `finish_run` with the final status and a summary once the feature is
+  validated end-to-end.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

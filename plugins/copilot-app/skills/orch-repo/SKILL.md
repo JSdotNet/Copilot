@@ -142,17 +142,26 @@ Orchestrate repository setup for:
 
 > Use them sequentially: run `orch-repo` first, then `orch-project`.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Repository configuration form (name, visibility, topics, license)
-- README editor with project description and setup steps
-- MCP server selector and configuration panel
-- Branch protection rule builder
-- Template and label configurator
-- Progress tracker for each workflow stage
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-repo"` and these stages: Repository Creation, README, MCP
+  Configuration, Copilot Instructions, Branch Protection, Issue and PR
+  Templates, Repository Governance.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. repository URL,
+  configured MCP servers, or branch protection rules applied.
+- Call `finish_run` with the final status and a summary once the repository
+  is fully configured.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 - Repository readiness summary with links to created resources
 
 ## Reference

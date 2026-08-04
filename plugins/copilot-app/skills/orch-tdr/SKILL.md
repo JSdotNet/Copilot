@@ -62,16 +62,25 @@ Invoke: orch-tdr
 - Impact statements verified across delivery, quality, and operations.
 - Review-ready TDR prepared with actionable remediation path.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Debt summary panel with scope and impact
-- Guideline context panel populated from MCP lookups
-- Remediation tracker for owner, severity, and timing
-- Traceability checklist for linked architecture artifacts
-- Review controls for publishing the TDR draft
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-tdr"` and these stages: Debt Context Retrieval, TDR
+  Drafting, Risk & Follow-Up Review.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. retrieved
+  guidelines, drafted TDR content, or follow-up risks.
+- Call `finish_run` with the final status and a summary once the TDR is
+  review-ready.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 
