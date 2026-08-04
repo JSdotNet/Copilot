@@ -54,13 +54,14 @@ Execute a complete workflow for adding a new service to an existing project, wit
 **Agents:** `csharp-coding:coding`, `development:testing`, `review:reviewer`
 
 ### Stage 5: Local Run & Monitoring
-- **Start host and new service locally**
-- **Validate health endpoints** and critical service flows
-- **Run smoke checks** across integration points
-- **Monitor logs and runtime behavior** for stability
-- **Record readiness status** and follow-up actions
+- **Start host and new service locally** (`qa:qa` agent's `aspire-run` skill)
+- **Validate health endpoints and critical service flows with Playwright** — `qa:qa` drives smoke checks across integration points, capturing screenshot/video evidence
+- **Monitor logs and runtime behavior** for stability — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Record readiness status** and follow-up actions, merging Playwright evidence with monitoring findings
 
-**Agents:** `csharp-coding:coding`, `development:developer`, `review:reviewer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 

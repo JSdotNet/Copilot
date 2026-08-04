@@ -54,12 +54,14 @@ Execute a complete workflow for adding a new module to an existing project using
 **Agents:** `csharp-coding:coding`, `review:reviewer`, `development:testing`
 
 ### Stage 5: Local Run & Monitoring
-- **Run the project locally** with module enabled
-- **Validate module endpoints/flows** using smoke tests
-- **Monitor logs and health checks** for regressions
-- **Record validation evidence** and readiness status
+- **Run the project locally** with module enabled (`qa:qa` agent's `aspire-run` skill)
+- **Validate module endpoints/flows with Playwright** — `qa:qa` drives smoke-test scenarios, capturing screenshot/video evidence
+- **Monitor logs and health checks** for regressions — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Record validation evidence** and readiness status, merging Playwright evidence with monitoring findings
 
-**Agents:** `csharp-coding:coding`, `development:developer`, `review:reviewer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 
