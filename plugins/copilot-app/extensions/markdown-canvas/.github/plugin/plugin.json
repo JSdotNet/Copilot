@@ -1,0 +1,15 @@
+{
+  "name": "markdown-canvas",
+  "description": "Live Markdown document preview canvas (ADRs, TDRs, arc42 sections, backlog items) for this repository's documentation and product-owner plugins.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "markdown-preview",
+    "documentation",
+    "product-owner"
+  ],
+  "extensions": "."
+}

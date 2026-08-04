@@ -47,10 +47,13 @@ JSdotNet-Copilot
 |  |- review/
 |  |- copilot-plugin-manager/
 |  |- copilot-spec-builder/
+|  |- copilot-app/
+|  |  \- extensions/
+|  |     |- diagram-canvas/
+|  |     |- markdown-canvas/
+|  |     \- orch-dashboard/
 |  |- wip-convention/
 |  \- worktree-parallel/
-|- extensions/
-|  \- copilot-canvas-studio/
 \- scripts/
 ```
 
@@ -93,15 +96,17 @@ copilot plugin list
 ### Canvas Extensions
 
 Unlike plugins (skills, agents, instructions), canvas extensions add interactive UI
-surfaces the agent can open in a side panel. This repository ships
-`plugins/copilot-app/extensions/copilot-canvas-studio`, bundling a Mermaid diagram viewer
-and a Markdown document preview used by the `architecture`, `domain-design`, `ux-design`,
-`documentation`, `product-owner`, and `copilot-app` plugins. It ships inside `copilot-app`
-but installs and runs independently of it — install it on its own for any of the other
-plugins. It is packaged like any other plugin (its own `.github/plugin/plugin.json`), so
-install it the same way:
-`copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio`. See
-`plugins/copilot-app/extensions/copilot-canvas-studio/README.md` for details.
+surfaces the agent can open in a side panel. This repository ships two independent canvas
+extensions inside `plugins/copilot-app/extensions/`: `diagram-canvas` (Mermaid diagram
+viewer) and `markdown-canvas` (Markdown document preview), used by the `architecture`,
+`domain-design`, `ux-design`, `documentation`, `product-owner`, and `copilot-app` plugins.
+Both ship inside `copilot-app` but install and run independently of it and of each other —
+install either one on its own for any of the other plugins. Each is packaged like any other
+plugin (its own `.github/plugin/plugin.json`), so install the same way:
+`copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas` and
+`copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`.
+See `plugins/copilot-app/extensions/diagram-canvas/README.md` and
+`plugins/copilot-app/extensions/markdown-canvas/README.md` for details.
 
 ## Project Structure
 

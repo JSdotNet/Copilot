@@ -103,11 +103,13 @@ When installed, the `ux-designer` agent and the `ux-design-review` and `ux-desig
 
 ## Optional Enhancement — Canvas Previews
 
-Install the `copilot-canvas-studio` canvas extension to get live, interactive previews of
-Mermaid-based wireframes/user flows and design documents instead of Markdown-only output:
+Install the `diagram-canvas` and `markdown-canvas` canvas extensions to get live,
+interactive previews of Mermaid-based wireframes/user flows and design documents instead
+of Markdown-only output:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas
 ```
 
 When installed, Mermaid wireframes and user flows render on the `mermaid-diagram` canvas

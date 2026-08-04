@@ -62,11 +62,11 @@ copilot plugin uninstall product-owner
 
 ## Optional Enhancement — Canvas Previews
 
-Install the `copilot-canvas-studio` canvas extension to get a live, interactive preview of
+Install the `markdown-canvas` canvas extension to get a live, interactive preview of
 drafted epics, stories, and bugs instead of Markdown-only output:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas
 ```
 
 When installed, backlog skills render drafted content on the `markdown-preview` canvas

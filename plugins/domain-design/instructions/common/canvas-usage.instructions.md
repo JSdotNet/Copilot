@@ -1,21 +1,25 @@
 ---
 applyTo: 'agents/**/*.agent.md'
-description: Defines when and how to use the copilot-canvas-studio canvases for domain design diagrams and documents in this plugin.
+description: Defines when and how to use the diagram-canvas and markdown-canvas canvases for domain design diagrams and documents in this plugin.
 ---
 
 # Canvas Usage Instructions
 
 ## Purpose
 
-- Prefer live canvas previews over Markdown-only output when the `copilot-canvas-studio`
-  canvas extension is available in the current session.
+- Prefer live canvas previews over Markdown-only output when the `diagram-canvas` and/or
+  `markdown-canvas` canvas extensions are available in the current session.
 - Keep the required file-based artifact as the source of truth; canvas rendering is an
   additional live preview, never a replacement for it.
 
 ## Availability Check
 
-- Canvas support depends on an installed extension (`copilot-canvas-studio`, see
-  `JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio`). Never assume it is present.
+- Canvas support depends on separately installed extensions:
+  `diagram-canvas` (`JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas`) for
+  the `mermaid-diagram` canvas, and `markdown-canvas`
+  (`JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`) for the
+  `markdown-preview` canvas. Never assume either is present, and check them independently
+  — one may be installed without the other.
 - Before using a canvas, confirm it is available in the current session (for example via
   `list_canvas_capabilities` for `mermaid-diagram` / `markdown-preview`, or by checking
   whether `open_canvas` / `invoke_canvas_action` are exposed).

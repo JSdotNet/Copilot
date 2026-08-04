@@ -121,11 +121,11 @@ All instruction files use generic `applyTo` globs so they work in any repository
 
 ## Optional Enhancement — Canvas Previews
 
-Install the `copilot-canvas-studio` canvas extension to get a live, interactive preview of
+Install the `markdown-canvas` canvas extension to get a live, interactive preview of
 drafted documents instead of Markdown-only output:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas
 ```
 
 When installed, all documentation and profile skills render their drafted content on the

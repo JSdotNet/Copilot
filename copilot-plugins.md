@@ -110,10 +110,15 @@ other local plugin — each one has its own `.github/plugin/plugin.json` with an
 its `extension.mjs`. Install with `copilot plugin install`, same as any plugin in this
 repo.
 
-- `copilot-canvas-studio` (`1.1.0`)
-  - Source path: `plugins/copilot-app/extensions/copilot-canvas-studio`
-  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio`
-  - Canvases: `mermaid-diagram` (interactive C4/sequence/state/deployment/DDD/wireframe diagram viewer), `markdown-preview` (live ADR/TDR/arc42/backlog document preview).
+- `diagram-canvas` (`1.0.0`)
+  - Source path: `plugins/copilot-app/extensions/diagram-canvas`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas`
+  - Canvas: `mermaid-diagram` (interactive C4/sequence/state/deployment/DDD/wireframe diagram viewer).
+  - Used by: `architecture`, `domain-design`, `ux-design`, and `copilot-app` plugins when installed alongside them. Ships inside `copilot-app` but installs and runs independently — installing `copilot-app` alone does not install it for the other plugins.
+- `markdown-canvas` (`1.0.0`)
+  - Source path: `plugins/copilot-app/extensions/markdown-canvas`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`
+  - Canvas: `markdown-preview` (live ADR/TDR/arc42/backlog document preview).
   - Used by: `architecture`, `domain-design`, `ux-design`, `documentation`, `product-owner`, and `copilot-app` plugins when installed alongside them. Ships inside `copilot-app` but installs and runs independently — installing `copilot-app` alone does not install it for the other plugins.
 - `orch-dashboard` (`1`)
   - Source path: `plugins/copilot-app/extensions/orch-dashboard`

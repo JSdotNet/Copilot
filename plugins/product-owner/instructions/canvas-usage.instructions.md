@@ -1,21 +1,21 @@
 ---
 applyTo: 'agents/**/*.agent.md'
-description: Defines when and how to use the copilot-canvas-studio markdown-preview canvas for backlog artifacts in this plugin.
+description: Defines when and how to use the markdown-canvas markdown-preview canvas for backlog artifacts in this plugin.
 ---
 
 # Canvas Usage Instructions
 
 ## Purpose
 
-- Prefer a live canvas preview over Markdown-only output when the `copilot-canvas-studio`
+- Prefer a live canvas preview over Markdown-only output when the `markdown-canvas`
   canvas extension is available in the current session.
 - Keep the required Markdown file as the source of truth; canvas rendering is an
   additional live preview, never a replacement for it.
 
 ## Availability Check
 
-- Canvas support depends on an installed extension (`copilot-canvas-studio`, see
-  `JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio`). Never assume it is present.
+- Canvas support depends on an installed extension (`markdown-canvas`, see
+  `JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`). Never assume it is present.
 - Before using a canvas, confirm it is available in the current session (for example via
   `list_canvas_capabilities` for `markdown-preview`, or by checking whether
   `open_canvas` / `invoke_canvas_action` are exposed).

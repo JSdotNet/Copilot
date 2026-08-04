@@ -1,29 +1,19 @@
-# copilot-canvas-studio
+# diagram-canvas
 
-Installable GitHub Copilot CLI canvas extension. Bundles two canvases used across this
-repository's plugins so the agent can render live, interactive previews instead of only
-writing Markdown files.
+Installable GitHub Copilot CLI canvas extension. Renders live, interactive Mermaid
+diagrams instead of only writing Markdown fenced code blocks.
 
-Ships inside the `copilot-app` plugin but installs and runs independently of it — install
-this extension on its own for any of `architecture`, `domain-design`, `ux-design`,
-`documentation`, or `product-owner`; installing `copilot-app` does not implicitly install it
-for those other plugins.
-
-## Canvases
+## Canvas
 
 - **`mermaid-diagram`** — Mermaid Diagram Viewer. Renders C4, sequence, state, deployment,
   and DDD diagrams (aggregate, context map, event flow, subdomain landscape), plus UX
   wireframes/user-flows, as an interactive, pannable/zoomable live preview. Supports
   drill-down navigation (`push`/`replace` modes with a Back button) and an optional
   explanation side panel.
-- **`markdown-preview`** — Markdown Document Preview. Live-renders ADRs, TDRs, arc42
-  sections, blueprints, and backlog artifacts (epics/stories/bugs) as formatted HTML while
-  the agent drafts or revises them.
 
-Both canvases are served by a single local HTTP server bound to `127.0.0.1` on an
-ephemeral port, with a random per-instance token required on every request. The Mermaid
-canvas loads `mermaid.js` from a CDN (`cdn.jsdelivr.net`) to render diagrams; the Markdown
-canvas uses a small dependency-free renderer and needs no network access.
+Served by a local HTTP server bound to `127.0.0.1` on an ephemeral port, with a random
+per-instance token required on every request. Loads `mermaid.js` from a CDN
+(`cdn.jsdelivr.net`) to render diagrams.
 
 ## Install
 
@@ -31,40 +21,38 @@ This folder is a standalone plugin (it has its own `.github/plugin/plugin.json` 
 `extensions` mapping), so install it the same way as any other plugin in this repo:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas
 copilot plugin list
 ```
 
 Reinstall after changes:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas
 ```
 
 Uninstall:
 
 ```bash
-copilot plugin uninstall copilot-canvas-studio
+copilot plugin uninstall diagram-canvas
 ```
 
 For local development/testing without installing, load it directly from disk:
 
 ```bash
-copilot --plugin-dir plugins/copilot-app/extensions/copilot-canvas-studio
+copilot --plugin-dir plugins/copilot-app/extensions/diagram-canvas
 ```
 
 Alternatively, use the `install_extension` tool from within a Copilot CLI/App session with
-`url: https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/copilot-canvas-studio` for a
-user- or session-scoped install without going through `copilot plugin install`.
+`url: https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/diagram-canvas`
+for a user- or session-scoped install without going through `copilot plugin install`.
 
 ## Agent Usage
 
-- `render_diagram` (mermaid-diagram): pass raw Mermaid source (the contents of a
-  ` ```mermaid ` fenced block) plus an optional title/mode/explanation. `open_canvas` also
-  accepts `source`/`title`/`explanation` directly to render on first open in a single call.
-- `render_markdown` (markdown-preview): pass raw Markdown content plus an optional
-  title/mode. `open_canvas` also accepts `content`/`title` directly.
-- Both canvases expose `get_state` and `clear` actions.
+- `render_diagram`: pass raw Mermaid source (the contents of a ` ```mermaid ` fenced block)
+  plus an optional title/mode/explanation. `open_canvas` also accepts
+  `source`/`title`/`explanation` directly to render on first open in a single call.
+- `show_explanation`, `get_state`, and `clear` are also available.
 
 ### Interactivity
 
@@ -86,3 +74,9 @@ See each plugin's `instructions/common/canvas-usage.instructions.md` (or
 `instructions/canvas-usage.instructions.md` where the plugin has no `common/` folder) for
 the policy on when skills should prefer opening a canvas over emitting Markdown-only
 output.
+
+## Related
+
+- `../markdown-canvas/` — sibling extension for live Markdown document previews (ADRs,
+  TDRs, arc42 sections, backlog items). Install separately; the two canvases do not share a
+  process.
