@@ -11,6 +11,7 @@ Concise decision guide and troubleshooting checklist for authoring GitHub Copilo
 | Agent | `.github/agents/*.agent.md` | You need a named persona with specific tools, tone, and handoff behavior |
 | Skill | `.github/skills/<skill>/SKILL.md` | You have a reusable multi-step workflow with defined inputs, steps, and outputs |
 | Prompt | `.github/prompts/*.prompt.md` | You want a slash-command-style shortcut for a specific, repeatable request |
+| Canvas extension | `.github/extensions/<name>/extension.mjs` | You need an interactive side-panel surface the agent can open and drive with actions |
 
 ## Troubleshooting: Asset Not Being Picked Up
 
