@@ -32,10 +32,11 @@ one agent's turn at a time.
 
 - If the QA session is running inside the GitHub Copilot App and genuine parallel
   execution is required (monitoring truly running concurrently with browser
-  interaction, in a separate session), use the `orch-qa` skill from the `copilot-app`
-  plugin instead — that skill uses App-level session orchestration
-  (`create_session`/cross-session messaging) which is not available to a plugin agent's
-  own tool set.
+  interaction, in a separate session), use App-level session orchestration directly
+  (`create_session`/cross-session messaging), as the `copilot-app` plugin's `orch-feature`,
+  `orch-bug`, and other orchestration skills do inline in their Local Run & Monitoring /
+  E2E validation stage — that capability is not available to a plugin agent's own tool
+  set.
 - This skill is the portable option: it works in any host that supports the `agent`
   tool (Copilot CLI, VS Code, GitHub Copilot App), at the cost of being sequential
   rather than truly concurrent.

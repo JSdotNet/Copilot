@@ -58,9 +58,10 @@ never just checked at the end:
   `delegate-to-qa-monitor` skill to hand monitoring off to the dedicated `qa-monitor`
   agent (with explicit user approval) so observability gets undivided attention instead
   of being interleaved with browser steps. This is still a same-session handoff — see
-  that skill's note on the [`orch-qa`](../../copilot-app/skills/orch-qa/SKILL.md) skill
-  in the `copilot-app` plugin if genuine parallel (separate-session) monitoring is
-  needed and the session is running inside the GitHub Copilot App.
+  that skill's note on genuine parallel (separate-session) monitoring, which the
+  `copilot-app` plugin's orchestration skills (`orch-feature`, `orch-bug`, etc.) apply
+  inline in their Local Run & Monitoring / E2E validation stage when running inside the
+  GitHub Copilot App.
 
 ### 3. Validate the Feature with Playwright MCP
 

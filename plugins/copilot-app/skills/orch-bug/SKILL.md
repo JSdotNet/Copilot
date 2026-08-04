@@ -70,13 +70,15 @@ Execute a complete bug fix workflow from identification through local runtime va
 **Agents:** `review:reviewer`, `csharp-coding:coding`
 
 ### Stage 6: Local Run & Monitoring
-- **Run fixed build locally** in reproduction-like conditions
-- **Execute local smoke tests** for impacted flows
-- **Monitor logs and health metrics** for regression signals
-- **Capture runtime evidence** (logs, screenshots, traces)
+- **Run fixed build locally** in reproduction-like conditions (`qa:qa` agent's `aspire-run` skill)
+- **Validate the fix with Playwright** — `qa:qa` re-runs the original reproduction steps plus the new regression scenario, capturing screenshot/video evidence
+- **Monitor logs and health metrics** for regression signals — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics for the duration of validation:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Capture runtime evidence** (logs, screenshots, traces) and merge Playwright evidence with monitoring findings
 - **Confirm issue closure criteria** before handoff
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer` running validation manually when the `qa` plugin isn't installed
 
 ## Severity Levels & Response Times
 

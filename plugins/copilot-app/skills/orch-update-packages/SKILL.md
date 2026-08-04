@@ -72,12 +72,14 @@ Execute a complete package update workflow with validation, testing, and local r
 **Agents:** `review:reviewer`, `csharp-coding:coding`
 
 ### Stage 7: Local Run & Monitoring
-- **Run the updated project locally**
-- **Monitor application health** after updates
-- **Run smoke tests** and key user scenarios
-- **Capture runtime observations** and blockers
+- **Run the updated project locally** (`qa:qa` agent's `aspire-run` skill)
+- **Validate with Playwright** — `qa:qa` runs smoke tests and key user scenarios, capturing screenshot/video evidence
+- **Monitor application health** after updates — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Capture runtime observations** and blockers, merging Playwright evidence with monitoring findings
 
-**Agents:** `development:developer`, `csharp-coding:coding`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:developer`, `csharp-coding:coding` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 
