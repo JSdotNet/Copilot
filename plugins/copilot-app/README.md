@@ -21,6 +21,7 @@ This plugin provides specialized skills for GitHub Copilot App users who need to
    - Bug triage with test-driven development (TDD)
    - Module creation inside existing projects
    - New service creation in existing projects
+   - QA validation with parallel Aspire monitoring session (`orch-qa`)
 
 Each orchestration skill coordinates multiple agents from other plugins (development, architecture, product-owner, csharp-coding, review) to execute complete workflows. Agent transitions require explicit user approval. Cross-plugin agents are recommended but not required — skills degrade gracefully when optional plugins are missing.
 
@@ -43,6 +44,7 @@ Each orchestration skill coordinates multiple agents from other plugins (develop
 - `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with local monitoring (canvas)
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
 - `skills/orch-create-service/SKILL.md` - Create and wire a new service in an existing project (canvas)
+- `skills/orch-qa/SKILL.md` - QA validation with a parallel child session for Aspire log/trace monitoring while the qa agent drives Playwright (App-only)
 
 ### Hooks
 
@@ -59,7 +61,7 @@ copilot plugin list
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- - In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
+- - In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`, `orch-qa`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -84,6 +86,7 @@ This plugin works best with the following installed plugins:
 - `csharp-coding` - For code implementation with TDD
 - `product-owner` - For user stories and backlog management
 - `review` - For validation and quality review
+- `qa` - For runtime QA validation (Aspire + Playwright), used by `orch-qa`
 
 Install recommended plugins:
 
@@ -93,6 +96,7 @@ copilot plugin install JSdotNet/Copilot:plugins/architecture
 copilot plugin install JSdotNet/Copilot:plugins/csharp-coding
 copilot plugin install JSdotNet/Copilot:plugins/product-owner
 copilot plugin install JSdotNet/Copilot:plugins/review
+copilot plugin install JSdotNet/Copilot:plugins/qa
 ```
 
 ## Usage Examples
@@ -249,6 +253,16 @@ Invoke: orch-create-service
 - Runtime target: Local run + monitoring
 ```
 
+### Orchestrate QA Validation (Parallel Monitoring)
+
+```
+Invoke: orch-qa
+- Feature: "Checkout flow"
+- AppHost: "Orders.Platform.AppHost"
+- Scenarios: happy path, invalid payment, empty cart
+- Monitoring: parallel child session running qa-monitor agent
+```
+
 ## Integration Architecture
 
 ```
@@ -262,7 +276,8 @@ copilot-app plugin
         ├── ↔ jsdotnet-project-guidelines-mcpserver (guideline and ADR retrieval)
         ├── ↔ csharp-coding plugin (coding agent for implementation)
         ├── ↔ product-owner plugin (product-owner agent)
-        └── ↔ review plugin (reviewer agent)
+        ├── ↔ review plugin (reviewer agent)
+        └── ↔ qa plugin (qa, qa-monitor agents — orch-qa runs qa-monitor in a parallel child session)
 ```
 
 ## Workflow Coordination Model
@@ -291,6 +306,10 @@ The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-tdr` uses `create-technical-debt-record` after MCP-based context gathering
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
 - `orch-create-service` can use `aspire` for AppHost wiring
+- `orch-qa` uses the `qa` plugin's `aspire-run`/`playwright-*` skills in the current
+  session and creates a child session running the `qa-monitor` agent for parallel
+  Aspire log/trace monitoring (App-only; see the `qa` plugin's `delegate-to-qa-monitor`
+  skill for the portable, same-session fallback)
 - All orchestration skills can invoke specialized agents (with user approval) and their associated skills
 - Canvas interfaces are planned for future interactive orchestration
 

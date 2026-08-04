@@ -49,11 +49,11 @@ first on an unfamiliar page to confirm available element references before inter
 ### 3. Execute the Scenario
 
 - Perform each interaction (`browser_click`, `browser_type`, etc.) in order.
-- After each meaningful step, take a screenshot with `browser_take_screenshot` and save
-  it under `.wip/qa/<feature-name>/screenshots/<step-number>-<short-name>.png`.
-- For multi-step or animated flows, start tracing/video (`browser_start_tracing` or
-  equivalent) before the sequence and stop it after, saving to
-  `.wip/qa/<feature-name>/video/<scenario-name>.webm` (or the format the MCP server produces).
+- Choose the evidence type per scenario, applying the matching skill:
+  - Single-state checkpoints or failures → apply the `playwright-screenshot` skill.
+  - Multi-step or animated flows where the sequence itself matters → apply the
+    `playwright-recording` skill (start it before the first action in the scenario).
+  - The two are complementary — a recorded flow can still have checkpoint screenshots.
 - Check `browser_console_messages` after each step for client-side JS errors.
 - Check `browser_network_requests` when validating API-backed features — confirm status
   codes and payload shape match expectations.
@@ -88,6 +88,13 @@ first on an unfamiliar page to confirm available element references before inter
 - Don't skip the console/network check just because the visual result looks correct.
 - Don't stop Aspire log monitoring before finishing all scenarios.
 - Don't reuse a stale snapshot reference after the page has re-rendered — re-snapshot.
+
+## Related Skills
+
+| Skill | When to use |
+|---|---|
+| `playwright-screenshot` | Point-in-time evidence for a checkpoint or failure |
+| `playwright-recording` | Continuous video/trace evidence for a multi-step flow |
 
 ## Reference
 

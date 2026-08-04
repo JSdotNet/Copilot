@@ -46,12 +46,21 @@ Apply the `aspire-run` skill:
 
 ### 2. Start Aspire Log/Trace Monitoring (keep running for the whole session)
 
-Apply the `aspire-log-monitor` skill:
+Choose one of two options — both must stay active for the entire Playwright session,
+never just checked at the end:
 
-1. Call `get_resources` to confirm which resources are up and record their baseline state.
-2. Establish a monitoring baseline (timestamp, known warnings) before interacting with the app.
-3. Keep polling `get_resource_logs` / `get_traces` / `get_console_logs` throughout Playwright validation — do not defer this to the end.
-4. Flag any Error/Critical log entries or failed traces immediately, even if the UI appeared to work.
+- **Self-contained (default)** — apply the `aspire-log-monitor` skill directly:
+  1. Call `get_resources` to confirm which resources are up and record their baseline state.
+  2. Establish a monitoring baseline (timestamp, known warnings) before interacting with the app.
+  3. Keep polling `get_resource_logs` / `get_traces` / `get_console_logs` throughout Playwright validation — do not defer this to the end.
+  4. Flag any Error/Critical log entries or failed traces immediately, even if the UI appeared to work.
+- **Delegated persona (optional)** — for long or high-stakes sessions, apply the
+  `delegate-to-qa-monitor` skill to hand monitoring off to the dedicated `qa-monitor`
+  agent (with explicit user approval) so observability gets undivided attention instead
+  of being interleaved with browser steps. This is still a same-session handoff — see
+  that skill's note on the [`orch-qa`](../../copilot-app/skills/orch-qa/SKILL.md) skill
+  in the `copilot-app` plugin if genuine parallel (separate-session) monitoring is
+  needed and the session is running inside the GitHub Copilot App.
 
 ### 3. Validate the Feature with Playwright MCP
 
@@ -79,6 +88,7 @@ Store evidence and the report under `.wip/qa/<feature-name>/` unless the user sp
 
 When a finding is outside this agent's scope, propose a handoff with explicit user approval:
 
+- **QA Monitor agent** (`qa:qa-monitor`) — to give continuous Aspire log/trace/metric monitoring a dedicated persona (see `delegate-to-qa-monitor` skill).
 - **Coding agent** (`csharp-coding:coding`) — to fix a runtime bug found during validation.
 - **SRE guidance** (`csharp-coding` plugin's `sre` skill) — for reliability/observability follow-up on repeated log errors.
 
@@ -96,8 +106,11 @@ Use the required wording: "I recommend handing this off to `<agent>` because `<r
 | Skill | When to use |
 |---|---|
 | `aspire-run` | Start (and confirm healthy) an Aspire-orchestrated app for testing |
-| `playwright-validation` | Drive browser validation via Playwright MCP with screenshot/video evidence |
+| `playwright-validation` | Drive browser validation via Playwright MCP with recorded evidence |
+| `playwright-screenshot` | Point-in-time evidence for a checkpoint or failure |
+| `playwright-recording` | Continuous video/trace evidence for a multi-step flow |
 | `aspire-log-monitor` | Continuously monitor Aspire logs/traces/metrics during a test session |
+| `delegate-to-qa-monitor` | Hand off monitoring to the `qa-monitor` agent persona (same-session) |
 
 ## Quality Checklist
 
