@@ -1,7 +1,7 @@
 ---
 description: Copilot assistant for writing and maintaining profile artifacts for GitHub, LinkedIn, and GitHub project showcases.
 model: claude-haiku-4.5
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal']
+tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
 handoffs:
   - label: Documentation Artifact
     agent: documentation
