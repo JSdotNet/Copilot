@@ -111,10 +111,15 @@ its `extension.mjs`. Install with `copilot plugin install`, same as any plugin i
 repo.
 
 - `copilot-canvas-studio` (`1.1.0`)
-  - Source path: `extensions/copilot-canvas-studio`
-  - Install: `copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio`
+  - Source path: `plugins/copilot-app/extensions/copilot-canvas-studio`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio`
   - Canvases: `mermaid-diagram` (interactive C4/sequence/state/deployment/DDD/wireframe diagram viewer), `markdown-preview` (live ADR/TDR/arc42/backlog document preview).
-  - Used by: `architecture`, `domain-design`, `ux-design`, `documentation`, `product-owner` plugins when installed alongside them.
+  - Used by: `architecture`, `domain-design`, `ux-design`, `documentation`, `product-owner`, and `copilot-app` plugins when installed alongside them. Ships inside `copilot-app` but installs and runs independently — installing `copilot-app` alone does not install it for the other plugins.
+- `orch-dashboard` (`1`)
+  - Source path: `plugins/copilot-app/extensions/orch-dashboard`
+  - Install: `install_extension` tool with `https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard` (not `copilot plugin install` — this extension has no standalone `.github/plugin/plugin.json`).
+  - Canvas: live progress/output dashboard for `copilot-app`'s `orch-*` orchestration skills.
+  - Used by: `copilot-app` plugin only.
 
 ## Team Commands
 

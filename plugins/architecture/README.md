@@ -71,7 +71,7 @@ Install the `copilot-canvas-studio` canvas extension to get live, interactive pr
 generated diagrams and documents instead of Markdown-only output:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
 ```
 
 When installed, this plugin's diagram skills render their Mermaid output on the

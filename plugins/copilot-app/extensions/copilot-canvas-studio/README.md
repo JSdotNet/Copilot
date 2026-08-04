@@ -4,6 +4,11 @@ Installable GitHub Copilot CLI canvas extension. Bundles two canvases used acros
 repository's plugins so the agent can render live, interactive previews instead of only
 writing Markdown files.
 
+Ships inside the `copilot-app` plugin but installs and runs independently of it — install
+this extension on its own for any of `architecture`, `domain-design`, `ux-design`,
+`documentation`, or `product-owner`; installing `copilot-app` does not implicitly install it
+for those other plugins.
+
 ## Canvases
 
 - **`mermaid-diagram`** — Mermaid Diagram Viewer. Renders C4, sequence, state, deployment,
@@ -26,14 +31,14 @@ This folder is a standalone plugin (it has its own `.github/plugin/plugin.json` 
 `extensions` mapping), so install it the same way as any other plugin in this repo:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
 copilot plugin list
 ```
 
 Reinstall after changes:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
 ```
 
 Uninstall:
@@ -45,11 +50,11 @@ copilot plugin uninstall copilot-canvas-studio
 For local development/testing without installing, load it directly from disk:
 
 ```bash
-copilot --plugin-dir extensions/copilot-canvas-studio
+copilot --plugin-dir plugins/copilot-app/extensions/copilot-canvas-studio
 ```
 
 Alternatively, use the `install_extension` tool from within a Copilot CLI/App session with
-`url: https://github.com/JSdotNet/Copilot/tree/main/extensions/copilot-canvas-studio` for a
+`url: https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/copilot-canvas-studio` for a
 user- or session-scoped install without going through `copilot plugin install`.
 
 ## Agent Usage

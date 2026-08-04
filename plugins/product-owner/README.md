@@ -66,7 +66,7 @@ Install the `copilot-canvas-studio` canvas extension to get a live, interactive 
 drafted epics, stories, and bugs instead of Markdown-only output:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio
 ```
 
 When installed, backlog skills render drafted content on the `markdown-preview` canvas

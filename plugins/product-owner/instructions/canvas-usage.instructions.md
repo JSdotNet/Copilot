@@ -15,7 +15,7 @@ description: Defines when and how to use the copilot-canvas-studio markdown-prev
 ## Availability Check
 
 - Canvas support depends on an installed extension (`copilot-canvas-studio`, see
-  `JSdotNet/Copilot:extensions/copilot-canvas-studio`). Never assume it is present.
+  `JSdotNet/Copilot:plugins/copilot-app/extensions/copilot-canvas-studio`). Never assume it is present.
 - Before using a canvas, confirm it is available in the current session (for example via
   `list_canvas_capabilities` for `markdown-preview`, or by checking whether
   `open_canvas` / `invoke_canvas_action` are exposed).
