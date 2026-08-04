@@ -54,13 +54,14 @@ Execute a complete workflow for adding a new service to an existing project, wit
 **Agents:** `csharp-coding:coding`, `development:testing`, `review:reviewer`
 
 ### Stage 5: Local Run & Monitoring
-- **Start host and new service locally**
-- **Validate health endpoints** and critical service flows
-- **Run smoke checks** across integration points
-- **Monitor logs and runtime behavior** for stability
-- **Record readiness status** and follow-up actions
+- **Start host and new service locally** (`qa:qa` agent's `aspire-run` skill)
+- **Validate health endpoints and critical service flows with Playwright** — `qa:qa` drives smoke checks across integration points, capturing screenshot/video evidence
+- **Monitor logs and runtime behavior** for stability — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Record readiness status** and follow-up actions, merging Playwright evidence with monitoring findings
 
-**Agents:** `csharp-coding:coding`, `development:developer`, `review:reviewer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 
@@ -82,17 +83,31 @@ Orchestrate new service creation for:
 - Logs and runtime behavior monitored for stability.
 - Readiness status recorded with follow-up actions.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Service scope panel with contracts and responsibilities
-- Integration map for dependencies and service references
-- Implementation tracker for project, wiring, and configuration
-- Testing dashboard for unit and integration readiness
-- Local run and monitoring panel for startup, health, and logs
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-create-service"` and these stages: Service Scope &
+  Requirements, Service Architecture & Integration Design, Service
+  Implementation & Wiring, Testing & Validation Prep, Local Run &
+  Monitoring.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. service contract,
+  wiring notes, or health-check results.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
+  health-check/integration flow with `status: "pass"|"fail"|"flaky"` and
+  Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
+- Call `finish_run` with the final status and a summary once the service
+  runs locally and passes its checks.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Skills Used
 

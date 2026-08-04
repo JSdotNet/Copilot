@@ -1,7 +1,7 @@
 ---
 description: Review specialist for validating drafted GitHub customization assets after execution.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search', 'web/fetch', 'agent', 'vscode/askQuestions', 'terminal/runInTerminal']
+tools: ['read/readFile', 'search', 'web/fetch', 'agent', 'vscode/askQuestions', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
 agents: ['Explore']
 ---
 

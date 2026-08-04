@@ -93,12 +93,15 @@ discovery, and health checks.
 - **Execute integration tests** against AppHost
 
 ### Stage 7: Running Application Validation & Recording
-- **Start Aspire AppHost** (`aspire run`) and confirm startup stability
+- **Start Aspire AppHost** (`aspire run`) and confirm startup stability — via `qa:qa` agent's `aspire-run` skill
 - **Verify dashboard** is accessible and services are running
 - **Check health endpoints** of all services
 - **Validate database connectivity** (if applicable)
-- **Run smoke tests** against the running application
-- **Record validation evidence** (runtime logs, endpoint results, screenshots)
+- **Run smoke tests against the running application with Playwright** — `qa:qa` drives browser-based checks, capturing screenshot/video evidence
+- **Monitor runtime logs, traces, and metrics continuously** — `qa:qa-monitor`:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Record validation evidence** (runtime logs, endpoint results, Playwright screenshots)
 - **Generate runtime validation report** with pass/fail outcomes and recommendations
 
 **Validation Checklist:**
@@ -113,7 +116,7 @@ discovery, and health checks.
 - [ ] Logs show expected output
 - [ ] Runtime validation evidence recorded and attached to report
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer` running validation manually when the `qa` plugin isn't installed
 **Output:** Build/test validation report plus runtime validation recording report
 
 ## Usage Pattern
@@ -139,17 +142,31 @@ Orchestrate project setup for:
 - All services report healthy status.
 - Runtime validation evidence recorded and attached to report.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Progress tracker for each workflow stage
-- Checklist of setup tasks
-- Generated files preview (.github structure, guidelines, scaffolding)
-- Configuration options (Aspire services, integrations, tooling)
-- Health indicators for build, test, application, and service status
-- Action buttons to generate, preview, apply, or re-validate
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-project"` and these stages: GitHub Folder Setup
+  (Foundation), GitHub Actions Workflows, Architecture & Planning, Tooling &
+  Dependencies, Aspire AppHost & Project Scaffolding, Build & Test
+  Validation, Running Application Validation & Recording.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. generated files,
+  build results, or runtime health evidence.
+- For the **Running Application Validation & Recording** stage, also pass
+  `scenarios` (each smoke-test scenario with `status: "pass"|"fail"|"flaky"`
+  and Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
+- Call `finish_run` with the final status and a summary once the project is
+  scaffolded and validated locally.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 - Validation report with detailed results
 
 ## Validation Stage Details

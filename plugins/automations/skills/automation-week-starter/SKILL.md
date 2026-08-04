@@ -2,7 +2,8 @@
 name: automation: week-starter
 description: >
   Scan configured topics for updates published in the last 7 days and produce a concise
-  "What's new this week" digest. Default topics: .NET Aspire and GitHub Copilot App.
+  "What's new this week" digest. Default topics: .NET Aspire, GitHub Copilot App, and the
+  Awesome Copilot community catalog (github.com/github/awesome-copilot).
   Use when: starting the week, catching up after a holiday, or tracking a release cadence.
 ---
 
@@ -16,17 +17,22 @@ multiple sources.
 
 ## Inputs
 
-- Topics: comma-separated list (default: `aspire, github-copilot-app`). Each topic maps to
-  a known source in the **Source Map** below.
+- Topics: comma-separated list (default: `aspire, github-copilot-app, awesome-copilot`). Each
+  topic maps to a known source in the **Source Map** below.
 - Look-back window: number of days to search (default: `7`).
 - Output format: `digest` (default — grouped by topic) or `timeline` (all items ordered by date).
 
 ## Source Map
 
-| Topic key | Source |
+| Topic key | Source(s) |
 |-----------|--------|
-| `aspire` | GitHub releases: `https://github.com/dotnet/aspire/releases` |
-| `github-copilot-app` | GitHub Copilot changelog: `https://github.blog/changelog/label/copilot/` |
+| `aspire` | GitHub releases: `https://github.com/microsoft/aspire/releases` · Announcement posts: `https://aspire.dev/whats-new/` (e.g. `https://aspire.dev/whats-new/aspire-13-4/`) |
+| `github-copilot-app` | Repo & releases: `https://github.com/github/app`, `https://github.com/github/app/releases` · Changelog: `https://github.blog/changelog/label/copilot/` |
+| `awesome-copilot` | GitHub Copilot community catalog: `https://github.com/github/awesome-copilot` |
+
+> **Note:** The Aspire repository moved from `dotnet/aspire` to `microsoft/aspire`; use the
+> `microsoft/aspire` URLs going forward. Old `dotnet/aspire` links may redirect but should not
+> be used as the canonical source.
 
 > **Extending:** To add a new topic, append a row to the Source Map and reference the key in
 > the Topics input. No code changes are required — just add a row and invoke the skill with
@@ -43,20 +49,52 @@ retrieve changelog and release data from public URLs.
 
 For each topic in the configured Topics list:
 
-1. Resolve the topic key to its Source Map URL.
+1. Resolve the topic key to its Source Map URL(s). A topic may have more than one source;
+   fetch each and merge results before applying the look-back filter.
 
-2. Fetch the page and extract items published within the look-back window.
+2. Fetch each source and extract items published within the look-back window.
    Use the following extraction rules per source type:
 
    **GitHub Releases** (`github.com/<org>/<repo>/releases`):
    - Fetch `https://github.com/<org>/<repo>/releases.atom` for structured data.
-   - Filter entries whose `<published>` date falls within the look-back window.
+   - Filter entries whose `<updated>`/`<published>` date falls within the look-back window.
    - Extract per entry: version tag, title, published date, and body (trimmed to key bullet points).
+   - Applies to both `https://github.com/microsoft/aspire/releases` and
+     `https://github.com/github/app/releases`.
 
    **GitHub Copilot Changelog** (`github.blog/changelog/label/copilot/`):
    - Fetch the page and parse visible changelog entries.
    - Filter entries whose date falls within the look-back window.
    - Extract per entry: date, title, summary, and URL.
+
+   **Aspire Announcement Posts** (`aspire.dev/whats-new/<slug>/`):
+   - `https://aspire.dev/whats-new/` redirects to the latest post (e.g. `aspire-13-4`); fetch
+     the redirect target to identify the current post slug.
+   - Fetch the resolved post and extract: version/title (from slug or heading), the summary
+     paragraph, and the bulleted list of highlights.
+   - Treat the post as in-window if its referenced version matches a release entry from the
+     `microsoft/aspire` releases feed that falls within the look-back window; otherwise skip it
+     to avoid re-reporting a stale announcement.
+   - Use this source to enrich the corresponding release entry with narrative context (e.g.
+     "TypeScript AppHost reaches GA") rather than as a separate digest item.
+
+   **GitHub Copilot App Repo** (`github.com/github/app`):
+   - Fetch the repo root page for descriptive context only (what the app does); it has no
+     dated entries and is not filtered by the look-back window.
+   - Use it to enrich release-entry summaries when a release body is terse, not as a
+     standalone item.
+
+   **GitHub Copilot Community Catalog** (`github.com/github/awesome-copilot`):
+   - Fetch `https://github.com/github/awesome-copilot/commits/main.atom` for structured commit
+     history (new and updated agents, instructions, skills, hooks, workflows, and plugins).
+   - Filter entries whose `<updated>` date falls within the look-back window.
+   - Extract per entry: commit title (often the contributed asset name), author, published
+     date, and commit URL.
+   - Group entries by apparent contribution type when discernible from the title/message
+     (e.g. new agent, new skill, new plugin, dependency bump, docs fix); otherwise list as
+     general updates.
+   - Note the site `https://awesome-copilot.github.com` as the canonical browsing surface for
+     the full catalog and its Learning Hub.
 
 3. If no updates are found for a topic within the look-back window, record:
    `No updates published in the last <n> days.`
@@ -97,6 +135,16 @@ For each topic in the configured Topics list:
    Source: <url>
 
    ---
+
+   ### GitHub Copilot Community Catalog (awesome-copilot)
+
+   #### <commit title / contributed asset> — <date> (<author>)
+
+   <1-2 sentence summary of what was added, updated, or fixed>
+
+   Commit: <url>
+
+   ---
    ```
 
    **`timeline` format:**
@@ -108,6 +156,7 @@ For each topic in the configured Topics list:
    |------|-------|-------|------|
    | <date> | .NET Aspire | <version> | <url> |
    | <date> | GitHub Copilot App | <title> | <url> |
+   | <date> | Awesome Copilot | <commit title> | <url> |
    ```
 
 6. Append a footer:
@@ -125,6 +174,9 @@ For each topic in the configured Topics list:
      to assess impact on the current solution.
    - If a GitHub Copilot App update introduces a new capability relevant to the configured
      plugins: note it as a potential enhancement opportunity.
+   - If the Awesome Copilot catalog gained a new agent, instruction, skill, hook, workflow, or
+     plugin that overlaps with this repository's own customizations: note it as a candidate for
+     review, reuse, or cross-referencing (do not install or copy content automatically).
    - Otherwise, confirm the digest is complete and the week can start.
 
 ## Output

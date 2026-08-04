@@ -68,14 +68,16 @@ Execute a complete feature development workflow from backlog to local validation
 
 ### Stage 6: E2E Validation & Result Recording
 - **Prepare end-to-end test scenarios** from acceptance criteria
-- **Execute E2E test suite** against integrated local flow
-- **Run feature locally** and confirm startup stability
-- **Monitor runtime behavior** (logs, health, key endpoints)
-- **Capture evidence** (logs, screenshots, and run metadata)
+- **Run feature locally** and confirm startup stability (`qa:qa` agent's `aspire-run` skill)
+- **Execute E2E scenarios with Playwright** — `qa:qa` drives the browser through each acceptance-criteria scenario, capturing screenshot/video evidence for every checkpoint and failure
+- **Monitor runtime behavior** (logs, traces, metrics) continuously during validation — `qa:qa-monitor`:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Capture evidence** (Playwright screenshots/recordings, Aspire log/trace findings, and run metadata)
 - **Record validation result** with pass/fail status per scenario
 - **Publish validation summary** for local acceptance decision input
 
-**Agents:** `development:testing`, `csharp-coding:coding`, `review:reviewer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`, `csharp-coding:coding`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 
@@ -111,17 +113,31 @@ Orchestrate feature development for:
 - Validation evidence captured (logs, screenshots).
 - Validation result recorded with pass/fail per scenario.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Feature specification with acceptance criteria
-- Development progress tracking each stage
-- Definition of Done interactive checklist
-- E2E validation panel with scenario-level pass/fail status
-- Local run and monitoring panel for startup, logs, and health checks
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-feature"` and these stages: Feature Specification,
+  Architecture & Design, Implementation, Testing & Validation, Code Review &
+  Quality, E2E Validation & Result Recording.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. acceptance criteria,
+  coverage numbers, review outcome, or E2E pass/fail results.
+- For the **E2E Validation & Result Recording** stage, also pass
+  `scenarios` (one entry per tested scenario with `status: "pass"|"fail"|"flaky"`,
+  `notes`, and Playwright screenshot/recording `evidence` paths) and
+  `monitoring` (the Aspire log/trace summary and any Error/Critical/Warning
+  findings) so the dashboard renders QA results with evidence inline.
+- Call `finish_run` with the final status and a summary once the feature is
+  validated end-to-end.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

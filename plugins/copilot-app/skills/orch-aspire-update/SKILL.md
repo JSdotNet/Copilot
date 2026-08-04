@@ -57,12 +57,15 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 
 ### Stage 5: Validation & Recording
 - **Compile and test** the full solution after upgrade and feature adoption
-- **Start updated AppHost** and verify dashboard/service health
-- **Run smoke and integration checks** on critical paths
-- **Record validation evidence** (logs, health results, screenshots)
+- **Start updated AppHost** and verify dashboard/service health — via `qa:qa` agent's `aspire-run` skill
+- **Run smoke and integration checks on critical paths with Playwright** — `qa:qa` drives browser-based checks, capturing screenshot/video evidence
+- **Monitor runtime logs, traces, and metrics continuously** — `qa:qa-monitor`:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Record validation evidence** (logs, health results, Playwright screenshots)
 - **Publish upgrade validation report** with pass/fail per validation target
 
-**Agents:** `csharp-coding:coding`, `development:testing`, `review:reviewer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:testing`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
 ## Usage Pattern
 
@@ -97,17 +100,30 @@ Orchestrate Aspire update for:
 - Runtime health validated on updated AppHost.
 - Validation evidence recorded and report published.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Plan board (initial plan and refined plan side-by-side)
-- Upgrade batch tracker with progress and blockers
-- Feature adoption checklist for newly enabled Aspire capabilities
-- Validation dashboard for build/test/runtime status
-- Recording panel for logs, screenshots, and final verdict
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-aspire-update"` and these stages: Baseline & Plan
+  Creation, Plan Refinement, Staged Aspire Upgrade, New Feature Adoption,
+  Validation & Recording.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. the refined plan,
+  batch progress, adopted features, or validation evidence.
+- For the **Validation & Recording** stage, also pass `scenarios` (each
+  smoke/integration check with `status: "pass"|"fail"|"flaky"` and
+  Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
+- Call `finish_run` with the final status and a summary once the upgrade is
+  validated locally.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 

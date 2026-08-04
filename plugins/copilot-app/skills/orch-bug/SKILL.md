@@ -70,13 +70,15 @@ Execute a complete bug fix workflow from identification through local runtime va
 **Agents:** `review:reviewer`, `csharp-coding:coding`
 
 ### Stage 6: Local Run & Monitoring
-- **Run fixed build locally** in reproduction-like conditions
-- **Execute local smoke tests** for impacted flows
-- **Monitor logs and health metrics** for regression signals
-- **Capture runtime evidence** (logs, screenshots, traces)
+- **Run fixed build locally** in reproduction-like conditions (`qa:qa` agent's `aspire-run` skill)
+- **Validate the fix with Playwright** — `qa:qa` re-runs the original reproduction steps plus the new regression scenario, capturing screenshot/video evidence
+- **Monitor logs and health metrics** for regression signals — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics for the duration of validation:
+  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
+  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
+- **Capture runtime evidence** (logs, screenshots, traces) and merge Playwright evidence with monitoring findings
 - **Confirm issue closure criteria** before handoff
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer` running validation manually when the `qa` plugin isn't installed
 
 ## Severity Levels & Response Times
 
@@ -120,17 +122,31 @@ Orchestrate bug fix for:
 - Local runtime evidence captured (logs, traces).
 - Validation result recorded with pass/fail status.
 
-## Canvas Interface (Planned)
+## Canvas Interface
 
-> Canvas panels described below represent the target experience. No canvas extensions
-> are implemented yet. The skill currently operates through standard chat interaction.
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
 
-- Bug triage panel with severity and priority assessment
-- Root cause investigation workspace with logs and traces
-- TDD workflow showing red → green → refactor cycle
-- Integration buttons to switch to `csharp-coding:coding` agent (with approval)
-- Hotfix fast-track for critical bugs
-- Local validation gates and monitoring dashboard
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "orch-bug"` and these stages: Bug Triage & Analysis, Root Cause
+  Analysis, Fix Implementation (TDD Approach), Testing & Verification, Code
+  Review & Security, Local Run & Monitoring.
+- Before each stage, call `update_stage` with `status: "in_progress"`.
+- After each stage, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary — e.g. severity, root
+  cause, red/green/refactor result, or monitoring evidence.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (the
+  original reproduction steps plus the regression scenario, each with
+  `status: "pass"|"fail"|"flaky"` and Playwright evidence paths) and
+  `monitoring` (the Aspire log/trace findings) so the dashboard renders QA
+  results with evidence inline.
+- Call `finish_run` with the final status and a summary once the fix is
+  verified locally.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Reference
 
