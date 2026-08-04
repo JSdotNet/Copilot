@@ -42,6 +42,7 @@ This agent is review-only. It evaluates outputs from `spec-builder.agent.md`, re
 - Always apply `../instructions/authoring/create-instruction.instructions.md` when reviewing instruction assets.
 - Always apply `../instructions/authoring/create-plugin.instructions.md` when reviewing plugin package files.
 - Always apply `../instructions/authoring/create-skill.instructions.md` when reviewing skill assets.
+- Always apply `../instructions/authoring/create-canvas.instructions.md` when reviewing canvas extension assets.
 
 ## References
 

@@ -44,6 +44,7 @@ In case of conflict, follow the Priority Guidelines over Context File Priority.
    - `plugins/copilot-spec-builder/instructions/authoring/create-instruction.instructions.md`
    - `plugins/copilot-spec-builder/instructions/authoring/create-plugin.instructions.md`
    - `plugins/copilot-spec-builder/instructions/authoring/create-skill.instructions.md`
+   - `plugins/copilot-spec-builder/instructions/authoring/create-canvas.instructions.md`
 
 When rules overlap, keep the highest-priority rule and remove duplicates from lower-priority assets.
 

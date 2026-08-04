@@ -1,7 +1,7 @@
 ---
 description: Execution specialist for implementing approved customization plans into concrete Markdown assets.
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'vscode/memory', 'agent', 'vscode/askQuestions', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+tools: ['read/readFile', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'vscode/memory', 'agent', 'vscode/askQuestions', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan', 'extensions_manage', 'extensions_reload']
 agents: ['Explore']
 handoffs:
   - label: Review
@@ -33,7 +33,8 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 
 ## Constraints and Priorities
 
-- Work on GitHub customization authoring tasks: agents, instructions, plugins, and skills.
+- Work on GitHub customization authoring tasks: agents, instructions, plugins, skills, and canvas extensions.
+- For canvas extensions, scaffold with `extensions_manage` and verify with `extensions_reload` before recommending review.
 - Do not produce implementation plans as the primary deliverable.
 - Keep all outputs in English for `.github/**` assets.
 - Enforce handoff approval policy and never switch agents without explicit approval.
@@ -58,6 +59,7 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 - Always apply `../instructions/authoring/create-instruction.instructions.md` when editing instruction assets.
 - Always apply `../instructions/authoring/create-plugin.instructions.md` when editing plugin package files.
 - Always apply `../instructions/authoring/create-skill.instructions.md` when editing skill assets.
+- Always apply `../instructions/authoring/create-canvas.instructions.md` when editing canvas extension assets.
 
 ## References
 
@@ -67,6 +69,7 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 - [create-instruction.instructions.md](../instructions/authoring/create-instruction.instructions.md)
 - [create-plugin.instructions.md](../instructions/authoring/create-plugin.instructions.md)
 - [create-skill.instructions.md](../instructions/authoring/create-skill.instructions.md)
+- [create-canvas.instructions.md](../instructions/authoring/create-canvas.instructions.md)
 - [spec-builder skill](../skills/spec-builder/SKILL.md)
 
 ## Custom Instructions

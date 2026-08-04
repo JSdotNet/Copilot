@@ -23,6 +23,7 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
   - `instructions/authoring/create-instruction.instructions.md`
   - `instructions/authoring/create-plugin.instructions.md`
   - `instructions/authoring/create-skill.instructions.md`
+  - `instructions/authoring/create-canvas.instructions.md`
 - Resources:
   - `resources/quick-reference.md`
 - Hooks:
@@ -30,7 +31,7 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
 
 ## Scope
 
-- This plugin focuses on creating and refining GitHub customization assets: agents, instructions, plugins, and skills.
+- This plugin focuses on creating and refining GitHub customization assets: agents, instructions, plugins, skills, and canvas extensions.
 - Default operating sequence is `spec-plan` -> `spec-builder` -> `spec-review`.
 - It does not provide runtime application code implementation.
 - It is self-contained and does not require assets from an external source repository.
@@ -65,6 +66,7 @@ copilot plugin uninstall copilot-spec-builder
 
 - **Review create naming**
 - **Prompt authoring skill** — add a `create-prompt` skill and matching `instructions/authoring/create-prompt.instructions.md` to cover `.prompt.md` assets.
+- **Multi-action canvas templates** — add reusable canvas renderer templates (static-file server, Vite dev server wiring) to `resources/` referenced by the `create-canvas` instructions.
 - **Spec authoring skill** — add a `create-spec` skill for structured specification documents that drive multi-step agent workflows.
 - **`plugin.json` schema validation** — add a `validate-plugin` skill that checks manifest completeness and path integrity before install.
 - **Hooks and MCP authoring** — add skills for `hooks.json` and `.mcp.json` to support lifecycle automation and MCP server wiring.
