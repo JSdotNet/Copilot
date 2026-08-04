@@ -158,6 +158,10 @@ interaction.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. generated files,
   build results, or runtime health evidence.
+- For the **Running Application Validation & Recording** stage, also pass
+  `scenarios` (each smoke-test scenario with `status: "pass"|"fail"|"flaky"`
+  and Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
 - Call `finish_run` with the final status and a summary once the project is
   scaffolded and validated locally.
 

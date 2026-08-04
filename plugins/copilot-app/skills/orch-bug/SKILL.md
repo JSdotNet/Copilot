@@ -137,6 +137,11 @@ interaction.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. severity, root
   cause, red/green/refactor result, or monitoring evidence.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (the
+  original reproduction steps plus the regression scenario, each with
+  `status: "pass"|"fail"|"flaky"` and Playwright evidence paths) and
+  `monitoring` (the Aspire log/trace findings) so the dashboard renders QA
+  results with evidence inline.
 - Call `finish_run` with the final status and a summary once the fix is
   verified locally.
 

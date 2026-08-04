@@ -16,16 +16,23 @@ dashboard in GitHub Copilot App, instead of plain chat narration.
   the agent(s) assigned, and the captured output text for that stage.
 - An **Insight** panel showing total tool calls, elapsed time, measured tool
   time, an estimated thinking/reasoning remainder, and a time-by-category
-  breakdown (Shell, Edit, Read, MCP tool, Agent tasks, Other) — the same
-  categories the CLI's own agent-activity view uses. This is captured
-  automatically from the session's own tool-call telemetry while a run is
-  `in_progress`; no extra reporting is required from the orchestrating
-  agent. Caveat: telemetry is session-wide, so any tool call made while a
-  run is active gets attributed to it, including unrelated work happening
-  in the same session.
+  breakdown (Shell, Edit, Read, `QA (Playwright/Aspire)`, MCP tool, Agent
+  tasks, Other) — the same categories the CLI's own agent-activity view
+  uses. This is captured automatically from the session's own tool-call
+  telemetry while a run is `in_progress`; no extra reporting is required
+  from the orchestrating agent. Caveat: telemetry is session-wide, so any
+  tool call made while a run is active gets attributed to it, including
+  unrelated work happening in the same session.
+- **QA results** on any stage driven by the `qa` plugin (`qa:qa`,
+  `qa:qa-monitor`): per-scenario Pass/Fail/Flaky badges with notes, inline
+  thumbnails for screenshot evidence and download links for
+  video/log/trace evidence, and a runtime-monitoring findings list (Error/
+  Critical/Warning/Info) from Aspire log/trace/metric checks. Evidence
+  files are served from `<session workspace>/<evidence path>` via
+  `/api/runs/:id/evidence?path=...` (path-traversal guarded).
 - A **Download report** button on each run that downloads a Markdown report
-  (stages, output, summary, and the insight breakdown) via
-  `/api/runs/:id/report`.
+  (stages, output, QA scenario/evidence tables, monitoring findings,
+  summary, and the insight breakdown) via `/api/runs/:id/report`.
 - Live updates over server-sent events, so the panel refreshes automatically
   as the orchestrating agent moves through stages.
 
@@ -36,9 +43,19 @@ Canvas id: `orch-dashboard`. Actions:
 - `start_run({ skillId, title, stages: [{ name, agents? }] })` -> `{ runId }`
   Call once at the start of an orchestration, listing every stage up front.
   Marks the run as the one currently receiving tool-activity insight.
-- `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput? })`
+- `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput?, scenarios?, monitoring? })`
   Call at the start of a stage (`status: "in_progress"`) and again when it
-  finishes, with the result captured in `output`.
+  finishes, with the result captured in `output`. For QA/validation stages,
+  also pass:
+  - `scenarios: [{ name, status: "pass"|"fail"|"flaky", notes?, evidence?: [{ type?, path, description? }] }]`
+    — one entry per tested scenario. `evidence[].path` is relative to the
+    session workspace (e.g. the `qa` plugin's
+    `.wip/qa/<feature>/screenshots/...` convention). Replaces any scenarios
+    previously recorded for this stage.
+  - `monitoring: { summary?, findings?: [{ level: "error"|"critical"|"warning"|"info", resource?, message, timestamp? }] }`
+    — a runtime log/trace/metric summary, e.g. from the `qa` plugin's
+    `aspire-log-monitor` skill. Replaces any monitoring previously recorded
+    for this stage.
 - `finish_run({ runId, status, summary? })`
   Call once the orchestration completes, is blocked, or is cancelled. Stops
   attributing further tool activity to this run.

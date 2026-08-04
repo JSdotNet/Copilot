@@ -128,6 +128,11 @@ interaction.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. acceptance criteria,
   coverage numbers, review outcome, or E2E pass/fail results.
+- For the **E2E Validation & Result Recording** stage, also pass
+  `scenarios` (one entry per tested scenario with `status: "pass"|"fail"|"flaky"`,
+  `notes`, and Playwright screenshot/recording `evidence` paths) and
+  `monitoring` (the Aspire log/trace summary and any Error/Critical/Warning
+  findings) so the dashboard renders QA results with evidence inline.
 - Call `finish_run` with the final status and a summary once the feature is
   validated end-to-end.
 

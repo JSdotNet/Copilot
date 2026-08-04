@@ -98,6 +98,10 @@ interaction.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. module contract,
   design notes, or test/run results.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
+  module endpoint/flow check with `status: "pass"|"fail"|"flaky"` and
+  Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
 - Call `finish_run` with the final status and a summary once the module
   runs locally and passes its checks.
 

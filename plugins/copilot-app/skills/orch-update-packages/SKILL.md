@@ -126,6 +126,10 @@ interaction.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. CVEs found, updated
   package versions, or test/validation results.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
+  smoke-test/user-scenario check with `status: "pass"|"fail"|"flaky"` and
+  Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
 - Call `finish_run` with the final status and a summary once updates are
   validated locally.
 

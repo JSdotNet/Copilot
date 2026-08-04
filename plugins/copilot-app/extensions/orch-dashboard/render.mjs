@@ -103,6 +103,32 @@ export function renderShell() {
     padding: 8px 10px;
     margin-top: 4px;
   }
+  .qa-block { margin-top: 8px; }
+  .qa-block h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-color-muted, #59636e); margin: 8px 0 4px; }
+  .qa-scenario {
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    background: var(--background-color-muted, rgba(127,127,127,0.05));
+  }
+  .qa-scenario-head { display: flex; align-items: center; gap: 8px; }
+  .qa-scenario-name { font-weight: var(--font-weight-semibold, 600); }
+  .qa-status { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: var(--font-weight-semibold, 600); text-transform: uppercase; }
+  .qa-status.pass { background: rgba(31,136,61,0.15); color: #1f883d; }
+  .qa-status.fail { background: rgba(207,34,46,0.15); color: var(--true-color-red, #cf222e); }
+  .qa-status.flaky { background: rgba(191,135,0,0.18); color: #9a6700; }
+  .qa-notes { font-size: 12px; color: var(--text-color-muted, #59636e); margin-top: 2px; }
+  .qa-evidence { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .qa-evidence img { max-width: 140px; max-height: 90px; border-radius: 4px; border: 1px solid var(--border-color-default, #d0d7de); display: block; }
+  .qa-evidence a { font-size: 11px; color: var(--true-color-blue, #0969da); text-decoration: none; }
+  .qa-evidence a:hover { text-decoration: underline; }
+  .qa-evidence-file { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
+  .qa-monitoring { border-radius: 6px; padding: 6px 10px; background: var(--background-color-muted, rgba(127,127,127,0.05)); }
+  .qa-finding { font-size: 12px; margin-bottom: 3px; }
+  .qa-finding .qa-level { font-weight: var(--font-weight-semibold, 600); text-transform: uppercase; font-size: 10px; margin-right: 6px; }
+  .qa-finding .qa-level.error, .qa-finding .qa-level.critical { color: var(--true-color-red, #cf222e); }
+  .qa-finding .qa-level.warning { color: #9a6700; }
+  .qa-finding .qa-level.info { color: var(--text-color-muted, #59636e); }
   .empty { color: var(--text-color-muted, #59636e); padding: 24px; text-align: center; }
   .summary { margin-top: 16px; padding: 10px 12px; border-radius: 6px; background: var(--background-color-muted, rgba(127,127,127,0.06)); }
   .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
@@ -204,6 +230,57 @@ export function renderShell() {
       );
     }
 
+    function evidenceUrl(runId, filePath) {
+      return "/api/runs/" + encodeURIComponent(runId) + "/evidence?path=" + encodeURIComponent(filePath);
+    }
+
+    function isImageEvidence(type, filePath) {
+      if (/screenshot|image/i.test(type || "")) return true;
+      return /\.(png|jpe?g|gif|webp)$/i.test(filePath || "");
+    }
+
+    function renderEvidence(runId, evidence) {
+      if (!Array.isArray(evidence) || !evidence.length) return "";
+      const items = evidence.map((e) => {
+        const url = evidenceUrl(runId, e.path);
+        const label = esc(e.description || e.path.split(/[\\/]/).pop());
+        if (isImageEvidence(e.type, e.path)) {
+          return '<a class="qa-evidence-file" href="' + url + '" target="_blank" rel="noopener" title="' + label + '">' +
+            '<img src="' + url + '" alt="' + label + '" loading="lazy" />' +
+            '<span>' + label + '</span></a>';
+        }
+        return '<a class="qa-evidence-file" href="' + url + '" target="_blank" rel="noopener">' + esc(e.type || "file") + ': ' + label + '</a>';
+      }).join("");
+      return '<div class="qa-evidence">' + items + '</div>';
+    }
+
+    function renderScenarios(runId, scenarios) {
+      if (!Array.isArray(scenarios) || !scenarios.length) return "";
+      const items = scenarios.map((s) => (
+        '<div class="qa-scenario">' +
+          '<div class="qa-scenario-head"><span class="qa-status ' + esc(s.status) + '">' + esc(s.status) + '</span>' +
+            '<span class="qa-scenario-name">' + esc(s.name) + '</span></div>' +
+          (s.notes ? '<div class="qa-notes">' + esc(s.notes) + '</div>' : "") +
+          renderEvidence(runId, s.evidence) +
+        '</div>'
+      )).join("");
+      return '<div class="qa-block"><h3>QA Scenarios</h3>' + items + '</div>';
+    }
+
+    function renderMonitoring(monitoring) {
+      if (!monitoring || (!monitoring.summary && !(monitoring.findings || []).length)) return "";
+      const findings = (monitoring.findings || []).map((f) => (
+        '<div class="qa-finding"><span class="qa-level ' + esc(f.level) + '">' + esc(f.level) + '</span>' +
+          (f.resource ? '<strong>' + esc(f.resource) + '</strong>: ' : "") + esc(f.message) +
+          (f.timestamp ? ' <span style="color:var(--text-color-muted,#59636e)">(' + esc(f.timestamp) + ')</span>' : "") +
+        '</div>'
+      )).join("");
+      return '<div class="qa-block"><h3>Runtime Monitoring</h3><div class="qa-monitoring">' +
+        (monitoring.summary ? '<div class="qa-notes">' + esc(monitoring.summary) + '</div>' : "") +
+        findings +
+      '</div></div>';
+    }
+
     function renderDetail(run) {
       const el = document.getElementById("detail");
       if (!run) {
@@ -215,6 +292,8 @@ export function renderShell() {
           '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + '</div>' +
           (s.agents && s.agents.length ? '<div class="stage-agents">Agents: ' + esc(s.agents.join(", ")) + '</div>' : "") +
           (s.output ? '<div class="stage-output">' + esc(s.output) + '</div>' : "") +
+          renderScenarios(run.id, s.scenarios) +
+          renderMonitoring(s.monitoring) +
         '</div>'
       )).join("");
       el.innerHTML =

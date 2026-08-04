@@ -99,6 +99,10 @@ interaction.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. service contract,
   wiring notes, or health-check results.
+- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
+  health-check/integration flow with `status: "pass"|"fail"|"flaky"` and
+  Playwright evidence paths) and `monitoring` (the Aspire log/trace
+  findings) so the dashboard renders QA results with evidence inline.
 - Call `finish_run` with the final status and a summary once the service
   runs locally and passes its checks.
 

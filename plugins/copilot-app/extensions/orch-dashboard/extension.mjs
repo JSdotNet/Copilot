@@ -7,12 +7,16 @@
 //
 // Model: an orchestration run is a JSON file (see store.mjs) with a list of
 // named stages, each carrying a status (pending/in_progress/done/blocked/
-// skipped/cancelled) and free-form output text. The orchestrating agent
-// drives the run through canvas actions (start_run, update_stage,
-// finish_run) as it works through a skill's workflow stages; list_runs/
-// get_run let the agent re-read state after a resume. The canvas itself is a
-// read-only live dashboard: a run list on the left, stage-by-stage progress
-// and captured output on the right, refreshed over SSE whenever an action
+// skipped/cancelled) and free-form output text. QA/validation stages (driven
+// by the qa plugin's playwright-validation and aspire-log-monitor skills)
+// may additionally carry `scenarios` (pass/fail/flaky results with evidence
+// file references) and `monitoring` (a runtime log/trace/metric findings
+// summary) — see update_stage below. The orchestrating agent drives the run
+// through canvas actions (start_run, update_stage, finish_run) as it works
+// through a skill's workflow stages; list_runs/get_run let the agent re-read
+// state after a resume. The canvas itself is a read-only live dashboard: a
+// run list on the left, stage-by-stage progress, QA results/evidence, and
+// captured output on the right, refreshed over SSE whenever an action
 // mutates state.
 //
 // State is persisted under `<session workspace>/orchestration-runs/*.json`
@@ -22,6 +26,8 @@
 // $COPILOT_HOME.
 
 import { createServer } from "node:http";
+import { createReadStream } from "node:fs";
+import { stat as fsStat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { EventEmitter } from "node:events";
@@ -32,6 +38,21 @@ import { categorizeTool, appendToolCall, summarizeInsights } from "./insight.mjs
 import { renderReportMarkdown } from "./report.mjs";
 
 const VALID_STATUSES = ["pending", "in_progress", "done", "blocked", "skipped", "cancelled"];
+const VALID_SCENARIO_STATUSES = ["pass", "fail", "flaky"];
+const VALID_FINDING_LEVELS = ["error", "critical", "warning", "info"];
+
+const EVIDENCE_CONTENT_TYPES = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+    ".webm": "video/webm",
+    ".mp4": "video/mp4",
+    ".log": "text/plain; charset=utf-8",
+    ".txt": "text/plain; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+};
 
 // One local HTTP server per open canvas instance; every instance reads/writes
 // the same on-disk run store, so all panels stay in sync.
@@ -85,6 +106,49 @@ function findStageIndex(run, { stageIndex, stageName }) {
     return -1;
 }
 
+// Normalizes the optional QA payload accepted by update_stage: a list of
+// tested scenarios (pass/fail/flaky, each with evidence file references) and
+// an optional runtime-monitoring summary (from the qa plugin's
+// aspire-log-monitor skill). Both are stored verbatim on the stage so the
+// dashboard/report can render them without re-deriving structure.
+function normalizeScenarios(scenarios) {
+    if (!Array.isArray(scenarios)) return undefined;
+    return scenarios.map((s) => ({
+        name: String((s && s.name) || "Scenario"),
+        status: VALID_SCENARIO_STATUSES.includes(s && s.status) ? s.status : "fail",
+        notes: typeof (s && s.notes) === "string" ? s.notes : "",
+        evidence: Array.isArray(s && s.evidence)
+            ? s.evidence
+                  .filter((e) => e && typeof e.path === "string" && e.path)
+                  .map((e) => ({
+                      type: typeof e.type === "string" && e.type ? e.type : "file",
+                      path: e.path,
+                      description: typeof e.description === "string" ? e.description : "",
+                  }))
+            : [],
+    }));
+}
+
+function normalizeMonitoring(monitoring) {
+    if (!monitoring || typeof monitoring !== "object") return undefined;
+    return {
+        summary: typeof monitoring.summary === "string" ? monitoring.summary : "",
+        findings: Array.isArray(monitoring.findings)
+            ? monitoring.findings.map((f) => ({
+                  level: VALID_FINDING_LEVELS.includes(f && f.level) ? f.level : "info",
+                  resource: typeof (f && f.resource) === "string" ? f.resource : "",
+                  message: typeof (f && f.message) === "string" ? f.message : "",
+                  timestamp: typeof (f && f.timestamp) === "string" ? f.timestamp : "",
+              }))
+            : [],
+    };
+}
+
+function evidenceContentType(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    return EVIDENCE_CONTENT_TYPES[ext] || "application/octet-stream";
+}
+
 async function startServer(instanceId, baseDir) {
     const server = createServer(async (req, res) => {
         try {
@@ -112,6 +176,43 @@ async function startServer(instanceId, baseDir) {
                 res.setHeader("Content-Type", "text/markdown; charset=utf-8");
                 res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
                 res.end(renderReportMarkdown(run));
+                return;
+            }
+            const evidenceMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/evidence$/);
+            if (req.method === "GET" && evidenceMatch) {
+                const relPath = url.searchParams.get("path");
+                const root = session.workspacePath;
+                if (!relPath || !root) {
+                    res.statusCode = 404;
+                    res.end("evidence not available");
+                    return;
+                }
+                // Evidence paths are relative to the session workspace (e.g. the
+                // `.wip/qa/<feature>/screenshots/...` convention from the qa
+                // plugin's playwright-screenshot skill). Resolve and confirm the
+                // result stays inside the workspace before serving it.
+                const resolved = path.resolve(root, relPath);
+                if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+                    res.statusCode = 403;
+                    res.end("forbidden");
+                    return;
+                }
+                let stats;
+                try {
+                    stats = await fsStat(resolved);
+                } catch {
+                    res.statusCode = 404;
+                    res.end("evidence file not found");
+                    return;
+                }
+                if (!stats.isFile()) {
+                    res.statusCode = 404;
+                    res.end("evidence file not found");
+                    return;
+                }
+                res.setHeader("Content-Type", evidenceContentType(resolved));
+                res.setHeader("Content-Length", String(stats.size));
+                createReadStream(resolved).pipe(res);
                 return;
             }
             const detailMatch = url.pathname.match(/^\/api\/runs\/([^/]+)$/);
@@ -221,7 +322,7 @@ const session = await joinSession({
                 {
                     name: "update_stage",
                     description:
-                        "Update one stage of a tracked run: its status and/or captured output. Call this at the start of a stage (status: in_progress) and again when it finishes (status: done/blocked/skipped) with a summary of what was produced.",
+                        "Update one stage of a tracked run: its status and/or captured output. Call this at the start of a stage (status: in_progress) and again when it finishes (status: done/blocked/skipped) with a summary of what was produced. For QA/validation stages (e.g. driven by the qa plugin), also pass scenarios and/or monitoring so the dashboard can show pass/fail results and evidence.",
                     inputSchema: {
                         type: "object",
                         properties: {
@@ -231,11 +332,58 @@ const session = await joinSession({
                             status: { type: "string", enum: VALID_STATUSES },
                             output: { type: "string", description: "Free-form output/result text to show for this stage; appended to any existing output." },
                             appendOutput: { type: "boolean", description: "If true (default false), append to existing output instead of replacing it." },
+                            scenarios: {
+                                type: "array",
+                                description:
+                                    "QA scenario results for this stage (e.g. from the qa plugin's playwright-validation skill). Replaces any scenarios previously recorded for this stage.",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        name: { type: "string", description: "Scenario name/description." },
+                                        status: { type: "string", enum: VALID_SCENARIO_STATUSES },
+                                        notes: { type: "string", description: "Findings, console/network errors, or other detail for this scenario." },
+                                        evidence: {
+                                            type: "array",
+                                            description: "Evidence files proving the result, e.g. Playwright screenshots/recordings.",
+                                            items: {
+                                                type: "object",
+                                                properties: {
+                                                    type: { type: "string", description: "screenshot, video, log, trace, or other." },
+                                                    path: { type: "string", description: "Path to the evidence file, relative to the session workspace." },
+                                                    description: { type: "string" },
+                                                },
+                                                required: ["path"],
+                                            },
+                                        },
+                                    },
+                                    required: ["name", "status"],
+                                },
+                            },
+                            monitoring: {
+                                type: "object",
+                                description: "Runtime monitoring summary for this stage (e.g. from the qa plugin's aspire-log-monitor skill).",
+                                properties: {
+                                    summary: { type: "string", description: "Overall monitoring summary, e.g. \"No new errors observed.\"" },
+                                    findings: {
+                                        type: "array",
+                                        items: {
+                                            type: "object",
+                                            properties: {
+                                                level: { type: "string", enum: VALID_FINDING_LEVELS },
+                                                resource: { type: "string" },
+                                                message: { type: "string" },
+                                                timestamp: { type: "string" },
+                                            },
+                                            required: ["message"],
+                                        },
+                                    },
+                                },
+                            },
                         },
                         required: ["runId", "status"],
                     },
                     handler: async (ctx) => {
-                        const { runId, stageIndex, stageName, status, output, appendOutput } = ctx.input || {};
+                        const { runId, stageIndex, stageName, status, output, appendOutput, scenarios, monitoring } = ctx.input || {};
                         if (!VALID_STATUSES.includes(status)) {
                             throw new CanvasError("canvas_input_invalid", `status must be one of ${VALID_STATUSES.join(", ")}`);
                         }
@@ -252,6 +400,10 @@ const session = await joinSession({
                             if (typeof output === "string" && output.length > 0) {
                                 stage.output = appendOutput && stage.output ? `${stage.output}\n${output}` : output;
                             }
+                            const normalizedScenarios = normalizeScenarios(scenarios);
+                            if (normalizedScenarios) stage.scenarios = normalizedScenarios;
+                            const normalizedMonitoring = normalizeMonitoring(monitoring);
+                            if (normalizedMonitoring) stage.monitoring = normalizedMonitoring;
                             stage.updatedAt = new Date().toISOString();
                             run.updatedAt = stage.updatedAt;
                             await writeRun(baseDir, run);

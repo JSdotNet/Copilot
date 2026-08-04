@@ -19,6 +19,11 @@ const CATEGORY_RULES = [
     { category: "Shell", test: /powershell|bash|shell/i },
     { category: "Edit", test: /^edit$|^create$/i },
     { category: "Read", test: /^view$|^glob$|^grep$/i },
+    // Playwright MCP (browser_*) and Aspire CLI MCP (get_resources/get_resource_logs/
+    // get_traces/get_metrics/get_console_logs) tool calls, used by the qa plugin's
+    // playwright-validation and aspire-log-monitor skills. Checked before the generic
+    // "MCP tool" rule so QA activity gets its own bucket in the insight breakdown.
+    { category: "QA (Playwright/Aspire)", test: /^browser_|^get_resources$|^get_resource_logs$|^get_traces$|^get_metrics$|^get_console_logs$/i },
     { category: "MCP tool", test: /mcpserver|mcp[_-]/i },
     { category: "Agent tasks", test: /^task$/i },
 ];

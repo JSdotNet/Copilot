@@ -46,6 +46,43 @@ export function renderReportMarkdown(run) {
         });
     }
 
+    const stagesWithQa = (run.stages || []).filter(
+        (stage) => (Array.isArray(stage.scenarios) && stage.scenarios.length) || (stage.monitoring && (stage.monitoring.summary || (stage.monitoring.findings || []).length))
+    );
+    if (stagesWithQa.length) {
+        lines.push("## QA Results");
+        lines.push("");
+        stagesWithQa.forEach((stage) => {
+            lines.push(`### ${stage.name}`);
+            lines.push("");
+            if (Array.isArray(stage.scenarios) && stage.scenarios.length) {
+                lines.push("| Scenario | Status | Evidence | Notes |");
+                lines.push("| -------- | ------ | -------- | ----- |");
+                stage.scenarios.forEach((s) => {
+                    const evidence = (s.evidence || []).map((e) => `${e.type || "file"}: \`${e.path}\``).join("<br>") || "-";
+                    lines.push(`| ${s.name} | ${s.status} | ${evidence} | ${s.notes || "-"} |`);
+                });
+                lines.push("");
+            }
+            if (stage.monitoring && (stage.monitoring.summary || (stage.monitoring.findings || []).length)) {
+                lines.push("**Runtime monitoring:**");
+                lines.push("");
+                if (stage.monitoring.summary) {
+                    lines.push(stage.monitoring.summary);
+                    lines.push("");
+                }
+                if ((stage.monitoring.findings || []).length) {
+                    lines.push("| Level | Resource | Message | Timestamp |");
+                    lines.push("| ----- | -------- | ------- | --------- |");
+                    stage.monitoring.findings.forEach((f) => {
+                        lines.push(`| ${f.level} | ${f.resource || "-"} | ${f.message} | ${f.timestamp || "-"} |`);
+                    });
+                    lines.push("");
+                }
+            }
+        });
+    }
+
     if (run.summary) {
         lines.push("## Summary");
         lines.push("");
