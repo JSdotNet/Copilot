@@ -39,6 +39,13 @@
   #stage.dragging { cursor: grabbing; }
   #diagram { transform-origin: 0 0; transition: transform 0.05s linear; }
   #diagram svg { max-width: none !important; }
+  #diagram .interactive-node { cursor: pointer; }
+  #diagram .interactive-node.selected > rect,
+  #diagram .interactive-node.selected > polygon,
+  #diagram .interactive-node.selected path:first-of-type {
+    stroke: #f0b429 !important;
+    stroke-width: 3px !important;
+  }
   #empty { color: #8b949e; font-size: 0.9rem; text-align: center; }
   #explanation {
     position: absolute; right: 0; top: 0; bottom: 0; width: 320px;
@@ -47,6 +54,8 @@
   }
   #explanation.visible { display: block; }
   #explanation h2 { font-size: 0.9rem; margin-top: 0; }
+  #hint { position: absolute; left: 1rem; bottom: 3.2rem; font-size: 0.7rem; color: #6e7681; display: none; }
+  #hint.visible { display: block; }
   #zoom { position: absolute; left: 1rem; bottom: 1rem; display: flex; gap: 0.4rem; }
   #error { position: absolute; left: 1rem; top: 1rem; right: 1rem; color: #f85149; font-size: 0.8rem; white-space: pre-wrap; }
 </style>
@@ -63,6 +72,7 @@
     <div id="empty">Waiting for a diagram to render...</div>
   </div>
   <div id="explanation"><h2 id="expTitle"></h2><div id="expText"></div></div>
+  <div id="hint">Click a node for details</div>
   <div id="zoom">
     <button class="nav" id="zoomOut">-</button>
     <button class="nav" id="zoomReset">Reset</button>
@@ -87,8 +97,50 @@
   const backBtn = document.getElementById("back");
   const stage = document.getElementById("stage");
   const explanation = document.getElementById("explanation");
+  const hintEl = document.getElementById("hint");
 
   let scale = 1, offsetX = 0, offsetY = 0, dragging = false, lastX = 0, lastY = 0, renderSeq = 0;
+  let selectedNode = null;
+
+  // Global hook so agent-authored diagrams can drive the explanation panel
+  // explicitly via Mermaid's native `click NodeId call showNodeDetails("Title","Text")`
+  // directive (works for flowchart/classDiagram/stateDiagram/sequenceDiagram nodes,
+  // which Mermaid renders with per-node ids/classes; C4 diagrams do not expose
+  // per-element ids in Mermaid's SVG output, so this hook has no effect there).
+  window.showNodeDetails = function (title, text) {
+    explanation.classList.add("visible");
+    document.getElementById("expTitle").textContent = title || "";
+    document.getElementById("expText").textContent = text || "";
+  };
+
+  // Generic click-to-inspect: works for any diagram type where Mermaid renders
+  // per-node groups (flowchart, classDiagram, stateDiagram, sequenceDiagram).
+  // Selecting a node highlights it and shows its rendered text (plus any native
+  // Mermaid tooltip set via `click NodeId "tooltip text"`) in the side panel.
+  function wireInteractivity() {
+    const svg = diagramEl.querySelector("svg");
+    if (!svg) { hintEl.classList.remove("visible"); return; }
+    const nodes = svg.querySelectorAll(".node, .classGroup, .actor, .state, .statediagram-state");
+    if (!nodes.length) { hintEl.classList.remove("visible"); return; }
+    hintEl.classList.add("visible");
+    nodes.forEach((node) => {
+      node.classList.add("interactive-node");
+      node.addEventListener("mousedown", (e) => e.stopPropagation());
+      node.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (selectedNode) selectedNode.classList.remove("selected");
+        node.classList.add("selected");
+        selectedNode = node;
+        const tooltip = node.querySelector("title")?.textContent?.trim();
+        const label = Array.from(node.querySelectorAll(".nodeLabel, .label, text"))
+          .map((el) => el.textContent.trim())
+          .filter(Boolean)
+          .join("\n");
+        const heading = label.split("\n")[0] || node.id || "Node";
+        window.showNodeDetails(heading, tooltip ? `${label}\n\n${tooltip}` : label);
+      });
+    });
+  }
 
   function applyTransform() {
     diagramEl.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
@@ -133,6 +185,7 @@
     if (!view || !view.source) {
       emptyEl.style.display = "block";
       diagramEl.innerHTML = "";
+      hintEl.classList.remove("visible");
       return;
     }
     emptyEl.style.display = "none";
@@ -143,8 +196,10 @@
       const { svg } = await mermaid.render(id, view.source);
       if (seq === renderSeq) {
         diagramEl.innerHTML = svg;
+        selectedNode = null;
         scale = 1; offsetX = 0; offsetY = 0;
         applyTransform();
+        wireInteractivity();
       }
     } catch (err) {
       errorEl.textContent = `Mermaid render error: ${err.message || err}`;

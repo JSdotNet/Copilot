@@ -16,7 +16,8 @@ Define Mermaid diagram conventions for domain design artifacts produced by the d
 - Keep diagrams focused: one diagram per concept or process.
 - Use domain language (ubiquitous language) for all node and participant labels.
 - Do not use technical identifiers (class names, variable names) as labels.
-- Do not embed hard-coded hex colours; use subgraph labels and annotations only so diagrams render correctly across light and dark themes.
+- Do not embed hard-coded hex colours; use subgraph labels and annotations only so diagrams render correctly across light and dark themes. **Exception:** Aggregate class diagrams (`classDiagram`, `aggregate-diagram` skill) and Context Map diagrams (`flowchart LR`, `context-mapping` skill) use the hard-coded palettes documented below/in `instructions/ddd/strategic-design-instructions.md`. In both cases colour is applied to nodes/classes only — never to lines/edges — and is always additive to existing text annotations (`<<AggregateRoot>>`, etc.) or labels, never a replacement for them.
+- When rendered in the `mermaid-diagram` canvas, `flowchart`/`classDiagram`/`stateDiagram`/`sequenceDiagram` nodes are automatically clickable (click-to-inspect shows the node's label in a side panel). Optionally add `click NodeId "tooltip text"` to Mermaid nodes to surface extra detail in that panel without changing the diagram's visual layout.
 
 ## Aggregate Class Diagram Conventions (`classDiagram`)
 
@@ -37,6 +38,17 @@ Use `classDiagram` for visualising tactical models within a bounded context.
 | Composition | `AggregateRoot *-- ValueObject` | Value object owned by aggregate |
 | Reference by ID | `AggregateRoot ..> OtherRoot : uses id` | Cross-aggregate reference (by ID only) |
 | Raises | `AggregateRoot ..> DomainEvent : raises` | Domain event emitted by aggregate |
+
+### Color Conventions
+
+Colour each class by its stereotype using a `style <ClassName> fill:...,stroke:...,color:...` line per class, in addition to (never instead of) the `<<...>>` annotation. Use `style`, not `classDef`/`:::` — Mermaid's `classDiagram` renderer does not apply `classDef`-based styling to class nodes (verified: it renders the theme default fill regardless of any `:::styleClass` suffix). Colour is applied to class boxes only — never to relationship lines.
+
+| Stereotype | Fill | Border | Font |
+| --- | --- | --- | --- |
+| `<<AggregateRoot>>` | `#1168BD` | `#0B4884` | `#FFFFFF` |
+| `<<Entity>>` | `#85BBF0` | `#5D82A8` | `#000000` |
+| `<<ValueObject>>` | `#27AE60` | `#1E8449` | `#FFFFFF` |
+| `<<DomainEvent>>` | `#E67E22` | `#B9670F` | `#FFFFFF` |
 
 ### Example
 
@@ -66,6 +78,11 @@ classDiagram
     Order *-- Money
     Order ..> OrderPlaced : raises
     Order ..> Product : uses id
+
+    style Order fill:#1168BD,stroke:#0B4884,color:#FFFFFF
+    style OrderLine fill:#85BBF0,stroke:#5D82A8,color:#000000
+    style Money fill:#27AE60,stroke:#1E8449,color:#FFFFFF
+    style OrderPlaced fill:#E67E22,stroke:#B9670F,color:#FFFFFF
 ```
 
 ## Event Flow Diagram Conventions (`sequenceDiagram`)
@@ -198,4 +215,4 @@ flowchart LR
 
 ## Context Map Diagram Conventions
 
-Refer to `instructions/ddd/strategic-design-instructions.md` for context map diagram conventions. Context map diagrams are produced by the `context-mapping` skill and use `flowchart LR` syntax with relationship pattern labels on edges.
+Refer to `instructions/ddd/strategic-design-instructions.md` for the full relationship pattern list and the Color Conventions palette. Context map diagrams are produced by the `context-mapping` skill and use `flowchart LR` syntax with relationship pattern labels on edges (text only, no edge colour). Bounded context nodes are colour-coded by deployment type (Service vs Module) using `classDef` + `class <nodeId> service|module`.

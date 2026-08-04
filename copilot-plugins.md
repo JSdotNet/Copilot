@@ -105,7 +105,7 @@ other local plugin — each one has its own `.github/plugin/plugin.json` with an
 its `extension.mjs`. Install with `copilot plugin install`, same as any plugin in this
 repo.
 
-- `copilot-canvas-studio` (`1.0.0`)
+- `copilot-canvas-studio` (`1.1.0`)
   - Source path: `extensions/copilot-canvas-studio`
   - Install: `copilot plugin install JSdotNet/Copilot:extensions/copilot-canvas-studio`
   - Canvases: `mermaid-diagram` (interactive C4/sequence/state/deployment/DDD/wireframe diagram viewer), `markdown-preview` (live ADR/TDR/arc42/backlog document preview).

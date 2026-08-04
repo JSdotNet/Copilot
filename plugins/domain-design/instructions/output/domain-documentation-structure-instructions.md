@@ -29,9 +29,9 @@ The `domain.md` file provides the high-level domain overview. It contains:
 
 1. **Domain Overview** — one-paragraph summary of the business domain.
 2. **Subdomains** — table listing each subdomain with name, type (core, supporting, generic), purpose, and owning bounded context(s).
-3. **Bounded Context Map** — Mermaid diagram showing all bounded contexts and their relationships.
+3. **Bounded Context Map** — Mermaid diagram showing all bounded contexts and their relationships, with each context node colour-coded by deployment type (Service vs Module) per `instructions/ddd/strategic-design-instructions.md`.
 4. **Cross-Cutting Concerns** — domain-wide policies, shared constraints, or compliance requirements that span multiple contexts.
-5. **Bounded Context Index** — table linking each bounded context name to its dedicated file.
+5. **Bounded Context Index** — table linking each bounded context name to its dedicated file, including its deployment type (Service or Module).
 
 ### Frontmatter
 

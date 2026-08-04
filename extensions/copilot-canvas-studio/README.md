@@ -55,10 +55,27 @@ user- or session-scoped install without going through `copilot plugin install`.
 ## Agent Usage
 
 - `render_diagram` (mermaid-diagram): pass raw Mermaid source (the contents of a
-  ` ```mermaid ` fenced block) plus an optional title/mode/explanation.
+  ` ```mermaid ` fenced block) plus an optional title/mode/explanation. `open_canvas` also
+  accepts `source`/`title`/`explanation` directly to render on first open in a single call.
 - `render_markdown` (markdown-preview): pass raw Markdown content plus an optional
-  title/mode.
+  title/mode. `open_canvas` also accepts `content`/`title` directly.
 - Both canvases expose `get_state` and `clear` actions.
+
+### Interactivity
+
+- **Pan/zoom** works on every diagram (drag to pan, scroll/`+`/`-`/`Reset` to zoom).
+- **Click-to-inspect**: for diagram types Mermaid renders with per-node identity
+  (`flowchart`, `classDiagram`, `stateDiagram`, `sequenceDiagram`), every node is clickable —
+  clicking highlights it and shows its label (plus any native Mermaid tooltip set via
+  `click NodeId "tooltip text"`) in the side panel. A "Click a node for details" hint
+  appears automatically whenever a diagram exposes clickable nodes.
+- Skills can drive the side panel explicitly by embedding
+  `click NodeId call showNodeDetails("Title","Explanation text")` in the Mermaid source.
+- **C4 diagrams (`C4Context`/`C4Container`/`C4Component`) are not clickable** — Mermaid's C4
+  renderer does not emit per-element ids/classes in its SVG output, so neither the generic
+  click-to-inspect nor `click` directives have any effect there. Use the Color Conventions
+  (`UpdateElementStyle`) instead to convey information visually, and `push`/`replace` mode
+  with the Back button for drill-down navigation between separate C4 diagrams.
 
 See each plugin's `instructions/common/canvas-usage.instructions.md` (or
 `instructions/canvas-usage.instructions.md` where the plugin has no `common/` folder) for

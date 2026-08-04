@@ -190,6 +190,15 @@ const mermaidCanvas = createCanvas({
     type: "object",
     properties: {
       title: { type: "string", description: "Optional title for the initial diagram" },
+      source: { type: "string", description: "Optional raw Mermaid diagram source to render immediately on open, e.g. the contents of a ```mermaid fenced code block" },
+      explanation: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          text: { type: "string" },
+        },
+        description: "Optional explanation panel shown alongside the initial diagram",
+      },
     },
   },
   actions: [
@@ -275,6 +284,13 @@ const mermaidCanvas = createCanvas({
   ],
   open({ instanceId, input }) {
     const inst = getInstance("mermaid", instanceId);
+    if (input?.source) {
+      replaceView(inst, {
+        title: input.title || "Diagram",
+        source: input.source,
+        explanation: input.explanation || null,
+      });
+    }
     return {
       url: openUrl("mermaid", instanceId, inst),
       title: input?.title || "Mermaid Diagram Viewer",
@@ -301,6 +317,7 @@ const markdownCanvas = createCanvas({
     type: "object",
     properties: {
       title: { type: "string", description: "Optional title for the initial document" },
+      content: { type: "string", description: "Optional raw Markdown content to render immediately on open" },
     },
   },
   actions: [
@@ -354,6 +371,9 @@ const markdownCanvas = createCanvas({
   ],
   open({ instanceId, input }) {
     const inst = getInstance("markdown", instanceId);
+    if (input?.content) {
+      replaceView(inst, { title: input.title || "Document", content: input.content });
+    }
     return {
       url: openUrl("markdown", instanceId, inst),
       title: input?.title || "Markdown Document Preview",
