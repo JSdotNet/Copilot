@@ -22,6 +22,14 @@ description: Defines the reusable delivery and validation phases shared by all o
 - The GitHub Copilot CLI does not auto-inline this file into a running skill, so the
   reference in each skill must name the phases explicitly and point here for their
   definitions.
+- The `orchestrator` agent (`agents/orchestrator.agent.md`) runs these phases in order,
+  drives the dashboard, and enforces the Personal Validation gate. The two heavy
+  code-modifying phases are packaged as invokable skills so their procedure is maintained
+  once:
+  - **Build & Test** → `skills/phase-build-test/SKILL.md`.
+  - **QA Validation** → `skills/phase-qa-validation/SKILL.md`.
+- Personal Validation, Create Pull Request, and Summary stay defined in this file (short,
+  linear phases where a separate skill would only add indirection).
 
 ## Agent Transition Rule (Shared)
 
@@ -44,7 +52,9 @@ description: Defines the reusable delivery and validation phases shared by all o
 ## Phase: Build & Test
 
 Applies to code-modifying orchestrations. Runs first, before QA Validation and Personal
-Validation, and is identical for every code-modifying skill.
+Validation, and is identical for every code-modifying skill. Packaged as the
+`phase-build-test` skill (`skills/phase-build-test/SKILL.md`); the orchestrator invokes it
+rather than re-describing the steps.
 
 - **Build all projects** and fail fast on any build error.
 - **Run the unit test suite** and require it to pass.
@@ -57,8 +67,9 @@ when those plugins are not installed.
 
 ## Phase: QA Validation
 
-Applies to code-modifying orchestrations. Runs after Build & Test. Its depth is driven by
-the kind of change:
+Applies to code-modifying orchestrations. Runs after Build & Test. Packaged as the
+`phase-qa-validation` skill (`skills/phase-qa-validation/SKILL.md`); the orchestrator
+invokes it and passes the change kind so depth is selected automatically:
 
 - **Functional change or bug fix** → run automatic QA validation:
   - **Run the application locally** via the `qa:qa` agent's `aspire-run` skill.
