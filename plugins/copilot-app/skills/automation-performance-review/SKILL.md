@@ -119,6 +119,26 @@ This skill orchestrates the following installed skills:
     - Link to the opened PR.
     - Remaining 9 findings listed for future review cycles.
 
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "automation-performance-review"` and these stages: Scan for
+  Findings, Present Findings, Implement the Winning Finding, Pull Request,
+  Summary.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once the PR is opened
+  or the run is otherwise concluded.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
+
 ## Output
 
 - Top-10 performance findings table.

@@ -52,11 +52,6 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager`
   - Notes: Plugin lifecycle management — install, update, uninstall, list, and check for updates.
 
-- `automations` (`0.1.0`)
-  - Source path: `plugins/automations`
-  - Install: `copilot plugin install JSdotNet/Copilot:plugins/automations`
-  - Notes: Automation prompts for Azure SRE → GitHub issues, session creation from issues, and session branch updates.
-
 - `aikido` (`0.1.0`)
   - Source path: `plugins/aikido`
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/aikido`
@@ -65,7 +60,7 @@ Track GitHub Copilot plugins used by this repository so team members can install
 - `copilot-app` (`0.1.0`)
   - Source path: `plugins/copilot-app`
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app`
-  - Notes: GitHub Copilot App plugin for PR creation with JSdotNet account and orchestrating development tasks (project-setup, MVP, package updates, features, bugs).
+  - Notes: GitHub Copilot App plugin for PR creation with JSdotNet account, orchestrating development tasks (project-setup, MVP, package updates, features, bugs), and scheduled automation workflows (Azure SRE → GitHub issues, session creation from issues, session branch updates, bug-fix/package-update/performance/review sweeps, weekly digests and cost analysis).
 
 - `domain-design` (`0.1.0`)
   - Source path: `plugins/domain-design`
@@ -123,7 +118,7 @@ repo.
 - `orch-dashboard` (`1`)
   - Source path: `plugins/copilot-app/extensions/orch-dashboard`
   - Install: `install_extension` tool with `https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard` (not `copilot plugin install` — this extension has no standalone `.github/plugin/plugin.json`).
-  - Canvas: live progress/output dashboard for `copilot-app`'s `orch-*` orchestration skills.
+  - Canvas: live progress/output dashboard for `copilot-app`'s `orch-*` orchestration and automation skills.
   - Used by: `copilot-app` plugin only.
 
 ## Team Commands

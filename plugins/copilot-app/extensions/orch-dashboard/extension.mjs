@@ -3,7 +3,12 @@
 // skills (orch-feature, orch-bug, orch-adr, orch-arc42, orch-blueprint,
 // orch-tdr, orch-architecture, orch-project, orch-repo, orch-create-mvp,
 // orch-update-packages, orch-aspire-update, orch-create-module,
-// orch-create-service).
+// orch-create-service) and the copilot-app automation skills
+// (automation-bug-fix, automation-package-update,
+// automation-performance-review, automation-review, automation-week-starter,
+// automation-weekly-cost-analysis, automation-whats-new,
+// azure-sre-to-github-issue, start-session-from-issue,
+// update-open-sessions).
 //
 // Model: an orchestration run is a JSON file (see store.mjs) with a list of
 // named stages, each carrying a status (pending/in_progress/done/blocked/
@@ -258,7 +263,7 @@ const session = await joinSession({
             id: "orch-dashboard",
             displayName: "Orchestration dashboard",
             description:
-                "Live progress and output dashboard for copilot-app orch-* orchestration skills (orch-feature, orch-bug, orch-adr, orch-arc42, orch-blueprint, orch-tdr, orch-architecture, orch-project, orch-repo, orch-create-mvp, orch-update-packages, orch-aspire-update, orch-create-module, orch-create-service). Open once per session; drive it with start_run/update_stage/finish_run as a workflow progresses.",
+                "Live progress and output dashboard for copilot-app orch-* orchestration skills (orch-feature, orch-bug, orch-adr, orch-arc42, orch-blueprint, orch-tdr, orch-architecture, orch-project, orch-repo, orch-create-mvp, orch-update-packages, orch-aspire-update, orch-create-module, orch-create-service) and the copilot-app automation skills (automation-bug-fix, automation-package-update, automation-performance-review, automation-review, automation-week-starter, automation-weekly-cost-analysis, automation-whats-new, azure-sre-to-github-issue, start-session-from-issue, update-open-sessions). Open once per session; drive it with start_run/update_stage/finish_run as a workflow progresses.",
             inputSchema: {
                 type: "object",
                 properties: {

@@ -210,6 +210,26 @@ one entry per repo:
     - If a new commit or PR has no discoverable ticket reference at all: note it for manual
       traceability follow-up if the team requires ticket linkage.
 
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "automation-whats-new"` and these stages: Load Checkpoint, Gather
+  New Main-Branch Commits, Gather Open Pull Requests, Gather Branches Without
+  an Open PR, Correlate Tickets, Report, Persist Checkpoint, Follow-Up.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once the report is
+  produced and the checkpoint is persisted.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
+
 ## Output
 
 - Consolidated "what's new" report across all configured repos, grouped by repo and split
