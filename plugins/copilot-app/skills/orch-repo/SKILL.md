@@ -20,9 +20,9 @@ Automate the complete GitHub repository creation and configuration workflow usin
 
 ## Workflow Stages
 
-> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
-> not installed, skip the stage or perform it manually and continue with remaining
-> stages. All agent transitions require explicit user approval before switching.
+> Agent transitions follow the shared rule in
+> `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
+> not required, and every transition needs explicit user approval.
 
 ### Stage 1: Repository Creation *(Manual)*
 
@@ -98,28 +98,19 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 **Agents:** *(default)*
 
-### Stage 8: Personal Validation
-- **Present the completed work** and its evidence to the user for review
-- **Confirm the outcome** against the skill's goals and acceptance criteria
-- **Wait for explicit user approval** before any pull request is created
+### Final Phases (Shared)
 
-**Agents:** `review:reviewer`
+After Repository Governance, this skill runs the shared closing phases defined once in
+`instructions/orch-shared-phases.instructions.md` (documentation/config tier), in order:
 
-### Stage 9: Create Pull Request
-- **Create the pull request only after explicit user approval** in Personal Validation — never before
-- **Write the PR description** from the change set and validation evidence
-- **Apply any PR-time improvements** (final polish, labels, changelog) as part of this stage
-- **Skip this stage** (mark it `skipped`) when the run produces no change set to submit
-- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy
+1. **Personal Validation** — hand back to the user (no agent); present the drafted
+   artifacts and any review for the user to approve.
+2. **Create Pull Request** — only after explicit user approval (mark skipped when there is
+   no change set).
+3. **Summary** — emit the run summary.
 
-**Agents:** `review:reviewer`
-**Skills Used:** `pr-jsdotnet`
-
-### Stage 10: Summary
-- **Summarize the delivered outcome** and the created pull request (if any)
-- **Emit the run summary** once the pull request is created, or the run concludes without one
-
-**Agents:** `review:reviewer`
+See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
@@ -167,34 +158,22 @@ Orchestrate repository setup for:
 
 ## Canvas Interface
 
-This skill reports progress through the `orch-dashboard` canvas extension
-(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
-installed, skip the canvas calls below and continue through standard chat
-interaction.
+This skill reports progress through the `orch-dashboard` canvas extension. Follow the
+shared **Dashboard Reporting Contract** in
+`instructions/orch-shared-phases.instructions.md` for the
+`start_run`/`update_stage`/`finish_run` cadence and the Personal Validation → Create Pull
+Request gating. If the extension is not installed, skip the canvas calls and continue
+through standard chat interaction.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
-  `skillId: "orch-repo"` and these stages: Repository Creation, README, MCP
-  Configuration, Copilot Instructions, Branch Protection, Issue and PR
+- Call `start_run` with `skillId: "orch-repo"` and these stages: Repository Creation,
+  README, MCP Configuration, Copilot Instructions, Branch Protection, Issue and PR
   Templates, Repository Governance, Personal Validation, Create Pull Request, Summary.
-- Before each stage, call `update_stage` with `status: "in_progress"`.
-- After each stage, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary — e.g. repository URL,
-  configured MCP servers, or branch protection rules applied.
-- Keep **Personal Validation** and **Create Pull Request** as separate stages:
-  gate **Create Pull Request** on explicit user approval recorded in **Personal
-  Validation** (mark it `skipped` when there is no change set to submit), and
-  record all PR-time changes under the **Create Pull Request** stage output —
-  never create the pull request before personal validation.
-- Mark the **Summary** stage `in_progress` then `done`, and call `finish_run`
-  with the final status and summary once the pull request is created (or the run
-  concludes without one).
-- During **README**, also open/update `markdown-canvas` (`markdown-preview`)
-  with the expanded README content, per `instructions/canvas-usage.instructions.md`.
-  Optional; skip gracefully if not installed.
+- During **README**, also open/update `markdown-canvas` (`markdown-preview`) with the
+  expanded README content, per `instructions/canvas-usage.instructions.md`. Optional; skip
+  gracefully if not installed.
 
-See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
-canvas action contract.
-- Repository readiness summary with links to created resources
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action
+contract.
 
 ## Reference
 
