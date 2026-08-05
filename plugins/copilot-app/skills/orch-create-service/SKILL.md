@@ -17,9 +17,9 @@ Execute a complete workflow for adding a new service to an existing project, wit
 
 ## Workflow Stages
 
-> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
-> not installed, skip the stage or perform it manually and continue with remaining
-> stages. All agent transitions require explicit user approval before switching.
+> Agent transitions follow the shared rule in
+> `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
+> not required, and every transition needs explicit user approval.
 
 ### Stage 1: Service Scope & Requirements
 - **Define service responsibility** and ownership boundaries
@@ -45,46 +45,22 @@ Execute a complete workflow for adding a new service to an existing project, wit
 
 **Agents:** `csharp-coding:coding`, `development:developer`
 
-### Stage 4: Testing & Validation Prep
-- **Create unit tests** for service logic
-- **Add integration tests** for service interactions
-- **Verify startup configuration** and dependency connectivity
-- **Fix defects** before runtime validation
+### Final Phases (Shared)
 
-**Agents:** `csharp-coding:coding`, `development:testing`, `review:reviewer`
+After Service Implementation & Wiring, this skill runs the shared delivery phases defined
+once in `instructions/orch-shared-phases.instructions.md` (code-modifying tier), in order:
 
-### Stage 5: Local Run & Monitoring
-- **Start host and new service locally** (`qa:qa` agent's `aspire-run` skill)
-- **Validate health endpoints and critical service flows with Playwright** — `qa:qa` drives smoke checks across integration points, capturing screenshot/video evidence
-- **Monitor logs and runtime behavior** for stability — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics:
-  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
-  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
-- **Record readiness status** and follow-up actions, merging Playwright evidence with monitoring findings
+1. **Build & Test** — build, unit tests, and E2E tests, run first.
+2. **QA Validation** — functional service change, so run the full automatic QA validation
+   (Playwright checks on health endpoints and critical service flows plus `qa:qa-monitor`
+   runtime monitoring, with evidence recorded).
+3. **Personal Validation** — hand back to the user (no agent); present the code review and
+   the recorded QA review, and start the application for the user to review.
+4. **Create Pull Request** — only after explicit user approval.
+5. **Summary** — emit the run summary.
 
-**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
-
-### Stage 6: Personal Validation
-- **Present the completed work** and its evidence to the user for review
-- **Confirm the outcome** against the skill's goals and acceptance criteria
-- **Wait for explicit user approval** before any pull request is created
-
-**Agents:** `review:reviewer`
-
-### Stage 7: Create Pull Request
-- **Create the pull request only after explicit user approval** in Personal Validation — never before
-- **Write the PR description** from the change set and validation evidence
-- **Apply any PR-time improvements** (final polish, labels, changelog) as part of this stage
-- **Skip this stage** (mark it `skipped`) when the run produces no change set to submit
-- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy
-
-**Agents:** `review:reviewer`
-**Skills Used:** `pr-jsdotnet`
-
-### Stage 8: Summary
-- **Summarize the delivered outcome** and the created pull request (if any)
-- **Emit the run summary** once the pull request is created, or the run concludes without one
-
-**Agents:** `review:reviewer`
+See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
@@ -108,41 +84,26 @@ Orchestrate new service creation for:
 
 ## Canvas Interface
 
-This skill reports progress through the `orch-dashboard` canvas extension
-(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
-installed, skip the canvas calls below and continue through standard chat
-interaction.
+This skill reports progress through the `orch-dashboard` canvas extension. Follow the
+shared **Dashboard Reporting Contract** in
+`instructions/orch-shared-phases.instructions.md` for the
+`start_run`/`update_stage`/`finish_run` cadence, the QA Validation
+`scenarios`/`monitoring` passthrough, and the Personal Validation → Create Pull Request
+gating. If the extension is not installed, skip the canvas calls and continue through
+standard chat interaction.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
-  `skillId: "orch-create-service"` and these stages: Service Scope &
-  Requirements, Service Architecture & Integration Design, Service
-  Implementation & Wiring, Testing & Validation Prep, Local Run &
-  Monitoring, Personal Validation, Create Pull Request, Summary.
-- Before each stage, call `update_stage` with `status: "in_progress"`.
-- After each stage, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary — e.g. service contract,
-  wiring notes, or health-check results.
-- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
-  health-check/integration flow with `status: "pass"|"fail"|"flaky"` and
-  Playwright evidence paths) and `monitoring` (the Aspire log/trace
-  findings) so the dashboard renders QA results with evidence inline.
-- Keep **Personal Validation** and **Create Pull Request** as separate stages:
-  gate **Create Pull Request** on explicit user approval recorded in **Personal
-  Validation** (mark it `skipped` when there is no change set to submit), and
-  record all PR-time changes under the **Create Pull Request** stage output —
-  never create the pull request before personal validation.
-- Mark the **Summary** stage `in_progress` then `done`, and call `finish_run`
-  with the final status and summary once the pull request is created (or the run
-  concludes without one).
+- Call `start_run` with `skillId: "orch-create-service"` and these stages: Service Scope &
+  Requirements, Service Architecture & Integration Design, Service Implementation &
+  Wiring, Build & Test, QA Validation, Personal Validation, Create Pull Request, Summary.
 - During **Service Scope & Requirements**, also open/update `markdown-canvas`
-  (`markdown-preview`) with the drafted service contract, and during
-  **Service Architecture & Integration Design**, open/update `markdown-canvas`
-  with the design documentation and `diagram-canvas` (`mermaid-diagram`) with
-  any accompanying Mermaid diagrams, per `instructions/canvas-usage.instructions.md`.
-  Optional; skip gracefully if not installed.
+  (`markdown-preview`) with the drafted service contract, and during **Service
+  Architecture & Integration Design**, open/update `markdown-canvas` with the design
+  documentation and `diagram-canvas` (`mermaid-diagram`) with any accompanying Mermaid
+  diagrams, per `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if
+  not installed.
 
-See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
-canvas action contract.
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action
+contract.
 
 ## Skills Used
 

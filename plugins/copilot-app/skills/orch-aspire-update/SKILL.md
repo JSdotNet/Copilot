@@ -17,9 +17,9 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 
 ## Workflow Stages
 
-> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
-> not installed, skip the stage or perform it manually and continue with remaining
-> stages. All agent transitions require explicit user approval before switching.
+> Agent transitions follow the shared rule in
+> `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
+> not required, and every transition needs explicit user approval.
 
 ### Stage 1: Baseline & Plan Creation
 - **Inventory current Aspire stack** (packages, SDK constraints, AppHost integrations)
@@ -55,40 +55,23 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 **Agents:** `csharp-coding:coding`, `architecture:architect`  
 **Skills Used:** `aspire`, `open-telemetry`
 
-### Stage 5: Validation & Recording
-- **Compile and test** the full solution after upgrade and feature adoption
-- **Start updated AppHost** and verify dashboard/service health — via `qa:qa` agent's `aspire-run` skill
-- **Run smoke and integration checks on critical paths with Playwright** — `qa:qa` drives browser-based checks, capturing screenshot/video evidence
-- **Monitor runtime logs, traces, and metrics continuously** — `qa:qa-monitor`:
-  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
-  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
-- **Record validation evidence** (logs, health results, Playwright screenshots)
-- **Publish upgrade validation report** with pass/fail per validation target
+### Final Phases (Shared)
 
-**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:testing`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
+After New Feature Adoption, this skill runs the shared delivery phases defined once in
+`instructions/orch-shared-phases.instructions.md` (code-modifying tier), in order:
 
-### Stage 6: Personal Validation
-- **Present the completed work** and its evidence to the user for review
-- **Confirm the outcome** against the skill's goals and acceptance criteria
-- **Wait for explicit user approval** before any pull request is created
+1. **Build & Test** — build, unit tests, and E2E tests, run first (post-upgrade
+   compilation and regression checks).
+2. **QA Validation** — framework upgrade, so run QA validation focused on startup health
+   plus Playwright smoke checks on the critical paths affected by the upgrade and adopted
+   features, with `qa:qa-monitor` runtime monitoring and evidence recorded.
+3. **Personal Validation** — hand back to the user (no agent); present the code review and
+   the recorded QA review, and start the application for the user to review.
+4. **Create Pull Request** — only after explicit user approval.
+5. **Summary** — emit the run summary.
 
-**Agents:** `review:reviewer`
-
-### Stage 7: Create Pull Request
-- **Create the pull request only after explicit user approval** in Personal Validation — never before
-- **Write the PR description** from the change set and validation evidence
-- **Apply any PR-time improvements** (final polish, labels, changelog) as part of this stage
-- **Skip this stage** (mark it `skipped`) when the run produces no change set to submit
-- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy
-
-**Agents:** `review:reviewer`
-**Skills Used:** `pr-jsdotnet`
-
-### Stage 8: Summary
-- **Summarize the delivered outcome** and the created pull request (if any)
-- **Emit the run summary** once the pull request is created, or the run concludes without one
-
-**Agents:** `review:reviewer`
+See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
@@ -125,37 +108,23 @@ Orchestrate Aspire update for:
 
 ## Canvas Interface
 
-This skill reports progress through the `orch-dashboard` canvas extension
-(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
-installed, skip the canvas calls below and continue through standard chat
-interaction.
+This skill reports progress through the `orch-dashboard` canvas extension. Follow the
+shared **Dashboard Reporting Contract** in
+`instructions/orch-shared-phases.instructions.md` for the
+`start_run`/`update_stage`/`finish_run` cadence, the QA Validation
+`scenarios`/`monitoring` passthrough, and the Personal Validation → Create Pull Request
+gating. If the extension is not installed, skip the canvas calls and continue through
+standard chat interaction.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
-  `skillId: "orch-aspire-update"` and these stages: Baseline & Plan
-  Creation, Plan Refinement, Staged Aspire Upgrade, New Feature Adoption,
-  Validation & Recording, Personal Validation, Create Pull Request, Summary.
-- Before each stage, call `update_stage` with `status: "in_progress"`.
-- After each stage, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary — e.g. the refined plan,
-  batch progress, adopted features, or validation evidence.
-- For the **Validation & Recording** stage, also pass `scenarios` (each
-  smoke/integration check with `status: "pass"|"fail"|"flaky"` and
-  Playwright evidence paths) and `monitoring` (the Aspire log/trace
-  findings) so the dashboard renders QA results with evidence inline.
-- Keep **Personal Validation** and **Create Pull Request** as separate stages:
-  gate **Create Pull Request** on explicit user approval recorded in **Personal
-  Validation** (mark it `skipped` when there is no change set to submit), and
-  record all PR-time changes under the **Create Pull Request** stage output —
-  never create the pull request before personal validation.
-- Mark the **Summary** stage `in_progress` then `done`, and call `finish_run`
-  with the final status and summary once the pull request is created (or the run
-  concludes without one).
-- During **Plan Refinement**, also open/update `markdown-canvas` (`markdown-preview`)
-  with the refined upgrade plan, per `instructions/canvas-usage.instructions.md`.
-  Optional; skip gracefully if not installed.
+- Call `start_run` with `skillId: "orch-aspire-update"` and these stages: Baseline & Plan
+  Creation, Plan Refinement, Staged Aspire Upgrade, New Feature Adoption, Build & Test, QA
+  Validation, Personal Validation, Create Pull Request, Summary.
+- During **Plan Refinement**, also open/update `markdown-canvas` (`markdown-preview`) with
+  the refined upgrade plan, per `instructions/canvas-usage.instructions.md`. Optional; skip
+  gracefully if not installed.
 
-See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
-canvas action contract.
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action
+contract.
 
 ## Reference
 

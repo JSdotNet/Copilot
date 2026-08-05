@@ -17,9 +17,9 @@ Execute a complete feature development workflow from backlog to local validation
 
 ## Workflow Stages
 
-> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
-> not installed, skip the stage or perform it manually and continue with remaining
-> stages. All agent transitions require explicit user approval before switching.
+> Agent transitions follow the shared rule in
+> `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
+> not required, and every transition needs explicit user approval.
 
 ### Stage 1: Feature Specification
 - **Define feature requirements** and scope
@@ -48,59 +48,22 @@ Execute a complete feature development workflow from backlog to local validation
 
 **Agents:** `csharp-coding:coding`, `development:developer`
 
-### Stage 4: Testing & Validation
-- **Run unit tests** for code coverage
-- **Perform integration testing**
-- **Execute user acceptance testing** (UAT)
-- **Test edge cases** and error handling
-- **Performance testing** if applicable
+### Final Phases (Shared)
 
-**Agents:** `development:testing`, `csharp-coding:coding`, `review:reviewer`
+After Implementation, this skill runs the shared delivery phases defined once in
+`instructions/orch-shared-phases.instructions.md` (code-modifying tier), in order:
 
-### Stage 5: Code Review & Quality
-- **Conduct code review** of the change set (no pull request yet)
-- **Address review feedback** and suggestions
-- **Run security scanning** (SAST, dependency checks)
-- **Verify all checks** pass (lint, build, tests)
+1. **Build & Test** — build, unit tests, and E2E tests, run first.
+2. **QA Validation** — functional feature change, so run the full automatic QA validation
+   (Playwright scenarios from the acceptance criteria plus `qa:qa-monitor` runtime
+   monitoring, with evidence recorded).
+3. **Personal Validation** — hand back to the user (no agent); present the code review and
+   the recorded QA review, and start the application for the user to review.
+4. **Create Pull Request** — only after explicit user approval.
+5. **Summary** — emit the run summary.
 
-**Agents:** `review:reviewer`, `csharp-coding:coding`
-
-### Stage 6: E2E Validation & Result Recording
-- **Prepare end-to-end test scenarios** from acceptance criteria
-- **Run feature locally** and confirm startup stability (`qa:qa` agent's `aspire-run` skill)
-- **Execute E2E scenarios with Playwright** — `qa:qa` drives the browser through each acceptance-criteria scenario, capturing screenshot/video evidence for every checkpoint and failure
-- **Monitor runtime behavior** (logs, traces, metrics) continuously during validation — `qa:qa-monitor`:
-  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
-  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
-- **Capture evidence** (Playwright screenshots/recordings, Aspire log/trace findings, and run metadata)
-- **Record validation result** with pass/fail status per scenario
-- **Publish validation summary** for local acceptance decision input
-
-**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`, `csharp-coding:coding`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
-
-### Stage 7: Personal Validation
-- **Present the change set** and validation evidence to the user for review
-- **Walk through acceptance criteria** and E2E results together
-- **Wait for explicit user approval** before any pull request is created
-- **Fold requested changes** back into earlier stages when needed
-
-**Agents:** `review:reviewer`
-
-### Stage 8: Create Pull Request
-- **Create the pull request only after explicit user approval** in Personal Validation — never before
-- **Write the PR description** from acceptance criteria, review outcome, and validation evidence
-- **Apply any PR-time improvements** (final polish, changelog, labels) as part of this stage
-- **Confirm all checks pass** on the pull request
-- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy
-
-**Agents:** `csharp-coding:coding`, `review:reviewer`
-**Skills Used:** `pr-jsdotnet`
-
-### Stage 9: Summary
-- **Summarize the delivered feature**, validation outcome, and the created pull request
-- **Emit the run summary** once the pull request is created (or the run concludes without one)
-
-**Agents:** `review:reviewer`
+See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
@@ -140,41 +103,25 @@ Orchestrate feature development for:
 
 ## Canvas Interface
 
-This skill reports progress through the `orch-dashboard` canvas extension
-(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
-installed, skip the canvas calls below and continue through standard chat
-interaction.
+This skill reports progress through the `orch-dashboard` canvas extension. Follow the
+shared **Dashboard Reporting Contract** in
+`instructions/orch-shared-phases.instructions.md` for the
+`start_run`/`update_stage`/`finish_run` cadence, the QA Validation
+`scenarios`/`monitoring` passthrough, and the Personal Validation → Create Pull Request
+gating. If the extension is not installed, skip the canvas calls and continue through
+standard chat interaction.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
-  `skillId: "orch-feature"` and these stages: Feature Specification,
-  Architecture & Design, Implementation, Testing & Validation, Code Review &
-  Quality, E2E Validation & Result Recording, Personal Validation, Create Pull
-  Request, Summary.
-- Before each stage, call `update_stage` with `status: "in_progress"`.
-- After each stage, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary — e.g. acceptance criteria,
-  coverage numbers, review outcome, or E2E pass/fail results.
-- For the **E2E Validation & Result Recording** stage, also pass
-  `scenarios` (one entry per tested scenario with `status: "pass"|"fail"|"flaky"`,
-  `notes`, and Playwright screenshot/recording `evidence` paths) and
-  `monitoring` (the Aspire log/trace summary and any Error/Critical/Warning
-  findings) so the dashboard renders QA results with evidence inline.
-- Keep **Personal Validation** and **Create Pull Request** as separate stages:
-  gate **Create Pull Request** on explicit user approval recorded in **Personal
-  Validation**, and record all PR-time changes under the **Create Pull Request**
-  stage output — never create the pull request before personal validation.
-- Mark the **Summary** stage `in_progress` then `done`, and call `finish_run`
-  with the final status and summary once the pull request is created (or the run
-  concludes without one).
-- During **Feature Specification**, also open/update `markdown-canvas`
-  (`markdown-preview`) with the drafted user stories, and during
-  **Architecture & Design**, open/update `markdown-canvas` with the data
-  model/API contract documentation and `diagram-canvas` (`mermaid-diagram`) with
-  any accompanying Mermaid diagrams, per `instructions/canvas-usage.instructions.md`.
-  Optional; skip gracefully if not installed.
+- Call `start_run` with `skillId: "orch-feature"` and these stages: Feature
+  Specification, Architecture & Design, Implementation, Build & Test, QA Validation,
+  Personal Validation, Create Pull Request, Summary.
+- During **Feature Specification**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the drafted user stories, and during **Architecture & Design**, open/update
+  `markdown-canvas` with the data model/API contract documentation and `diagram-canvas`
+  (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
+  `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.
 
-See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
-canvas action contract.
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action
+contract.
 
 ## Reference
 
