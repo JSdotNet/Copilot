@@ -18,9 +18,9 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 ## Workflow Stages
 
-> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
-> not installed, skip the stage or perform it manually and continue with remaining
-> stages. All agent transitions require explicit user approval before switching.
+> Agent transitions follow the shared rule in
+> `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
+> not required, and every transition needs explicit user approval.
 
 ### Stage 1: GitHub Folder Setup (Foundation)
 - **Initialize `.github/` directory structure** with recommended layouts
@@ -86,38 +86,26 @@ discovery, and health checks.
 **Agents:** `csharp-coding:coding`, `development:developer`  
 **Skills Used:** `aspire` skill from development plugin
 
-### Stage 6: Build & Test Validation
+### Final Phases (Shared)
 
-- **Compile all projects** to verify no build errors
-- **Run unit test suite** to verify test framework works
-- **Execute integration tests** against AppHost
+After Aspire AppHost & Project Scaffolding, this skill runs the shared delivery phases
+defined once in `instructions/orch-shared-phases.instructions.md` (code-modifying tier),
+in order:
 
-### Stage 7: Running Application Validation & Recording
-- **Start Aspire AppHost** (`aspire run`) and confirm startup stability — via `qa:qa` agent's `aspire-run` skill
-- **Verify dashboard** is accessible and services are running
-- **Check health endpoints** of all services
-- **Validate database connectivity** (if applicable)
-- **Run smoke tests against the running application with Playwright** — `qa:qa` drives browser-based checks, capturing screenshot/video evidence
-- **Monitor runtime logs, traces, and metrics continuously** — `qa:qa-monitor`:
-  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
-  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
-- **Record validation evidence** (runtime logs, endpoint results, Playwright screenshots)
-- **Generate runtime validation report** with pass/fail outcomes and recommendations
+1. **Build & Test** — compile all projects and run the unit and integration/E2E test
+   suites, run first; fail fast on build or test errors.
+2. **QA Validation** — new runnable scaffold, so run QA validation: start the Aspire
+   AppHost, confirm the dashboard and service health endpoints are green (default
+   dashboard `localhost:18888`) and database connectivity works, and run Playwright smoke
+   checks on the example service, with `qa:qa-monitor` runtime monitoring and evidence
+   recorded.
+3. **Personal Validation** — hand back to the user (no agent); present the code review and
+   the recorded QA review, and start the application for the user to review.
+4. **Create Pull Request** — only after explicit user approval.
+5. **Summary** — emit the run summary.
 
-**Validation Checklist:**
-- [ ] All projects compile without errors
-- [ ] Unit tests pass (>0% coverage established)
-- [ ] Integration tests execute successfully
-- [ ] AppHost starts without errors
-- [ ] Dashboard is accessible (default: localhost:18888)
-- [ ] All services report healthy status
-- [ ] Database connections working
-- [ ] API endpoints respond correctly
-- [ ] Logs show expected output
-- [ ] Runtime validation evidence recorded and attached to report
-
-**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:developer` running validation manually when the `qa` plugin isn't installed
-**Output:** Build/test validation report plus runtime validation recording report
+See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
@@ -144,71 +132,40 @@ Orchestrate project setup for:
 
 ## Canvas Interface
 
-This skill reports progress through the `orch-dashboard` canvas extension
-(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
-installed, skip the canvas calls below and continue through standard chat
-interaction.
+This skill reports progress through the `orch-dashboard` canvas extension. Follow the
+shared **Dashboard Reporting Contract** in
+`instructions/orch-shared-phases.instructions.md` for the
+`start_run`/`update_stage`/`finish_run` cadence, the QA Validation
+`scenarios`/`monitoring` passthrough, and the Personal Validation → Create Pull Request
+gating. If the extension is not installed, skip the canvas calls and continue through
+standard chat interaction.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
-  `skillId: "orch-project"` and these stages: GitHub Folder Setup
-  (Foundation), GitHub Actions Workflows, Architecture & Planning, Tooling &
-  Dependencies, Aspire AppHost & Project Scaffolding, Build & Test
-  Validation, Running Application Validation & Recording.
-- Before each stage, call `update_stage` with `status: "in_progress"`.
-- After each stage, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary — e.g. generated files,
-  build results, or runtime health evidence.
-- For the **Running Application Validation & Recording** stage, also pass
-  `scenarios` (each smoke-test scenario with `status: "pass"|"fail"|"flaky"`
-  and Playwright evidence paths) and `monitoring` (the Aspire log/trace
-  findings) so the dashboard renders QA results with evidence inline.
-- Call `finish_run` with the final status and a summary once the project is
-  scaffolded and validated locally.
+- Call `start_run` with `skillId: "orch-project"` and these stages: GitHub Folder Setup
+  (Foundation), GitHub Actions Workflows, Architecture & Planning, Tooling & Dependencies,
+  Aspire AppHost & Project Scaffolding, Build & Test, QA Validation, Personal Validation,
+  Create Pull Request, Summary.
 - During **Architecture & Planning**, also open/update `markdown-canvas`
-  (`markdown-preview`) with the drafted architecture documentation and
-  `diagram-canvas` (`mermaid-diagram`) with any accompanying Mermaid diagrams,
-  per `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if
-  not installed.
+  (`markdown-preview`) with the drafted architecture documentation and `diagram-canvas`
+  (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
+  `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.
 
-See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
-canvas action contract.
-- Validation report with detailed results
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action
+contract.
 
-## Validation Stage Details
+## Validation Notes
 
-The validation stages (5 and 6) ensure the project is ready for development:
+The build, test, and running-application checks for this scaffold are the shared
+**Build & Test** and **QA Validation** phases (see
+`instructions/orch-shared-phases.instructions.md`). Project-specific expectations for those
+phases:
 
-### Build Validation
-```
-✓ Compile AppHost project
-✓ Compile all service projects
-✓ Compile test projects
-✓ Resolve all NuGet dependencies
-```
-
-### Test Validation
-```
-✓ Run unit tests (establish baseline)
-✓ Run integration tests against AppHost
-✓ Verify test framework is working
-```
-
-### Application Validation
-```
-✓ Start Aspire AppHost: aspire run
-✓ Wait for dashboard initialization
-✓ Check all services started successfully
-✓ Verify health endpoints responsive
-✓ Test database connectivity (if configured)
-✓ Run smoke tests against API endpoints
-```
-
-### Failure Handling
-If validation fails, the canvas displays:
-- Specific error messages
-- Which stage failed
-- Suggested fixes
-- Option to re-run validation after fixes
+- Compile the AppHost, service, and test projects and resolve all NuGet dependencies.
+- Run unit tests (establish a baseline) and integration tests against the AppHost.
+- Start the Aspire AppHost (`aspire run`), confirm the dashboard initializes (default
+  `localhost:18888`), all services report healthy, database connectivity works, and smoke
+  tests against the API endpoints pass.
+- On failure, record which phase failed with the specific errors and suggested fixes, and
+  re-run after fixing.
 
 ## Reference
 

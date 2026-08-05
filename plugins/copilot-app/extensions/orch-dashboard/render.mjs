@@ -68,6 +68,30 @@ export function renderShell() {
   }
   .run-item .title { font-weight: var(--font-weight-semibold, 600); display: block; margin-bottom: 2px; }
   .run-item .meta { font-size: 12px; color: var(--text-color-muted, #59636e); }
+  .stage-nav { margin: 0 0 8px 6px; padding-left: 8px; border-left: 1px solid var(--border-color-default, #d0d7de); }
+  .stage-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 6px;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+  }
+  .stage-nav-item:hover { background: var(--background-color-muted, rgba(127,127,127,0.08)); }
+  .stage-nav-item.active { background: var(--background-color-muted, rgba(127,127,127,0.12)); font-weight: var(--font-weight-semibold, 600); }
+  .stage-nav-item .stage-nav-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stage-nav-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; background: var(--text-color-muted, #59636e); }
+  .stage-nav-dot.in_progress { background: var(--true-color-blue, #0969da); }
+  .stage-nav-dot.done { background: #1f883d; }
+  .stage-nav-dot.blocked, .stage-nav-dot.cancelled { background: var(--true-color-red, #cf222e); }
+  .stage-nav-dot.skipped { background: rgba(127,127,127,0.4); }
   .badge {
     display: inline-block;
     padding: 1px 8px;
@@ -130,7 +154,8 @@ export function renderShell() {
   .qa-finding .qa-level.warning { color: #9a6700; }
   .qa-finding .qa-level.info { color: var(--text-color-muted, #59636e); }
   .empty { color: var(--text-color-muted, #59636e); padding: 24px; text-align: center; }
-  .summary { margin-top: 16px; padding: 10px 12px; border-radius: 6px; background: var(--background-color-muted, rgba(127,127,127,0.06)); }
+  .summary { margin-top: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(31,136,61,0.08); border-left: 3px solid #1f883d; }
+  .summary h2 { font-size: var(--text-body-large, 15px); margin: 0 0 6px; }
   .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
   .header-actions { display: flex; align-items: center; gap: 8px; }
   .subtitle { color: var(--text-color-muted, #59636e); font-size: 12px; margin: 0 0 16px; }
@@ -168,6 +193,8 @@ export function renderShell() {
     const STATUS_LABEL = ${JSON.stringify(STATUS_LABEL)};
     let runs = [];
     let selectedId = null;
+    let selectedRun = null;
+    let activeStage = null;
 
     function esc(s) {
       return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -176,6 +203,33 @@ export function renderShell() {
     function badge(status) {
       const s = status || "pending";
       return '<span class="badge ' + esc(s) + '">' + esc(STATUS_LABEL[s] || s) + '</span>';
+    }
+
+    function renderStageNav(run) {
+      const items = (run.stages || []).map((s, i) => (
+        '<button class="stage-nav-item ' + (activeStage === i ? "active" : "") + '" data-stage="' + i + '">' +
+          '<span class="stage-nav-dot ' + esc(s.status) + '"></span>' +
+          '<span class="stage-nav-name">' + esc(s.name) + '</span>' +
+          badge(s.status) +
+        '</button>'
+      ));
+      if (run.summary) {
+        items.push(
+          '<button class="stage-nav-item ' + (activeStage === "summary" ? "active" : "") + '" data-stage="summary">' +
+            '<span class="stage-nav-dot done"></span>' +
+            '<span class="stage-nav-name">Summary</span>' +
+          '</button>'
+        );
+      }
+      return '<div class="stage-nav">' + items.join("") + '</div>';
+    }
+
+    function scrollToStage(key) {
+      activeStage = key === "summary" ? "summary" : Number(key);
+      const id = key === "summary" ? "summary-block" : ("stage-" + key);
+      const target = document.getElementById(id);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      renderRunList();
     }
 
     function renderRunList() {
@@ -188,10 +242,17 @@ export function renderShell() {
         '<button class="run-item ' + (r.id === selectedId ? "selected" : "") + '" data-id="' + esc(r.id) + '">' +
           '<span class="title">' + esc(r.title) + '</span>' +
           '<span class="meta">' + esc(r.skillId) + ' &middot; ' + badge(r.status) + '</span>' +
-        '</button>'
+        '</button>' +
+        (r.id === selectedId && selectedRun ? renderStageNav(selectedRun) : "")
       )).join("");
       el.querySelectorAll(".run-item").forEach((btn) => {
         btn.addEventListener("click", () => selectRun(btn.dataset.id));
+      });
+      el.querySelectorAll(".stage-nav-item").forEach((btn) => {
+        btn.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          scrollToStage(btn.dataset.stage);
+        });
       });
     }
 
@@ -283,12 +344,14 @@ export function renderShell() {
 
     function renderDetail(run) {
       const el = document.getElementById("detail");
+      selectedRun = run;
       if (!run) {
         el.innerHTML = '<div class="empty">Select a run to see progress and output.</div>';
+        renderRunList();
         return;
       }
-      const stages = (run.stages || []).map((s) => (
-        '<div class="stage ' + esc(s.status) + '">' +
+      const stages = (run.stages || []).map((s, i) => (
+        '<div class="stage ' + esc(s.status) + '" id="stage-' + i + '">' +
           '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + '</div>' +
           (s.agents && s.agents.length ? '<div class="stage-agents">Agents: ' + esc(s.agents.join(", ")) + '</div>' : "") +
           (s.output ? '<div class="stage-output">' + esc(s.output) + '</div>' : "") +
@@ -305,11 +368,13 @@ export function renderShell() {
         '<p class="subtitle">' + esc(run.skillId) + ' &middot; started ' + esc(new Date(run.startedAt).toLocaleString()) +
           (run.updatedAt ? ' &middot; updated ' + esc(new Date(run.updatedAt).toLocaleString()) : "") + '</p>' +
         stages +
-        (run.summary ? '<div class="summary"><strong>Summary:</strong><br/>' + esc(run.summary) + '</div>' : "") +
+        (run.summary ? '<div class="summary" id="summary-block"><h2>Summary</h2>' + esc(run.summary) + '</div>' : "") +
         renderInsight(run);
+      renderRunList();
     }
 
     async function selectRun(id) {
+      if (id !== selectedId) activeStage = null;
       selectedId = id;
       renderRunList();
       const res = await fetch("/api/runs/" + encodeURIComponent(id));

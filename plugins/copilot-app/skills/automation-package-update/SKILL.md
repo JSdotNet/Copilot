@@ -58,7 +58,7 @@ This skill orchestrates the following installed skills:
    | `Newtonsoft.Json` | `src/Api/Api.csproj` | `13.0.1` | `13.0.3` | patch | Update |
    | `Microsoft.Extensions.Logging` | `Directory.Packages.props` | `8.0.0` | `9.0.0` | major | Confirm |
    | `Aspire.Hosting.Redis` | `AppHost/AppHost.csproj` | `9.0.0` | `9.1.0` | minor | Update |
-   | `automations` | Copilot plugin | — | — | reinstall | Reinstall |
+   | `copilot-app` | Copilot plugin | — | — | reinstall | Reinstall |
 
 5. If `update-strategy` is `major`, highlight all major bumps and ask for explicit confirmation
    before including them. Stop here if dry-run is `true`.
@@ -90,9 +90,16 @@ This skill orchestrates the following installed skills:
     If tests fail, revert the failing package update, record it as **Skipped (test failure)**,
     and continue with the remaining packages.
 
-### Phase 4 — Pull Request
+### Phase 4 — Personal Validation
 
-11. Commit all changes with message:
+11. Present the audit table (Phase 1) and the build/test results (Phase 3) to the
+    user and **wait for explicit approval before opening a pull request**. If
+    approval is withheld, stop here and record the outcome — never open the PR
+    before personal validation.
+
+### Phase 5 — Pull Request
+
+12. Commit all changes with message:
 
     ```
     chore: update NuGet packages <YYYY-MM-DD>
@@ -102,21 +109,41 @@ This skill orchestrates the following installed skills:
     - Copilot plugins: <n> plugins reinstalled
     ```
 
-12. Push the branch and open a PR:
+13. After approval, push the branch and open a PR:
     - **Title:** `chore: NuGet package updates <YYYY-MM-DD>`
     - **Body:** the audit table from Phase 1 with each row marked Updated or Skipped.
     - **Labels:** `dependencies`, `automated`.
 
-### Phase 5 — Summary
+### Phase 6 — Summary
 
-13. Output a final summary table:
+14. Once the pull request is created (or the run concludes without one), output a
+    final summary table:
 
     | Package | Current | New | Result |
     |---------|---------|-----|--------|
     | `Newtonsoft.Json` | `13.0.1` | `13.0.3` | ✅ Updated |
     | `xunit` | `2.6.0` | `2.7.0` | ⚠️ Skipped (test failure) |
     | `Aspire.Hosting.Redis` | `9.0.0` | `9.1.0` | ✅ Updated |
-    | `automations` | — | — | ✅ Reinstalled |
+    | `copilot-app` | — | — | ✅ Reinstalled |
+
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "automation-package-update"` and these stages: Audit, Apply
+  Updates, Verify, Personal Validation, Pull Request, Summary.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once the PR is opened
+  or the run is otherwise concluded.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Output
 

@@ -15,9 +15,9 @@ Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retr
 
 ## Workflow Stages
 
-> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
-> not installed, skip the stage or perform it manually and continue with remaining
-> stages. All agent transitions require explicit user approval before switching.
+> Agent transitions follow the shared rule in
+> `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
+> not required, and every transition needs explicit user approval.
 
 ### Stage 1: Debt Context Retrieval
 - **Clarify the debt item** and affected scope
@@ -44,6 +44,20 @@ Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retr
 
 **Agents:** `architecture:architect`, `review:reviewer`
 
+### Final Phases (Shared)
+
+After Risk & Follow-Up Review, this skill runs the shared closing phases defined once in
+`instructions/orch-shared-phases.instructions.md` (documentation/config tier), in order:
+
+1. **Personal Validation** — hand back to the user (no agent); present the drafted
+   artifacts and any review for the user to approve.
+2. **Create Pull Request** — only after explicit user approval (mark skipped when there is
+   no change set).
+3. **Summary** — emit the run summary.
+
+See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+update that file to change these phases for every orchestration.
+
 ## Usage Pattern
 
 ```text
@@ -64,26 +78,21 @@ Invoke: orch-tdr
 
 ## Canvas Interface
 
-This skill reports progress through the `orch-dashboard` canvas extension
-(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
-installed, skip the canvas calls below and continue through standard chat
-interaction.
+This skill reports progress through the `orch-dashboard` canvas extension. Follow the
+shared **Dashboard Reporting Contract** in
+`instructions/orch-shared-phases.instructions.md` for the
+`start_run`/`update_stage`/`finish_run` cadence and the Personal Validation → Create Pull
+Request gating. If the extension is not installed, skip the canvas calls and continue
+through standard chat interaction.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
-  `skillId: "orch-tdr"` and these stages: Debt Context Retrieval, TDR
-  Drafting, Risk & Follow-Up Review.
-- Before each stage, call `update_stage` with `status: "in_progress"`.
-- After each stage, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary — e.g. retrieved
-  guidelines, drafted TDR content, or follow-up risks.
-- Call `finish_run` with the final status and a summary once the TDR is
-  review-ready.
-- During **TDR Drafting**, also open/update `markdown-canvas` (`markdown-preview`)
-  with the drafted TDR content, per `instructions/canvas-usage.instructions.md`.
-  Optional; skip gracefully if not installed.
+- Call `start_run` with `skillId: "orch-tdr"` and these stages: Debt Context Retrieval, TDR
+  Drafting, Risk & Follow-Up Review, Personal Validation, Create Pull Request, Summary.
+- During **TDR Drafting**, also open/update `markdown-canvas` (`markdown-preview`) with the
+  drafted TDR content, per `instructions/canvas-usage.instructions.md`. Optional; skip
+  gracefully if not installed.
 
-See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
-canvas action contract.
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action
+contract.
 
 ## Reference
 

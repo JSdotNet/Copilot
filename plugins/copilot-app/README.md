@@ -45,13 +45,29 @@ Each orchestration skill coordinates multiple agents from other plugins (develop
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
 - `skills/orch-create-service/SKILL.md` - Create and wire a new service in an existing project (canvas)
 
+#### Automation Skills
+
+Scheduled / batch automation workflows (formerly the standalone `automations`
+plugin). Each reports progress through the `orch-dashboard` canvas extension.
+
+- `skills/azure-sre-to-github-issue/SKILL.md` - Create GitHub issues from active Azure SRE alerts
+- `skills/start-session-from-issue/SKILL.md` - Start a Copilot session per matching GitHub issue in plan mode
+- `skills/update-open-sessions/SKILL.md` - Rebase or merge all open sessions onto the latest source branch
+- `skills/automation-bug-fix/SKILL.md` - Start one `orch-bug` session per confirmed open `bug` issue
+- `skills/automation-package-update/SKILL.md` - Update all outdated NuGet packages and open a PR
+- `skills/automation-performance-review/SKILL.md` - Identify performance improvements, implement the best one, open a PR
+- `skills/automation-review/SKILL.md` - Full review cycle (TODOs, suggestions, code review) with optional issue creation
+- `skills/automation-week-starter/SKILL.md` - Produce a weekly "what's new" digest for configured topics
+- `skills/automation-weekly-cost-analysis/SKILL.md` - Produce a weekly Chronicle cost report
+- `skills/automation-whats-new/SKILL.md` - Report open and merged pull requests across repos since the last run
+
 ### Hooks
 
 - `hooks.json` - Guardrails that block the built-in PR tool for JSdotNet PRs and add recovery guidance for `gh`-based PR failures
 
 ### Canvas Extensions
 
-- `extensions/orch-dashboard/` - Live progress and output dashboard for all `orch-*` skills. See `extensions/orch-dashboard/README.md` for the canvas action contract and install instructions.
+- `extensions/orch-dashboard/` - Live progress and output dashboard for all `orch-*` and automation skills. See `extensions/orch-dashboard/README.md` for the canvas action contract and install instructions.
 - `extensions/diagram-canvas/` - Mermaid diagram viewer canvas (`mermaid-diagram`), opened by `orch-*` skills on behalf of the `architecture`, `domain-design`, and `ux-design` agents they coordinate — those plugins have no direct dependency on it. Installs and runs independently of `copilot-app` — see `extensions/diagram-canvas/README.md`.
 - `extensions/markdown-canvas/` - Markdown document preview canvas (`markdown-preview`), opened by `orch-*` skills on behalf of the `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` agents they coordinate — those plugins have no direct dependency on it. Installs and runs independently of `copilot-app` — see `extensions/markdown-canvas/README.md`.
 
@@ -302,6 +318,9 @@ Each orchestration skill follows a staged workflow tailored to the scenario (pro
 2. **Implementation stage** - Code creation with handoff to `csharp-coding:coding` (with approval)
 3. **Validation stages** - Unit, integration, and local runtime validation with recorded outcomes
 4. **Quality stage** - Review readiness and blocker resolution
+5. **Personal Validation stage** - The user reviews the result and explicitly approves before any pull request is created
+6. **Create Pull Request stage** - A separate stage after personal validation; all PR-time changes belong here and the pull request is never opened before approval
+7. **Summary stage** - Emitted once the pull request is created (or the run concludes without one)
 
 Agent selection per stage is recommended based on task context. All agent transitions
 require explicit user approval per the repository handoff policy.

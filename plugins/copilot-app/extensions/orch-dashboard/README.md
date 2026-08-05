@@ -4,16 +4,26 @@ A canvas extension that gives copilot-app `orch-*` orchestration skills
 (`orch-feature`, `orch-bug`, `orch-adr`, `orch-arc42`, `orch-blueprint`,
 `orch-tdr`, `orch-architecture`, `orch-project`, `orch-repo`,
 `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`,
-`orch-create-module`, `orch-create-service`) a live progress and output
-dashboard in GitHub Copilot App, instead of plain chat narration.
+`orch-create-module`, `orch-create-service`) and the copilot-app automation
+skills (`automation-bug-fix`, `automation-package-update`,
+`automation-performance-review`, `automation-review`, `automation-week-starter`,
+`automation-weekly-cost-analysis`, `automation-whats-new`,
+`azure-sre-to-github-issue`, `start-session-from-issue`,
+`update-open-sessions`) a live progress and output dashboard in GitHub Copilot
+App, instead of plain chat narration.
 
 ## What It Shows
 
 - A run list (left panel) with one entry per orchestration in the current
-  session, each labeled with its skill and overall status.
+  session, each labeled with its skill and overall status. Selecting a run
+  expands an always-visible **stage navigation** beneath it: every stage
+  declared in `start_run` is listed with a status dot/badge and jumps to that
+  stage in the detail view when clicked, so no stage is hidden.
 - A run detail view (right panel) with every workflow stage, its status
   (`pending` / `in_progress` / `done` / `blocked` / `skipped` / `cancelled`),
-  the agent(s) assigned, and the captured output text for that stage.
+  the agent(s) assigned, and the captured output text for that stage. The
+  `finish_run` **Summary** is rendered as a highlighted block at the end of the
+  run and is reachable from the stage navigation.
 - An **Insight** panel showing total tool calls, elapsed time, measured tool
   time, an estimated thinking/reasoning remainder, and a time-by-category
   breakdown (Shell, Edit, Read, `QA (Playwright/Aspire)`, MCP tool, Agent
@@ -41,8 +51,11 @@ dashboard in GitHub Copilot App, instead of plain chat narration.
 Canvas id: `orch-dashboard`. Actions:
 
 - `start_run({ skillId, title, stages: [{ name, agents? }] })` -> `{ runId }`
-  Call once at the start of an orchestration, listing every stage up front.
-  Marks the run as the one currently receiving tool-activity insight.
+  Call once at the start of an orchestration, listing every stage up front —
+  including a **Personal Validation** stage, a separate **Create Pull Request**
+  stage after it (for skills that open a PR; mark it `skipped` when there is no
+  change set), and a final **Summary** stage. Marks the run as the one currently
+  receiving tool-activity insight.
 - `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput?, scenarios?, monitoring? })`
   Call at the start of a stage (`status: "in_progress"`) and again when it
   finishes, with the result captured in `output`. For QA/validation stages,
@@ -57,8 +70,10 @@ Canvas id: `orch-dashboard`. Actions:
     `aspire-log-monitor` skill. Replaces any monitoring previously recorded
     for this stage.
 - `finish_run({ runId, status, summary? })`
-  Call once the orchestration completes, is blocked, or is cancelled. Stops
-  attributing further tool activity to this run.
+  Call once the orchestration completes, is blocked, or is cancelled — from the
+  **Summary** stage, once the pull request is created (or the run concludes
+  without one). The `summary` is shown as a highlighted block at the end of the
+  run detail. Stops attributing further tool activity to this run.
 - `list_runs()` / `get_run({ runId })`
   Read back state, e.g. to recover the current `runId` after a session resume.
   Both include an `insightSummary` (or, for `get_run`, the full per-call

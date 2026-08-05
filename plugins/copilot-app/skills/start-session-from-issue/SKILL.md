@@ -82,6 +82,25 @@ Do not start coding until the plan is approved.
 8. Remind the user that each session is in **plan mode** — review and approve the
    plan in each session before the agent starts implementation.
 
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "start-session-from-issue"` and these stages: Fetch Matching
+  Issues, Create Sessions, Summary.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once every session has
+  been created.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
+
 ## Output
 
 - One Copilot session per confirmed issue, started in plan mode.

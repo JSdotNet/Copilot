@@ -179,6 +179,25 @@ For each topic in the configured Topics list:
      review, reuse, or cross-referencing (do not install or copy content automatically).
    - Otherwise, confirm the digest is complete and the week can start.
 
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "automation-week-starter"` and these stages: Fetch Updates per
+  Topic, Produce Digest, Follow-Up.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once the digest is
+  produced.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
+
 ## Output
 
 - Structured weekly digest grouped by topic (or in timeline order).

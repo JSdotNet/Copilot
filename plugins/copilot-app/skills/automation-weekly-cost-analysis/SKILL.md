@@ -103,6 +103,25 @@ This skill has no hard skill dependencies, but pairs well with:
    - If prompt trimming is recommended for a specific skill: offer to invoke `suggestion-review`
      on that file.
 
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "automation-weekly-cost-analysis"` and these stages: Retrieve Cost
+  Data, Analyse Patterns, Produce Report, Follow-Up.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once the cost report
+  is produced.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
+
 ## Output
 
 - Structured weekly cost report with summary metrics and prioritised tips.

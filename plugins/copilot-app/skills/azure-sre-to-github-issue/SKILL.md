@@ -97,6 +97,26 @@ Skips alerts that already have an open GitHub issue to avoid duplicates.
 | `<name>` | `<resource>` | Sev2 | Created | #42 |
 | `<name>` | `<resource>` | Sev1 | Skipped (existing #38) | #38 |
 
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "azure-sre-to-github-issue"` and these stages: Fetch Active
+  Alerts, Deduplicate Against Open GitHub Issues, Create GitHub Issues,
+  Summary.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once every issue has
+  been created.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
+
 ## Output
 
 - One GitHub issue per new alert.

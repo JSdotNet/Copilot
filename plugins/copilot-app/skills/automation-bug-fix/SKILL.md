@@ -148,6 +148,26 @@ This skill orchestrates the following installed skills:
 10. Remind the user that each session is in plan mode — review and approve the
     `orch-bug` plan in each session before the agent begins implementation.
 
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "automation-bug-fix"` and these stages: Fetch Open Bug Issues,
+  Deduplicate Against Active Sessions, User Confirmation, Create Sessions,
+  Summary.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once every confirmed
+  session has been created.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
+
 ## Output
 
 - One Copilot session per confirmed bug issue, driven by `orch-bug`.

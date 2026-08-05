@@ -1,6 +1,6 @@
 {
   "name": "copilot-app",
-  "description": "GitHub Copilot App plugin for PR creation and orchestrating development tasks with JSdotNet account integration.",
+  "description": "GitHub Copilot App plugin for PR creation, orchestrating development tasks, and running scheduled automation workflows with JSdotNet account integration.",
   "version": "0.1.0",
   "author": {
     "name": "Job Schepers"
@@ -13,8 +13,13 @@
     "orchestration",
     "development",
     "tasks",
-    "jsdotnet"
+    "jsdotnet",
+    "automation",
+    "azure",
+    "sre",
+    "session"
   ],
+  "agents": "agents/",
   "skills": "skills/",
   "hooks": "hooks.json"
 }

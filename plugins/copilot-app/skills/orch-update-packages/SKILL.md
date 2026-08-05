@@ -17,9 +17,9 @@ Execute a complete package update workflow with validation, testing, and local r
 
 ## Workflow Stages
 
-> **Cross-plugin agents are recommended, not required.** When a referenced plugin is
-> not installed, skip the stage or perform it manually and continue with remaining
-> stages. All agent transitions require explicit user approval before switching.
+> Agent transitions follow the shared rule in
+> `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
+> not required, and every transition needs explicit user approval.
 
 ### Stage 1: Dependency Analysis
 - **Scan all dependencies** for updates available
@@ -47,15 +47,7 @@ Execute a complete package update workflow with validation, testing, and local r
 
 **Agents:** `csharp-coding:coding`, `development:developer`
 
-### Stage 4: Compatibility Testing
-- **Run full test suite** against updated dependencies
-- **Check API compatibility** for breaking changes
-- **Perform integration tests** across services
-- **Validate build pipeline** with new versions
-
-**Agents:** `development:testing`, `review:reviewer`
-
-### Stage 5: Security Validation
+### Stage 4: Security Validation
 - **Run SAST scanning** (Aikido, Snyk, etc.)
 - **Check for security advisories** in updated packages
 - **Review dependency tree** for transitive vulnerabilities
@@ -63,23 +55,24 @@ Execute a complete package update workflow with validation, testing, and local r
 
 **Agents:** `csharp-coding:coding`, `development:security`
 
-### Stage 6: Code Review & Quality Gates
-- **Review dependency changes** in PR
-- **Check for deprecated API usage**
-- **Validate performance metrics**
-- **Approve for local runtime validation**
+### Final Phases (Shared)
 
-**Agents:** `review:reviewer`, `csharp-coding:coding`
+After Security Validation, this skill runs the shared delivery phases defined once in
+`instructions/orch-shared-phases.instructions.md` (code-modifying tier), in order:
 
-### Stage 7: Local Run & Monitoring
-- **Run the updated project locally** (`qa:qa` agent's `aspire-run` skill)
-- **Validate with Playwright** — `qa:qa` runs smoke tests and key user scenarios, capturing screenshot/video evidence
-- **Monitor application health** after updates — `qa:qa-monitor` continuously watches Aspire logs/traces/metrics:
-  - Inside the GitHub Copilot App, run `qa-monitor` in a parallel child session (`create_session` + cross-session messaging) so monitoring is concurrent with Playwright validation.
-  - Otherwise, use the `qa` plugin's `delegate-to-qa-monitor` skill for a same-session handoff.
-- **Capture runtime observations** and blockers, merging Playwright evidence with monitoring findings
+1. **Build & Test** — build, unit tests, and E2E tests, run first (this covers the
+   compatibility and build-pipeline checks for the updated dependencies).
+2. **QA Validation** — dependency update with no functional change, so reduce QA to a
+   startup-without-errors validation: start the app, confirm healthy dashboard/health
+   endpoints, and confirm no new errors in the logs. Escalate to full Playwright
+   validation only when an update changes user-facing behavior.
+3. **Personal Validation** — hand back to the user (no agent); present the code review and
+   the recorded QA review, and start the application for the user to review.
+4. **Create Pull Request** — only after explicit user approval.
+5. **Summary** — emit the run summary.
 
-**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:developer`, `csharp-coding:coding` running validation manually when the `qa` plugin isn't installed
+See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
@@ -113,31 +106,23 @@ Orchestrate package updates for:
 
 ## Canvas Interface
 
-This skill reports progress through the `orch-dashboard` canvas extension
-(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
-installed, skip the canvas calls below and continue through standard chat
-interaction.
+This skill reports progress through the `orch-dashboard` canvas extension. Follow the
+shared **Dashboard Reporting Contract** in
+`instructions/orch-shared-phases.instructions.md` for the
+`start_run`/`update_stage`/`finish_run` cadence, the QA Validation
+`scenarios`/`monitoring` passthrough, and the Personal Validation → Create Pull Request
+gating. If the extension is not installed, skip the canvas calls and continue through
+standard chat interaction.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
-  `skillId: "orch-update-packages"` and these stages: Dependency Analysis,
-  Update Planning, Staged Updates, Compatibility Testing, Security
-  Validation, Code Review & Quality Gates, Local Run & Monitoring.
-- Before each stage, call `update_stage` with `status: "in_progress"`.
-- After each stage, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary — e.g. CVEs found, updated
-  package versions, or test/validation results.
-- For the **Local Run & Monitoring** stage, also pass `scenarios` (each
-  smoke-test/user-scenario check with `status: "pass"|"fail"|"flaky"` and
-  Playwright evidence paths) and `monitoring` (the Aspire log/trace
-  findings) so the dashboard renders QA results with evidence inline.
-- Call `finish_run` with the final status and a summary once updates are
-  validated locally.
-- During **Update Planning**, also open/update `markdown-canvas` (`markdown-preview`)
-  with the drafted update/rollback plan, per `instructions/canvas-usage.instructions.md`.
+- Call `start_run` with `skillId: "orch-update-packages"` and these stages: Dependency
+  Analysis, Update Planning, Staged Updates, Security Validation, Build & Test, QA
+  Validation, Personal Validation, Create Pull Request, Summary.
+- During **Update Planning**, also open/update `markdown-canvas` (`markdown-preview`) with
+  the drafted update/rollback plan, per `instructions/canvas-usage.instructions.md`.
   Optional; skip gracefully if not installed.
 
-See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
-canvas action contract.
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action
+contract.
 
 ## Reference
 

@@ -103,6 +103,25 @@ This skill orchestrates the following installed skills:
     | Code Review | 6 | 3 | 3 |
     | **Total** | **19** | **5** | **5** |
 
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "automation-review"` and these stages: TODO Review, Suggestion
+  Review, Code Review, Consolidated Report, Issue Creation, Summary.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once the review cycle
+  completes.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
+
 ## Output
 
 - Consolidated, prioritised findings report covering TODOs, suggestions, and code review.

@@ -101,9 +101,16 @@ This skill orchestrates the following installed skills:
     Impact score: <n>/5 | Effort score: <n>/5
     ```
 
-### Phase 4 — Pull Request
+### Phase 4 — Personal Validation
 
-13. Push the branch and open a PR:
+13. Present the top-10 findings table (Phase 2), the implemented fix, and the
+    test/benchmark results to the user and **wait for explicit approval before
+    opening a pull request**. If approval is withheld, stop here and record the
+    outcome — never open the PR before personal validation.
+
+### Phase 5 — Pull Request
+
+14. After approval, push the branch and open a PR:
     - **Title:** `perf: <short description>`
     - **Body:**
       - Full top-10 findings table from Phase 2.
@@ -111,13 +118,34 @@ This skill orchestrates the following installed skills:
       - Test or benchmark output confirming the improvement.
     - **Labels:** `performance`, `automated`.
 
-### Phase 5 — Summary
+### Phase 6 — Summary
 
-14. Output a completion summary:
+15. Once the pull request is created (or the run concludes without one), output a
+    completion summary:
     - Number of findings identified.
     - Implemented finding: file, issue, expected improvement.
     - Link to the opened PR.
     - Remaining 9 findings listed for future review cycles.
+
+## Canvas Interface
+
+This skill reports progress through the `orch-dashboard` canvas extension
+(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
+installed, skip the canvas calls below and continue through standard chat
+interaction.
+
+- Open canvas `orch-dashboard`, then call `start_run` with
+  `skillId: "automation-performance-review"` and these stages: Scan for
+  Findings, Present Findings, Implement the Winning Finding, Personal
+  Validation, Pull Request, Summary.
+- Before each phase, call `update_stage` with `status: "in_progress"`.
+- After each phase, call `update_stage` again with `status: "done"` (or
+  `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
+- Call `finish_run` with the final status and a summary once the PR is opened
+  or the run is otherwise concluded.
+
+See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full
+canvas action contract.
 
 ## Output
 
