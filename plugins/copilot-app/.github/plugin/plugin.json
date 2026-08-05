@@ -19,6 +19,7 @@
     "sre",
     "session"
   ],
+  "agents": "agents/",
   "skills": "skills/",
   "hooks": "hooks.json"
 }
