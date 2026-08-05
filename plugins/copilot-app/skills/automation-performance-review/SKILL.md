@@ -136,8 +136,8 @@ interaction.
 
 - Open canvas `orch-dashboard`, then call `start_run` with
   `skillId: "automation-performance-review"` and these stages: Scan for
-  Findings, Present Findings, Implement the Winning Finding, Pull Request,
-  Summary.
+  Findings, Present Findings, Implement the Winning Finding, Personal
+  Validation, Pull Request, Summary.
 - Before each phase, call `update_stage` with `status: "in_progress"`.
 - After each phase, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.

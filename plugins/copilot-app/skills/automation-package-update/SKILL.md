@@ -135,7 +135,7 @@ interaction.
 
 - Open canvas `orch-dashboard`, then call `start_run` with
   `skillId: "automation-package-update"` and these stages: Audit, Apply
-  Updates, Verify, Pull Request, Summary.
+  Updates, Verify, Personal Validation, Pull Request, Summary.
 - Before each phase, call `update_stage` with `status: "in_progress"`.
 - After each phase, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
