@@ -59,7 +59,7 @@ plugin). Each reports progress through the `orch-dashboard` canvas extension.
 - `skills/automation-review/SKILL.md` - Full review cycle (TODOs, suggestions, code review) with optional issue creation
 - `skills/automation-week-starter/SKILL.md` - Produce a weekly "what's new" digest for configured topics
 - `skills/automation-weekly-cost-analysis/SKILL.md` - Produce a weekly Chronicle cost report
-- `skills/automation-whats-new/SKILL.md` - Report new commits, PRs, and PR-less branches across repos since the last run
+- `skills/automation-whats-new/SKILL.md` - Report open and merged pull requests across repos since the last run
 
 ### Hooks
 

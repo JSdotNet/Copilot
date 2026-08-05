@@ -1,10 +1,10 @@
 ---
 name: automation: whats-new
 description: >
-  Check one or more GitHub repositories for what changed since the last run: new commits
-  merged to the main branch, open pull requests, and active branches without a PR yet.
-  Correlates each item with related Jira tickets or GitHub issues where discoverable, and
-  persists a per-repo checkpoint so the next run only reports genuinely new activity.
+  Check one or more GitHub repositories for what changed since the last run: open pull
+  requests and pull requests merged since the last checkpoint. Correlates each PR with
+  related Jira tickets or GitHub issues where discoverable, and persists a per-repo
+  checkpoint so the next run only reports genuinely new activity.
   Use when: periodic delivery check-ins, standups, release readiness reviews, or catching up
   on multiple repositories after time away.
 ---
@@ -14,25 +14,22 @@ description: >
 ## Purpose
 
 Give a concise, de-duplicated "what shipped and what's in flight" report across one or more
-repositories, without re-reporting items already seen on a previous run. Covers three sources
-per repo: commits landed on the main branch, currently open pull requests, and branches that
-exist but have no open PR yet (candidate stale or forgotten work). Each item is enriched with
-any Jira ticket or GitHub issue reference it can be traced back to.
+repositories, without re-reporting items already seen on a previous run. Covers two sources
+per repo: currently open pull requests, and pull requests merged since the last run. Each PR
+is enriched with any Jira ticket or GitHub issue reference it can be traced back to.
 
 ## Inputs
 
 - Repos: comma-separated list of `owner/repo` (required — no default, this automation is
   built to run across multiple repositories in one pass).
-- Main branch override: per-repo `owner/repo=branch` pairs (optional; default is each repo's
-  actual default branch, auto-detected).
+- Base branch filter: per-repo `owner/repo=branch` pairs (optional; when set, only PRs whose
+  `baseRefName` matches are reported for that repo; default is all base branches).
 - Include open PRs: `true` (default) or `false`.
-- Include branches without an open PR: `true` (default) or `false`.
+- Include merged PRs: `true` (default) or `false`.
 - Jira base URL: e.g. `https://yourteam.atlassian.net` (optional; used to build ticket links
   when a Jira MCP tool is not available to fetch live ticket data).
-- Stale branch threshold: number of days with no commits before a branch-without-PR is
-  flagged as **stale** (default: `14`).
-- First-run look-back window: number of days of history to report when a repo has no prior
-  checkpoint (default: `7`).
+- First-run look-back window: number of days of merged-PR history to report when a repo has no
+  prior checkpoint (default: `7`).
 - State file path (optional; default: `.copilot/state/whats-new/state.json` relative to the
   repository this automation is run from — i.e. the control repo, not the tracked repos).
 
@@ -51,26 +48,21 @@ one entry per repo:
 ```json
 {
   "owner/repo": {
-    "main_branch": "main",
     "last_run_at": "2026-08-04T12:00:00Z",
-    "last_seen_commit_sha": "abc1234",
-    "known_pr_numbers": [101, 102],
-    "known_branches": {
-      "feature/foo": "def5678"
-    }
+    "known_open_pr_numbers": [101, 102],
+    "reported_merged_pr_numbers": [95, 98]
   }
 }
 ```
 
-- `last_seen_commit_sha` is the newest main-branch commit SHA reported in the previous run —
-  used as the boundary for "new commits since last time."
-- `known_pr_numbers` is the set of open PR numbers already reported; a PR is only re-reported
-  if its `updated_at` moved past `last_run_at` (i.e. it changed since last seen).
-- `known_branches` maps branch name to the tip SHA last reported; a branch is only re-reported
-  as new/changed if its tip SHA differs from the stored value.
+- `last_run_at` is the timestamp of the previous run — used as the boundary for "PRs merged
+  since last time" (`mergedAt` strictly after this value).
+- `known_open_pr_numbers` is the set of open PR numbers already reported; an open PR is only
+  re-reported if its `updatedAt` moved past `last_run_at` (i.e. it changed since last seen).
+- `reported_merged_pr_numbers` is the set of merged PR numbers already reported; used to guard
+  against re-reporting a merge if `mergedAt` sits exactly on the boundary or clocks drift.
 - If the state file or a repo entry does not exist yet, treat that repo as a **first run**:
-  use the look-back window instead of a commit-SHA boundary, and report all currently open
-  PRs and PR-less branches once.
+  report all currently open PRs once, and all PRs merged within the look-back window.
 
 ## Workflow
 
@@ -78,78 +70,58 @@ one entry per repo:
 
 1. Read the state file at the configured path. If missing, initialize an empty state object
    and note that every configured repo will run in first-run mode.
-2. For each repo in the Repos input, look up its entry (if any) and resolve the main branch:
-   use the per-repo override if given, otherwise fetch the repo's actual default branch:
+2. For each repo in the Repos input, look up its entry (if any) and resolve `last_run_at`. For
+   a first run, compute the look-back boundary as `now - <look-back window> days`.
+
+### Phase 2 — Gather Open Pull Requests
+
+3. If "Include open PRs" is enabled, fetch open PRs:
    ```bash
-   gh api repos/<owner>/<repo> --jq .default_branch
+   gh pr list --repo <owner>/<repo> --state open \
+     --json number,title,author,url,createdAt,updatedAt,labels,headRefName,baseRefName,body
    ```
-
-### Phase 2 — Gather New Main-Branch Commits
-
-3. For each repo, fetch commits on the main branch:
-   ```bash
-   gh api repos/<owner>/<repo>/commits --field sha=<main-branch> --paginate
-   ```
-4. Determine the new commit set:
-   - **Repeat run:** commits strictly after `last_seen_commit_sha` in the returned list
-     (stop once that SHA is reached; if it's not found at all within a reasonable page depth,
-     treat as first run and fall back to the look-back window instead, noting the SHA was
-     not found — e.g. due to a force-push or history rewrite).
-   - **First run:** commits with `commit.author.date` within the look-back window.
-5. For each new commit, capture: short SHA, author, date, first line of the commit message,
-   and the commit URL.
-
-### Phase 3 — Gather Open Pull Requests
-
-6. If "Include open PRs" is enabled, fetch open PRs:
-   ```bash
-   gh pr list --repo <owner>/<repo> --state open --json number,title,author,headRefName,url,updatedAt,createdAt,body
-   ```
-7. Classify each PR:
-   - **New** — number not in `known_pr_numbers`.
+4. Apply the base branch filter for the repo if one is configured.
+5. Classify each open PR:
+   - **New** — number not in `known_open_pr_numbers`.
    - **Updated** — number known, but `updatedAt` is after `last_run_at`.
    - **Unchanged** — skip from the report entirely (already seen, nothing changed).
 
-### Phase 4 — Gather Branches Without an Open PR
+### Phase 3 — Gather Merged Pull Requests
 
-8. If "Include branches without an open PR" is enabled, list all branches and their tip commit:
+6. If "Include merged PRs" is enabled, fetch PRs merged since the boundary:
    ```bash
-   gh api repos/<owner>/<repo>/branches --paginate --jq '.[] | {name: .name, sha: .commit.sha}'
+   gh pr list --repo <owner>/<repo> --state merged \
+     --search "merged:>=<boundary-date>" \
+     --json number,title,author,url,mergedAt,createdAt,labels,headRefName,baseRefName,body
    ```
-9. Exclude the main branch and any branch that has an open PR (from Phase 3).
-10. For each remaining branch, fetch its tip commit date:
-    ```bash
-    gh api repos/<owner>/<repo>/commits/<sha> --jq '.commit.author.date'
-    ```
-11. Classify each branch:
-    - **New** — not in `known_branches`.
-    - **Updated** — known, but tip SHA changed since `known_branches[name]`.
-    - **Stale** — tip commit date is older than the stale-branch threshold; flag regardless of
-      new/updated status.
-    - **Unchanged** — same SHA as last run and not stale — skip from the report.
+   The `<boundary-date>` is `last_run_at` for a repeat run, or the look-back boundary for a
+   first run (date form `YYYY-MM-DD` is sufficient for the `--search` filter).
+7. Apply the base branch filter for the repo if one is configured.
+8. Drop any PR whose number is already in `reported_merged_pr_numbers`, and any whose
+   `mergedAt` is not strictly after the boundary. Report the rest as **Merged**.
 
-### Phase 5 — Correlate Tickets
+### Phase 4 — Correlate Tickets
 
-12. For every commit message, PR title/body, and branch name gathered above, extract ticket
-    references using these patterns (a single item may match more than one):
-    - **Jira key:** `[A-Z][A-Z0-9]{1,9}-\d+` (e.g. `PROJ-123`).
-    - **GitHub issue, closing keyword:** `(close[sd]?|fix(es|ed)?|resolve[sd]?)\s+#(\d+)`
-      (case-insensitive).
-    - **GitHub issue, bare reference:** `#(\d+)` when not already matched above.
-13. For each Jira key found:
+9. For every open and merged PR title, body, and `headRefName` gathered above, extract ticket
+   references using these patterns (a single PR may match more than one):
+   - **Jira key:** `[A-Z][A-Z0-9]{1,9}-\d+` (e.g. `PROJ-123`).
+   - **GitHub issue, closing keyword:** `(close[sd]?|fix(es|ed)?|resolve[sd]?)\s+#(\d+)`
+     (case-insensitive).
+   - **GitHub issue, bare reference:** `#(\d+)` when not already matched above.
+10. For each Jira key found:
     - If a Jira MCP tool is configured, fetch the ticket's summary and status.
     - Otherwise, if a Jira base URL is configured, build a link: `<base-url>/browse/<KEY>`
       without fetching live data.
     - If neither is available, report the raw key only.
-14. For each GitHub issue reference found, fetch the issue's title and state:
+11. For each GitHub issue reference found, fetch the issue's title and state:
     ```bash
     gh issue view <number> --repo <owner>/<repo> --json title,state,url
     ```
-15. Attach resolved ticket/issue context to the originating commit, PR, or branch item.
+12. Attach resolved ticket/issue context to the originating PR.
 
-### Phase 6 — Report
+### Phase 5 — Report
 
-16. Produce one report covering all configured repos:
+13. Produce one report covering all configured repos:
 
     ```
     ## What's New — <ISO date>
@@ -157,57 +129,50 @@ one entry per repo:
 
     ### <owner/repo>
 
-    #### New commits on `<main-branch>` (<count>)
+    #### Merged pull requests (<count>)
 
-    | Commit | Author | Date | Message | Ticket |
-    |--------|--------|------|---------|--------|
-    | `abc1234` | <author> | <date> | <message> | [PROJ-123](<link>) — <summary/status> |
+    | PR | Title | Author | Base | Merged | Ticket |
+    |----|-------|--------|------|--------|--------|
+    | #98 | <title> | <author> | `<base>` | <date> | [PROJ-123](<link>) — <summary/status> |
 
-    #### Pull requests (<new-count> new, <updated-count> updated)
+    #### Open pull requests (<new-count> new, <updated-count> updated)
 
-    | PR | Title | Author | Branch | Status | Ticket |
-    |----|-------|--------|--------|--------|--------|
-    | #101 | <title> | <author> | `<branch>` | 🆕 New | #45 <issue title> (open) |
-    | #98 | <title> | <author> | `<branch>` | 🔄 Updated | — |
-
-    #### Branches without an open PR (<count>)
-
-    | Branch | Tip | Last commit | Status | Ticket |
-    |--------|-----|-------------|--------|--------|
-    | `<branch>` | `<sha>` | <date> | 🆕 New | PROJ-456 |
-    | `<branch>` | `<sha>` | <date> | ⚠️ Stale (<n> days) | — |
+    | PR | Title | Author | Base ← Head | Status | Ticket |
+    |----|-------|--------|-------------|--------|--------|
+    | #101 | <title> | <author> | `<base>` ← `<head>` | 🆕 New | #45 <issue title> (open) |
+    | #99 | <title> | <author> | `<base>` ← `<head>` | 🔄 Updated | — |
 
     ---
     ```
 
-17. If a repo has no new activity in any category, record a single line:
-    `No new commits, PR changes, or branch changes since <last run timestamp>.`
-18. Append a footer:
+14. If a repo has no new activity in any category, record a single line:
+    `No merged PRs or open-PR changes since <last run timestamp>.`
+15. Append a footer:
     ```
     ---
     *Generated by `automation: whats-new` on <ISO datetime UTC>.*
     *Checkpoint saved to `<state file path>`.*
     ```
 
-### Phase 7 — Persist Checkpoint
+### Phase 6 — Persist Checkpoint
 
-19. For each repo processed, update its state entry:
+16. For each repo processed, update its state entry:
     - `last_run_at` → current UTC timestamp.
-    - `last_seen_commit_sha` → newest main-branch commit SHA seen this run.
-    - `known_pr_numbers` → all currently open PR numbers (drop merged/closed ones).
-    - `known_branches` → all currently existing non-main branches without an open PR, mapped
-      to their tip SHA (drop branches that were deleted or now have a PR).
-20. Write the updated state object back to the state file, creating parent directories if
+    - `known_open_pr_numbers` → all currently open PR numbers (drop merged/closed ones).
+    - `reported_merged_pr_numbers` → the prior set plus every merged PR number reported this
+      run; prune numbers older than a reasonable retention window (e.g. drop entries merged
+      more than 30 days ago) to keep the file bounded.
+17. Write the updated state object back to the state file, creating parent directories if
     needed. Do not overwrite entries for repos that were not part of this run's Repos input.
 
-### Phase 8 — Follow-Up (Optional)
+### Phase 7 — Follow-Up (Optional)
 
-21. After presenting the report, ask whether to act on any notable item:
-    - If a branch is flagged **Stale** with no linked ticket: suggest confirming with the
-      author whether it should be revived, converted to a PR, or deleted.
-    - If a PR references a Jira ticket that is already **Done**/closed: flag as a candidate
-      for merge or closure.
-    - If a new commit or PR has no discoverable ticket reference at all: note it for manual
+18. After presenting the report, ask whether to act on any notable item:
+    - If an open PR references a Jira ticket that is already **Done**/closed: flag as a
+      candidate for merge or closure.
+    - If a merged PR closed a GitHub issue that is still **open**: flag for manual issue
+      closure follow-up.
+    - If an open or merged PR has no discoverable ticket reference at all: note it for manual
       traceability follow-up if the team requires ticket linkage.
 
 ## Canvas Interface
@@ -219,8 +184,8 @@ interaction.
 
 - Open canvas `orch-dashboard`, then call `start_run` with
   `skillId: "automation-whats-new"` and these stages: Load Checkpoint, Gather
-  New Main-Branch Commits, Gather Open Pull Requests, Gather Branches Without
-  an Open PR, Correlate Tickets, Report, Persist Checkpoint, Follow-Up.
+  Open Pull Requests, Gather Merged Pull Requests, Correlate Tickets, Report,
+  Persist Checkpoint, Follow-Up.
 - Before each phase, call `update_stage` with `status: "in_progress"`.
 - After each phase, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
@@ -233,10 +198,10 @@ canvas action contract.
 ## Output
 
 - Consolidated "what's new" report across all configured repos, grouped by repo and split
-  into new commits, PR changes, and branch changes.
-- Ticket/issue context attached to each item where discoverable.
+  into merged pull requests and open-PR changes.
+- Ticket/issue context attached to each PR where discoverable.
 - Updated checkpoint file so the next run reports only genuinely new activity.
-- Optional follow-up suggestions for stale branches and closeable PRs.
+- Optional follow-up suggestions for closeable open PRs and unclosed linked issues.
 
 ## Notes
 
@@ -245,10 +210,9 @@ canvas action contract.
   ad hoc works the same way — the checkpoint makes each run additive regardless of cadence.
 - The state file is local to whichever repo/session runs this automation; it does not need to
   live in any of the tracked repos and should not be committed to them.
-- If a repo's main branch history was rewritten (force-push) such that `last_seen_commit_sha`
-  is no longer reachable, this automation falls back to the look-back window for that repo
-  only and notes the fallback in the report so it isn't mistaken for a silent gap.
-- Ticket correlation is best-effort text matching; it will miss tickets referenced only in
-  linked external tools with no ID pattern in the commit/PR/branch text.
-- For very active repos, `gh api ... --paginate` on commits/branches can be slow; consider
-  narrowing with a `since` parameter aligned to `last_run_at` for repeat runs to reduce calls.
+- "Merged since last run" is driven by the `last_run_at` timestamp and the PR `mergedAt`
+  field, so it is resilient to force-pushes and history rewrites on the base branch.
+- Ticket correlation is best-effort text matching against PR title, body, and head branch
+  name; it will miss tickets referenced only in linked external tools with no ID pattern.
+- For very active repos, narrow the merged-PR query with a tighter `merged:>=<date>` bound
+  aligned to `last_run_at` to keep `gh pr list` responses small on repeat runs.
