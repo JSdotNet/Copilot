@@ -90,9 +90,16 @@ This skill orchestrates the following installed skills:
     If tests fail, revert the failing package update, record it as **Skipped (test failure)**,
     and continue with the remaining packages.
 
-### Phase 4 — Pull Request
+### Phase 4 — Personal Validation
 
-11. Commit all changes with message:
+11. Present the audit table (Phase 1) and the build/test results (Phase 3) to the
+    user and **wait for explicit approval before opening a pull request**. If
+    approval is withheld, stop here and record the outcome — never open the PR
+    before personal validation.
+
+### Phase 5 — Pull Request
+
+12. Commit all changes with message:
 
     ```
     chore: update NuGet packages <YYYY-MM-DD>
@@ -102,14 +109,15 @@ This skill orchestrates the following installed skills:
     - Copilot plugins: <n> plugins reinstalled
     ```
 
-12. Push the branch and open a PR:
+13. After approval, push the branch and open a PR:
     - **Title:** `chore: NuGet package updates <YYYY-MM-DD>`
     - **Body:** the audit table from Phase 1 with each row marked Updated or Skipped.
     - **Labels:** `dependencies`, `automated`.
 
-### Phase 5 — Summary
+### Phase 6 — Summary
 
-13. Output a final summary table:
+14. Once the pull request is created (or the run concludes without one), output a
+    final summary table:
 
     | Package | Current | New | Result |
     |---------|---------|-----|--------|

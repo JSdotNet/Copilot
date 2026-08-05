@@ -98,6 +98,29 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 **Agents:** *(default)*
 
+### Stage 8: Personal Validation
+- **Present the completed work** and its evidence to the user for review
+- **Confirm the outcome** against the skill's goals and acceptance criteria
+- **Wait for explicit user approval** before any pull request is created
+
+**Agents:** `review:reviewer`
+
+### Stage 9: Create Pull Request
+- **Create the pull request only after explicit user approval** in Personal Validation — never before
+- **Write the PR description** from the change set and validation evidence
+- **Apply any PR-time improvements** (final polish, labels, changelog) as part of this stage
+- **Skip this stage** (mark it `skipped`) when the run produces no change set to submit
+- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy
+
+**Agents:** `review:reviewer`
+**Skills Used:** `pr-jsdotnet`
+
+### Stage 10: Summary
+- **Summarize the delivered outcome** and the created pull request (if any)
+- **Emit the run summary** once the pull request is created, or the run concludes without one
+
+**Agents:** `review:reviewer`
+
 ## Usage Pattern
 
 ```
@@ -152,13 +175,19 @@ interaction.
 - Open canvas `orch-dashboard`, then call `start_run` with
   `skillId: "orch-repo"` and these stages: Repository Creation, README, MCP
   Configuration, Copilot Instructions, Branch Protection, Issue and PR
-  Templates, Repository Governance.
+  Templates, Repository Governance, Personal Validation, Create Pull Request, Summary.
 - Before each stage, call `update_stage` with `status: "in_progress"`.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. repository URL,
   configured MCP servers, or branch protection rules applied.
-- Call `finish_run` with the final status and a summary once the repository
-  is fully configured.
+- Keep **Personal Validation** and **Create Pull Request** as separate stages:
+  gate **Create Pull Request** on explicit user approval recorded in **Personal
+  Validation** (mark it `skipped` when there is no change set to submit), and
+  record all PR-time changes under the **Create Pull Request** stage output —
+  never create the pull request before personal validation.
+- Mark the **Summary** stage `in_progress` then `done`, and call `finish_run`
+  with the final status and summary once the pull request is created (or the run
+  concludes without one).
 - During **README**, also open/update `markdown-canvas` (`markdown-preview`)
   with the expanded README content, per `instructions/canvas-usage.instructions.md`.
   Optional; skip gracefully if not installed.

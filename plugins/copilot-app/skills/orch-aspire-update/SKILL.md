@@ -67,6 +67,29 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 
 **Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`, `development:testing`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
 
+### Stage 6: Personal Validation
+- **Present the completed work** and its evidence to the user for review
+- **Confirm the outcome** against the skill's goals and acceptance criteria
+- **Wait for explicit user approval** before any pull request is created
+
+**Agents:** `review:reviewer`
+
+### Stage 7: Create Pull Request
+- **Create the pull request only after explicit user approval** in Personal Validation — never before
+- **Write the PR description** from the change set and validation evidence
+- **Apply any PR-time improvements** (final polish, labels, changelog) as part of this stage
+- **Skip this stage** (mark it `skipped`) when the run produces no change set to submit
+- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy
+
+**Agents:** `review:reviewer`
+**Skills Used:** `pr-jsdotnet`
+
+### Stage 8: Summary
+- **Summarize the delivered outcome** and the created pull request (if any)
+- **Emit the run summary** once the pull request is created, or the run concludes without one
+
+**Agents:** `review:reviewer`
+
 ## Usage Pattern
 
 ```
@@ -110,7 +133,7 @@ interaction.
 - Open canvas `orch-dashboard`, then call `start_run` with
   `skillId: "orch-aspire-update"` and these stages: Baseline & Plan
   Creation, Plan Refinement, Staged Aspire Upgrade, New Feature Adoption,
-  Validation & Recording.
+  Validation & Recording, Personal Validation, Create Pull Request, Summary.
 - Before each stage, call `update_stage` with `status: "in_progress"`.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. the refined plan,
@@ -119,8 +142,14 @@ interaction.
   smoke/integration check with `status: "pass"|"fail"|"flaky"` and
   Playwright evidence paths) and `monitoring` (the Aspire log/trace
   findings) so the dashboard renders QA results with evidence inline.
-- Call `finish_run` with the final status and a summary once the upgrade is
-  validated locally.
+- Keep **Personal Validation** and **Create Pull Request** as separate stages:
+  gate **Create Pull Request** on explicit user approval recorded in **Personal
+  Validation** (mark it `skipped` when there is no change set to submit), and
+  record all PR-time changes under the **Create Pull Request** stage output —
+  never create the pull request before personal validation.
+- Mark the **Summary** stage `in_progress` then `done`, and call `finish_run`
+  with the final status and summary once the pull request is created (or the run
+  concludes without one).
 - During **Plan Refinement**, also open/update `markdown-canvas` (`markdown-preview`)
   with the refined upgrade plan, per `instructions/canvas-usage.instructions.md`.
   Optional; skip gracefully if not installed.

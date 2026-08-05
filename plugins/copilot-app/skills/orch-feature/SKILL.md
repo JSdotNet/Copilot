@@ -58,11 +58,10 @@ Execute a complete feature development workflow from backlog to local validation
 **Agents:** `development:testing`, `csharp-coding:coding`, `review:reviewer`
 
 ### Stage 5: Code Review & Quality
-- **Submit pull request** for peer review
+- **Conduct code review** of the change set (no pull request yet)
 - **Address review feedback** and suggestions
 - **Run security scanning** (SAST, dependency checks)
 - **Verify all checks** pass (lint, build, tests)
-- **Approve for merge**
 
 **Agents:** `review:reviewer`, `csharp-coding:coding`
 
@@ -78,6 +77,30 @@ Execute a complete feature development workflow from backlog to local validation
 - **Publish validation summary** for local acceptance decision input
 
 **Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`, `csharp-coding:coding`, `review:reviewer` running validation manually when the `qa` plugin isn't installed
+
+### Stage 7: Personal Validation
+- **Present the change set** and validation evidence to the user for review
+- **Walk through acceptance criteria** and E2E results together
+- **Wait for explicit user approval** before any pull request is created
+- **Fold requested changes** back into earlier stages when needed
+
+**Agents:** `review:reviewer`
+
+### Stage 8: Create Pull Request
+- **Create the pull request only after explicit user approval** in Personal Validation — never before
+- **Write the PR description** from acceptance criteria, review outcome, and validation evidence
+- **Apply any PR-time improvements** (final polish, changelog, labels) as part of this stage
+- **Confirm all checks pass** on the pull request
+- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy
+
+**Agents:** `csharp-coding:coding`, `review:reviewer`
+**Skills Used:** `pr-jsdotnet`
+
+### Stage 9: Summary
+- **Summarize the delivered feature**, validation outcome, and the created pull request
+- **Emit the run summary** once the pull request is created (or the run concludes without one)
+
+**Agents:** `review:reviewer`
 
 ## Usage Pattern
 
@@ -103,6 +126,8 @@ Orchestrate feature development for:
 - [ ] E2E validation executed successfully
 - [ ] E2E run evidence captured (logs/screenshots)
 - [ ] Validation result recorded and shared
+- [ ] Personal validation approved by the user
+- [ ] Pull request created after approval, with all checks passing
 
 ## Output Expectations
 
@@ -123,7 +148,8 @@ interaction.
 - Open canvas `orch-dashboard`, then call `start_run` with
   `skillId: "orch-feature"` and these stages: Feature Specification,
   Architecture & Design, Implementation, Testing & Validation, Code Review &
-  Quality, E2E Validation & Result Recording.
+  Quality, E2E Validation & Result Recording, Personal Validation, Create Pull
+  Request, Summary.
 - Before each stage, call `update_stage` with `status: "in_progress"`.
 - After each stage, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary — e.g. acceptance criteria,
@@ -133,8 +159,13 @@ interaction.
   `notes`, and Playwright screenshot/recording `evidence` paths) and
   `monitoring` (the Aspire log/trace summary and any Error/Critical/Warning
   findings) so the dashboard renders QA results with evidence inline.
-- Call `finish_run` with the final status and a summary once the feature is
-  validated end-to-end.
+- Keep **Personal Validation** and **Create Pull Request** as separate stages:
+  gate **Create Pull Request** on explicit user approval recorded in **Personal
+  Validation**, and record all PR-time changes under the **Create Pull Request**
+  stage output — never create the pull request before personal validation.
+- Mark the **Summary** stage `in_progress` then `done`, and call `finish_run`
+  with the final status and summary once the pull request is created (or the run
+  concludes without one).
 - During **Feature Specification**, also open/update `markdown-canvas`
   (`markdown-preview`) with the drafted user stories, and during
   **Architecture & Design**, open/update `markdown-canvas` with the data

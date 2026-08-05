@@ -318,6 +318,9 @@ Each orchestration skill follows a staged workflow tailored to the scenario (pro
 2. **Implementation stage** - Code creation with handoff to `csharp-coding:coding` (with approval)
 3. **Validation stages** - Unit, integration, and local runtime validation with recorded outcomes
 4. **Quality stage** - Review readiness and blocker resolution
+5. **Personal Validation stage** - The user reviews the result and explicitly approves before any pull request is created
+6. **Create Pull Request stage** - A separate stage after personal validation; all PR-time changes belong here and the pull request is never opened before approval
+7. **Summary stage** - Emitted once the pull request is created (or the run concludes without one)
 
 Agent selection per stage is recommended based on task context. All agent transitions
 require explicit user approval per the repository handoff policy.
