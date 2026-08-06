@@ -28,6 +28,9 @@ automatically from the kind of change so callers do not re-describe QA rules.
     concurrently with Playwright validation; otherwise use the `qa` plugin's
     `delegate-to-qa-monitor` skill for a same-session handoff.
   4. **Record the QA result** with pass/fail per scenario and the captured evidence.
+
+  Playwright execution itself stays in the orchestrating session (inline or via a
+  sub-agent in the **same worktree**) so it exercises the actual change set.
 - **Bug fix or change to existing functionality → targeted QA validation without required capture:**
   1. **Run the application locally** via the `aspire` / `aspire-run` skill and verify the
      affected scenarios.
@@ -77,6 +80,16 @@ automatically from the kind of change so callers do not re-describe QA rules.
 - `playwright` for browser automation and smoke/E2E execution when QA runs browser-facing
   scenarios; evidence capture is required only for new functionality unless explicitly
   requested.
+
+## Evidence Location
+
+- Evidence paths reported to the dashboard are resolved **relative to the orchestrating
+  session's workspace**, and paths outside it are rejected.
+- A `qa-monitor` child session runs in its own worktree, so it must write evidence under
+  the orchestrating session's workspace path, or its findings must be copied back before
+  they are reported.
+- The orchestrating session reports all QA results; the child session never calls dashboard
+  actions itself.
 
 ## Reference
 

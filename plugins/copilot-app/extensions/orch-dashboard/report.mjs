@@ -21,6 +21,12 @@ export function renderReportMarkdown(run) {
     lines.push(`- **Status:** ${run.status}`);
     lines.push(`- **Started:** ${run.startedAt}`);
     lines.push(`- **Updated:** ${run.updatedAt}`);
+    if (run.changeKind) lines.push(`- **Change kind:** ${run.changeKind}`);
+    if (run.approval && run.approval.personalValidation) {
+        const decidedAt = run.approval.decidedAt ? ` (${run.approval.decidedAt})` : "";
+        const note = run.approval.note ? ` — ${run.approval.note}` : "";
+        lines.push(`- **Personal validation:** ${run.approval.personalValidation}${decidedAt}${note}`);
+    }
     lines.push("");
 
     lines.push("## Stages");

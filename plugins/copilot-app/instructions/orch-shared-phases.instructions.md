@@ -75,6 +75,64 @@ description: Defines the reusable delivery and validation phases shared by all o
 - Prefer the narrowest server that matches the phase. Do not query all four servers by
   default.
 
+## Execution Model (Shared)
+
+Defines *where* an orchestration runs and *how* its progress is tracked. Applies to every
+`orch-*` skill.
+
+### Session Ownership
+
+- **One owner session.** The `orchestrator` agent runs the orchestration in the session it
+  was invoked from and stays the sole owner of the run: it alone calls `start_run`,
+  `update_stage`, `set_run_context`, and `finish_run`, and it alone holds the Personal
+  Validation gate. Never delegate dashboard writes or the approval decision.
+- **Never start a second orchestration in the same session** while a run is
+  `in_progress`; the dashboard's tool-activity insight is session-wide and would
+  mis-attribute the work.
+
+### Delegation Order
+
+1. **Do it inline** for short, decision-heavy steps that need the run's context.
+2. **Delegate to a sub-agent (default for heavy work).** Use a sub-agent for build, test,
+   Playwright execution, and large code changes. A sub-agent gets its own context but the
+   **same worktree**, so evidence paths, the change set, and the running application all
+   stay valid for the owner session. This keeps verbose output out of the orchestrator's
+   context without breaking the dashboard.
+3. **Create a child session only for genuinely concurrent long-running work** — in
+   practice, `qa:qa-monitor` tailing Aspire logs while Playwright drives scenarios. Do not
+   use a child session merely to save context.
+
+Whichever form is used, pass the model resolved for that stage's category per
+`instructions/orch-model-selection.instructions.md` on the `task` / `create_session` call.
+
+### Child Session Constraints
+
+When a child session is used (`create_session` + cross-session messaging):
+
+- The child runs in a **different worktree**. It cannot see the owner session's uncommitted
+  change set and must not be asked to build, test, or validate the change there.
+- **Evidence must land in the owner session's workspace.** Instruct the child to write
+  evidence under the owner workspace path, or copy it back before the owner reports it.
+  The dashboard serves evidence only from the owner workspace and rejects paths outside it.
+- The owner session reports the child's findings; the child never calls dashboard actions.
+
+### Run State and Resume
+
+- **The run JSON is the source of truth**, not the conversation. It lives at
+  `<session workspace>/orchestration-runs/<runId>.json` and survives compaction, restart,
+  and session resume.
+- **On start, reattach before creating.** `start_run` resumes an existing `in_progress`
+  run for the same `skillId` by default and returns `resumed: true` with the stored run.
+  Continue from the first stage that is not `done`; pass `resume: false` only to
+  deliberately start a second run of the same skill.
+- **Persist the decisions that gate later phases** with `set_run_context`:
+  - `changeKind` (`new-functionality` / `bug-fix` / `dependency-update` / `none`) as soon
+    as it is known, so a resumed run selects the same QA depth.
+  - `approval` (`pending` / `approved` / `rejected`) at the Personal Validation decision.
+- **Never create a pull request unless the persisted `approval` is `approved`.** If the
+  run state says `pending` after a resume, re-run Personal Validation — do not rely on
+  conversation memory of an approval.
+
 ## Phase Tiers
 
 - **Code-modifying orchestrations** — `orch-feature`, `orch-bug`, `orch-create-module`,
@@ -161,13 +219,16 @@ back to the user and waits for them.
   review the running result themselves before deciding.
 - **Wait for explicit user approval** before any pull request is created, and fold
   requested changes back into the earlier stages when needed.
+- **Record the decision durably** with `set_run_context` (`approval: "approved"` or
+  `"rejected"`, plus the user's wording as `approvalNote`) so the gate survives a session
+  resume.
 
 ## Phase: Create Pull Request
 
 Applies to every orchestration.
 
 - **Create the pull request only after explicit user approval** in Personal Validation —
-  never before.
+  never before, and only when the persisted `approval` in the run state is `approved`.
 - **Write the PR description** from the change set, code review outcome, and validation
   evidence.
 - **Apply any PR-time improvements** (final polish, labels, changelog) as part of this
@@ -200,9 +261,13 @@ Every `orch-*` skill reports progress through the `orch-dashboard` canvas extens
 (`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not installed,
 skip the canvas calls and continue through standard chat interaction.
 
-- **Open** canvas `orch-dashboard`, then call `start_run` with the skill's `skillId` and
-  the full ordered stage list (its skill-specific stages followed by the shared phase
-  names for its tier).
+- **Open** canvas `orch-dashboard`, then call `start_run` with the skill's `skillId`, the
+  full ordered stage list (its skill-specific stages followed by the shared phase names for
+  its tier), and the `changeKind` when it is already known. `start_run` reattaches to an
+  existing `in_progress` run for the same skill and returns `resumed: true`; continue from
+  the first stage that is not `done` instead of restarting the orchestration.
+- **Persist gating state** with `set_run_context`: the `changeKind` as soon as it is
+  determined, and the `approval` decision recorded in Personal Validation.
 - **Before each stage**, call `update_stage` with `status: "in_progress"`.
 - **After each stage**, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary.
@@ -238,5 +303,10 @@ contract, and `instructions/canvas-usage.instructions.md` for when to also open 
 - [ ] QA Validation depth matches the change kind (new functionality vs. bug/existing-flow
       verification vs. startup-only vs. skipped).
 - [ ] Personal Validation waits for the user and uses no agent.
+- [ ] The orchestration runs in one owner session; heavy work is delegated to sub-agents in
+      the same worktree, and child sessions are used only for concurrent monitoring.
+- [ ] `start_run` reattaches to an existing `in_progress` run instead of duplicating it.
+- [ ] Change kind and the Personal Validation approval are persisted with
+      `set_run_context`, and no pull request is created while approval is `pending`.
 - [ ] Model choice per phase follows `instructions/orch-model-selection.instructions.md`
       and is never hardcoded in a skill or phase.

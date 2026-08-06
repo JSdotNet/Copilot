@@ -35,10 +35,13 @@ that resolution, it does not re-decide model choice per skill.
    `orch-model-selection.instructions.md`, resolving each to the current latest non-legacy
    model ID (never a hardcoded version number), to build the run's category → model mapping,
    following that file's Resolution Order (repo override → category family/tier → `auto`).
-4. **Open the dashboard once.** Open the `orch-dashboard` canvas and call `start_run` with
-   the skill's `skillId` and the full ordered stage list (unique stages + shared phases for
-   its tier). Follow the shared **Dashboard Reporting Contract** for every stage transition.
-   Skip canvas calls gracefully when the extension is not installed.
+4. **Open the dashboard once and reattach if a run exists.** Open the `orch-dashboard`
+   canvas and call `start_run` with the skill's `skillId`, the full ordered stage list
+   (unique stages + shared phases for its tier), and the `changeKind` when known.
+   `start_run` returns `resumed: true` when an `in_progress` run for the same skill already
+   exists — in that case continue from the first stage that is not `done` rather than
+   restarting. Follow the shared **Dashboard Reporting Contract** for every stage
+   transition. Skip canvas calls gracefully when the extension is not installed.
 5. **Apply the resolved model at every stage transition.** When creating a session, spawning
    a task, or starting a child/background session (for example the parallel `qa:qa-monitor`
    session) for a stage, pass the model resolved for that stage's category. No agent invoked
@@ -57,13 +60,23 @@ that resolution, it does not re-decide model choice per skill.
 9. **Enforce the Personal Validation gate.** Personal Validation uses **no agent and no
    model**: hand control back to the user, present the code review and the recorded QA
    review, start the application for code changes, and wait for explicit user approval.
-   Never auto-approve.
-10. **Gate the pull request.** Create a pull request only after explicit approval recorded in
-    Personal Validation; mark Create Pull Request `skipped` when there is no change set.
-11. **Track the run durably.** Maintain per-run progress (stage, status, evidence, and the
-    resolved model) so a run can be reported or resumed, and reconcile it with the dashboard
-    state.
-12. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
+   Never auto-approve. Record the decision with `set_run_context` (`approval`, plus the
+   user's wording as `approvalNote`).
+10. **Gate the pull request.** Create a pull request only when the persisted `approval` in
+    the run state is `approved`; mark Create Pull Request `skipped` when there is no change
+    set. If a resumed run shows `pending`, re-run Personal Validation rather than trusting
+    conversation memory.
+11. **Stay in one owner session and delegate deliberately.** Run the orchestration in the
+    invoking session and keep sole ownership of the dashboard actions and the approval gate.
+    Delegate build, test, Playwright execution, and large code changes to **sub-agents in the
+    same worktree** so evidence paths and the change set stay valid. Use `create_session`
+    only for genuinely concurrent long-running work such as `qa:qa-monitor`, and require its
+    evidence to land in this session's workspace. See the shared **Execution Model**.
+12. **Track the run durably.** The run JSON under
+    `<session workspace>/orchestration-runs/` is the source of truth, not the conversation.
+    Persist `changeKind`, `approval`, and the resolved model with `set_run_context` so a
+    compacted or resumed session recovers the run's position and gate state.
+13. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
 
 ## Constraints and Priorities
 
@@ -75,9 +88,14 @@ that resolution, it does not re-decide model choice per skill.
 - **Approval before every agent transition** and before every pull request.
 - **Cross-plugin agents are recommended, not required** — skip or perform a stage manually
   when a referenced plugin is not installed, and continue with the remaining stages.
-- **No pull request** unless the user has explicitly approved it in Personal Validation.
+- **No pull request** unless the user has explicitly approved it in Personal Validation and
+  that approval is persisted in the run state.
 - **Repo overrides always win.** A `.github/copilot-model-selection.md` entry overrides the
   category default for that category.
+- **Sub-agents before child sessions:** a child session gets its own worktree and cannot see
+  this session's uncommitted change set, so use it only for concurrent monitoring.
+- **One orchestration per session** while a run is `in_progress`, because dashboard insight
+  telemetry is session-wide.
 
 ## Example Usage
 
