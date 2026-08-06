@@ -44,8 +44,8 @@ Validation — so build and test behavior lives in one place instead of in each 
 
 ## Agents
 
-- `csharp-coding:coding`, `development:testing` (recommended); performed manually when those
-  plugins are not installed. Agent transitions require explicit user approval.
+- `csharp-coding:coding` (recommended); performed manually when that plugin is not
+  installed. Agent transitions require explicit user approval.
 
 ## Reference
 

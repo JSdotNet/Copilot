@@ -27,7 +27,7 @@ Execute a complete MVP development workflow from planning through local run and 
 - **Estimate effort** and timeline
 - **Identify dependencies** and risks
 
-**Agents:** `product-owner:product-owner`, `development:development-plan`
+**Agents:** `product-owner:product-owner`
 
 ### Stage 2: Architecture & Design
 - **Design system architecture** for MVP scope
@@ -35,15 +35,14 @@ Execute a complete MVP development workflow from planning through local run and 
 - **Plan integration points** with external services
 - **Define local runtime validation strategy**
 
-**Agents:** `architecture:architect`, `development:developer`
+**Agents:** `architecture:architect`
 
 ### Stage 3: Implementation Sprint
-- **Create feature branches** for parallel development
 - **Implement core features** using TDD approach
 - **Build API endpoints** and services
 - **Integrate UI/Frontend** (if applicable)
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Final Phases (Shared)
 

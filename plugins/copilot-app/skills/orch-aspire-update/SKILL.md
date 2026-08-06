@@ -27,7 +27,7 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 - **Create initial update plan** with scope, sequencing, and rollback strategy
 - **Define success criteria** for upgrade completion and feature adoption
 
-**Agents:** `development:development-plan`, `csharp-coding:coding`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 2: Plan Refinement
 - **Review release notes and breaking changes** for target Aspire versions
@@ -35,15 +35,15 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 - **Split work into execution batches** (low-risk first, high-risk last)
 - **Finalize feature-adoption plan** for new Aspire capabilities to enable
 
-**Agents:** `architecture:architect`, `review:reviewer`, `development:development-plan`
+**Agents:** `architecture:architect`, `review:reviewer`
 
 ### Stage 3: Staged Aspire Upgrade
-- **Create upgrade branch** and apply package updates in batches
+- **Apply package updates in batches**
 - **Upgrade AppHost integrations** and related service references
 - **Resolve breaking changes** in configuration and wiring
 - **Keep changes incremental** and reversible per batch
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
+**Agents:** `csharp-coding:coding`  
 **Skills Used:** `aspire`, `nuget-manager`
 
 ### Stage 4: New Feature Adoption

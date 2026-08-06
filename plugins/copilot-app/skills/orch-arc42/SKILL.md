@@ -1,6 +1,6 @@
 ---
 name: orch-arc42
-description: 'Orchestrate arc42 architecture documentation with GitHub Copilot App canvas. Uses the architecture:architect agent for section drafting and `jsdotnet-project-guidelines-mcpserver` for guideline and ADR grounding before governed asset changes.'
+description: 'Orchestrate arc42 architecture documentation with GitHub Copilot App canvas. Uses the architecture:architect agent for section drafting and the configured guidance MCP server for guideline and ADR grounding before governed asset changes.'
 ---
 
 # Orchestrate arc42 Documentation
@@ -22,12 +22,12 @@ Execute an arc42 documentation workflow in GitHub Copilot App canvas while keepi
 
 ### Stage 1: Context & Guideline Retrieval
 - **Clarify target sections** and documentation goals
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations and ADRs
+- **Query the configured guidance MCP server** for relevant recommendations and ADRs
 - **Collect repository-specific constraints** for governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Server:** Configured guidance MCP server
 
 ### Stage 2: Section Drafting
 - **Load arc42 global instructions** and target section instructions

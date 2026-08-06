@@ -24,7 +24,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 ### Stage 1: GitHub Folder Setup (Foundation)
 - **Initialize `.github/` directory structure** with recommended layouts
-- **Generate project guidelines** using `JSdotNet.MCP.Guidelines`:
+- **Generate project guidelines** using the configured guidance MCP server:
   - Coding standards and patterns
   - Git workflow conventions
   - Review guidelines
@@ -32,8 +32,8 @@ Automate the complete project scaffolding workflow for an existing, configured r
 - **Create `.github/instructions/` files** for developer guidance
 - **Create `.github/copilot-settings.json`** for Copilot configuration
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
-**MCP Server:** `JSdotNet.MCP.Guidelines` for guideline generation
+**Agents:** `csharp-coding:coding`  
+**MCP Server:** Configured guidance MCP server for guideline generation
 
 ### Stage 2: GitHub Actions Workflows
 
@@ -51,7 +51,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 - **Plan integration points** across services
 - **Capture risk and assumptions** for local development
 
-**Agents:** `architecture:architect`, `development:development-plan`
+**Agents:** `architecture:architect`
 
 ### Stage 4: Tooling & Dependencies
 - **Install base dependencies** (frameworks, SDKs)
@@ -59,7 +59,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 - **Set up linting and code quality tools**
 - **Configure logging and observability**
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 5: Aspire AppHost & Project Scaffolding
 
@@ -83,8 +83,8 @@ discovery, and health checks.
 - **Create first unit tests** as examples
 - **Setup test data fixtures**
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
-**Skills Used:** `aspire` skill from development plugin
+**Agents:** `csharp-coding:coding`  
+**Skills Used:** `aspire`
 
 ### Final Phases (Shared)
 

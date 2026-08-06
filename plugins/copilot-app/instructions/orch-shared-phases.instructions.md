@@ -62,8 +62,8 @@ rather than re-describing the steps.
 - **Stop and fix** before continuing when build, unit, or E2E tests fail — do not proceed
   to QA Validation or Personal Validation on a red build.
 
-**Agents:** `csharp-coding:coding`, `development:testing` (recommended); performed manually
-when those plugins are not installed.
+**Agents:** `csharp-coding:coding` (recommended); performed manually when that plugin is not
+installed.
 
 ## Phase: QA Validation
 
@@ -89,9 +89,9 @@ invokes it and passes the change kind so depth is selected automatically:
   update changes user-facing behavior.
 - **No functional change and nothing to run** → mark this phase `skipped` and record why.
 
-**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`,
-`csharp-coding:coding`, `review:reviewer` running validation manually when the `qa` plugin
-isn't installed.
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to
+`csharp-coding:coding`, `review:reviewer` running validation manually when the `qa`
+plugin isn't installed.
 
 ## Phase: Personal Validation
 
@@ -119,10 +119,8 @@ Applies to every orchestration.
 - **Apply any PR-time improvements** (final polish, labels, changelog) as part of this
   phase.
 - **Skip this phase** (mark it `skipped`) when the run produces no change set to submit.
-- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy.
 
 **Agents:** `review:reviewer`
-**Skills Used:** `pr-jsdotnet`
 
 ## Phase: Summary
 

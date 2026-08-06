@@ -27,7 +27,7 @@ Execute a complete workflow for adding a new module to an existing project using
 - **Capture acceptance criteria** and non-functional requirements
 - **Identify dependencies** and integration risks
 
-**Agents:** `product-owner:product-owner`, `development:development-plan`
+**Agents:** `product-owner:product-owner`
 
 ### Stage 2: Architecture & Design
 - **Design module structure** and naming conventions
@@ -35,7 +35,7 @@ Execute a complete workflow for adding a new module to an existing project using
 - **Plan integration points** with existing modules/services
 - **Create implementation checklist** for incremental delivery
 
-**Agents:** `architecture:architect`, `development:developer`
+**Agents:** `architecture:architect`
 
 ### Stage 3: Module Implementation
 - **Create module files/folders** in the existing project layout
@@ -43,7 +43,7 @@ Execute a complete workflow for adding a new module to an existing project using
 - **Add dependency wiring** and configuration updates
 - **Keep changes incremental** for easier review
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Final Phases (Shared)
 

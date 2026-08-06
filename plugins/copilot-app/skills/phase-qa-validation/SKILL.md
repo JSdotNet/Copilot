@@ -57,9 +57,9 @@ automatically from the kind of change so callers do not re-describe QA rules.
 
 ## Agents
 
-- `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`,
-  `csharp-coding:coding`, `review:reviewer` running validation manually when the `qa`
-  plugin is not installed. Agent transitions require explicit user approval.
+- `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`,
+  `review:reviewer` running validation manually when the `qa` plugin is not installed.
+  Agent transitions require explicit user approval.
 
 ## Reference
 

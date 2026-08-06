@@ -29,7 +29,7 @@ Execute a complete bug fix workflow from identification through local runtime va
 - **Create detailed bug report** with logs/traces
 - **Assign priority** (critical, high, medium, low)
 
-**Agents:** `product-owner:product-owner`, `development:developer`, `review:reviewer`
+**Agents:** `product-owner:product-owner`, `review:reviewer`
 
 ### Stage 2: Root Cause Analysis
 - **Debug issue** using logs and diagnostics
@@ -38,7 +38,7 @@ Execute a complete bug fix workflow from identification through local runtime va
 - **Document findings** for the fix
 - **Create minimal reproduction case**
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 3: Fix Implementation (TDD Approach)
 - **Create failing test first** that reproduces the bug
@@ -93,12 +93,11 @@ Orchestrate bug fix for:
 ## Critical Bug Fast-Track Process
 
 ```
-1. Branch: hotfix/bug-id
-2. Fix: Minimal changes, test thoroughly
-3. PR: Immediate review (no waiting)
-4. Validate: Reproduction test + regression suite
-5. Run locally: Verify startup and impacted flows
-6. Monitor: Logs/health until stability confirmed
+1. Fix: Minimal changes, test thoroughly
+2. PR: Immediate review (no waiting)
+3. Validate: Reproduction test + regression suite
+4. Run locally: Verify startup and impacted flows
+5. Monitor: Logs/health until stability confirmed
 ```
 
 ## Output Expectations

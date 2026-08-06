@@ -1,6 +1,6 @@
 ---
 name: orch-adr
-description: 'Orchestrate ADR creation in GitHub Copilot App canvas. Uses the architecture:architect agent for decision documentation and `jsdotnet-project-guidelines-mcpserver` to retrieve relevant project guidance and existing ADR context first.'
+description: 'Orchestrate ADR creation in GitHub Copilot App canvas. Uses the architecture:architect agent for decision documentation and the configured guidance MCP server to retrieve relevant project guidance and existing ADR context first.'
 ---
 
 # Orchestrate Architectural Decision Record
@@ -21,12 +21,12 @@ Execute an ADR workflow in GitHub Copilot App canvas with upfront MCP-based guid
 
 ### Stage 1: Decision Context Retrieval
 - **Clarify the decision statement** and affected scope
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations and existing ADRs
+- **Query the configured guidance MCP server** for relevant recommendations and existing ADRs
 - **Capture constraints and decision drivers** that govern the requested change
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Server:** Configured guidance MCP server
 
 ### Stage 2: ADR Drafting
 - **Document context** and competing alternatives

@@ -52,7 +52,6 @@ them; the phase content is maintained there and in the phase skills.
 - **Cross-plugin agents are recommended, not required** — skip or perform a stage manually
   when a referenced plugin is not installed, and continue with the remaining stages.
 - **No pull request** unless the user has explicitly approved it in Personal Validation.
-- Prefer the `JSdotNet` account for GitHub CLI/API operations per repository policy.
 
 ## Example Usage
 

@@ -1,6 +1,6 @@
 ---
 name: orch-blueprint
-description: 'Orchestrate architecture blueprint creation or refresh in GitHub Copilot App canvas. Uses the architecture:architect agent for blueprint work and `jsdotnet-project-guidelines-mcpserver` to ground governed asset changes in project guidance.'
+description: 'Orchestrate architecture blueprint creation or refresh in GitHub Copilot App canvas. Uses the architecture:architect agent for blueprint work and the configured guidance MCP server to ground governed asset changes in project guidance.'
 ---
 
 # Orchestrate Architecture Blueprint
@@ -22,12 +22,12 @@ Execute a blueprint workflow in GitHub Copilot App canvas with MCP-guided contex
 
 ### Stage 1: Scope & Guideline Retrieval
 - **Define blueprint scope** and target audience
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations and ADRs
+- **Query the configured guidance MCP server** for relevant recommendations and ADRs
 - **Capture repository constraints** that affect governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Server:** Configured guidance MCP server
 
 ### Stage 2: Blueprint Drafting
 - **Identify system boundaries** and major components

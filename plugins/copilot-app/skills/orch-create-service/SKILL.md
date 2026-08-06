@@ -27,7 +27,7 @@ Execute a complete workflow for adding a new service to an existing project, wit
 - **Identify upstream/downstream dependencies**
 - **Set acceptance criteria** and operational expectations
 
-**Agents:** `product-owner:product-owner`, `development:development-plan`
+**Agents:** `product-owner:product-owner`
 
 ### Stage 2: Service Architecture & Integration Design
 - **Design service project structure** aligned with existing architecture
@@ -35,7 +35,7 @@ Execute a complete workflow for adding a new service to an existing project, wit
 - **Define configuration model** (env vars, secrets, defaults)
 - **Define health checks and observability signals**
 
-**Agents:** `architecture:architect`, `development:developer`
+**Agents:** `architecture:architect`
 
 ### Stage 3: Service Implementation & Wiring
 - **Create the new service project** in the existing solution/repository
@@ -43,7 +43,7 @@ Execute a complete workflow for adding a new service to an existing project, wit
 - **Wire service into host orchestration** (for example AppHost/service catalog)
 - **Configure dependencies** (database, queue, cache) as needed
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Final Phases (Shared)
 

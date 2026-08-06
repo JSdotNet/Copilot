@@ -1,6 +1,6 @@
 ---
 name: orch-architecture
-description: 'Orchestrate general architecture work in GitHub Copilot App canvas. Uses the architecture:architect agent directly and `jsdotnet-project-guidelines-mcpserver` for guideline and ADR retrieval before governed asset changes.'
+description: 'Orchestrate general architecture work in GitHub Copilot App canvas. Uses the architecture:architect agent directly and the configured guidance MCP server for guideline and ADR retrieval before governed asset changes.'
 ---
 
 # Orchestrate Architecture Work
@@ -21,12 +21,12 @@ Execute a general architecture workflow in GitHub Copilot App canvas for request
 
 ### Stage 1: Goal & Guideline Retrieval
 - **Clarify the architecture objective** and expected output
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations and ADRs
+- **Query the configured guidance MCP server** for relevant recommendations and ADRs
 - **Capture repository constraints** that affect governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Server:** Configured guidance MCP server
 
 ### Stage 2: Architecture Investigation
 - **Inspect the current repository context** and affected architecture surfaces
@@ -64,7 +64,7 @@ Invoke: orch-architecture
 - Goal: evaluate and document the architecture impact of a plugin boundary change
 - Scope: "architecture and copilot-app plugins"
 - Output: proposal with risks, trade-offs, and recommended follow-up artifacts
-- Use `jsdotnet-project-guidelines-mcpserver` before governed asset edits
+- Use the configured guidance MCP server before governed asset edits
 ```
 
 ## Output Expectations

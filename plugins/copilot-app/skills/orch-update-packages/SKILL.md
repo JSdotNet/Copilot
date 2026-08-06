@@ -27,7 +27,7 @@ Execute a complete package update workflow with validation, testing, and local r
 - **Identify breaking changes** in major versions
 - **Review changelogs** and release notes
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 2: Update Planning
 - **Categorize updates** (security, patch, minor, major)
@@ -35,17 +35,16 @@ Execute a complete package update workflow with validation, testing, and local r
 - **Plan rollback strategy** for risky updates
 - **Coordinate with stakeholders** for major version upgrades
 
-**Agents:** `product-owner:product-owner`, `development:development-plan`
+**Agents:** `product-owner:product-owner`
 
 ### Stage 3: Staged Updates
-- **Create update branch** per update batch
 - **Update packages** using appropriate package managers:
   - NuGet: `nuget-manager` skill
   - npm: Package manager commands
   - .NET SDK: `dotnet` CLI
 - **Verify lockfiles** and dependency resolution
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 4: Security Validation
 - **Run SAST scanning** (Aikido, Snyk, etc.)
@@ -53,7 +52,7 @@ Execute a complete package update workflow with validation, testing, and local r
 - **Review dependency tree** for transitive vulnerabilities
 - **Document any exceptions** to security policy
 
-**Agents:** `csharp-coding:coding`, `development:security`
+**Agents:** `csharp-coding:coding`
 
 ### Final Phases (Shared)
 

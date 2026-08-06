@@ -1,35 +1,27 @@
 # copilot-app
 
-Installable GitHub Copilot App plugin for creating Pull Requests across JSdotNet repositories and orchestrating development workflows with canvas-based interfaces.
+Installable GitHub Copilot App plugin for orchestration workflows and automation with
+canvas-based interfaces.
 
 ## Purpose
 
 This plugin provides specialized skills for GitHub Copilot App users who need to:
 
-1. **Create Pull Requests** efficiently in any JSdotNet organization repository
-2. **Orchestrate Development Tasks** with local-first canvas interfaces including:
-   - Repository creation and configuration (`orch-repo`)
-   - Project setup with `.github` folder initialization (`orch-project`)
-   - MVP creation and sprint planning
-   - Package/dependency updates with security scanning
-   - Aspire upgrade orchestration with plan refinement and feature adoption
-   - General architecture orchestration with the architect agent and MCP-guided context gathering
-   - arc42 documentation orchestration with MCP-guided context gathering
-   - Architecture blueprint orchestration with traceability review
-   - ADR and TDR orchestration with guideline and ADR retrieval
-   - Feature development lifecycle management
-   - Bug triage with test-driven development (TDD)
-   - Module creation inside existing projects
-   - New service creation in existing projects
-   - Runtime validation (Local Run & Monitoring stages) driven by the `qa` plugin's `qa`/`qa-monitor` agents for Playwright evidence and continuous Aspire monitoring
+1. **Orchestrate repository and project setup** with guided, staged workflows
+2. **Drive implementation workflows** for features, bugs, modules, services, and package
+   updates
+3. **Coordinate documentation workflows** for architecture, arc42, ADRs, TDRs, and
+   blueprints
+4. **Track progress visually** through shared dashboard and content-preview canvases
 
-Each orchestration skill coordinates multiple agents from other plugins (development, architecture, product-owner, csharp-coding, review) to execute complete workflows. Agent transitions require explicit user approval. Cross-plugin agents are recommended but not required — skills degrade gracefully when optional plugins are missing.
+Each orchestration skill coordinates specialist agents from other plugins where useful.
+Agent transitions require explicit user approval. Cross-plugin agents are recommended but
+not required — skills degrade gracefully when optional plugins are missing.
 
 ## Includes
 
 ### Skills
 
-- `skills/pr-jsdotnet/SKILL.md` - Create PRs across all JSdotNet organization repositories
 - `skills/orch-repo/SKILL.md` - Create and configure a new GitHub repository (branch protection, CI/CD, templates)
 - `skills/orch-project/SKILL.md` - Set up development project inside an existing repository (`.github/`, guidelines, Aspire scaffolding)
 - `skills/orch-create-mvp/SKILL.md` - MVP development from planning to local run and monitoring (canvas)
@@ -61,10 +53,6 @@ plugin). Each reports progress through the `orch-dashboard` canvas extension.
 - `skills/automation-weekly-cost-analysis/SKILL.md` - Produce a weekly Chronicle cost report
 - `skills/automation-whats-new/SKILL.md` - Report open and merged pull requests across repos since the last run
 
-### Hooks
-
-- `hooks.json` - Guardrails that block the built-in PR tool for JSdotNet PRs and add recovery guidance for `gh`-based PR failures
-
 ### Canvas Extensions
 
 - `extensions/orch-dashboard/` - Live progress and output dashboard for all `orch-*` and automation skills. See `extensions/orch-dashboard/README.md` for the canvas action contract and install instructions.
@@ -74,7 +62,7 @@ plugin). Each reports progress through the `orch-dashboard` canvas extension.
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app
+copilot plugin install <owner>/<repo>:plugins/copilot-app
 copilot plugin list
 ```
 
@@ -83,14 +71,15 @@ separate opt-in steps (canvas extensions are not installed by the plugin
 mechanism itself, and each has its own install method):
 
 - `orch-dashboard`: install with the `install_extension` tool using
-  `https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard`,
+  a repo folder URL such as
+  `https://github.com/<owner>/<repo>/tree/<ref>/plugins/copilot-app/extensions/orch-dashboard`,
   choosing `project`, `user`, or `session` scope. See
   `extensions/orch-dashboard/README.md` for details.
 - `diagram-canvas` and `markdown-canvas`: each has its own `.github/plugin/plugin.json`, so
   install them the same way as any plugin, independently of each other:
-  `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas`
+  `copilot plugin install <owner>/<repo>:plugins/copilot-app/extensions/diagram-canvas`
   and
-  `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`.
+  `copilot plugin install <owner>/<repo>:plugins/copilot-app/extensions/markdown-canvas`.
   See `extensions/diagram-canvas/README.md` and `extensions/markdown-canvas/README.md` for
   details.
 
@@ -98,7 +87,7 @@ mechanism itself, and each has its own install method):
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- - In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
+- In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -108,17 +97,14 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 - **Canvas Interfaces** - Interactive orchestration progress/output dashboard (`extensions/orch-dashboard/`) driven by every `orch-*` skill, plus live Mermaid diagram (`extensions/diagram-canvas/`) and Markdown document preview (`extensions/markdown-canvas/`) canvases that `orch-*` skills open on behalf of the architecture/domain-design/ux-design/documentation/product-owner agents they coordinate — those content plugins are unaware of and do not depend on either canvas extension
 - **TDD Bug Fixes** - Solve bugs by creating tests first with csharp-coding agent
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
-- **Project Guidelines** - Uses `jsdotnet-project-guidelines-mcpserver` for consistent standards
+- **Project Guidelines** - Uses the configured guidance MCP server for consistent standards
 - **Local-First Validation** - Workflows focus on local run, health checks, and monitoring
-- **Multi-Repository** - PR creation works across all JSdotNet organization repos
-- **PR Guardrails** - Hooks keep JSdotNet PR creation on the `gh` plus `JSDOTNET_GH_TOKEN` path
 - **Approval-Based Handoffs** - Agent transitions require explicit user approval
 
 ## Dependencies
 
 This plugin works best with the following installed plugins:
 
-- `development` - For development planning and execution
 - `architecture` - For architecture guidance
 - `csharp-coding` - For code implementation with TDD
 - `product-owner` - For user stories and backlog management
@@ -131,27 +117,14 @@ This plugin works best with the following installed plugins:
 Install recommended plugins:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/development
-copilot plugin install JSdotNet/Copilot:plugins/architecture
-copilot plugin install JSdotNet/Copilot:plugins/csharp-coding
-copilot plugin install JSdotNet/Copilot:plugins/product-owner
-copilot plugin install JSdotNet/Copilot:plugins/review
-copilot plugin install JSdotNet/Copilot:plugins/qa
+copilot plugin install <owner>/<repo>:plugins/architecture
+copilot plugin install <owner>/<repo>:plugins/csharp-coding
+copilot plugin install <owner>/<repo>:plugins/product-owner
+copilot plugin install <owner>/<repo>:plugins/review
+copilot plugin install <owner>/<repo>:plugins/qa
 ```
 
 ## Usage Examples
-
-### Create a PR in JSdotNet Repository
-
-```text
-Invoke: pr-jsdotnet
-- Repository: "JSdotNet/Copilot" (or any JSdotNet repo)
-- Title: "Add GitHub Copilot App integration"
-- Description: Comprehensive change summary
-- Labels: feature, copilot-app
-- Branch: already committed on feature branch
-- PR creation path: `gh pr create` with `JSDOTNET_GH_TOKEN`
-```
 
 ### Orchestrate Repository Setup
 
@@ -169,7 +142,7 @@ Invoke: orch-repo
 ```
 Invoke: orch-project
 - Repository: "MyAwesomeAPI" (already exists and is configured)
-- Setup .github folder with guidelines (`jsdotnet-project-guidelines-mcpserver`)
+- Setup `.github` folder with repository guidance
 - Create Aspire AppHost for distributed services
 - Validate compilation and local run monitoring
 ```
@@ -222,7 +195,7 @@ Invoke: orch-arc42
 - System: "Copilot plugin monorepo"
 - Sections: 1, 3, and 9
 - Goal: refresh architecture documentation before plugin restructuring
-- Use `jsdotnet-project-guidelines-mcpserver` before governed asset edits
+- Use the configured guidance MCP server before governed asset edits
 ```
 
 ### Orchestrate Architecture Blueprint
@@ -231,7 +204,7 @@ Invoke: orch-arc42
 Invoke: orch-blueprint
 - System: "Copilot App plugin ecosystem"
 - Goal: refresh component boundaries and traceability
-- Use `jsdotnet-project-guidelines-mcpserver` before governed asset edits
+- Use the configured guidance MCP server before governed asset edits
 ```
 
 ### Orchestrate ADR
@@ -299,11 +272,9 @@ Invoke: orch-create-service
 GitHub Copilot App
     ↓
 copilot-app plugin
-    ├── pr-jsdotnet (works across JSdotNet repos)
     └── orch-* skills (with canvas interfaces)
-        ├── ↔ development plugin (development-plan, developer agents)
         ├── ↔ architecture plugin (architect agent)
-        ├── ↔ jsdotnet-project-guidelines-mcpserver (guideline and ADR retrieval)
+        ├── ↔ configured guidance MCP server
         ├── ↔ csharp-coding plugin (coding agent for implementation)
         ├── ↔ product-owner plugin (product-owner agent)
         ├── ↔ review plugin (reviewer agent)
@@ -325,12 +296,34 @@ Each orchestration skill follows a staged workflow tailored to the scenario (pro
 Agent selection per stage is recommended based on task context. All agent transitions
 require explicit user approval per the repository handoff policy.
 
+## Orchestration Flow Diagrams
+
+To keep individual `SKILL.md` files focused on execution guidance, the workflow diagrams
+live in one central document: [`resources/orchestration-flow-diagrams.md`](resources/orchestration-flow-diagrams.md).
+
+| Skill | Workflow diagram |
+|-------|------------------|
+| `orch-repo` | [`resources/orchestration-flow-diagrams.md#orch-repo`](resources/orchestration-flow-diagrams.md#orch-repo) |
+| `orch-project` | [`resources/orchestration-flow-diagrams.md#orch-project`](resources/orchestration-flow-diagrams.md#orch-project) |
+| `orch-create-mvp` | [`resources/orchestration-flow-diagrams.md#orch-create-mvp`](resources/orchestration-flow-diagrams.md#orch-create-mvp) |
+| `orch-update-packages` | [`resources/orchestration-flow-diagrams.md#orch-update-packages`](resources/orchestration-flow-diagrams.md#orch-update-packages) |
+| `orch-aspire-update` | [`resources/orchestration-flow-diagrams.md#orch-aspire-update`](resources/orchestration-flow-diagrams.md#orch-aspire-update) |
+| `orch-architecture` | [`resources/orchestration-flow-diagrams.md#orch-architecture`](resources/orchestration-flow-diagrams.md#orch-architecture) |
+| `orch-arc42` | [`resources/orchestration-flow-diagrams.md#orch-arc42`](resources/orchestration-flow-diagrams.md#orch-arc42) |
+| `orch-blueprint` | [`resources/orchestration-flow-diagrams.md#orch-blueprint`](resources/orchestration-flow-diagrams.md#orch-blueprint) |
+| `orch-adr` | [`resources/orchestration-flow-diagrams.md#orch-adr`](resources/orchestration-flow-diagrams.md#orch-adr) |
+| `orch-tdr` | [`resources/orchestration-flow-diagrams.md#orch-tdr`](resources/orchestration-flow-diagrams.md#orch-tdr) |
+| `orch-feature` | [`resources/orchestration-flow-diagrams.md#orch-feature`](resources/orchestration-flow-diagrams.md#orch-feature) |
+| `orch-bug` | [`resources/orchestration-flow-diagrams.md#orch-bug`](resources/orchestration-flow-diagrams.md#orch-bug) |
+| `orch-create-module` | [`resources/orchestration-flow-diagrams.md#orch-create-module`](resources/orchestration-flow-diagrams.md#orch-create-module) |
+| `orch-create-service` | [`resources/orchestration-flow-diagrams.md#orch-create-service`](resources/orchestration-flow-diagrams.md#orch-create-service) |
+
 ## Skills Can Use Other Skills
 
 The orchestration skills are designed to coordinate with other plugin skills:
 
 - `orch-repo` creates and configures the repository; `orch-project` scaffolds the development project inside it — use them sequentially
-- `orch-project` uses the `aspire` skill from the development plugin
+- `orch-project` uses the `aspire` skill for AppHost setup
 - `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
 - `orch-architecture` uses the `architecture:architect` agent directly after MCP-based context gathering
 - `orch-arc42` uses `architecture-arc42-generator` after MCP-based context gathering
@@ -353,7 +346,7 @@ The orchestration skills are designed to coordinate with other plugin skills:
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app
+copilot plugin install <owner>/<repo>:plugins/copilot-app
 ```
 
 ## Uninstall
@@ -374,7 +367,7 @@ Updates to skills should follow:
 
 For issues or questions about this plugin:
 
-1. Check GitHub Issues: https://github.com/JSdotNet/Copilot/issues
+1. Check [GitHub Issues](../../issues)
 2. Review skill documentation for specific tasks
 3. Verify dependent plugins are installed and current
 
