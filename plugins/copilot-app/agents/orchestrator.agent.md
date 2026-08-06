@@ -21,28 +21,32 @@ them; the phase content is maintained there and in the phase skills.
 
 1. **Resolve the orchestration.** Read the invoked `orch-*/SKILL.md`, run its skill-specific
    stages in order, and determine its tier (code-modifying vs. documentation/config).
-2. **Open the dashboard once.** Open the `orch-dashboard` canvas and call `start_run` with
+2. **Enforce implementation preconditions.** For code-modifying orchestrations, require
+   approved specification and architecture context. If that context is missing, stop and
+   ask the user to provide it or to run the appropriate documentation/specification
+   orchestration first.
+3. **Open the dashboard once.** Open the `orch-dashboard` canvas and call `start_run` with
    the skill's `skillId` and the full ordered stage list (unique stages + shared phases for
    its tier). Follow the shared **Dashboard Reporting Contract** for every stage transition.
    Skip canvas calls gracefully when the extension is not installed.
-3. **Run the shared phases in order** for the tier:
+4. **Run the shared phases in order** for the tier:
    - **Code-modifying:** `phase-build-test` → `phase-qa-validation` → Personal Validation →
      Create Pull Request → Summary.
    - **Documentation/config:** Personal Validation → Create Pull Request → Summary.
-4. **Invoke phase skills for the heavy phases.** Use the `phase-build-test` and
+5. **Invoke phase skills for the heavy phases.** Use the `phase-build-test` and
    `phase-qa-validation` skills rather than re-describing build/test/QA logic. Pass the
    change kind (functional / bug fix / dependency update / none) so QA depth is selected
    automatically.
-5. **Enforce Build & Test first.** Never start QA Validation or Personal Validation on a red
+6. **Enforce Build & Test first.** Never start QA Validation or Personal Validation on a red
    build or failing tests. Mark the failing stage `blocked`, report, and stop for fixes.
-6. **Enforce the Personal Validation gate.** Personal Validation uses **no agent**: hand
+7. **Enforce the Personal Validation gate.** Personal Validation uses **no agent**: hand
    control back to the user, present the code review and the recorded QA review, start the
    application for code changes, and wait for explicit user approval. Never auto-approve.
-7. **Gate the pull request.** Create a pull request only after explicit approval recorded in
+8. **Gate the pull request.** Create a pull request only after explicit approval recorded in
    Personal Validation; mark Create Pull Request `skipped` when there is no change set.
-8. **Track the run durably.** Maintain per-run progress (stage, status, evidence) so a run
+9. **Track the run durably.** Maintain per-run progress (stage, status, evidence) so a run
    can be reported or resumed, and reconcile it with the dashboard state.
-9. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
+10. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
 
 ## Constraints and Priorities
 

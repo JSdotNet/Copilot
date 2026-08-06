@@ -45,26 +45,29 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 ### Stage 3: MCP Configuration
 
-- **Query the configured guidance MCP server** to retrieve recommended MCP server
+- **Query `jsdotnet-guidelines-mcpserver`** to retrieve recommended MCP server
   selections and configuration patterns for the project type.
 - **Configure MCP servers** in `.github/github-app.yml`:
-  - Select and enable relevant MCP servers for the project.
+  - Select and enable the repository's core MCP servers:
+    `jsdotnet-guidelines-mcpserver`, `microsoft-learn`, and `playwright`.
+  - Enable `jsdotnet-design-mcpserver` when the repository expects UX-specific design
+    orchestrations or artifacts.
   - Set server-level permissions and scopes.
 
 **Agents:** *(default)*  
-**MCP Server:** Configured guidance MCP server for server selection guidance  
+**MCP Server:** `jsdotnet-guidelines-mcpserver` for server selection guidance  
 **Tools:** `.github/github-app.yml`
 
 ### Stage 4: Copilot Instructions
 
-- **Query the configured guidance MCP server** to retrieve coding standards,
+- **Query `jsdotnet-guidelines-mcpserver`** to retrieve coding standards,
   conventions, and agent guidance relevant to the project type.
 - **Create `.github/copilot-instructions.md`** with repository-wide Copilot context (tech stack, conventions, key patterns, agent guidance).
 - **Add repo-level instruction files** under `.github/instructions/` using the `create-instruction` skill from `copilot-spec-builder` if installed; otherwise use the default agent.
 
 **Skills:** `copilot-instructions-blueprint-generator`, `create-instruction` *(if `copilot-spec-builder` is installed)*  
 **Agents:** *(default)*  
-**MCP Server:** Configured guidance MCP server for conventions and agent guidance
+**MCP Server:** `jsdotnet-guidelines-mcpserver` for conventions and agent guidance
 
 ### Stage 5: Branch Protection
 
@@ -81,7 +84,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 
 ### Stage 6: Issue and PR Templates
 
-- **Query the configured guidance MCP server** to retrieve recommended issue template
+- **Query `jsdotnet-guidelines-mcpserver`** to retrieve recommended issue template
   structures, PR checklist standards, and label conventions.
 - **Create issue templates** (bug report, feature request, question).
 - **Create pull request template** with a standard checklist.
@@ -89,7 +92,7 @@ gh repo create <org>/<name> --description "<description>" --private --clone
 - **Configure repository labels** (bug, feature, documentation, breaking-change, etc.).
 
 **Agents:** *(default)*  
-**MCP Server:** Configured guidance MCP server for template and label conventions
+**MCP Server:** `jsdotnet-guidelines-mcpserver` for template and label conventions
 
 ### Stage 7: Repository Governance (Optional)
 

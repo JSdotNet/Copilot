@@ -22,14 +22,27 @@ flowchart TD
     J --> L["Summary"]
 ```
 
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Repository Creation (Manual) | — | — |
+| README | `documentation:profile`, default agent | — |
+| MCP Configuration | Default agent | `jsdotnet-guidelines-mcpserver`, `jsdotnet-design-mcpserver` *(enable for future UX flows)*, `microsoft-learn`, `playwright` |
+| Copilot Instructions | Default agent | `jsdotnet-guidelines-mcpserver` |
+| Branch Protection | Default agent | — |
+| Issue and PR Templates | Default agent | `jsdotnet-guidelines-mcpserver` |
+| Repository Governance | Default agent | — |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
+
 ## orch-project
 
 ```mermaid
 flowchart TD
     A["GitHub Folder Setup (Foundation)"] --> B["GitHub Actions Workflows"]
-    B --> C["Architecture & Planning"]
+    B --> C["Specification & Architecture Intake"]
     C --> D["Tooling & Dependencies"]
-    D --> E["Aspire AppHost & Project Scaffolding"]
+    D --> E["Implementation"]
     E --> F["Build & Test"]
     F --> G["QA Validation"]
     G --> H["Personal Validation"]
@@ -40,12 +53,25 @@ flowchart TD
     J --> L["Summary"]
 ```
 
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| GitHub Folder Setup (Foundation) | `csharp-coding:coding` | `jsdotnet-guidelines-mcpserver` |
+| GitHub Actions Workflows | `csharp-coding:coding` | — |
+| Specification & Architecture Intake | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Tooling & Dependencies | `csharp-coding:coding` | `microsoft-learn` |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
+
 ## orch-create-mvp
 
 ```mermaid
 flowchart TD
-    A["MVP Definition & Planning"] --> B["Architecture & Design"]
-    B --> C["Implementation Sprint"]
+    A["MVP Scope Intake"] --> B["Implementation Planning"]
+    B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
     E --> F["Personal Validation"]
@@ -56,12 +82,23 @@ flowchart TD
     H --> J["Summary"]
 ```
 
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| MVP Scope Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Implementation Planning | `architecture:architect` | — |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
+
 ## orch-update-packages
 
 ```mermaid
 flowchart TD
     A["Dependency Analysis"] --> B["Update Planning"]
-    B --> C["Staged Updates"]
+    B --> C["Implementation"]
     C --> D["Security Validation"]
     D --> E["Build & Test"]
     E --> F["QA Validation"]
@@ -73,12 +110,24 @@ flowchart TD
     I --> K["Summary"]
 ```
 
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Dependency Analysis | `csharp-coding:coding` | `microsoft-learn` |
+| Update Planning | `product-owner:product-owner` | — |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` |
+| Security Validation | `csharp-coding:coding` | — |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(only when new user-facing behavior is introduced)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
+
 ## orch-aspire-update
 
 ```mermaid
 flowchart TD
-    A["Baseline & Plan Creation"] --> B["Plan Refinement"]
-    B --> C["Staged Aspire Upgrade"]
+    A["Upgrade Intake & Baseline"] --> B["Plan Refinement"]
+    B --> C["Implementation"]
     C --> D["New Feature Adoption"]
     D --> E["Build & Test"]
     E --> F["QA Validation"]
@@ -89,6 +138,18 @@ flowchart TD
     J --> A
     I --> K["Summary"]
 ```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Upgrade Intake & Baseline | `csharp-coding:coding` | `microsoft-learn` |
+| Plan Refinement | `architecture:architect` | `microsoft-learn` |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` |
+| New Feature Adoption | `csharp-coding:coding`, `architecture:architect` | `microsoft-learn` |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture only for adopted new functionality)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
 
 ## orch-architecture
 
@@ -104,6 +165,15 @@ flowchart TD
     F --> H["Summary"]
 ```
 
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Goal & Guideline Retrieval | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Architecture Investigation | `architecture:architect` | — |
+| Drafting & Review | `architecture:architect` | — |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
+
 ## orch-arc42
 
 ```mermaid
@@ -117,6 +187,15 @@ flowchart TD
     G --> A
     F --> H["Summary"]
 ```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Context & Guideline Retrieval | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Section Drafting | `architecture:architect` | — |
+| Cross-Section Review | `architecture:architect` | — |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
 
 ## orch-blueprint
 
@@ -132,6 +211,15 @@ flowchart TD
     F --> H["Summary"]
 ```
 
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Scope & Guideline Retrieval | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Blueprint Drafting | `architecture:architect` | — |
+| Review & Traceability | `architecture:architect` | — |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
+
 ## orch-adr
 
 ```mermaid
@@ -145,6 +233,15 @@ flowchart TD
     G --> A
     F --> H["Summary"]
 ```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Decision Context Retrieval | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| ADR Drafting | `architecture:architect` | — |
+| Traceability Review | `architecture:architect` | — |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
 
 ## orch-tdr
 
@@ -160,26 +257,46 @@ flowchart TD
     F --> H["Summary"]
 ```
 
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Debt Context Retrieval | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| TDR Drafting | `architecture:architect` | — |
+| Risk & Follow-Up Review | `architecture:architect` | — |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
+
 ## orch-feature
 
 ```mermaid
 flowchart TD
-    A["Implementation"] --> B["Build & Test"]
-    B --> C["QA Validation"]
-    C --> D["Personal Validation"]
-    D --> E{User approves?}
-    E -->|Yes| F["Create Pull Request or Skip"]
-    E -->|No| G["Return to the relevant earlier stage"]
-    G --> A
-    F --> H["Summary"]
+    A["Specification & Architecture Intake"] --> B["Implementation"]
+    B --> C["Build & Test"]
+    C --> D["QA Validation"]
+    D --> E["Personal Validation"]
+    E --> F{User approves?}
+    F -->|Yes| G["Create Pull Request or Skip"]
+    F -->|No| H["Return to the relevant earlier stage"]
+    H --> A
+    G --> I["Summary"]
 ```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Specification & Architecture Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
 
 ## orch-bug
 
 ```mermaid
 flowchart TD
-    A["Bug Triage & Analysis"] --> B["Root Cause Analysis"]
-    B --> C["Fix Implementation (TDD Approach)"]
+    A["Bug Intake & Reproduction"] --> B["Root Cause Analysis"]
+    B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
     E --> F["Personal Validation"]
@@ -189,13 +306,24 @@ flowchart TD
     I --> A
     H --> J["Summary"]
 ```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Bug Intake & Reproduction | `product-owner:product-owner` | — |
+| Root Cause Analysis | `csharp-coding:coding` | — |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture only when needed for failure or on request)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
 
 ## orch-create-module
 
 ```mermaid
 flowchart TD
-    A["Module Scope & Contract"] --> B["Architecture & Design"]
-    B --> C["Module Implementation"]
+    A["Specification Intake"] --> B["Implementation Planning"]
+    B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
     E --> F["Personal Validation"]
@@ -205,13 +333,24 @@ flowchart TD
     I --> A
     H --> J["Summary"]
 ```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Specification Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Implementation Planning | `architecture:architect` | — |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |
 
 ## orch-create-service
 
 ```mermaid
 flowchart TD
-    A["Service Scope & Requirements"] --> B["Service Architecture & Integration Design"]
-    B --> C["Service Implementation & Wiring"]
+    A["Specification Intake"] --> B["Implementation Planning"]
+    B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
     E --> F["Personal Validation"]
@@ -221,3 +360,14 @@ flowchart TD
     I --> A
     H --> J["Summary"]
 ```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Specification Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Implementation Planning | `architecture:architect` | — |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Summary | `orchestrator` agent | — |

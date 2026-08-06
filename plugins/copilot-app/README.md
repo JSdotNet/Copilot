@@ -18,6 +18,11 @@ Each orchestration skill coordinates specialist agents from other plugins where 
 Agent transitions require explicit user approval. Cross-plugin agents are recommended but
 not required — skills degrade gracefully when optional plugins are missing.
 
+Code-modifying orchestrations assume the specification and architecture work is already
+done. They are intended to be triggered from the results of documentation and
+specification orchestrations, and they focus on intake, implementation, validation, and
+review rather than restarting broad discovery.
+
 ## Includes
 
 ### Skills
@@ -97,7 +102,7 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 - **Canvas Interfaces** - Interactive orchestration progress/output dashboard (`extensions/orch-dashboard/`) driven by every `orch-*` skill, plus live Mermaid diagram (`extensions/diagram-canvas/`) and Markdown document preview (`extensions/markdown-canvas/`) canvases that `orch-*` skills open on behalf of the architecture/domain-design/ux-design/documentation/product-owner agents they coordinate — those content plugins are unaware of and do not depend on either canvas extension
 - **TDD Bug Fixes** - Solve bugs by creating tests first with csharp-coding agent
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
-- **Project Guidelines** - Uses the configured guidance MCP server for consistent standards
+- **MCP-Aware Orchestration** - Routes standards and governed-asset checks through `jsdotnet-guidelines-mcpserver`, official Microsoft stack lookups through `microsoft-learn`, browser QA automation through `playwright`, and reserves `jsdotnet-design-mcpserver` for UX-specific flows
 - **Local-First Validation** - Workflows focus on local run, health checks, and monitoring
 - **Approval-Based Handoffs** - Agent transitions require explicit user approval
 
@@ -108,7 +113,6 @@ This plugin works best with the following installed plugins:
 - `architecture` - For architecture guidance
 - `csharp-coding` - For code implementation with TDD
 - `product-owner` - For user stories and backlog management
-- `review` - For validation and quality review
 - `qa` - For runtime QA validation (Aspire + Playwright), used in the Local Run &
   Monitoring / E2E validation stage of `orch-feature`, `orch-bug`,
   `orch-update-packages`, `orch-create-module`, `orch-create-service`,
@@ -123,6 +127,20 @@ copilot plugin install <owner>/<repo>:plugins/product-owner
 copilot plugin install <owner>/<repo>:plugins/review
 copilot plugin install <owner>/<repo>:plugins/qa
 ```
+
+## MCP Server Routing
+
+The orchestration skills are optimized for these four MCP servers when they are enabled:
+
+| MCP server | Primary use in orchestrations |
+|------------|-------------------------------|
+| `jsdotnet-guidelines-mcpserver` | Repository conventions, governed asset guidance, Copilot instructions, issue/PR templates, architecture/documentation constraints, and implementation context |
+| `jsdotnet-design-mcpserver` | UX-specific design work such as wireframes, user flows, and design artifacts; reserve it for orchestrations that explicitly include UX design |
+| `microsoft-learn` | Official Microsoft/.NET/Azure/Aspire documentation and code samples during implementation, upgrades, package analysis, and targeted build remediation |
+| `playwright` | Browser-based QA validation and smoke/E2E execution; capture screenshot/video evidence only for new functionality or when explicitly requested |
+
+Use the narrowest server needed for the current phase rather than querying all four by
+default.
 
 ## Usage Examples
 
@@ -195,7 +213,7 @@ Invoke: orch-arc42
 - System: "Copilot plugin monorepo"
 - Sections: 1, 3, and 9
 - Goal: refresh architecture documentation before plugin restructuring
-- Use the configured guidance MCP server before governed asset edits
+- Use `jsdotnet-guidelines-mcpserver` before governed asset edits
 ```
 
 ### Orchestrate Architecture Blueprint
@@ -204,7 +222,7 @@ Invoke: orch-arc42
 Invoke: orch-blueprint
 - System: "Copilot App plugin ecosystem"
 - Goal: refresh component boundaries and traceability
-- Use the configured guidance MCP server before governed asset edits
+- Use `jsdotnet-guidelines-mcpserver` before governed asset edits
 ```
 
 ### Orchestrate ADR
@@ -274,19 +292,21 @@ GitHub Copilot App
 copilot-app plugin
     └── orch-* skills (with canvas interfaces)
         ├── ↔ architecture plugin (architect agent)
-        ├── ↔ configured guidance MCP server
+        ├── ↔ jsdotnet-guidelines-mcpserver
+        ├── ↔ jsdotnet-design-mcpserver (UX-specific flows only)
+        ├── ↔ microsoft-learn
+        ├── ↔ playwright
         ├── ↔ csharp-coding plugin (coding agent for implementation)
         ├── ↔ product-owner plugin (product-owner agent)
-        ├── ↔ review plugin (reviewer agent)
-        └── ↔ qa plugin (qa, qa-monitor agents used in Local Run & Monitoring / E2E validation stages)
+        └── ↔ qa plugin (qa, qa-monitor, and aspire/aspire-run used in Local Run & Monitoring / E2E validation stages)
 ```
 
 ## Workflow Coordination Model
 
 Each orchestration skill follows a staged workflow tailored to the scenario (project setup, MVP, feature, package updates, bug fix, module creation, or service creation):
 
-1. **Planning and design stages** - Define scope, architecture, and risks
-2. **Implementation stage** - Code creation with handoff to `csharp-coding:coding` (with approval)
+1. **Intake and alignment stages** - Review approved specification, architecture, constraints, and validation targets
+2. **Implementation stage** - Every code-modifying orchestration includes an explicit Implementation phase; it can appear after intake/planning stages instead of always being first
 3. **Validation stages** - Unit, integration, and local runtime validation with recorded outcomes
 4. **Quality stage** - Review readiness and blocker resolution
 5. **Personal Validation stage** - The user reviews the result and explicitly approves before any pull request is created
@@ -323,6 +343,10 @@ live in one central document: [`resources/orchestration-flow-diagrams.md`](resou
 The orchestration skills are designed to coordinate with other plugin skills:
 
 - `orch-repo` creates and configures the repository; `orch-project` scaffolds the development project inside it — use them sequentially
+- Documentation/specification orchestrations (`orch-architecture`, `orch-arc42`,
+  `orch-blueprint`, `orch-adr`, `orch-tdr`, and future spec-update workflows) are the
+  upstream source for approved implementation context used by the code-modifying
+  orchestrations
 - `orch-project` uses the `aspire` skill for AppHost setup
 - `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
 - `orch-architecture` uses the `architecture:architect` agent directly after MCP-based context gathering

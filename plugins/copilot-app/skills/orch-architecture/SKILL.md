@@ -1,6 +1,6 @@
 ---
 name: orch-architecture
-description: 'Orchestrate general architecture work in GitHub Copilot App canvas. Uses the architecture:architect agent directly and the configured guidance MCP server for guideline and ADR retrieval before governed asset changes.'
+description: 'Orchestrate general architecture work in GitHub Copilot App canvas. Uses the architecture:architect agent directly plus `jsdotnet-guidelines-mcpserver` for governed asset guidance before edits.'
 ---
 
 # Orchestrate Architecture Work
@@ -21,12 +21,12 @@ Execute a general architecture workflow in GitHub Copilot App canvas for request
 
 ### Stage 1: Goal & Guideline Retrieval
 - **Clarify the architecture objective** and expected output
-- **Query the configured guidance MCP server** for relevant recommendations and ADRs
+- **Query `jsdotnet-guidelines-mcpserver`** for standards, relevant guidance, and governed asset constraints
 - **Capture repository constraints** that affect governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** Configured guidance MCP server
+**MCP Servers:** `jsdotnet-guidelines-mcpserver`
 
 ### Stage 2: Architecture Investigation
 - **Inspect the current repository context** and affected architecture surfaces
@@ -41,7 +41,7 @@ Execute a general architecture workflow in GitHub Copilot App canvas for request
 - **Check internal consistency** across scope, constraints, risks, and traceability
 - **Prepare a review-ready result** with explicit follow-up actions when needed
 
-**Agents:** `architecture:architect`, `review:reviewer`
+**Agents:** `architecture:architect`
 
 ### Final Phases (Shared)
 
@@ -64,7 +64,7 @@ Invoke: orch-architecture
 - Goal: evaluate and document the architecture impact of a plugin boundary change
 - Scope: "architecture and copilot-app plugins"
 - Output: proposal with risks, trade-offs, and recommended follow-up artifacts
-- Use the configured guidance MCP server before governed asset edits
+- Use `jsdotnet-guidelines-mcpserver` before governed asset edits
 ```
 
 ## Output Expectations

@@ -1,6 +1,6 @@
 ---
 name: orch-tdr
-description: 'Orchestrate technical debt record creation in GitHub Copilot App canvas. Uses the architecture:architect agent for debt documentation and the configured guidance MCP server to ground the record in project guidance and related decisions.'
+description: 'Orchestrate technical debt record creation in GitHub Copilot App canvas. Uses the architecture:architect agent for debt documentation plus `jsdotnet-guidelines-mcpserver` to ground the record in project guidance and related decisions.'
 ---
 
 # Orchestrate Technical Debt Record
@@ -21,13 +21,13 @@ Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retr
 
 ### Stage 1: Debt Context Retrieval
 - **Clarify the debt item** and affected scope
-- **Query the configured guidance MCP server** for relevant recommendations, ADRs, and
-  constraints
+- **Query `jsdotnet-guidelines-mcpserver`** for standards, relevant guidance, ADR context,
+  and governed asset constraints
 - **Capture remediation boundaries** for governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** Configured guidance MCP server
+**MCP Servers:** `jsdotnet-guidelines-mcpserver`
 
 ### Stage 2: TDR Drafting
 - **Describe the debt origin** and current impact
@@ -43,7 +43,7 @@ Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retr
 - **Identify related ADR, blueprint, or arc42 follow-up**
 - **Prepare a review-ready TDR** with an actionable remediation path
 
-**Agents:** `architecture:architect`, `review:reviewer`
+**Agents:** `architecture:architect`
 
 ### Final Phases (Shared)
 

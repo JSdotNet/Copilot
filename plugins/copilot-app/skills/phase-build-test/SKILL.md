@@ -47,6 +47,11 @@ Validation — so build and test behavior lives in one place instead of in each 
 - `csharp-coding:coding` (recommended); performed manually when that plugin is not
   installed. Agent transitions require explicit user approval.
 
+## MCP Servers
+
+- `microsoft-learn` *(optional)* for targeted official .NET/Azure/Aspire guidance or code
+  samples when build/test failures require stack-specific remediation.
+
 ## Reference
 
 Source skill location: `plugins/copilot-app/skills/phase-build-test/SKILL.md`.

@@ -7,9 +7,14 @@ description: 'Orchestrate bug resolution workflow from triage through local run 
 
 Execute a complete bug fix workflow from identification through local runtime validation using test-driven development (TDD) approach.
 
+> **Precondition:** This skill assumes the bug report, reproduction context, and affected
+> architecture area are already known well enough to implement a fix. Use it to analyze and
+> fix the bug, not to create the initial product specification.
+
 ## Input Expectations
 
 - Bug description and reproduction steps.
+- Existing incident notes, issue details, or other approved bug context.
 - Severity level (critical, high, medium, low).
 - Affected versions or environments.
 - Root cause hypothesis (if known).
@@ -22,14 +27,14 @@ Execute a complete bug fix workflow from identification through local runtime va
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
 
-### Stage 1: Bug Triage & Analysis
+### Stage 1: Bug Intake & Reproduction
 - **Reproduce the bug** following provided steps
 - **Determine severity** and impact assessment
 - **Identify affected versions** and users
 - **Create detailed bug report** with logs/traces
 - **Assign priority** (critical, high, medium, low)
 
-**Agents:** `product-owner:product-owner`, `review:reviewer`
+**Agents:** `product-owner:product-owner`
 
 ### Stage 2: Root Cause Analysis
 - **Debug issue** using logs and diagnostics
@@ -40,7 +45,7 @@ Execute a complete bug fix workflow from identification through local runtime va
 
 **Agents:** `csharp-coding:coding`
 
-### Stage 3: Fix Implementation (TDD Approach)
+### Stage 3: Implementation
 - **Create failing test first** that reproduces the bug
 - **Write test case** that fails with current code
 - **Implement minimal fix** addressing root cause
@@ -58,9 +63,10 @@ After Fix Implementation, this skill runs the shared delivery phases defined onc
 
 1. **Build & Test** — build, unit tests (including the new regression test), and E2E
    tests, run first.
-2. **QA Validation** — bug fix, so run the full automatic QA validation: `qa:qa` re-runs
-   the original reproduction steps plus the regression scenario with `qa:qa-monitor`
-   runtime monitoring, and records the evidence.
+2. **QA Validation** — bug fix, so run targeted QA validation: `qa:qa` re-runs the
+   original reproduction steps plus the regression scenario with `qa:qa-monitor` runtime
+   monitoring, and records pass/fail plus findings. Capture evidence only when requested
+   or when a failure needs supporting artifacts.
 3. **Personal Validation** — hand back to the user (no agent); present the code review and
    the recorded QA review, and start the application for the user to review.
 4. **Create Pull Request** — only after explicit user approval.
@@ -107,7 +113,7 @@ Orchestrate bug fix for:
 - Minimal fix implemented; test passes.
 - Regression tests added.
 - No side effects in existing functionality.
-- Local runtime evidence captured (logs, traces).
+- Local runtime findings recorded (logs, traces, and optional evidence when needed).
 - Validation result recorded with pass/fail status.
 
 ## Canvas Interface
@@ -120,10 +126,10 @@ shared **Dashboard Reporting Contract** in
 gating. If the extension is not installed, skip the canvas calls and continue through
 standard chat interaction.
 
-- Call `start_run` with `skillId: "orch-bug"` and these stages: Bug Triage & Analysis,
-  Root Cause Analysis, Fix Implementation (TDD Approach), Build & Test, QA Validation,
+- Call `start_run` with `skillId: "orch-bug"` and these stages: Bug Intake &
+  Reproduction, Root Cause Analysis, Implementation, Build & Test, QA Validation,
   Personal Validation, Create Pull Request, Summary.
-- During **Bug Triage & Analysis**, also open/update `markdown-canvas` (`markdown-preview`)
+- During **Bug Intake & Reproduction**, also open/update `markdown-canvas` (`markdown-preview`)
   with the drafted bug report content, per `instructions/canvas-usage.instructions.md`.
   Optional; skip gracefully if not installed.
 
