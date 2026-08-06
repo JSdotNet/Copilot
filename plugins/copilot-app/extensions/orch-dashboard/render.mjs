@@ -118,6 +118,18 @@ export function renderShell() {
   .stage-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
   .stage-name { font-weight: var(--font-weight-semibold, 600); }
   .stage-agents { font-size: 12px; color: var(--text-color-muted, #59636e); margin-bottom: 4px; }
+  .stage-used { font-size: 12px; color: var(--text-color-muted, #59636e); margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    background: var(--background-color-muted, rgba(127,127,127,0.1));
+    color: var(--text-color-default, #1f2328);
+  }
+  .tag.agent { background: rgba(130,80,223,0.15); color: #8250df; }
+  .tag.mcp { background: rgba(9,105,218,0.12); color: var(--true-color-blue, #0969da); }
+  .tag.model { background: rgba(31,136,61,0.12); color: #1f883d; }
   .stage-output {
     white-space: pre-wrap;
     font-family: var(--font-mono, "SFMono-Regular", Consolas, monospace);
@@ -279,6 +291,11 @@ export function renderShell() {
           '<div class="bar-track"><div class="bar-fill" style="width:' + Math.round((insight.thinkingMs / maxMs) * 100) + '%;background:var(--text-color-muted,#59636e);"></div></div>' +
           '<span class="bar-value">' + fmtDuration(insight.thinkingMs) + '</span></div>'
       ) : "";
+      const usedTags = renderUsedTags({
+        agents: insight.agentsUsed,
+        mcpServers: insight.mcpServersUsed,
+        models: insight.modelsUsed,
+      });
       return (
         '<div class="insight"><h2>Insight</h2>' +
         '<div class="insight-stats">' +
@@ -286,9 +303,27 @@ export function renderShell() {
           '<div class="insight-stat"><strong>' + fmtDuration(insight.elapsedMs) + '</strong>elapsed</div>' +
           '<div class="insight-stat"><strong>' + fmtDuration(insight.totalToolMs) + '</strong>tool time</div>' +
         '</div>' +
+        usedTags +
         thinkingBar + bars +
         '</div>'
       );
+    }
+
+    function renderUsedTags(perStageEntry) {
+      if (!perStageEntry) return "";
+      const groups = [
+        ["agent", "Agent", perStageEntry.agents],
+        ["mcp", "MCP", perStageEntry.mcpServers],
+        ["model", "Model", perStageEntry.models],
+      ];
+      const parts = [];
+      groups.forEach(([cls, label, values]) => {
+        (values || []).forEach((v) => {
+          parts.push('<span class="tag ' + cls + '">' + esc(label) + ': ' + esc(v) + '</span>');
+        });
+      });
+      if (!parts.length) return "";
+      return '<div class="stage-used">' + parts.join("") + '</div>';
     }
 
     function evidenceUrl(runId, filePath) {
@@ -354,6 +389,7 @@ export function renderShell() {
         '<div class="stage ' + esc(s.status) + '" id="stage-' + i + '">' +
           '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + '</div>' +
           (s.agents && s.agents.length ? '<div class="stage-agents">Agents: ' + esc(s.agents.join(", ")) + '</div>' : "") +
+          renderUsedTags(run.insightSummary && run.insightSummary.perStage && run.insightSummary.perStage[i]) +
           (s.output ? '<div class="stage-output">' + esc(s.output) + '</div>' : "") +
           renderScenarios(run.id, s.scenarios) +
           renderMonitoring(s.monitoring) +
