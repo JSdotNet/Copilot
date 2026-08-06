@@ -1,6 +1,5 @@
 ---
 description: Copilot assistant for writing and maintaining documentation artifacts (How-To, Explanations, Blog/Articles, Proposals, Ideas, and Infographics).
-model: claude-haiku-4.5
 tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
 handoffs:
   - label: Profile Maintenance

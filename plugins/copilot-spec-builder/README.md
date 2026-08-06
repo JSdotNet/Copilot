@@ -5,13 +5,8 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
 ## Includes
 
 - Agent:
-  - `agents/spec-plan.agent.md`
   - `agents/spec-builder.agent.md`
-  - `agents/spec-review.agent.md`
 - Skills:
-  - `skills/spec-plan/SKILL.md`
-  - `skills/spec-builder/SKILL.md`
-  - `skills/spec-review/SKILL.md`
   - `skills/create-agent/SKILL.md`
   - `skills/create-instruction/SKILL.md`
   - `skills/create-plugin/SKILL.md`
@@ -34,7 +29,8 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
 ## Scope
 
 - This plugin focuses on creating and refining GitHub customization assets: agents, instructions, plugins, skills, canvas extensions, and GitHub Actions workflow files.
-- Default operating sequence is `spec-plan` -> `spec-builder` -> `spec-review`.
+- A single `spec-builder` agent owns the full flow: scope, plan, build, verify, and report.
+- Asset-specific rules live in the `create-*` skills and matching authoring instructions.
 - It does not provide runtime application code implementation.
 - It is self-contained and does not require assets from an external source repository.
 
@@ -74,4 +70,3 @@ copilot plugin uninstall copilot-spec-builder
 - **Hooks and MCP authoring** — add skills for `hooks.json` and `.mcp.json` to support lifecycle automation and MCP server wiring.
 - **Resource templates folder** — add a `resources/` folder with reusable checklists, frontmatter templates, and example assets for bootstrapping new customization work.
 - **Marketplace publishing workflow** — extend `create-plugin` to include `marketplace.json` composition and publishing readiness checks.
-- **Multi-agent composition** — skill for composing multiple specialist agents into a coherent plugin with explicit handoff chains.

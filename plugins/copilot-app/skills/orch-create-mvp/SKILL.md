@@ -25,6 +25,10 @@ Execute a complete MVP development workflow from planning through local run and 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
+>
+> Model choice per stage follows `instructions/orch-model-selection.instructions.md`
+> (category defaults, overridable via `.github/copilot-model-selection.md` in the
+> consuming repo).
 
 ### Stage 1: MVP Scope Intake
 - **Review the approved MVP scope** and acceptance criteria

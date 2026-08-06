@@ -30,6 +30,9 @@ description: Defines the reusable delivery and validation phases shared by all o
   - **QA Validation** → `skills/phase-qa-validation/SKILL.md`.
 - Personal Validation, Create Pull Request, and Summary stay defined in this file (short,
   linear phases where a separate skill would only add indirection).
+- Model choice for every phase (and every skill-specific stage) is resolved once, centrally,
+  from `instructions/orch-model-selection.instructions.md` — do not describe model choice
+  here or in individual skills.
 
 ## Agent Transition Rule (Shared)
 
@@ -99,6 +102,9 @@ Defines *where* an orchestration runs and *how* its progress is tracked. Applies
    practice, `qa:qa-monitor` tailing Aspire logs while Playwright drives scenarios. Do not
    use a child session merely to save context.
 
+Whichever form is used, pass the model resolved for that stage's category per
+`instructions/orch-model-selection.instructions.md` on the `task` / `create_session` call.
+
 ### Child Session Constraints
 
 When a child session is used (`create_session` + cross-session messaging):
@@ -156,6 +162,8 @@ installed.
 
 **MCP Servers:** `microsoft-learn` *(optional, targeted official lookup only)*
 
+**Model Category:** Implementation & Coding (see `orch-model-selection.instructions.md`).
+
 ## Phase: QA Validation
 
 Applies to code-modifying orchestrations. Runs after Build & Test. Packaged as the
@@ -195,6 +203,8 @@ invokes it and passes the change kind so depth is selected automatically:
 
 **Skills Used:** `aspire`, `aspire-run`
 
+**Model Category:** Testing, QA & Monitoring (see `orch-model-selection.instructions.md`).
+
 ## Phase: Personal Validation
 
 Applies to every orchestration. This phase does **not** use an agent — it hands control
@@ -227,6 +237,10 @@ Applies to every orchestration.
 
 **Agents:** *(default)*
 
+**Model Category:** Review (see `orch-model-selection.instructions.md`). No dedicated agent
+runs this phase by default, so the orchestrator performs it directly under the category's
+resolved model.
+
 ## Phase: Summary
 
 Applies to every orchestration.
@@ -236,6 +250,10 @@ Applies to every orchestration.
   one.
 
 **Agents:** `orchestrator` agent
+
+**Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
+No dedicated agent runs this phase; the orchestrator summarizes directly under the
+category's resolved model.
 
 ## Dashboard Reporting Contract (Shared)
 
@@ -290,3 +308,5 @@ contract, and `instructions/canvas-usage.instructions.md` for when to also open 
 - [ ] `start_run` reattaches to an existing `in_progress` run instead of duplicating it.
 - [ ] Change kind and the Personal Validation approval are persisted with
       `set_run_context`, and no pull request is created while approval is `pending`.
+- [ ] Model choice per phase follows `instructions/orch-model-selection.instructions.md`
+      and is never hardcoded in a skill or phase.

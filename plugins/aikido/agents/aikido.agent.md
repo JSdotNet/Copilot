@@ -1,6 +1,5 @@
 ---
 description: "Application security specialist — scan code, triage Aikido findings, and fix SAST, secrets, and IaC issues."
-model: GPT-5.3-Codex
 tools: ['read/readFile', 'search/codebase', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
 ---
 
