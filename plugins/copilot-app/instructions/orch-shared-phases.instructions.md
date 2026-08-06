@@ -105,6 +105,15 @@ Defines *where* an orchestration runs and *how* its progress is tracked. Applies
 Whichever form is used, pass the model resolved for that stage's category per
 `instructions/orch-model-selection.instructions.md` on the `task` / `create_session` call.
 
+**Escalate to sub-agent delegation when the run-level context gauge approaches its limit.**
+The gauge described in **Context and Token Insight** below is the signal: when the owner
+session's context is filling up, move the next heavy step — broad exploration, large
+refactors, verbose build/test output — to a sub-agent so its cost lands in a separate
+context window, instead of continuing inline until compaction interrupts the run
+mid-orchestration. The gauge ignores sub-agent samples, so this genuinely relieves the owner
+session's context. This is the existing delegation order applied earlier, not a new
+mechanism; child sessions remain reserved for concurrent monitoring.
+
 ### Child Session Constraints
 
 When a child session is used (`create_session` + cross-session messaging):
@@ -289,6 +298,59 @@ See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canva
 contract, and `instructions/canvas-usage.instructions.md` for when to also open the
 `markdown-canvas`/`diagram-canvas` content previews.
 
+## Context and Token Insight (Shared)
+
+The dashboard's **Context** panel reports context-window and token consumption alongside
+the tool-activity Insight panel. Both are captured automatically by the extension from
+session telemetry; the orchestrating agent does not report them.
+
+- **Per-stage token delta** (the `Token delta:` badge on each stage) — the tokens of every model
+  call that completed while that stage was `in_progress`, with reasoning and prompt cache
+  read/write tracked separately, plus a subtotal for sub-agent usage so delegated cost stays
+  visible. It is a delta rather than an absolute reading at the stage boundary, because
+  compaction can reset the absolute mid-stage. Two figures are shown:
+  - **Input + output** — the headline total. `inputTokens` counts the *whole* prompt, most
+    of which is normally served from the prompt cache on later turns, so this figure can
+    legitimately run to several times the model's context window. It measures throughput,
+    **not** context occupancy.
+  - **Uncached** (`input − cache reads + output`) — the fresh tokens the stage actually
+    pushed through the model. This is the figure that approximates real context pressure.
+- **Run-level context gauge** — the latest `currentTokens` against `tokenLimit` as a
+  percentage, the component breakdown (system, conversation, tool definitions), the peak
+  observed during the run, and the count and reasons of compaction and truncation events.
+  The gauge deliberately **ignores sub-agent samples**, because a sub-agent runs in its own
+  context window.
+
+How to use these:
+
+- **Never invent, estimate, or hand-write token numbers** into `update_stage` output,
+  `set_run_context`, or the run summary. The extension owns these values; a written-in
+  figure would conflict with the captured one. Keep stage `output` focused on what the
+  stage did and produced.
+- **Never read the headline input + output figure as context consumption.** A stage showing
+  a multi-million-token total against a 200k window is normal cache behavior, not an
+  emergency. Compare stages on the **uncached** figure, and read occupancy off the run-level
+  gauge.
+- **Read the uncached per-stage figure as the signal for which phase is expensive.** A stage
+  whose uncached delta dwarfs the rest — especially one with a large sub-agent subtotal — is
+  evidence that the stage should be split into smaller stages or delegated, and is worth
+  naming in the Summary phase as a qualitative observation.
+- **Act on the run-level gauge before it forces compaction.** As it approaches the limit,
+  apply the escalation in **Execution Model → Delegation Order**: push the next heavy step
+  to a sub-agent in the same worktree. Because the gauge ignores sub-agent samples,
+  delegating genuinely relieves the owner session's context rather than just relabelling the
+  cost. Compaction and truncation counts rising during a run mean the mitigation came too
+  late.
+- **Runs that predate this capture simply omit the panel and its fields** — treat their
+  absence as "not recorded", not as zero.
+
+**Caveat — attribution is session-wide.** Token telemetry, like the existing tool-activity
+insight, is captured per session, not per run. Any model call made while a run is
+`in_progress` is attributed to that run and to its current stage, including unrelated work
+done in the same session. This is the reason for the **one orchestration per session** rule
+in the Execution Model; interpret the numbers as an upper bound when other work happened
+alongside the run.
+
 ## Reference Convention
 
 - Each skill ends with a `## Reference` section naming its own source location, for
@@ -310,3 +372,9 @@ contract, and `instructions/canvas-usage.instructions.md` for when to also open 
       `set_run_context`, and no pull request is created while approval is `pending`.
 - [ ] Model choice per phase follows `instructions/orch-model-selection.instructions.md`
       and is never hardcoded in a skill or phase.
+- [ ] Token and context figures are left to the dashboard's automatic capture and are never
+      hand-written into stage output or the run summary.
+- [ ] Stage cost is compared on the uncached token figure, and the headline input + output
+      total is never read as context occupancy.
+- [ ] Heavy work is escalated to a sub-agent as the run-level context gauge approaches its
+      limit, rather than continuing inline until compaction hits.
