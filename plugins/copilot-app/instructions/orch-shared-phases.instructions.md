@@ -304,7 +304,7 @@ The dashboard's **Context** panel reports context-window and token consumption a
 the tool-activity Insight panel. Both are captured automatically by the extension from
 session telemetry; the orchestrating agent does not report them.
 
-- **Per-stage token delta** (the `Tokens:` badge on each stage) — the tokens of every model
+- **Per-stage token delta** (the `Token delta:` badge on each stage) — the tokens of every model
   call that completed while that stage was `in_progress`, with reasoning and prompt cache
   read/write tracked separately, plus a subtotal for sub-agent usage so delegated cost stays
   visible. It is a delta rather than an absolute reading at the stage boundary, because
