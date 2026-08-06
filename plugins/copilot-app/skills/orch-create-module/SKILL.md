@@ -7,9 +7,13 @@ description: 'Orchestrate creating a new module in an existing project using Git
 
 Execute a complete workflow for adding a new module to an existing project using a local-first validation approach.
 
+> **Precondition:** This skill assumes the module specification, boundaries, and
+> architecture context already exist. Use it to translate that approved context into code.
+
 ## Input Expectations
 
 - Target project name and location.
+- Approved module specification or design notes.
 - Module name and purpose.
 - Public interfaces and expected consumers.
 - Dependencies on existing modules or services.
@@ -21,29 +25,29 @@ Execute a complete workflow for adding a new module to an existing project using
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
 
-### Stage 1: Module Scope & Contract
-- **Define module purpose** and boundaries
-- **List public interfaces** and expected consumers
+### Stage 1: Specification Intake
+- **Review the approved module purpose** and boundaries
+- **Confirm public interfaces** and expected consumers
 - **Capture acceptance criteria** and non-functional requirements
 - **Identify dependencies** and integration risks
 
-**Agents:** `product-owner:product-owner`, `development:development-plan`
+**Agents:** `product-owner:product-owner`, `architecture:architect`
 
-### Stage 2: Architecture & Design
-- **Design module structure** and naming conventions
-- **Define data contracts** and error handling behavior
+### Stage 2: Implementation Planning
+- **Map the approved design** to the existing project structure
+- **Define data contracts** and error handling behavior for implementation
 - **Plan integration points** with existing modules/services
-- **Create implementation checklist** for incremental delivery
+- **Create an implementation checklist** for incremental delivery
 
-**Agents:** `architecture:architect`, `development:developer`
+**Agents:** `architecture:architect`
 
-### Stage 3: Module Implementation
+### Stage 3: Implementation
 - **Create module files/folders** in the existing project layout
 - **Implement core functionality** using project patterns
 - **Add dependency wiring** and configuration updates
 - **Keep changes incremental** for easier review
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Final Phases (Shared)
 
@@ -51,7 +55,7 @@ After Module Implementation, this skill runs the shared delivery phases defined 
 `instructions/orch-shared-phases.instructions.md` (code-modifying tier), in order:
 
 1. **Build & Test** — build, unit tests, and E2E tests, run first.
-2. **QA Validation** — functional module change, so run the full automatic QA validation
+2. **QA Validation** — new module functionality, so run the full automatic QA validation
    (Playwright checks on the new module's endpoints/flows plus `qa:qa-monitor` runtime
    monitoring, with evidence recorded).
 3. **Personal Validation** — hand back to the user (no agent); present the code review and
@@ -92,11 +96,11 @@ shared **Dashboard Reporting Contract** in
 gating. If the extension is not installed, skip the canvas calls and continue through
 standard chat interaction.
 
-- Call `start_run` with `skillId: "orch-create-module"` and these stages: Module Scope &
-  Contract, Architecture & Design, Module Implementation, Build & Test, QA Validation,
+- Call `start_run` with `skillId: "orch-create-module"` and these stages: Specification
+  Intake, Implementation Planning, Implementation, Build & Test, QA Validation,
   Personal Validation, Create Pull Request, Summary.
-- During **Module Scope & Contract**, also open/update `markdown-canvas` (`markdown-preview`)
-  with the drafted acceptance criteria, and during **Architecture & Design**, open/update
+- During **Specification Intake**, also open/update `markdown-canvas` (`markdown-preview`)
+  with the approved acceptance criteria, and during **Implementation Planning**, open/update
   `markdown-canvas` with the module design documentation and `diagram-canvas`
   (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
   `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.

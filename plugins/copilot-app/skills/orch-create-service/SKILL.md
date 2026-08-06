@@ -7,9 +7,13 @@ description: 'Orchestrate creating a new service in an existing project using Gi
 
 Execute a complete workflow for adding a new service to an existing project, with local run and monitoring as the final readiness gate.
 
+> **Precondition:** This skill assumes the service specification, responsibilities, and
+> architecture context are already approved. Use it to implement and wire the service.
+
 ## Input Expectations
 
 - Target project name and repository.
+- Approved service specification or architecture notes.
 - New service name and responsibilities.
 - API or messaging contracts for the new service.
 - Upstream and downstream dependencies.
@@ -21,29 +25,29 @@ Execute a complete workflow for adding a new service to an existing project, wit
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
 
-### Stage 1: Service Scope & Requirements
-- **Define service responsibility** and ownership boundaries
-- **Capture API or messaging contracts** for the new service
+### Stage 1: Specification Intake
+- **Review the approved service responsibility** and ownership boundaries
+- **Confirm API or messaging contracts** for the new service
 - **Identify upstream/downstream dependencies**
 - **Set acceptance criteria** and operational expectations
 
-**Agents:** `product-owner:product-owner`, `development:development-plan`
+**Agents:** `product-owner:product-owner`, `architecture:architect`
 
-### Stage 2: Service Architecture & Integration Design
-- **Design service project structure** aligned with existing architecture
+### Stage 2: Implementation Planning
+- **Map the approved design** to the repository structure
 - **Plan service discovery and references** for the host project
 - **Define configuration model** (env vars, secrets, defaults)
 - **Define health checks and observability signals**
 
-**Agents:** `architecture:architect`, `development:developer`
+**Agents:** `architecture:architect`
 
-### Stage 3: Service Implementation & Wiring
+### Stage 3: Implementation
 - **Create the new service project** in the existing solution/repository
 - **Implement service endpoints/workers** and core logic
 - **Wire service into host orchestration** (for example AppHost/service catalog)
 - **Configure dependencies** (database, queue, cache) as needed
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Final Phases (Shared)
 
@@ -51,7 +55,7 @@ After Service Implementation & Wiring, this skill runs the shared delivery phase
 once in `instructions/orch-shared-phases.instructions.md` (code-modifying tier), in order:
 
 1. **Build & Test** — build, unit tests, and E2E tests, run first.
-2. **QA Validation** — functional service change, so run the full automatic QA validation
+2. **QA Validation** — new service functionality, so run the full automatic QA validation
    (Playwright checks on health endpoints and critical service flows plus `qa:qa-monitor`
    runtime monitoring, with evidence recorded).
 3. **Personal Validation** — hand back to the user (no agent); present the code review and
@@ -92,12 +96,12 @@ shared **Dashboard Reporting Contract** in
 gating. If the extension is not installed, skip the canvas calls and continue through
 standard chat interaction.
 
-- Call `start_run` with `skillId: "orch-create-service"` and these stages: Service Scope &
-  Requirements, Service Architecture & Integration Design, Service Implementation &
-  Wiring, Build & Test, QA Validation, Personal Validation, Create Pull Request, Summary.
-- During **Service Scope & Requirements**, also open/update `markdown-canvas`
-  (`markdown-preview`) with the drafted service contract, and during **Service
-  Architecture & Integration Design**, open/update `markdown-canvas` with the design
+- Call `start_run` with `skillId: "orch-create-service"` and these stages: Specification
+  Intake, Implementation Planning, Implementation, Build & Test, QA Validation, Personal
+  Validation, Create Pull Request, Summary.
+- During **Specification Intake**, also open/update `markdown-canvas`
+  (`markdown-preview`) with the approved service contract, and during
+  **Implementation Planning**, open/update `markdown-canvas` with the design
   documentation and `diagram-canvas` (`mermaid-diagram`) with any accompanying Mermaid
   diagrams, per `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if
   not installed.

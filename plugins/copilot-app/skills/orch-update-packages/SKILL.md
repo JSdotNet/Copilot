@@ -7,9 +7,14 @@ description: 'Orchestrate dependency and package update workflows using GitHub C
 
 Execute a complete package update workflow with validation, testing, and local runtime monitoring using canvas interface.
 
+> **Precondition:** This skill assumes the update scope, risk tolerance, and maintenance
+> intent are already known. Use it to implement the approved update run, not to define the
+> overall maintenance policy.
+
 ## Input Expectations
 
 - Project name and location.
+- Approved update scope or maintenance directive.
 - Update scope (security, critical patches, minor, major).
 - Testing strategy (core tests, full suite, extended).
 - Runtime validation target (e.g., local run + monitoring).
@@ -27,7 +32,7 @@ Execute a complete package update workflow with validation, testing, and local r
 - **Identify breaking changes** in major versions
 - **Review changelogs** and release notes
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 2: Update Planning
 - **Categorize updates** (security, patch, minor, major)
@@ -35,17 +40,16 @@ Execute a complete package update workflow with validation, testing, and local r
 - **Plan rollback strategy** for risky updates
 - **Coordinate with stakeholders** for major version upgrades
 
-**Agents:** `product-owner:product-owner`, `development:development-plan`
+**Agents:** `product-owner:product-owner`
 
-### Stage 3: Staged Updates
-- **Create update branch** per update batch
+### Stage 3: Implementation
 - **Update packages** using appropriate package managers:
   - NuGet: `nuget-manager` skill
   - npm: Package manager commands
   - .NET SDK: `dotnet` CLI
 - **Verify lockfiles** and dependency resolution
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 4: Security Validation
 - **Run SAST scanning** (Aikido, Snyk, etc.)
@@ -53,7 +57,7 @@ Execute a complete package update workflow with validation, testing, and local r
 - **Review dependency tree** for transitive vulnerabilities
 - **Document any exceptions** to security policy
 
-**Agents:** `csharp-coding:coding`, `development:security`
+**Agents:** `csharp-coding:coding`
 
 ### Final Phases (Shared)
 
@@ -65,7 +69,8 @@ After Security Validation, this skill runs the shared delivery phases defined on
 2. **QA Validation** — dependency update with no functional change, so reduce QA to a
    startup-without-errors validation: start the app, confirm healthy dashboard/health
    endpoints, and confirm no new errors in the logs. Escalate to full Playwright
-   validation only when an update changes user-facing behavior.
+   validation only when an update introduces new user-facing behavior, and require capture
+   only in that case.
 3. **Personal Validation** — hand back to the user (no agent); present the code review and
    the recorded QA review, and start the application for the user to review.
 4. **Create Pull Request** — only after explicit user approval.
@@ -115,7 +120,7 @@ gating. If the extension is not installed, skip the canvas calls and continue th
 standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-update-packages"` and these stages: Dependency
-  Analysis, Update Planning, Staged Updates, Security Validation, Build & Test, QA
+  Analysis, Update Planning, Implementation, Security Validation, Build & Test, QA
   Validation, Personal Validation, Create Pull Request, Summary.
 - During **Update Planning**, also open/update `markdown-canvas` (`markdown-preview`) with
   the drafted update/rollback plan, per `instructions/canvas-usage.instructions.md`.

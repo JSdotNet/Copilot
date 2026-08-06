@@ -8,10 +8,14 @@ description: 'Orchestrate project scaffolding and development environment setup 
 Automate the complete project scaffolding workflow for an existing, configured repository using GitHub Copilot App canvas interface, including automated local validation and testing.
 
 > **Note:** This skill assumes your repository already exists and is configured (README, Copilot instructions, MCP servers, branch protection, templates). Use `orch-repo` first to create and configure the repository, then use this skill to scaffold the development project inside it.
+>
+> **Precondition:** This skill also assumes the target project structure and architecture
+> direction are already approved. Use it to scaffold and implement that agreed setup.
 
 ## Input Expectations
 
 - Repository name (must already exist on GitHub and be configured via `orch-repo`).
+- Approved project structure or architecture notes for the scaffold.
 - Project type (e.g., ASP.NET Core API with Aspire).
 - Language and framework preferences.
 - Aspire services to include (API, Database, Cache, Worker).
@@ -24,7 +28,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 ### Stage 1: GitHub Folder Setup (Foundation)
 - **Initialize `.github/` directory structure** with recommended layouts
-- **Generate project guidelines** using `JSdotNet.MCP.Guidelines`:
+- **Generate project guidelines** using `jsdotnet-guidelines-mcpserver`:
   - Coding standards and patterns
   - Git workflow conventions
   - Review guidelines
@@ -32,8 +36,8 @@ Automate the complete project scaffolding workflow for an existing, configured r
 - **Create `.github/instructions/` files** for developer guidance
 - **Create `.github/copilot-settings.json`** for Copilot configuration
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
-**MCP Server:** `JSdotNet.MCP.Guidelines` for guideline generation
+**Agents:** `csharp-coding:coding`  
+**MCP Server:** `jsdotnet-guidelines-mcpserver` for guideline generation
 
 ### Stage 2: GitHub Actions Workflows
 
@@ -45,13 +49,16 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 **Agents:** `csharp-coding:coding`
 
-### Stage 3: Architecture & Planning
-- **Define target architecture** for initial setup
-- **Capture API contracts** and data model boundaries
+### Stage 3: Specification & Architecture Intake
+- **Review the approved target architecture** for the initial setup
+- **Load the approved implementation context** and repository constraints from
+  `jsdotnet-guidelines-mcpserver`
+- **Capture API contracts** and data model boundaries already agreed
 - **Plan integration points** across services
-- **Capture risk and assumptions** for local development
+- **Capture implementation risks and assumptions** for local development
 
-**Agents:** `architecture:architect`, `development:development-plan`
+**Agents:** `architecture:architect`
+**MCP Servers:** `jsdotnet-guidelines-mcpserver`
 
 ### Stage 4: Tooling & Dependencies
 - **Install base dependencies** (frameworks, SDKs)
@@ -59,9 +66,9 @@ Automate the complete project scaffolding workflow for an existing, configured r
 - **Set up linting and code quality tools**
 - **Configure logging and observability**
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
-### Stage 5: Aspire AppHost & Project Scaffolding
+### Stage 5: Implementation
 
 This stage combines AppHost creation and initial project scaffolding because they are
 interdependent — the example service references AppHost configuration, service
@@ -83,18 +90,18 @@ discovery, and health checks.
 - **Create first unit tests** as examples
 - **Setup test data fixtures**
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
-**Skills Used:** `aspire` skill from development plugin
+**Agents:** `csharp-coding:coding`  
+**Skills Used:** `aspire`
 
 ### Final Phases (Shared)
 
-After Aspire AppHost & Project Scaffolding, this skill runs the shared delivery phases
+After Implementation, this skill runs the shared delivery phases
 defined once in `instructions/orch-shared-phases.instructions.md` (code-modifying tier),
 in order:
 
 1. **Build & Test** — compile all projects and run the unit and integration/E2E test
    suites, run first; fail fast on build or test errors.
-2. **QA Validation** — new runnable scaffold, so run QA validation: start the Aspire
+2. **QA Validation** — new runnable scaffold, so run QA validation with capture: start the Aspire
    AppHost, confirm the dashboard and service health endpoints are green (default
    dashboard `localhost:18888`) and database connectivity works, and run Playwright smoke
    checks on the example service, with `qa:qa-monitor` runtime monitoring and evidence
@@ -128,7 +135,7 @@ Orchestrate project setup for:
 - Unit and integration tests passing.
 - AppHost starts without errors and dashboard is accessible.
 - All services report healthy status.
-- Runtime validation evidence recorded and attached to report.
+- Runtime validation findings recorded, with capture attached for the new runnable flows.
 
 ## Canvas Interface
 
@@ -141,10 +148,10 @@ gating. If the extension is not installed, skip the canvas calls and continue th
 standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-project"` and these stages: GitHub Folder Setup
-  (Foundation), GitHub Actions Workflows, Architecture & Planning, Tooling & Dependencies,
-  Aspire AppHost & Project Scaffolding, Build & Test, QA Validation, Personal Validation,
+  (Foundation), GitHub Actions Workflows, Specification & Architecture Intake, Tooling &
+  Dependencies, Implementation, Build & Test, QA Validation, Personal Validation,
   Create Pull Request, Summary.
-- During **Architecture & Planning**, also open/update `markdown-canvas`
+- During **Specification & Architecture Intake**, also open/update `markdown-canvas`
   (`markdown-preview`) with the drafted architecture documentation and `diagram-canvas`
   (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
   `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.
