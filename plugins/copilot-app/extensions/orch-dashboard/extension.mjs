@@ -39,7 +39,17 @@ import { EventEmitter } from "node:events";
 import { joinSession, createCanvas, CanvasError } from "@github/copilot-sdk/extension";
 import { ensureDir, writeRun, readRun, listRuns, newRunId } from "./store.mjs";
 import { renderShell } from "./render.mjs";
-import { categorizeTool, appendToolCall, appendAgentUse, summarizeInsights } from "./insight.mjs";
+import {
+    categorizeTool,
+    appendToolCall,
+    appendAgentUse,
+    summarizeInsights,
+    summarizeContext,
+    recordTokenUsage,
+    recordContextSample,
+    recordCompaction,
+    recordTruncation,
+} from "./insight.mjs";
 import { renderReportMarkdown } from "./report.mjs";
 
 const VALID_STATUSES = ["pending", "in_progress", "done", "blocked", "skipped", "cancelled"];
@@ -239,7 +249,7 @@ async function startServer(instanceId, baseDir) {
                     return;
                 }
                 res.setHeader("Content-Type", "application/json; charset=utf-8");
-                res.end(JSON.stringify({ ...run, insightSummary: summarizeInsights(run) }));
+                res.end(JSON.stringify({ ...run, insightSummary: summarizeInsights(run), contextSummary: summarizeContext(run) }));
                 return;
             }
             if (req.method === "GET" && url.pathname === "/events") {
@@ -554,7 +564,7 @@ const session = await joinSession({
                         const baseDir = resolveBaseDir(session);
                         const run = await readRun(baseDir, ctx.input && ctx.input.runId);
                         if (!run) throw new CanvasError("run_not_found", `No run with id ${ctx.input && ctx.input.runId}`);
-                        return { ...run, insightSummary: summarizeInsights(run) };
+                        return { ...run, insightSummary: summarizeInsights(run), contextSummary: summarizeContext(run) };
                     },
                 },
             ],
@@ -664,3 +674,118 @@ function recordAgentUse(status) {
 }
 session.on("subagent.completed", recordAgentUse("completed"));
 session.on("subagent.failed", recordAgentUse("failed"));
+
+// Context-window tracking: `assistant.usage` gives the tokens consumed by each
+// model call (attributed to the active run/stage exactly like tool calls
+// above), while `session.usage_info` / `session.compaction_*` /
+// `session.truncation` give the live context gauge for the run. Same
+// session-wide caveat as the tool insights: anything happening while a run is
+// `in_progress` is attributed to that run.
+session.on("assistant.usage", (event) => {
+    const data = event && event.data;
+    if (!data || !activeRunId) return;
+    const runId = activeRunId;
+    const stageInfo = activeStageByRun.get(runId);
+    // `agentId` is absent for the root agent and present for sub-agent work.
+    const isSubAgent = Boolean(event.agentId);
+    withRunLock(runId, async () => {
+        const baseDir = resolveBaseDir(session);
+        const run = await readRun(baseDir, runId);
+        if (!run) return;
+        recordTokenUsage(run, {
+            inputTokens: data.inputTokens,
+            outputTokens: data.outputTokens,
+            reasoningTokens: data.reasoningTokens,
+            cacheReadTokens: data.cacheReadTokens,
+            cacheWriteTokens: data.cacheWriteTokens,
+            model: data.model,
+            isSubAgent,
+            stageIndex: stageInfo ? stageInfo.index : null,
+            stageName: stageInfo ? stageInfo.name : null,
+        });
+        await writeRun(baseDir, run);
+    })
+        .then(() => bus.emit("update"))
+        .catch(() => {});
+});
+
+// `session.usage_info` is ephemeral and fires very frequently, so persistence
+// is throttled: write only when the value moved by more than 1% of the token
+// limit, or when at least CONTEXT_SAMPLE_MIN_INTERVAL_MS has passed.
+const CONTEXT_SAMPLE_MIN_INTERVAL_MS = 5000;
+const CONTEXT_SAMPLE_MIN_DELTA_RATIO = 0.01;
+let lastContextSample = { runId: null, at: 0, tokens: 0 };
+session.on("session.usage_info", (event) => {
+    const data = event && event.data;
+    if (!data || !activeRunId) return;
+    // Sub-agents have their own context window; only the root agent's samples
+    // describe the orchestration's own "am I about to be compacted?" state.
+    if (event.agentId) return;
+    const currentTokens = Number(data.currentTokens);
+    if (!Number.isFinite(currentTokens)) return;
+    const tokenLimit = Number(data.tokenLimit);
+    const runId = activeRunId;
+    const now = Date.now();
+    const sameRun = lastContextSample.runId === runId;
+    if (sameRun && currentTokens === lastContextSample.tokens) return;
+    const minDelta = Number.isFinite(tokenLimit) && tokenLimit > 0 ? tokenLimit * CONTEXT_SAMPLE_MIN_DELTA_RATIO : 0;
+    const movedEnough = !sameRun || Math.abs(currentTokens - lastContextSample.tokens) > minDelta;
+    const waitedEnough = !sameRun || now - lastContextSample.at >= CONTEXT_SAMPLE_MIN_INTERVAL_MS;
+    if (!movedEnough && !waitedEnough) return;
+    lastContextSample = { runId, at: now, tokens: currentTokens };
+    withRunLock(runId, async () => {
+        const baseDir = resolveBaseDir(session);
+        const run = await readRun(baseDir, runId);
+        if (!run) return;
+        recordContextSample(run, {
+            currentTokens,
+            tokenLimit,
+            messagesLength: data.messagesLength,
+            conversationTokens: data.conversationTokens,
+            systemTokens: data.systemTokens,
+            toolDefinitionsTokens: data.toolDefinitionsTokens,
+        });
+        await writeRun(baseDir, run);
+    })
+        .then(() => bus.emit("update"))
+        .catch(() => {});
+});
+
+session.on("session.compaction_start", (event) => {
+    const data = (event && event.data) || {};
+    if (!activeRunId) return;
+    const runId = activeRunId;
+    withRunLock(runId, async () => {
+        const baseDir = resolveBaseDir(session);
+        const run = await readRun(baseDir, runId);
+        if (!run) return;
+        recordCompaction(run, {
+            reason: data.trigger,
+            currentTokens: data.currentTokens,
+            at: (event && event.timestamp) || new Date().toISOString(),
+        });
+        await writeRun(baseDir, run);
+    })
+        .then(() => bus.emit("update"))
+        .catch(() => {});
+});
+
+session.on("session.truncation", (event) => {
+    const data = event && event.data;
+    if (!data || !activeRunId) return;
+    const runId = activeRunId;
+    withRunLock(runId, async () => {
+        const baseDir = resolveBaseDir(session);
+        const run = await readRun(baseDir, runId);
+        if (!run) return;
+        recordTruncation(run, {
+            preTokens: data.preTruncationTokensInMessages,
+            postTokens: data.postTruncationTokensInMessages,
+            removedTokens: data.tokensRemovedDuringTruncation,
+            at: (event && event.timestamp) || new Date().toISOString(),
+        });
+        await writeRun(baseDir, run);
+    })
+        .then(() => bus.emit("update"))
+        .catch(() => {});
+});

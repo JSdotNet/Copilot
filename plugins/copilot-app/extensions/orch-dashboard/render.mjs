@@ -196,6 +196,13 @@ export function renderShell() {
   .bar-track { flex: 1; background: var(--background-color-muted, rgba(127,127,127,0.08)); border-radius: 4px; overflow: hidden; height: 10px; }
   .bar-fill { height: 100%; background: var(--true-color-blue, #0969da); border-radius: 4px; }
   .bar-value { width: 70px; flex: none; text-align: right; color: var(--text-color-muted, #59636e); }
+  .ctx-gauge { margin: 4px 0 10px; }
+  .ctx-track { background: var(--background-color-muted, rgba(127,127,127,0.08)); border-radius: 4px; overflow: hidden; height: 12px; }
+  .ctx-fill { height: 100%; background: var(--true-color-blue, #0969da); border-radius: 4px; }
+  .ctx-fill.warn { background: #9a6700; }
+  .ctx-fill.danger { background: var(--true-color-red, #cf222e); }
+  .ctx-meta { font-size: 12px; color: var(--text-color-muted, #59636e); margin-top: 4px; }
+  .tag.tokens { background: rgba(191,135,0,0.16); color: #9a6700; }
 </style>
 </head>
 <body>
@@ -309,6 +316,82 @@ export function renderShell() {
       );
     }
 
+    function fmtTokens(n) {
+      if (n === null || n === undefined || !isFinite(n)) return "n/a";
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+      if (n >= 1000) return (n / 1000).toFixed(1) + "k";
+      return String(Math.round(n));
+    }
+
+    // Run-level context gauge + per-stage token totals. Runs recorded before
+    // context tracking existed have no contextSummary, so the whole block is
+    // omitted rather than rendered empty.
+    function renderContext(run) {
+      const ctx = run.contextSummary;
+      if (!ctx) return "";
+      const parts = [];
+      if (ctx.gauge) {
+        const g = ctx.gauge;
+        const pct = g.percent === null || g.percent === undefined ? null : g.percent;
+        const cls = pct === null ? "" : (pct >= 90 ? "danger" : (pct >= 75 ? "warn" : ""));
+        const label = g.tokenLimit
+          ? fmtTokens(g.currentTokens) + ' / ' + fmtTokens(g.tokenLimit) + (pct !== null ? ' (' + pct + '%)' : "")
+          : fmtTokens(g.currentTokens) + ' tokens';
+        const breakdown = [];
+        if (g.systemTokens !== null && g.systemTokens !== undefined) breakdown.push('system ' + fmtTokens(g.systemTokens));
+        if (g.conversationTokens !== null && g.conversationTokens !== undefined) breakdown.push('conversation ' + fmtTokens(g.conversationTokens));
+        if (g.toolDefinitionsTokens !== null && g.toolDefinitionsTokens !== undefined) breakdown.push('tool defs ' + fmtTokens(g.toolDefinitionsTokens));
+        if (g.messagesLength !== null && g.messagesLength !== undefined) breakdown.push(g.messagesLength + ' messages');
+        parts.push(
+          '<div class="ctx-gauge">' +
+            '<div class="bar-row"><span class="bar-label">Context window</span>' +
+              '<div class="ctx-track"><div class="ctx-fill ' + cls + '" style="width:' + (pct === null ? 0 : pct) + '%"></div></div>' +
+              '<span class="bar-value">' + esc(label) + '</span></div>' +
+            (breakdown.length ? '<div class="ctx-meta">' + esc(breakdown.join(" · ")) + '</div>' : "") +
+            (g.peakTokens ? '<div class="ctx-meta">Peak ' + esc(fmtTokens(g.peakTokens)) + (g.peakPercent !== null && g.peakPercent !== undefined ? ' (' + g.peakPercent + '%)' : "") + '</div>' : "") +
+          '</div>'
+        );
+      }
+      const stats = [];
+      if (ctx.totals) {
+        stats.push('<div class="insight-stat"><strong>' + esc(fmtTokens(ctx.totals.tokens)) + '</strong>tokens used</div>');
+        stats.push('<div class="insight-stat"><strong>' + esc(fmtTokens(ctx.totals.uncachedTokens)) + '</strong>uncached</div>');
+        stats.push('<div class="insight-stat"><strong>' + ctx.totals.modelCalls + '</strong>model calls</div>');
+        if (ctx.totals.reasoningTokens) {
+          stats.push('<div class="insight-stat"><strong>' + esc(fmtTokens(ctx.totals.reasoningTokens)) + '</strong>reasoning</div>');
+        }
+        if (ctx.totals.cacheReadTokens) {
+          stats.push('<div class="insight-stat"><strong>' + esc(fmtTokens(ctx.totals.cacheReadTokens)) + '</strong>cache read</div>');
+        }
+        if (ctx.subAgentTotals) {
+          stats.push('<div class="insight-stat"><strong>' + esc(fmtTokens(ctx.subAgentTotals.tokens)) + '</strong>via sub-agents</div>');
+        }
+      }
+      if (ctx.compactionCount) {
+        const reasons = Object.entries(ctx.compactionReasons || {}).map(([r, n]) => r + ' x' + n).join(", ");
+        stats.push('<div class="insight-stat"><strong>' + ctx.compactionCount + '</strong>compactions' + (reasons ? ' (' + esc(reasons) + ')' : "") + '</div>');
+      }
+      if (ctx.truncationCount) {
+        stats.push('<div class="insight-stat"><strong>' + ctx.truncationCount + '</strong>truncations' + (ctx.truncatedTokens ? ' (-' + esc(fmtTokens(ctx.truncatedTokens)) + ')' : "") + '</div>');
+      }
+      if (stats.length) parts.push('<div class="insight-stats">' + stats.join("") + '</div>');
+      if (!parts.length) return "";
+      return '<div class="insight"><h2>Context</h2>' + parts.join("") + '</div>';
+    }
+
+    function renderStageTokens(run, index) {
+      const ctx = run.contextSummary;
+      const stage = ctx && ctx.perStage && ctx.perStage[index];
+      if (!stage || !stage.tokens) return "";
+      const sub = stage.subAgent && stage.subAgent.tokens
+        ? ', ' + fmtTokens(stage.subAgent.tokens) + ' sub-agent'
+        : "";
+      const title = 'Input + output tokens of model calls during this stage. ' +
+        'Input counts the whole prompt, most of which is normally served from the prompt cache.';
+      return '<div class="stage-used"><span class="tag tokens" title="' + esc(title) + '">Tokens: ' +
+        esc(fmtTokens(stage.tokens) + ' (' + fmtTokens(stage.uncachedTokens) + ' uncached' + sub + ')') + '</span></div>';
+    }
+
     function renderUsedTags(perStageEntry) {
       if (!perStageEntry) return "";
       const groups = [
@@ -390,6 +473,7 @@ export function renderShell() {
           '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + '</div>' +
           (s.agents && s.agents.length ? '<div class="stage-agents">Agents: ' + esc(s.agents.join(", ")) + '</div>' : "") +
           renderUsedTags(run.insightSummary && run.insightSummary.perStage && run.insightSummary.perStage[i]) +
+          renderStageTokens(run, i) +
           (s.output ? '<div class="stage-output">' + esc(s.output) + '</div>' : "") +
           renderScenarios(run.id, s.scenarios) +
           renderMonitoring(s.monitoring) +
@@ -409,7 +493,8 @@ export function renderShell() {
             : "") + '</p>' +
         stages +
         (run.summary ? '<div class="summary" id="summary-block"><h2>Summary</h2>' + esc(run.summary) + '</div>' : "") +
-        renderInsight(run);
+        renderInsight(run) +
+        renderContext(run);
       renderRunList();
     }
 

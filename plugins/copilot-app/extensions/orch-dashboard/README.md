@@ -43,6 +43,42 @@ App, instead of plain chat narration.
   reflects what actually ran, not just the agents declared up front in
   `start_run`. Same session-wide-telemetry caveat as the rest of Insight
   applies.
+- A **Context** panel showing context-window and token consumption for the run,
+  captured automatically from the session's own telemetry:
+  - A **live context gauge** — the latest `currentTokens` against the model's
+    `tokenLimit` as a percentage bar (e.g. `128.4k / 200k (64%)`, amber from
+    75%, red from 90%), plus the component breakdown (system, conversation,
+    tool-definition tokens and message count) and the peak observed during the
+    run. This is the "am I about to be compacted mid-orchestration?" signal.
+  - **Compaction and truncation counts** for the run, with the compaction
+    reasons (`threshold`, `context_limit_retry`, `manual`, `memory_pressure`,
+    `model_switch`) and the number of tokens truncation removed.
+  - **Per-stage token deltas** — a `Tokens: …` badge on each stage totalling the
+    input + output tokens of every model call that completed while that stage
+    was `in_progress`, so it is visible which phase is the context hog. A delta
+    is used rather than an absolute reading at the stage boundary, because
+    compaction can reset the absolute figure mid-stage. Reasoning and prompt
+    cache read/write tokens are tracked separately and reported alongside.
+    Note that `inputTokens` counts the whole prompt, most of which is normally
+    served from the prompt cache on later turns — which is why a stage total
+    can legitimately exceed the model's context window. An **uncached** figure
+    (`input − cache reads + output`) is reported next to it as the "fresh"
+    tokens the stage actually pushed through the model.
+  - **Sub-agent attribution** — token usage carrying an `agentId` (Task-tool or
+    custom-agent work) is folded into the parent stage total, because the
+    delegated work is still part of what the stage cost, but is also kept as a
+    separate sub-agent subtotal (`… (42.5k sub-agent)`) so it stays visible that
+    the cost came from delegated work. The run-level gauge deliberately ignores
+    sub-agent samples: a sub-agent runs its own context window.
+
+  Sources: `assistant.usage` (per model call), `session.usage_info` (gauge,
+  persisted throttled because the event is ephemeral and high-frequency),
+  `session.compaction_start`, and `session.truncation`. Caveat: exactly as with
+  the tool insights, this telemetry is session-wide and not run-scoped, so any
+  model call or context change that happens while a run is `in_progress` is
+  attributed to that run — including unrelated work done in the same session
+  concurrently. Runs recorded before context tracking existed simply omit the
+  panel.
 - **QA results** on any stage driven by the `qa` plugin (`qa:qa`,
   `qa:qa-monitor`): per-scenario Pass/Fail/Flaky badges with notes, inline
   thumbnails for screenshot evidence and download links for
@@ -52,8 +88,9 @@ App, instead of plain chat narration.
   `/api/runs/:id/evidence?path=...` (path-traversal guarded).
 - A **Download report** button on each run that downloads a Markdown report
   (stages with planned vs. actually-used agents/MCP servers/models, output,
-  QA scenario/evidence tables, monitoring findings, summary, and the insight
-  breakdown) via `/api/runs/:id/report`.
+  QA scenario/evidence tables, monitoring findings, summary, the insight
+  breakdown, and the context/token figures including the per-stage token table)
+  via `/api/runs/:id/report`.
 - Live updates over server-sent events, so the panel refreshes automatically
   as the orchestrating agent moves through stages.
 
@@ -98,8 +135,9 @@ Canvas id: `orch-dashboard`. Actions:
   run detail. Stops attributing further tool activity to this run.
 - `list_runs()` / `get_run({ runId })`
   Read back state, e.g. to recover the current `runId` after a session resume.
-  Both include an `insightSummary` (or, for `get_run`, the full per-call
-  `insights` log) alongside the run data.
+  Both include an `insightSummary` and a `contextSummary` (or, for `get_run`,
+  the full per-call `insights` log) alongside the run data. `contextSummary` is
+  `null` for runs recorded before context tracking existed.
 
 State is stored as JSON files under `<session workspace>/orchestration-runs/`,
 so each orchestration run persists for the life of the session and is
