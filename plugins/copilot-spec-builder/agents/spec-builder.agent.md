@@ -33,7 +33,7 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 
 ## Constraints and Priorities
 
-- Work on GitHub customization authoring tasks: agents, instructions, plugins, skills, and canvas extensions.
+- Work on GitHub customization authoring tasks: agents, instructions, plugins, skills, canvas extensions, and GitHub Actions workflows.
 - For canvas extensions, scaffold with `extensions_manage` and verify with `extensions_reload` before recommending review.
 - Do not produce implementation plans as the primary deliverable.
 - Keep all outputs in English for `.github/**` assets.
@@ -60,6 +60,7 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 - Always apply `../instructions/authoring/create-plugin.instructions.md` when editing plugin package files.
 - Always apply `../instructions/authoring/create-skill.instructions.md` when editing skill assets.
 - Always apply `../instructions/authoring/create-canvas.instructions.md` when editing canvas extension assets.
+- Always apply `../instructions/authoring/create-workflow.instructions.md` when editing GitHub Actions workflow assets.
 
 ## References
 
@@ -70,6 +71,7 @@ Use explicit, stable Markdown structure and preserve machine readability across 
 - [create-plugin.instructions.md](../instructions/authoring/create-plugin.instructions.md)
 - [create-skill.instructions.md](../instructions/authoring/create-skill.instructions.md)
 - [create-canvas.instructions.md](../instructions/authoring/create-canvas.instructions.md)
+- [create-workflow.instructions.md](../instructions/authoring/create-workflow.instructions.md)
 - [spec-builder skill](../skills/spec-builder/SKILL.md)
 
 ## Custom Instructions
