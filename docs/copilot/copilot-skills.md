@@ -83,7 +83,8 @@ Track skill provenance and avoid duplicate local skills when plugin-provided ski
 
 ### copilot-spec-builder (v0.1.0)
 
-- `prompt-builder`: Local plugin curation from `copilot-spec-builder`.
-- `create-specification`: Local plugin curation from `copilot-spec-builder`.
-- `create-readme`: Local plugin curation from `copilot-spec-builder`.
-- `sync-copilot-trackers`: Local plugin curation from `copilot-spec-builder`.
+- `create-agent`: Local plugin curation from `copilot-spec-builder`.
+- `create-instruction`: Local plugin curation from `copilot-spec-builder`.
+- `create-plugin`: Local plugin curation from `copilot-spec-builder`.
+- `create-skill`: Local plugin curation from `copilot-spec-builder`.
+- `create-workflow`: Local plugin curation from `copilot-spec-builder`.
