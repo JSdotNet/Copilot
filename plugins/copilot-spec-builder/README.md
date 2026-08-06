@@ -16,6 +16,7 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
   - `skills/create-instruction/SKILL.md`
   - `skills/create-plugin/SKILL.md`
   - `skills/create-skill/SKILL.md`
+  - `skills/create-workflow/SKILL.md`
 - Instructions:
   - `instructions/agent/agent-naming.instructions.md`
   - `instructions/agent/agent-spec-workflow.instructions.md`
@@ -24,6 +25,7 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
   - `instructions/authoring/create-plugin.instructions.md`
   - `instructions/authoring/create-skill.instructions.md`
   - `instructions/authoring/create-canvas.instructions.md`
+  - `instructions/authoring/create-workflow.instructions.md`
 - Resources:
   - `resources/quick-reference.md`
 - Hooks:
@@ -31,7 +33,7 @@ Installable GitHub Copilot CLI plugin for creating GitHub customization assets.
 
 ## Scope
 
-- This plugin focuses on creating and refining GitHub customization assets: agents, instructions, plugins, skills, and canvas extensions.
+- This plugin focuses on creating and refining GitHub customization assets: agents, instructions, plugins, skills, canvas extensions, and GitHub Actions workflow files.
 - Default operating sequence is `spec-plan` -> `spec-builder` -> `spec-review`.
 - It does not provide runtime application code implementation.
 - It is self-contained and does not require assets from an external source repository.

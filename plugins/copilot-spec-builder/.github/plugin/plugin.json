@@ -13,7 +13,9 @@
     "instruction",
     "plugin",
     "skill",
-    "markdown"
+    "markdown",
+    "workflow",
+    "github-actions"
   ],
   "agents": "agents/",
   "skills": "skills/",

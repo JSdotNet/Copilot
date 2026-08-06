@@ -60,12 +60,14 @@ This agent is planning-only. It gathers context, confirms scope, captures assump
 - Always apply `../instructions/authoring/create-plugin.instructions.md` when planning plugin package changes.
 - Always apply `../instructions/authoring/create-skill.instructions.md` when planning skill changes.
 - Always apply `../instructions/authoring/create-canvas.instructions.md` when planning canvas extension changes.
+- Always apply `../instructions/authoring/create-workflow.instructions.md` when planning GitHub Actions workflow changes.
 
 ## References
 
 - [Plugin README](../README.md)
 - [Agent Workflow Instructions](../instructions/agent/agent-spec-workflow.instructions.md)
 - [spec-plan skill](../skills/spec-plan/SKILL.md)
+- [create-workflow.instructions.md](../instructions/authoring/create-workflow.instructions.md)
 
 ## Custom Instructions
 
