@@ -214,3 +214,7 @@ Before finalizing generated changes:
 - Use concise, direct, and friendly language in customization assets.
 - Keep changes minimal and scoped to the requested asset.
 - When uncertain, ask a targeted clarification question instead of inventing conventions.
+
+## Pull Request Creation
+
+> When creating a pull request in this repository, always invoke the `pr-jsdotnet` skill (`.github/skills/pr-jsdotnet/SKILL.md`) instead of the built-in PR creation tool, so the PR is authored using JSdotNet organization credentials via `gh pr create`.
