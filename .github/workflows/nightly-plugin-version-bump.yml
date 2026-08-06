@@ -1,0 +1,97 @@
+name: Nightly Plugin Version Bump
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-plugin-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump changed plugin versions
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = "Stop"
+
+          $defaultBranch = "${{ github.event.repository.default_branch }}"
+          if ([string]::IsNullOrWhiteSpace($defaultBranch)) {
+              $defaultBranch = "main"
+          }
+
+          git fetch origin $defaultBranch --quiet
+          $base = git merge-base "origin/$defaultBranch" HEAD
+
+          $changedFiles = @(git diff --name-only $base HEAD)
+          if (-not $changedFiles -or $changedFiles.Count -eq 0) {
+              Write-Host "No changed files detected."
+              "updated=false" >> $env:GITHUB_OUTPUT
+              exit 0
+          }
+
+          $pluginPaths = @{}
+          foreach ($file in $changedFiles) {
+              if ($file -match '^plugins/([^/]+)/') {
+                  $pluginName = $Matches[1]
+                  $manifestPath = "plugins/$pluginName/.github/plugin/plugin.json"
+                  if (Test-Path -LiteralPath $manifestPath) {
+                      $pluginPaths[$manifestPath] = $true
+                  }
+              }
+          }
+
+          if ($pluginPaths.Count -eq 0) {
+              Write-Host "No plugin manifests to update."
+              "updated=false" >> $env:GITHUB_OUTPUT
+              exit 0
+          }
+
+          $updatedManifests = @()
+          foreach ($manifestPath in $pluginPaths.Keys) {
+              $raw = Get-Content -LiteralPath $manifestPath -Raw
+              $json = $raw | ConvertFrom-Json
+              $versionParts = $json.version -split '\.'
+              if ($versionParts.Count -ne 3) {
+                  throw "Invalid semver '$($json.version)' in $manifestPath"
+              }
+
+              $major = [int]$versionParts[0]
+              $minor = [int]$versionParts[1]
+              $patch = [int]$versionParts[2] + 1
+              $json.version = "$major.$minor.$patch"
+
+              $json | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -Encoding utf8NoBOM
+              $updatedManifests += $manifestPath
+          }
+
+          if ($updatedManifests.Count -eq 0) {
+              "updated=false" >> $env:GITHUB_OUTPUT
+              exit 0
+          }
+
+          Write-Host "Updated manifests:"
+          $updatedManifests | ForEach-Object { Write-Host "- $_" }
+          "updated=true" >> $env:GITHUB_OUTPUT
+
+      - name: Create pull request
+        if: steps.bump-plugin-versions.outputs.updated == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: nightly bump plugin versions"
+          title: "chore: nightly bump plugin versions"
+          body: |
+            Automated nightly plugin version bump.
+
+            This PR increments patch versions for plugin manifests where files changed under the corresponding `plugins/<name>/` tree.
+          branch: chore/nightly-plugin-version-bump
+          delete-branch: true
