@@ -7,9 +7,14 @@ description: 'Orchestrate .NET Aspire upgrades with a plan-first workflow in Git
 
 Execute a complete Aspire update workflow using canvas interface, starting with a plan, refining it, then implementing and adopting new features safely.
 
+> **Precondition:** This skill assumes the target upgrade scope, success criteria, and
+> architecture/runtime constraints are already agreed. Use it to execute that approved
+> upgrade path.
+
 ## Input Expectations
 
 - Repository or project name.
+- Approved upgrade scope or maintenance directive.
 - Current Aspire version.
 - Target Aspire version.
 - New Aspire features to adopt (if any).
@@ -25,13 +30,13 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 > (category defaults, overridable via `.github/copilot-model-selection.md` in the
 > consuming repo).
 
-### Stage 1: Baseline & Plan Creation
+### Stage 1: Upgrade Intake & Baseline
 - **Inventory current Aspire stack** (packages, SDK constraints, AppHost integrations)
 - **Capture baseline behavior** (build, tests, runtime health)
-- **Create initial update plan** with scope, sequencing, and rollback strategy
+- **Confirm the approved upgrade scope** and rollback boundaries
 - **Define success criteria** for upgrade completion and feature adoption
 
-**Agents:** `development:development-plan`, `csharp-coding:coding`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 2: Plan Refinement
 - **Review release notes and breaking changes** for target Aspire versions
@@ -39,15 +44,15 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 - **Split work into execution batches** (low-risk first, high-risk last)
 - **Finalize feature-adoption plan** for new Aspire capabilities to enable
 
-**Agents:** `architecture:architect`, `review:reviewer`, `development:development-plan`
+**Agents:** `architecture:architect`
 
-### Stage 3: Staged Aspire Upgrade
-- **Create upgrade branch** and apply package updates in batches
+### Stage 3: Implementation
+- **Apply package updates in batches**
 - **Upgrade AppHost integrations** and related service references
 - **Resolve breaking changes** in configuration and wiring
 - **Keep changes incremental** and reversible per batch
 
-**Agents:** `csharp-coding:coding`, `development:developer`  
+**Agents:** `csharp-coding:coding`  
 **Skills Used:** `aspire`, `nuget-manager`
 
 ### Stage 4: New Feature Adoption
@@ -68,7 +73,8 @@ After New Feature Adoption, this skill runs the shared delivery phases defined o
    compilation and regression checks).
 2. **QA Validation** — framework upgrade, so run QA validation focused on startup health
    plus Playwright smoke checks on the critical paths affected by the upgrade and adopted
-   features, with `qa:qa-monitor` runtime monitoring and evidence recorded.
+   features, with `qa:qa-monitor` runtime monitoring. Capture evidence only for adopted
+   new functionality or when failure analysis needs it.
 3. **Personal Validation** — hand back to the user (no agent); present the code review and
    the recorded QA review, and start the application for the user to review.
 4. **Create Pull Request** — only after explicit user approval.
@@ -98,7 +104,7 @@ Orchestrate Aspire update for:
 - [ ] Selected new Aspire features enabled
 - [ ] Build and tests pass after upgrade
 - [ ] Runtime health validated on updated AppHost
-- [ ] Validation evidence recorded and report published
+- [ ] Validation findings recorded and report published; attach capture only for adopted new functionality or when needed for failures
 
 ## Output Expectations
 
@@ -108,7 +114,7 @@ Orchestrate Aspire update for:
 - Selected new features enabled and configured.
 - Build and tests pass after upgrade.
 - Runtime health validated on updated AppHost.
-- Validation evidence recorded and report published.
+- Validation findings recorded and report published, with capture attached only when applicable.
 
 ## Canvas Interface
 
@@ -120,8 +126,8 @@ shared **Dashboard Reporting Contract** in
 gating. If the extension is not installed, skip the canvas calls and continue through
 standard chat interaction.
 
-- Call `start_run` with `skillId: "orch-aspire-update"` and these stages: Baseline & Plan
-  Creation, Plan Refinement, Staged Aspire Upgrade, New Feature Adoption, Build & Test, QA
+- Call `start_run` with `skillId: "orch-aspire-update"` and these stages: Upgrade Intake &
+  Baseline, Plan Refinement, Implementation, New Feature Adoption, Build & Test, QA
   Validation, Personal Validation, Create Pull Request, Summary.
 - During **Plan Refinement**, also open/update `markdown-canvas` (`markdown-preview`) with
   the refined upgrade plan, per `instructions/canvas-usage.instructions.md`. Optional; skip

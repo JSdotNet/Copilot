@@ -33,6 +33,16 @@ App, instead of plain chat narration.
   from the orchestrating agent. Caveat: telemetry is session-wide, so any
   tool call made while a run is active gets attributed to it, including
   unrelated work happening in the same session.
+- **Agent / MCP server / model usage**, both overall (in the Insight panel)
+  and per stage (a tag row beneath each stage's declared `agents`), captured
+  from `tool.execution_start`/`tool.execution_complete` (MCP server name and
+  model per tool call) and `subagent.completed`/`subagent.failed` (custom
+  agent name, model, tokens, duration for Task-tool/custom-agent
+  invocations). Calls and sub-agent runs are attributed to whichever stage
+  is currently `in_progress` for the active run when they happen, so this
+  reflects what actually ran, not just the agents declared up front in
+  `start_run`. Same session-wide-telemetry caveat as the rest of Insight
+  applies.
 - **QA results** on any stage driven by the `qa` plugin (`qa:qa`,
   `qa:qa-monitor`): per-scenario Pass/Fail/Flaky badges with notes, inline
   thumbnails for screenshot evidence and download links for
@@ -41,8 +51,9 @@ App, instead of plain chat narration.
   files are served from `<session workspace>/<evidence path>` via
   `/api/runs/:id/evidence?path=...` (path-traversal guarded).
 - A **Download report** button on each run that downloads a Markdown report
-  (stages, output, QA scenario/evidence tables, monitoring findings,
-  summary, and the insight breakdown) via `/api/runs/:id/report`.
+  (stages with planned vs. actually-used agents/MCP servers/models, output,
+  QA scenario/evidence tables, monitoring findings, summary, and the insight
+  breakdown) via `/api/runs/:id/report`.
 - Live updates over server-sent events, so the panel refreshes automatically
   as the orchestrating agent moves through stages.
 

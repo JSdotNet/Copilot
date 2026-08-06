@@ -7,9 +7,14 @@ description: 'Orchestrate Minimum Viable Product (MVP) creation using GitHub Cop
 
 Execute a complete MVP development workflow from planning through local run and monitoring using coordinated agents and canvas interface.
 
+> **Precondition:** This skill assumes the MVP scope, priorities, and architecture are
+> already approved. Use it to sequence and implement that approved MVP, not to establish the
+> initial product definition.
+
 ## Input Expectations
 
 - Project name and description.
+- Approved MVP specification or roadmap scope.
 - Core features list with priority order.
 - Target timeline or sprint allocation.
 - Runtime validation target (e.g., local or cloud run + monitoring).
@@ -25,37 +30,36 @@ Execute a complete MVP development workflow from planning through local run and 
 > (category defaults, overridable via `.github/copilot-model-selection.md` in the
 > consuming repo).
 
-### Stage 1: MVP Definition & Planning
-- **Define MVP scope** (core features, acceptance criteria)
-- **Create user stories** for each feature
-- **Estimate effort** and timeline
+### Stage 1: MVP Scope Intake
+- **Review the approved MVP scope** and acceptance criteria
+- **Confirm feature priorities** and delivery order
 - **Identify dependencies** and risks
+- **Confirm the validation target** for the implementation run
 
-**Agents:** `product-owner:product-owner`, `development:development-plan`
+**Agents:** `product-owner:product-owner`, `architecture:architect`
 
-### Stage 2: Architecture & Design
-- **Design system architecture** for MVP scope
-- **Document API contracts** and data models
+### Stage 2: Implementation Planning
+- **Break the approved MVP into implementation slices**
+- **Map API contracts and data models** to the current codebase
 - **Plan integration points** with external services
-- **Define local runtime validation strategy**
+- **Define the local runtime validation strategy**
 
-**Agents:** `architecture:architect`, `development:developer`
+**Agents:** `architecture:architect`
 
-### Stage 3: Implementation Sprint
-- **Create feature branches** for parallel development
+### Stage 3: Implementation
 - **Implement core features** using TDD approach
 - **Build API endpoints** and services
 - **Integrate UI/Frontend** (if applicable)
 
-**Agents:** `csharp-coding:coding`, `development:developer`
+**Agents:** `csharp-coding:coding`
 
 ### Final Phases (Shared)
 
-After the Implementation Sprint, this skill runs the shared delivery phases defined once
+After Implementation, this skill runs the shared delivery phases defined once
 in `instructions/orch-shared-phases.instructions.md` (code-modifying tier), in order:
 
 1. **Build & Test** — build, unit tests, and E2E tests, run first.
-2. **QA Validation** — functional MVP change, so run the full automatic QA validation
+2. **QA Validation** — new MVP functionality, so run the full automatic QA validation
    (Playwright smoke tests on core user flows plus `qa:qa-monitor` runtime monitoring,
    with evidence recorded).
 3. **Personal Validation** — hand back to the user (no agent); present the code review and
@@ -120,11 +124,11 @@ shared **Dashboard Reporting Contract** in
 gating. If the extension is not installed, skip the canvas calls and continue through
 standard chat interaction.
 
-- Call `start_run` with `skillId: "orch-create-mvp"` and these stages: MVP Definition &
-  Planning, Architecture & Design, Implementation Sprint, Build & Test, QA Validation,
+- Call `start_run` with `skillId: "orch-create-mvp"` and these stages: MVP Scope Intake,
+  Implementation Planning, Implementation, Build & Test, QA Validation,
   Personal Validation, Create Pull Request, Summary.
-- During **MVP Definition & Planning**, also open/update `markdown-canvas`
-  (`markdown-preview`) with the drafted user stories, and during **Architecture & Design**,
+- During **MVP Scope Intake**, also open/update `markdown-canvas`
+  (`markdown-preview`) with the approved MVP scope, and during **Implementation Planning**,
   open/update `markdown-canvas` with the architecture documentation and `diagram-canvas`
   (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
   `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.

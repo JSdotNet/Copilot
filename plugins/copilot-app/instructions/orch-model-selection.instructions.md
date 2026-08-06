@@ -45,15 +45,19 @@ agents to this table when a new `orch-*` skill introduces one.
 
 | Category | Typical Stages | Agents | Default Model | Rationale |
 | --- | --- | --- | --- | --- |
-| **Planning & Product Definition** | Feature Specification, Bug Triage, Package/Update Planning | `product-owner:product-owner`, `development:development-plan` | `claude-sonnet-5` | Prose-heavy drafting (stories, acceptance criteria, plans) still benefits from strong general reasoning to keep scope and criteria coherent; Recent tier, not the cheapest lightweight tier. |
-| **Architecture & Design** | Architecture & Design, ADR/TDR/arc42/Blueprint drafting | `architecture:architect`, `domain-design:domain-architect` | `claude-opus-5` | Trade-off analysis and long-term design decisions warrant the strongest current general-reasoning model (Recent tier). |
-| **Implementation & Coding** | Implementation, Build & Test, module/service scaffolding | `csharp-coding:coding`, `development:developer` | `gpt-5.3-codex` | Precise, tool-heavy code generation and TDD; current Powerful/Complex-tasks tier model purpose-built for coding. |
-| **Testing, QA & Monitoring** | QA Validation, runtime monitoring | `qa:qa`, `qa:qa-monitor`, `development:testing` | `gpt-5.3-codex` | Tool-heavy (Playwright, log/trace inspection); needs the same reliability as coding tasks. |
-| **Security & Compliance** | Security scan/hardening steps | `development:security` | `gpt-5.3-codex` | Careful, tool-heavy analysis where mistakes are costly. |
-| **Review** | Create Pull Request (PR description + final polish), code review passes | `review:reviewer` | `claude-opus-5` | Highest-quality judgment for catching bugs and writing an accurate PR description; not on the hot path, so the strongest Recent-tier model is worth it. |
-| **Documentation & Low-Complexity** | Summary, profile/README updates, straightforward lookups | `documentation:profile`, `documentation:documentation` | `claude-haiku-4.5` | Genuinely low-complexity formatting/writing task — the one category where the Lightweight tier is the right match, not a cost shortcut. |
+| **Planning & Product Definition** | Feature/bug/package specification intake | `product-owner:product-owner` | `claude-sonnet-5` | Prose-heavy drafting (stories, acceptance criteria, plans) still benefits from strong general reasoning to keep scope and criteria coherent; Recent tier, not the cheapest lightweight tier. |
+| **Architecture & Design** | Architecture & Design intake, ADR/TDR/arc42/Blueprint drafting | `architecture:architect`, `domain-design:domain-architect` | `claude-opus-5` | Trade-off analysis and long-term design decisions warrant the strongest current general-reasoning model (Recent tier). |
+| **Implementation & Coding** | Implementation, Build & Test, module/service scaffolding | `csharp-coding:coding` | `gpt-5.3-codex` | Precise, tool-heavy code generation and TDD; current Powerful/Complex-tasks tier model purpose-built for coding. |
+| **Testing, QA & Monitoring** | QA Validation, runtime monitoring | `qa:qa`, `qa:qa-monitor` | `gpt-5.3-codex` | Tool-heavy (Playwright, log/trace inspection); needs the same reliability as coding tasks. |
+| **Review** | Create Pull Request (PR description + final polish), Summary | *(default; no dedicated agent — the orchestrator performs these directly)* | `claude-opus-5` | Highest-quality judgment for catching bugs and writing an accurate PR description; not on the hot path, so the strongest Recent-tier model is worth it. |
+| **Documentation & Low-Complexity** | `orch-repo` documentation/README stages, Summary | `documentation:profile` | `claude-haiku-4.5` | Genuinely low-complexity formatting/writing task — the one category where the Lightweight tier is the right match, not a cost shortcut. |
 | **Human-in-the-Loop** | Personal Validation | *(none)* | *(none)*  | No agent and no model: this phase always hands control back to the user. |
-| **Fallback / Unclassified** | Any stage whose agent is not yet listed above | *(any)* | `auto` | Let the runtime pick until the agent is added to this table — safer than guessing a fixed model for an uncategorized case. |
+| **Fallback / Unclassified** | Any stage whose agent is not yet listed above, and any `(default)` stage with no clear category match | *(any)* | `auto` | Let the runtime pick until the agent is added to this table — safer than guessing a fixed model for an uncategorized case. |
+
+A stage may list agents from more than one category (for example a combined
+"Specification & Architecture Intake" stage naming both `product-owner:product-owner` and
+`architecture:architect`). Resolve the model per named agent, not once per stage, so each
+agent still gets its own category's model.
 
 ## When to Use `auto`
 

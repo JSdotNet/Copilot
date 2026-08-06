@@ -39,7 +39,7 @@ import { EventEmitter } from "node:events";
 import { joinSession, createCanvas, CanvasError } from "@github/copilot-sdk/extension";
 import { ensureDir, writeRun, readRun, listRuns, newRunId } from "./store.mjs";
 import { renderShell } from "./render.mjs";
-import { categorizeTool, appendToolCall, summarizeInsights } from "./insight.mjs";
+import { categorizeTool, appendToolCall, appendAgentUse, summarizeInsights } from "./insight.mjs";
 import { renderReportMarkdown } from "./report.mjs";
 
 const VALID_STATUSES = ["pending", "in_progress", "done", "blocked", "skipped", "cancelled"];
@@ -71,6 +71,12 @@ bus.setMaxListeners(0);
 // tracking" below). Only one run is tracked live at a time — the most
 // recently started run that hasn't finished yet.
 let activeRunId = null;
+// The stage currently `in_progress` for each tracked run (runId -> { index,
+// name }), used to attribute tool calls and sub-agent invocations to the
+// right stage in the insight breakdown. Cleared when that stage moves to a
+// terminal status, so activity between stages (or after the last stage)
+// isn't misattributed.
+const activeStageByRun = new Map();
 
 // Serializes read-modify-write access per runId so concurrent action calls
 // (e.g. two update_stage calls issued back-to-back) can't race each other
@@ -402,6 +408,12 @@ const session = await joinSession({
                             }
                             const stage = run.stages[idx];
                             stage.status = status;
+                            if (status === "in_progress") {
+                                activeStageByRun.set(runId, { index: idx, name: stage.name });
+                            } else {
+                                const active = activeStageByRun.get(runId);
+                                if (active && active.index === idx) activeStageByRun.delete(runId);
+                            }
                             if (typeof output === "string" && output.length > 0) {
                                 stage.output = appendOutput && stage.output ? `${stage.output}\n${output}` : output;
                             }
@@ -441,6 +453,7 @@ const session = await joinSession({
                             await writeRun(baseDir, run);
                         });
                         if (activeRunId === runId) activeRunId = null;
+                        activeStageByRun.delete(runId);
                         bus.emit("update");
                         return { ok: true };
                     },
@@ -491,16 +504,24 @@ const session = await joinSession({
     ],
 });
 
-// Insight tracking: listen to the session's own tool-call telemetry and
-// attribute each call's duration to whichever run is currently
-// "in_progress" (see resolveBaseDir/activeRunId above). Kept outside the
-// canvas action handlers because it's driven by session events, not
-// agent-invoked actions.
+// Insight tracking: listen to the session's own tool-call and sub-agent
+// telemetry and attribute each call to whichever run is currently
+// "in_progress" (see resolveBaseDir/activeRunId above) and, when known,
+// whichever stage of that run is currently `in_progress`
+// (activeStageByRun) — so the dashboard can show which agent(s), MCP
+// server(s), and model(s) actually did the work for each phase, not just
+// the ones declared up front in start_run. Kept outside the canvas action
+// handlers because it's driven by session events, not agent-invoked actions.
 const pendingToolCalls = new Map();
 session.on("tool.execution_start", (event) => {
     const data = event && event.data;
     if (!data || !data.toolCallId) return;
-    pendingToolCalls.set(data.toolCallId, { toolName: data.toolName, startedAt: Date.now() });
+    pendingToolCalls.set(data.toolCallId, {
+        toolName: data.toolName,
+        mcpServerName: data.mcpServerName,
+        model: data.model,
+        startedAt: Date.now(),
+    });
 });
 session.on("tool.execution_complete", (event) => {
     const data = event && event.data;
@@ -511,6 +532,7 @@ session.on("tool.execution_complete", (event) => {
     const runId = activeRunId;
     const toolName = data.toolName || pending.toolName || "unknown";
     const durationMs = Math.max(0, Date.now() - pending.startedAt);
+    const stageInfo = activeStageByRun.get(runId);
     withRunLock(runId, async () => {
         const baseDir = resolveBaseDir(session);
         const run = await readRun(baseDir, runId);
@@ -521,9 +543,49 @@ session.on("tool.execution_complete", (event) => {
             durationMs,
             success: data.success !== false,
             endedAt: new Date().toISOString(),
+            mcpServerName: data.mcpServerName || pending.mcpServerName || undefined,
+            model: data.model || pending.model || undefined,
+            stageIndex: stageInfo ? stageInfo.index : null,
+            stageName: stageInfo ? stageInfo.name : null,
         });
         await writeRun(baseDir, run);
     })
         .then(() => bus.emit("update"))
         .catch(() => {});
 });
+
+// Custom-agent / Task-tool sub-agent invocations. `subagent.completed` and
+// `subagent.failed` both carry the agent name, model, and duration, so
+// either terminal event is enough to record what ran; `subagent.started`
+// carries no duration yet and is not persisted.
+function recordAgentUse(status) {
+    return (event) => {
+        const data = event && event.data;
+        if (!data || !activeRunId) return;
+        const runId = activeRunId;
+        const stageInfo = activeStageByRun.get(runId);
+        withRunLock(runId, async () => {
+            const baseDir = resolveBaseDir(session);
+            const run = await readRun(baseDir, runId);
+            if (!run) return;
+            appendAgentUse(run, {
+                agentName: data.agentName,
+                agentDisplayName: data.agentDisplayName || data.agentName,
+                model: data.model,
+                status,
+                durationMs: data.durationMs,
+                totalTokens: data.totalTokens,
+                totalToolCalls: data.totalToolCalls,
+                error: status === "failed" ? data.error : undefined,
+                endedAt: new Date().toISOString(),
+                stageIndex: stageInfo ? stageInfo.index : null,
+                stageName: stageInfo ? stageInfo.name : null,
+            });
+            await writeRun(baseDir, run);
+        })
+            .then(() => bus.emit("update"))
+            .catch(() => {});
+    };
+}
+session.on("subagent.completed", recordAgentUse("completed"));
+session.on("subagent.failed", recordAgentUse("failed"));

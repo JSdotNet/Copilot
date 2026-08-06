@@ -13,6 +13,7 @@ function fmtDuration(ms) {
 }
 
 export function renderReportMarkdown(run) {
+    const insight = summarizeInsights(run);
     const lines = [];
     lines.push(`# ${run.title}`);
     lines.push("");
@@ -24,10 +25,13 @@ export function renderReportMarkdown(run) {
 
     lines.push("## Stages");
     lines.push("");
-    lines.push("| # | Stage | Status | Agents |");
-    lines.push("| - | ----- | ------ | ------ |");
+    lines.push("| # | Stage | Status | Agents (planned) | Agents (used) | MCP Servers | Models |");
+    lines.push("| - | ----- | ------ | ----------------- | -------------- | ----------- | ------ |");
     (run.stages || []).forEach((stage, i) => {
-        lines.push(`| ${i + 1} | ${stage.name} | ${stage.status} | ${(stage.agents || []).join(", ") || "-"} |`);
+        const observed = insight.perStage[i] || { agents: [], mcpServers: [], models: [] };
+        lines.push(
+            `| ${i + 1} | ${stage.name} | ${stage.status} | ${(stage.agents || []).join(", ") || "-"} | ${observed.agents.join(", ") || "-"} | ${observed.mcpServers.join(", ") || "-"} | ${observed.models.join(", ") || "-"} |`
+        );
     });
     lines.push("");
 
@@ -90,7 +94,6 @@ export function renderReportMarkdown(run) {
         lines.push("");
     }
 
-    const insight = summarizeInsights(run);
     lines.push("## Insight");
     lines.push("");
     lines.push(`- **Total tool calls:** ${insight.totalCalls}`);
@@ -107,6 +110,10 @@ export function renderReportMarkdown(run) {
         categories.forEach(([category, ms]) => lines.push(`| ${category} | ${fmtDuration(ms)} |`));
         lines.push("");
     }
+    if (insight.agentsUsed.length) lines.push(`- **Agents used:** ${insight.agentsUsed.join(", ")}`);
+    if (insight.mcpServersUsed.length) lines.push(`- **MCP servers used:** ${insight.mcpServersUsed.join(", ")}`);
+    if (insight.modelsUsed.length) lines.push(`- **Models used:** ${insight.modelsUsed.join(", ")}`);
+    lines.push("");
 
     return lines.join("\n");
 }
