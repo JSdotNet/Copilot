@@ -76,7 +76,15 @@ that resolution, it does not re-decide model choice per skill.
     `<session workspace>/orchestration-runs/` is the source of truth, not the conversation.
     Persist `changeKind`, `approval`, and the resolved model with `set_run_context` so a
     compacted or resumed session recovers the run's position and gate state.
-13. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
+13. **Watch the dashboard's context insight, never author it.** The dashboard captures
+    per-stage token consumption and a run-level context gauge automatically from session
+    telemetry — do not invent, estimate, or write token numbers into `update_stage` output
+    or the summary. Use the per-stage delta to judge which phase is expensive and worth
+    splitting or delegating, and when the run-level gauge approaches the context limit,
+    escalate the next heavy step to a sub-agent in the same worktree rather than continuing
+    inline until compaction interrupts the run. See the shared **Context and Token
+    Insight**.
+14. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
 
 ## Constraints and Priorities
 
@@ -95,7 +103,11 @@ that resolution, it does not re-decide model choice per skill.
 - **Sub-agents before child sessions:** a child session gets its own worktree and cannot see
   this session's uncommitted change set, so use it only for concurrent monitoring.
 - **One orchestration per session** while a run is `in_progress`, because dashboard insight
-  telemetry is session-wide.
+  telemetry — tool activity and token usage alike — is session-wide and would otherwise
+  attribute unrelated work to the run.
+- **Dashboard-measured numbers are never authored by this agent.** Token, context, and
+  timing figures come from the extension's own telemetry; stage output describes what the
+  stage did, not what it cost.
 
 ## Example Usage
 
