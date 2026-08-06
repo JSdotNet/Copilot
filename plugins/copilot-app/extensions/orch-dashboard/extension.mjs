@@ -45,6 +45,8 @@ import { renderReportMarkdown } from "./report.mjs";
 const VALID_STATUSES = ["pending", "in_progress", "done", "blocked", "skipped", "cancelled"];
 const VALID_SCENARIO_STATUSES = ["pass", "fail", "flaky"];
 const VALID_FINDING_LEVELS = ["error", "critical", "warning", "info"];
+const VALID_CHANGE_KINDS = ["new-functionality", "bug-fix", "dependency-update", "none"];
+const VALID_APPROVAL_STATES = ["pending", "approved", "rejected"];
 
 const EVIDENCE_CONTENT_TYPES = {
     ".png": "image/png",
@@ -105,6 +107,8 @@ function summarize(run) {
         status: run.status,
         startedAt: run.startedAt,
         updatedAt: run.updatedAt,
+        changeKind: run.changeKind || null,
+        approval: run.approval || null,
     };
 }
 
@@ -298,20 +302,44 @@ const session = await joinSession({
                                     required: ["name"],
                                 },
                             },
+                            changeKind: {
+                                type: "string",
+                                enum: VALID_CHANGE_KINDS,
+                                description: "Kind of change this run produces; drives QA Validation depth and is persisted so a resumed run keeps the same depth.",
+                            },
+                            resume: {
+                                type: "boolean",
+                                description: "If true (default), reattach to an existing in_progress run for the same skillId instead of starting a duplicate. Set false to force a new run.",
+                            },
                         },
                         required: ["skillId", "title", "stages"],
                     },
                     handler: async (ctx) => {
-                        const { skillId, title, stages } = ctx.input || {};
+                        const { skillId, title, stages, changeKind, resume } = ctx.input || {};
                         if (!skillId || !title || !Array.isArray(stages) || stages.length === 0) {
                             throw new CanvasError("canvas_input_invalid", "skillId, title, and a non-empty stages[] are required.");
                         }
+                        if (changeKind && !VALID_CHANGE_KINDS.includes(changeKind)) {
+                            throw new CanvasError("canvas_input_invalid", `changeKind must be one of ${VALID_CHANGE_KINDS.join(", ")}`);
+                        }
                         const baseDir = resolveBaseDir(session);
+                        if (resume !== false) {
+                            const existing = (await listRuns(baseDir)).find(
+                                (r) => r.skillId === skillId && r.status === "in_progress"
+                            );
+                            if (existing) {
+                                activeRunId = existing.id;
+                                bus.emit("update");
+                                return { runId: existing.id, resumed: true, run: existing };
+                            }
+                        }
                         const run = {
                             id: newRunId(),
                             skillId,
                             title,
                             status: "in_progress",
+                            changeKind: changeKind || null,
+                            approval: { personalValidation: "pending", decidedAt: null, note: "" },
                             startedAt: new Date().toISOString(),
                             updatedAt: new Date().toISOString(),
                             stages: stages.map((s) => ({
@@ -327,7 +355,54 @@ const session = await joinSession({
                         await writeRun(baseDir, run);
                         activeRunId = run.id;
                         bus.emit("update");
-                        return { runId: run.id };
+                        return { runId: run.id, resumed: false };
+                    },
+                },
+                {
+                    name: "set_run_context",
+                    description:
+                        "Persist run-level context that must survive a session resume: the change kind driving QA depth, and the Personal Validation approval decision that gates the pull request. Call with approval 'approved' only after the user explicitly approves.",
+                    inputSchema: {
+                        type: "object",
+                        properties: {
+                            runId: { type: "string" },
+                            changeKind: { type: "string", enum: VALID_CHANGE_KINDS },
+                            approval: {
+                                type: "string",
+                                enum: VALID_APPROVAL_STATES,
+                                description: "Personal Validation decision. 'approved' is the only value that unlocks the Create Pull Request stage.",
+                            },
+                            approvalNote: { type: "string", description: "What the user said when approving or rejecting." },
+                        },
+                        required: ["runId"],
+                    },
+                    handler: async (ctx) => {
+                        const { runId, changeKind, approval, approvalNote } = ctx.input || {};
+                        if (changeKind && !VALID_CHANGE_KINDS.includes(changeKind)) {
+                            throw new CanvasError("canvas_input_invalid", `changeKind must be one of ${VALID_CHANGE_KINDS.join(", ")}`);
+                        }
+                        if (approval && !VALID_APPROVAL_STATES.includes(approval)) {
+                            throw new CanvasError("canvas_input_invalid", `approval must be one of ${VALID_APPROVAL_STATES.join(", ")}`);
+                        }
+                        const baseDir = resolveBaseDir(session);
+                        let result = null;
+                        await withRunLock(runId, async () => {
+                            const run = await readRun(baseDir, runId);
+                            if (!run) throw new CanvasError("run_not_found", `No run with id ${runId}`);
+                            if (changeKind) run.changeKind = changeKind;
+                            if (approval) {
+                                run.approval = {
+                                    personalValidation: approval,
+                                    decidedAt: new Date().toISOString(),
+                                    note: typeof approvalNote === "string" ? approvalNote : (run.approval && run.approval.note) || "",
+                                };
+                            }
+                            run.updatedAt = new Date().toISOString();
+                            await writeRun(baseDir, run);
+                            result = { changeKind: run.changeKind || null, approval: run.approval || null };
+                        });
+                        bus.emit("update");
+                        return result || { ok: true };
                     },
                 },
                 {

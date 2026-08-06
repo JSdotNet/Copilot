@@ -402,7 +402,11 @@ export function renderShell() {
           '</div>' +
         '</div>' +
         '<p class="subtitle">' + esc(run.skillId) + ' &middot; started ' + esc(new Date(run.startedAt).toLocaleString()) +
-          (run.updatedAt ? ' &middot; updated ' + esc(new Date(run.updatedAt).toLocaleString()) : "") + '</p>' +
+          (run.updatedAt ? ' &middot; updated ' + esc(new Date(run.updatedAt).toLocaleString()) : "") +
+          (run.changeKind ? ' &middot; change: ' + esc(run.changeKind) : "") +
+          (run.approval && run.approval.personalValidation
+            ? ' &middot; personal validation: ' + esc(run.approval.personalValidation)
+            : "") + '</p>' +
         stages +
         (run.summary ? '<div class="summary" id="summary-block"><h2>Summary</h2>' + esc(run.summary) + '</div>' : "") +
         renderInsight(run);

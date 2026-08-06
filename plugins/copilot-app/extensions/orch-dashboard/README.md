@@ -61,12 +61,23 @@ App, instead of plain chat narration.
 
 Canvas id: `orch-dashboard`. Actions:
 
-- `start_run({ skillId, title, stages: [{ name, agents? }] })` -> `{ runId }`
+- `start_run({ skillId, title, stages: [{ name, agents? }], changeKind?, resume? })` ->
+  `{ runId, resumed }`
   Call once at the start of an orchestration, listing every stage up front —
   including a **Personal Validation** stage, a separate **Create Pull Request**
   stage after it (for skills that open a PR; mark it `skipped` when there is no
   change set), and a final **Summary** stage. Marks the run as the one currently
-  receiving tool-activity insight.
+  receiving tool-activity insight. By default it **reattaches** to an existing
+  `in_progress` run for the same `skillId` and returns `resumed: true` with the
+  stored run, so a resumed session continues instead of duplicating the run; pass
+  `resume: false` to force a new one. `changeKind` is one of `new-functionality`,
+  `bug-fix`, `dependency-update`, `none`.
+- `set_run_context({ runId, changeKind?, approval?, approvalNote? })`
+  Persist the run-level state that gates later phases: the change kind driving QA
+  depth, and the Personal Validation decision (`pending` / `approved` /
+  `rejected`). Because it lives in the run JSON, it survives compaction and
+  session resume — a pull request must never be created while approval is
+  `pending`.
 - `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput?, scenarios?, monitoring? })`
   Call at the start of a stage (`status: "in_progress"`) and again when it
   finishes, with the result captured in `output`. For QA/validation stages,
@@ -92,7 +103,21 @@ Canvas id: `orch-dashboard`. Actions:
 
 State is stored as JSON files under `<session workspace>/orchestration-runs/`,
 so each orchestration run persists for the life of the session and is
-inspectable on disk.
+inspectable on disk. This file — not the conversation — is the source of truth
+for a run's position, change kind, and approval state.
+
+## Session Model
+
+The orchestrating session is the **sole owner** of a run: only it calls
+`start_run`, `update_stage`, `set_run_context`, and `finish_run`. Heavy work
+(build, test, Playwright) should be delegated to sub-agents in the **same
+worktree** so the change set and evidence paths stay valid. A child session
+(`create_session`) gets a different worktree and should be used only for
+genuinely concurrent work such as `qa:qa-monitor`; its evidence must be written
+into — or copied back to — the owner session's workspace, because the evidence
+endpoint rejects paths outside it. See
+`plugins/copilot-app/instructions/orch-shared-phases.instructions.md` for the
+full Execution Model.
 
 ## Install
 
