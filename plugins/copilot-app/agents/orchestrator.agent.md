@@ -76,14 +76,17 @@ that resolution, it does not re-decide model choice per skill.
     `<session workspace>/orchestration-runs/` is the source of truth, not the conversation.
     Persist `changeKind`, `approval`, and the resolved model with `set_run_context` so a
     compacted or resumed session recovers the run's position and gate state.
-13. **Watch the dashboard's context insight, never author it.** The dashboard captures
-    per-stage token consumption and a run-level context gauge automatically from session
+13. **Watch the dashboard's Context panel, never author it.** The dashboard captures
+    per-stage token deltas and a run-level context gauge automatically from session
     telemetry — do not invent, estimate, or write token numbers into `update_stage` output
-    or the summary. Use the per-stage delta to judge which phase is expensive and worth
-    splitting or delegating, and when the run-level gauge approaches the context limit,
-    escalate the next heavy step to a sub-agent in the same worktree rather than continuing
-    inline until compaction interrupts the run. See the shared **Context and Token
-    Insight**.
+    or the summary. Each stage reports both a headline input + output total, which is
+    dominated by prompt-cache reads and can far exceed the context window, and an
+    **uncached** figure that approximates real context pressure; judge which stage is
+    expensive and worth splitting or delegating on the uncached figure, never the headline.
+    When the run-level gauge approaches the context limit, escalate the next heavy step to a
+    sub-agent in the same worktree — the gauge ignores sub-agent samples, so delegation
+    genuinely relieves it — rather than continuing inline until compaction interrupts the
+    run. See the shared **Context and Token Insight**.
 14. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
 
 ## Constraints and Priorities
