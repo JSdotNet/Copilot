@@ -1,6 +1,5 @@
 ---
 description: Product Owner specialist for Agile/Scrum epics, user stories, and bugs.
-model: claude-haiku-4.5
 tools: ['read/readFile', 'edit/createFile', 'edit/editFiles', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/searchResults', 'search/textSearch', 'search/usages', 'web/fetch', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
 handoffs:
   - label: Sync To Jira

@@ -1,39 +1,60 @@
 ---
 applyTo: 'skills/orch-*/SKILL.md'
-description: Defines the model-selection categories the orchestrator uses to pick a model for each orchestration step, the default model per category, and how a consuming repo can override those defaults.
+description: Defines the model-selection categories the orchestrator uses to pick a model for each orchestration step, the family/tier to pick per category, and how a consuming repo can override those defaults.
 ---
 
 # Orchestration Model Selection (Orchestration-Owned)
 
 ## Purpose
 
-- Make the `orchestrator` agent (`agents/orchestrator.agent.md`) responsible for choosing a
-  model for every step of an `orch-*` run, instead of running every stage under whatever
-  model the orchestrator itself happens to use.
+- Make the `orchestrator` agent (`agents/orchestrator.agent.md`) the **single** place that
+  chooses a model for every step of an `orch-*` run. Every other agent used by an
+  orchestration (`product-owner:product-owner`, `architecture:architect`,
+  `csharp-coding:coding`, `qa:qa`, `qa:qa-monitor`, `documentation:profile`, etc.) has no
+  `model` in its own frontmatter for this reason — pinning a model on the agent itself would
+  create a second, conflicting source of truth. Only `orchestrator.agent.md` pins its own
+  model, because it is the one agent that must run under a fixed, known model to reliably
+  drive the rest of the process.
 - Define the categories **once** so a maintainer edits this file instead of re-describing
   model choice in every `orch-*/SKILL.md`.
 - Let a consuming repository override any category's default without editing plugin files.
-- Pick the **best-matching current-generation model per category** — never default to a
-  cheap model just because it is cheap, and never leave a category pinned to a model that
-  has rolled into the "Legacy" tier in the model picker.
+- Pick the **best-matching model family per category** — never default to a cheap family
+  just because it is cheap, and never pin an exact version number that goes stale the moment
+  a newer release ships.
 
-## Model Tiers (Re-check Periodically)
+## No Hardcoded Version Numbers — Resolve to "Latest" at Run Time
 
-The model picker groups models into tiers that change as new models ship. Only pick
-defaults from **Recent** or **Powerful · Complex tasks**; only use **Lightweight · Fast
-responses** for genuinely low-complexity, low-risk work; never default a category to a
-**Legacy · Previous versions** model — those exist for compatibility, not for new defaults.
-When a new model tier ships, re-evaluate the table below instead of leaving stale pins.
+- This file names a **model family and quality tier** per category (for example "Claude
+  Opus, latest release"), not an exact versioned model ID (for example `claude-opus-5`).
+  Exact IDs go stale as soon as a newer version ships and the previous one rolls into the
+  model picker's "Legacy" tier — this file must not need an edit every time that happens.
+- At the start of a run, the orchestrator resolves each category's family + tier to a
+  concrete model ID by reading the model options currently exposed to it (the same list
+  shown in the model picker / offered by its `create_session`/`task` tools) and picking the
+  **highest-numbered release in the named family** that is not in the picker's "Legacy ·
+  Previous versions" group.
+- If the named family has no non-legacy release available (rare), fall back to `auto` for
+  that category for the run and note it, rather than reaching into the Legacy tier.
+- Never write a specific version number into this file's category table, an override file,
+  or `orchestrator.agent.md` — the only version-pinned model in this whole flow is the
+  orchestrator's own frontmatter `model`, because that one has to be fixed for the
+  orchestrator to run at all.
 
-- **Recent (general-purpose, strong default):** `claude-sonnet-5`, `claude-opus-5`, `gpt-5.4`.
-- **Powerful · Complex tasks (reasoning + tool-heavy work):** `gemini-3.1-pro-preview`,
-  `gpt-5.3-codex`.
-- **Lightweight · Fast responses (genuinely low-complexity only):** `claude-haiku-4.5`,
-  `gpt-5.4-mini`, `mai-code-1-flash-picker`.
-- **Legacy · Previous versions (do not use as a new default):** `claude-opus-4.5` through
-  `claude-opus-4.8`, `claude-sonnet-4.5`, `claude-sonnet-4.6`, `gpt-5-mini`, etc.
+## Model Families & Tiers
+
+The model picker groups releases into tiers that shift as new models ship (checked against
+the picker at the time of writing):
+
+- **Recent (general-purpose, strong default):** Claude Sonnet, Claude Opus, GPT (flagship,
+  non-Codex).
+- **Powerful · Complex tasks (reasoning + tool-heavy work):** Gemini Pro, GPT Codex.
+- **Lightweight · Fast responses (genuinely low-complexity only):** Claude Haiku, GPT mini,
+  MAI-Code Flash.
+- **Legacy · Previous versions (never pick from here for a new default):** older Claude
+  Opus/Sonnet releases, older GPT mini releases, and any release the picker has moved out of
+  Recent/Powerful/Lightweight.
 - **`auto`** lets the runtime pick per call. It is a legitimate choice, not just a
-  cost-saving fallback — but this file still names a concrete default per category so the
+  cost-saving fallback — but this file still names a concrete family per category so the
   orchestrator makes a deliberate, explainable choice. Use `auto` deliberately (see
   "When to Use `auto`" below), not as the universal default.
 
@@ -43,16 +64,16 @@ Each stage in an `orch-*` skill delegates to one or more agents (its `**Agents:*
 Every agent used across the `orch-*` skills maps to exactly one category below. Add new
 agents to this table when a new `orch-*` skill introduces one.
 
-| Category | Typical Stages | Agents | Default Model | Rationale |
+| Category | Typical Stages | Agents | Family (Tier) | Rationale |
 | --- | --- | --- | --- | --- |
-| **Planning & Product Definition** | Feature/bug/package specification intake | `product-owner:product-owner` | `claude-sonnet-5` | Prose-heavy drafting (stories, acceptance criteria, plans) still benefits from strong general reasoning to keep scope and criteria coherent; Recent tier, not the cheapest lightweight tier. |
-| **Architecture & Design** | Architecture & Design intake, ADR/TDR/arc42/Blueprint drafting | `architecture:architect`, `domain-design:domain-architect` | `claude-opus-5` | Trade-off analysis and long-term design decisions warrant the strongest current general-reasoning model (Recent tier). |
-| **Implementation & Coding** | Implementation, Build & Test, module/service scaffolding | `csharp-coding:coding` | `gpt-5.3-codex` | Precise, tool-heavy code generation and TDD; current Powerful/Complex-tasks tier model purpose-built for coding. |
-| **Testing, QA & Monitoring** | QA Validation, runtime monitoring | `qa:qa`, `qa:qa-monitor` | `gpt-5.3-codex` | Tool-heavy (Playwright, log/trace inspection); needs the same reliability as coding tasks. |
-| **Review** | Create Pull Request (PR description + final polish), Summary | *(default; no dedicated agent — the orchestrator performs these directly)* | `claude-opus-5` | Highest-quality judgment for catching bugs and writing an accurate PR description; not on the hot path, so the strongest Recent-tier model is worth it. |
-| **Documentation & Low-Complexity** | `orch-repo` documentation/README stages, Summary | `documentation:profile` | `claude-haiku-4.5` | Genuinely low-complexity formatting/writing task — the one category where the Lightweight tier is the right match, not a cost shortcut. |
+| **Planning & Product Definition** | Feature/bug/package specification intake | `product-owner:product-owner` | Claude Sonnet, latest (Recent) | Prose-heavy drafting (stories, acceptance criteria, plans) still benefits from strong general reasoning to keep scope and criteria coherent; not the cheapest lightweight tier. |
+| **Architecture & Design** | Architecture & Design intake, ADR/TDR/arc42/Blueprint drafting | `architecture:architect`, `domain-design:domain-architect` | Claude Opus, latest (Recent) | Trade-off analysis and long-term design decisions warrant the strongest current general-reasoning family. |
+| **Implementation & Coding** | Implementation, Build & Test, module/service scaffolding | `csharp-coding:coding` | GPT Codex, latest (Powerful) | Precise, tool-heavy code generation and TDD; the family purpose-built for coding. |
+| **Testing, QA & Monitoring** | QA Validation, runtime monitoring | `qa:qa`, `qa:qa-monitor` | GPT Codex, latest (Powerful) | Tool-heavy (Playwright, log/trace inspection); needs the same reliability as coding tasks. |
+| **Review** | Create Pull Request (PR description + final polish), Summary | *(default; no dedicated agent — the orchestrator performs these directly)* | Claude Opus, latest (Recent) | Highest-quality judgment for catching bugs and writing an accurate PR description; not on the hot path, so the strongest Recent-tier family is worth it. |
+| **Documentation & Low-Complexity** | `orch-repo` documentation/README stages, Summary | `documentation:profile` | Claude Haiku, latest (Lightweight) | Genuinely low-complexity formatting/writing task — the one category where the Lightweight tier is the right match, not a cost shortcut. |
 | **Human-in-the-Loop** | Personal Validation | *(none)* | *(none)*  | No agent and no model: this phase always hands control back to the user. |
-| **Fallback / Unclassified** | Any stage whose agent is not yet listed above, and any `(default)` stage with no clear category match | *(any)* | `auto` | Let the runtime pick until the agent is added to this table — safer than guessing a fixed model for an uncategorized case. |
+| **Fallback / Unclassified** | Any stage whose agent is not yet listed above, and any `(default)` stage with no clear category match | *(any)* | `auto` | Let the runtime pick until the agent is added to this table — safer than guessing a family for an uncategorized case. |
 
 A stage may list agents from more than one category (for example a combined
 "Specification & Architecture Intake" stage naming both `product-owner:product-owner` and
@@ -62,7 +83,7 @@ agent still gets its own category's model.
 ## When to Use `auto`
 
 - Use it for the **Fallback / Unclassified** category above (an agent not yet mapped to a
-  category), so an uncategorized stage never gets a blind fixed-model guess.
+  category), so an uncategorized stage never gets a blind guess.
 - A repo may also opt any specific category into `auto` via the override file below, if it
   prefers the runtime to pick dynamically for that category (for example, a repo with highly
   variable planning tasks).
@@ -76,36 +97,36 @@ For every stage transition, the orchestrator resolves the model to use in this o
 stopping at the first match:
 
 1. **Repo override** — if the consuming repository defines `.github/copilot-model-selection.md`
-   (see below) and it lists an entry for the stage's category, use that model.
-2. **Pinned agent model** — if the stage's target is a custom agent with its own `model` in
-   frontmatter (for example `csharp-coding:coding` pins `GPT-5.3-Codex`), use that pinned
-   model. A dedicated agent's pin reflects a deliberate, tested choice and should not be
-   silently overridden by the category default.
-3. **Category default** — otherwise use the category default from the table above.
-4. **`auto`** — if the stage's agent is not yet categorized, use `auto` and flag it for
+   (see below) and it lists an entry for the stage's category, use that (family, or an exact
+   model ID if the repo chose to pin one).
+2. **Category family + tier** — otherwise resolve the category's family/tier from the table
+   above to the current latest matching model ID, per "No Hardcoded Version Numbers" above.
+3. **`auto`** — if the stage's agent is not yet categorized, use `auto` and flag it for
    follow-up (add the agent to the table above).
 
-Apply the resolved model explicitly wherever the orchestrator controls it: the `model`
-parameter on `create_session`/`task`/kickoff calls it makes for that stage, and any
-background/child session it spawns (for example the parallel `qa:qa-monitor` session). When
-the orchestrator hands off in-session to a custom agent that already carries its own pinned
-model, no explicit override is needed unless step 1 (repo override) applies.
+None of the agents invoked by an orchestration pin their own `model`, so there is no
+"agent's pinned model" tier to consider — the orchestrator's resolution above is the only
+source of truth. Apply the resolved model explicitly wherever the orchestrator controls it:
+the `model` parameter on `create_session`/`task`/kickoff calls it makes for that stage, and
+any background/child session it spawns (for example the parallel `qa:qa-monitor` session).
 
 ## Repo Override File
 
 - A consuming repository may create `.github/copilot-model-selection.md` at its repo root to
-  override any category's default model.
+  override any category's default.
 - Format: a Markdown table with two columns, `Category` and `Model`, using the exact category
-  names from the table above. Only include the rows being overridden; omitted categories keep
-  the plugin defaults.
+  names from the table above. The `Model` value may be a family name (for example "Gemini
+  Pro") for the orchestrator to resolve to the latest release, or an exact model ID if the
+  repo wants to pin a specific version deliberately. Only include the rows being overridden;
+  omitted categories keep the plugin defaults.
 
 ```markdown
 # Copilot Model Selection Overrides
 
 | Category | Model |
 | --- | --- |
-| Implementation & Coding | gemini-3.1-pro-preview |
-| Review | gpt-5.4 |
+| Implementation & Coding | Gemini Pro |
+| Review | GPT flagship |
 ```
 
 - The orchestrator reads this file once per run (if present) before `start_run`, and reuses
@@ -117,12 +138,14 @@ model, no explicit override is needed unless step 1 (repo override) applies.
 
 - [ ] Every agent referenced by an `orch-*/SKILL.md` `**Agents:**` line has a category in the
       table above.
+- [ ] No agent invoked by an orchestration (other than `orchestrator.agent.md` itself) pins
+      its own `model` in frontmatter.
 - [ ] The orchestrator resolves and applies a model before each stage transition, following
-      the Resolution Order.
+      the Resolution Order, and never hardcodes a version number while doing so.
 - [ ] A repo override in `.github/copilot-model-selection.md`, when present, takes precedence
-      over both the category default and the target agent's pinned model.
+      over the category default.
 - [ ] Personal Validation never receives a model or agent assignment.
-- [ ] No category default sits in the model picker's "Legacy" tier; re-check the Model Tiers
-      section when new models ship and update stale pins.
+- [ ] This file names families and tiers, not exact version-pinned model IDs, so it does not
+      need an edit every time a new model ships.
 - [ ] `auto` is used deliberately (Fallback/Unclassified, or an explicit repo override), not
       set as the blanket default for every category.

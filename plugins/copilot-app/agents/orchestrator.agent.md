@@ -31,19 +31,19 @@ that resolution, it does not re-decide model choice per skill.
    ask the user to provide it or to run the appropriate documentation/specification
    orchestration first.
 3. **Resolve model selection once per run.** Before `start_run`, check for a repo override at
-   `.github/copilot-model-selection.md`. Combine it with the category defaults from
-   `orch-model-selection.instructions.md` to build the run's category → model mapping,
-   following that file's Resolution Order (repo override → pinned agent model → category
-   default → `auto`).
+   `.github/copilot-model-selection.md`. Combine it with the category families/tiers from
+   `orch-model-selection.instructions.md`, resolving each to the current latest non-legacy
+   model ID (never a hardcoded version number), to build the run's category → model mapping,
+   following that file's Resolution Order (repo override → category family/tier → `auto`).
 4. **Open the dashboard once.** Open the `orch-dashboard` canvas and call `start_run` with
    the skill's `skillId` and the full ordered stage list (unique stages + shared phases for
    its tier). Follow the shared **Dashboard Reporting Contract** for every stage transition.
    Skip canvas calls gracefully when the extension is not installed.
 5. **Apply the resolved model at every stage transition.** When creating a session, spawning
    a task, or starting a child/background session (for example the parallel `qa:qa-monitor`
-   session) for a stage, pass the model resolved for that stage's category. Skip an explicit
-   override when handing off in-session to a pinned custom agent, unless a repo override
-   applies.
+   session) for a stage, pass the model resolved for that stage's category. No agent invoked
+   by an orchestration pins its own model, so this resolved value is always the one that
+   applies — there is nothing to defer to.
 6. **Run the shared phases in order** for the tier:
    - **Code-modifying:** `phase-build-test` → `phase-qa-validation` → Personal Validation →
      Create Pull Request → Summary.
@@ -69,14 +69,15 @@ that resolution, it does not re-decide model choice per skill.
 
 - **Single source of truth:** never copy phase prose into this agent or into `orch-*`
   skills; edit `orch-shared-phases.instructions.md` or the phase skills to change behavior.
-  Likewise, never hardcode a per-stage model in this agent or in `orch-*` skills; edit
-  `orch-model-selection.instructions.md` to change category defaults.
+  Likewise, never hardcode a per-stage model or a version-pinned model ID in this agent or
+  in `orch-*` skills; edit `orch-model-selection.instructions.md` to change category
+  families/tiers.
 - **Approval before every agent transition** and before every pull request.
 - **Cross-plugin agents are recommended, not required** — skip or perform a stage manually
   when a referenced plugin is not installed, and continue with the remaining stages.
 - **No pull request** unless the user has explicitly approved it in Personal Validation.
-- **Repo overrides always win.** A `.github/copilot-model-selection.md` entry overrides both
-  the category default and a target agent's pinned model.
+- **Repo overrides always win.** A `.github/copilot-model-selection.md` entry overrides the
+  category default for that category.
 
 ## Example Usage
 
