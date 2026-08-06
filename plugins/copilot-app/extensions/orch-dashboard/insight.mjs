@@ -22,7 +22,30 @@
 // including calls unrelated to the orchestration if the user does other
 // work in the same session concurrently.
 
+// It additionally observes the session's context-window telemetry
+// (`assistant.usage`, `session.usage_info`, `session.compaction_start`,
+// `session.compaction_complete`, `session.truncation`) to answer two
+// different questions:
+//
+//   1. "Which phase is the context hog?" — per-stage token *deltas*: the
+//      tokens actually consumed by model calls that completed while a stage
+//      was `in_progress` (see `recordTokenUsage`). A delta is used rather
+//      than an absolute `currentTokens` sample at the stage boundary,
+//      because compaction can reset the absolute figure mid-stage and make
+//      boundary sampling meaningless.
+//   2. "Am I about to get compacted mid-orchestration?" — a run-level live
+//      gauge of the latest `currentTokens` / `tokenLimit`, its component
+//      breakdown, the peak observed, and how often compaction/truncation
+//      has fired (see `recordContextSample` / `recordCompaction` /
+//      `recordTruncation`).
+//
+// The same session-wide caveat below applies to these numbers too.
+
 const MAX_TOOL_CALLS_PER_RUN = 1000;
+// Compaction/truncation events are rare compared to tool calls, but the
+// arrays are still capped so a very long-running run can't grow the run
+// file without bound (mirrors MAX_TOOL_CALLS_PER_RUN for run.insights).
+const MAX_CONTEXT_EVENTS_PER_RUN = 100;
 
 const CATEGORY_RULES = [
     { category: "Shell", test: /powershell|bash|shell/i },
@@ -66,6 +89,212 @@ export function appendAgentUse(run, entry) {
     if (run.insights.length > MAX_TOOL_CALLS_PER_RUN) {
         run.insights.splice(0, run.insights.length - MAX_TOOL_CALLS_PER_RUN);
     }
+}
+
+const TOKEN_FIELDS = ["inputTokens", "outputTokens", "reasoningTokens", "cacheReadTokens", "cacheWriteTokens"];
+
+function emptyBucket() {
+    const bucket = { modelCalls: 0 };
+    for (const field of TOKEN_FIELDS) bucket[field] = 0;
+    return bucket;
+}
+
+function addToBucket(bucket, entry) {
+    bucket.modelCalls += 1;
+    for (const field of TOKEN_FIELDS) {
+        bucket[field] += Math.max(0, Number(entry[field]) || 0);
+    }
+}
+
+function normalizeBucket(bucket) {
+    const normalized = emptyBucket();
+    if (!bucket || typeof bucket !== "object") return normalized;
+    normalized.modelCalls = Math.max(0, Number(bucket.modelCalls) || 0);
+    for (const field of TOKEN_FIELDS) {
+        normalized[field] = Math.max(0, Number(bucket[field]) || 0);
+    }
+    return normalized;
+}
+
+function billableTokens(bucket) {
+    // Input + output are the tokens that actually consume the context window
+    // for the next call. Reasoning tokens are a subset of output tokens (they
+    // are reported separately by the provider) and cache read/write counts
+    // describe how the input was served, so neither is added again here —
+    // both are surfaced on their own instead.
+    return (Number(bucket.inputTokens) || 0) + (Number(bucket.outputTokens) || 0);
+}
+
+function uncachedTokens(bucket) {
+    // `inputTokens` counts the whole prompt, most of which is usually served
+    // from the prompt cache on later turns — which is why a stage total can
+    // legitimately exceed the model's context window. This is the "fresh"
+    // remainder: the tokens the stage actually pushed through the model on
+    // top of cache reads.
+    const input = Number(bucket.inputTokens) || 0;
+    const cached = Number(bucket.cacheReadTokens) || 0;
+    return Math.max(0, input - cached) + (Number(bucket.outputTokens) || 0);
+}
+
+// entry: { inputTokens, outputTokens, reasoningTokens, cacheReadTokens,
+//   cacheWriteTokens, model, isSubAgent, stageIndex, stageName }.
+//
+// Sub-agent rule: usage carrying an `agentId` (Task-tool / custom-agent work)
+// is folded into the parent stage total — the delegated work is still part of
+// what the stage cost — but is ALSO accumulated into a separate `subAgent`
+// subtotal at both run and stage level, so it stays visible that the cost came
+// from delegated work rather than the main conversation.
+export function recordTokenUsage(run, entry) {
+    if (!entry) return;
+    const usage = run.tokenUsage && typeof run.tokenUsage === "object" ? run.tokenUsage : {};
+    usage.total = normalizeBucket(usage.total);
+    usage.subAgent = normalizeBucket(usage.subAgent);
+    usage.byStage = usage.byStage && typeof usage.byStage === "object" ? usage.byStage : {};
+    usage.models = Array.isArray(usage.models) ? usage.models : [];
+
+    addToBucket(usage.total, entry);
+    if (entry.isSubAgent) addToBucket(usage.subAgent, entry);
+    if (entry.model && !usage.models.includes(entry.model)) usage.models.push(entry.model);
+
+    if (entry.stageIndex !== null && entry.stageIndex !== undefined) {
+        const key = String(entry.stageIndex);
+        const existing = usage.byStage[key] || {};
+        const stage = {
+            stageName: entry.stageName || existing.stageName || "",
+            total: normalizeBucket(existing.total),
+            subAgent: normalizeBucket(existing.subAgent),
+        };
+        addToBucket(stage.total, entry);
+        if (entry.isSubAgent) addToBucket(stage.subAgent, entry);
+        usage.byStage[key] = stage;
+    }
+    usage.updatedAt = new Date().toISOString();
+    run.tokenUsage = usage;
+}
+
+// sample: { currentTokens, tokenLimit, messagesLength, conversationTokens,
+//   systemTokens, toolDefinitionsTokens }. Only root-agent samples should be
+// passed in: a sub-agent runs its own separate context window, so mixing its
+// samples into the run gauge would make the "how close am I to compaction?"
+// signal jump around meaninglessly.
+export function recordContextSample(run, sample) {
+    if (!sample || !Number.isFinite(Number(sample.currentTokens))) return;
+    const ctx = run.context && typeof run.context === "object" ? run.context : {};
+    const currentTokens = Math.max(0, Number(sample.currentTokens));
+    ctx.currentTokens = currentTokens;
+    if (Number.isFinite(Number(sample.tokenLimit)) && Number(sample.tokenLimit) > 0) {
+        ctx.tokenLimit = Number(sample.tokenLimit);
+    }
+    for (const field of ["messagesLength", "conversationTokens", "systemTokens", "toolDefinitionsTokens"]) {
+        if (Number.isFinite(Number(sample[field]))) ctx[field] = Number(sample[field]);
+    }
+    ctx.peakTokens = Math.max(Number(ctx.peakTokens) || 0, currentTokens);
+    ctx.sampledAt = new Date().toISOString();
+    run.context = ctx;
+}
+
+function pushCapped(list, entry) {
+    list.push(entry);
+    if (list.length > MAX_CONTEXT_EVENTS_PER_RUN) {
+        list.splice(0, list.length - MAX_CONTEXT_EVENTS_PER_RUN);
+    }
+    return list;
+}
+
+// entry: { reason, currentTokens, tokenLimit, at }
+export function recordCompaction(run, entry) {
+    const ctx = run.context && typeof run.context === "object" ? run.context : {};
+    ctx.compactions = pushCapped(Array.isArray(ctx.compactions) ? ctx.compactions : [], {
+        reason: (entry && entry.reason) || "unknown",
+        currentTokens: Number.isFinite(Number(entry && entry.currentTokens)) ? Number(entry.currentTokens) : null,
+        at: (entry && entry.at) || new Date().toISOString(),
+    });
+    run.context = ctx;
+}
+
+// entry: { preTokens, postTokens, removedTokens, tokenLimit, at }
+export function recordTruncation(run, entry) {
+    const ctx = run.context && typeof run.context === "object" ? run.context : {};
+    ctx.truncations = pushCapped(Array.isArray(ctx.truncations) ? ctx.truncations : [], {
+        preTokens: Number.isFinite(Number(entry && entry.preTokens)) ? Number(entry.preTokens) : null,
+        postTokens: Number.isFinite(Number(entry && entry.postTokens)) ? Number(entry.postTokens) : null,
+        removedTokens: Number.isFinite(Number(entry && entry.removedTokens)) ? Number(entry.removedTokens) : null,
+        at: (entry && entry.at) || new Date().toISOString(),
+    });
+    run.context = ctx;
+}
+
+// Aggregates the context/token state recorded above into a shape the
+// dashboard and report can render directly. Runs created before context
+// tracking existed simply have no `context`/`tokenUsage` fields; this returns
+// `null` for them so every caller can omit the section entirely.
+export function summarizeContext(run) {
+    const ctx = run && run.context && typeof run.context === "object" ? run.context : null;
+    const usage = run && run.tokenUsage && typeof run.tokenUsage === "object" ? run.tokenUsage : null;
+    if (!ctx && !usage) return null;
+
+    let gauge = null;
+    if (ctx && Number.isFinite(Number(ctx.currentTokens))) {
+        const currentTokens = Number(ctx.currentTokens);
+        const tokenLimit = Number.isFinite(Number(ctx.tokenLimit)) && Number(ctx.tokenLimit) > 0 ? Number(ctx.tokenLimit) : null;
+        gauge = {
+            currentTokens,
+            tokenLimit,
+            percent: tokenLimit ? Math.min(100, Math.round((currentTokens / tokenLimit) * 100)) : null,
+            peakTokens: Number.isFinite(Number(ctx.peakTokens)) ? Number(ctx.peakTokens) : currentTokens,
+            peakPercent:
+                tokenLimit && Number.isFinite(Number(ctx.peakTokens))
+                    ? Math.min(100, Math.round((Number(ctx.peakTokens) / tokenLimit) * 100))
+                    : null,
+            systemTokens: Number.isFinite(Number(ctx.systemTokens)) ? Number(ctx.systemTokens) : null,
+            conversationTokens: Number.isFinite(Number(ctx.conversationTokens)) ? Number(ctx.conversationTokens) : null,
+            toolDefinitionsTokens: Number.isFinite(Number(ctx.toolDefinitionsTokens)) ? Number(ctx.toolDefinitionsTokens) : null,
+            messagesLength: Number.isFinite(Number(ctx.messagesLength)) ? Number(ctx.messagesLength) : null,
+            sampledAt: ctx.sampledAt || null,
+        };
+    }
+
+    const compactions = ctx && Array.isArray(ctx.compactions) ? ctx.compactions : [];
+    const truncations = ctx && Array.isArray(ctx.truncations) ? ctx.truncations : [];
+    const compactionReasons = {};
+    for (const c of compactions) {
+        const reason = c && c.reason ? c.reason : "unknown";
+        compactionReasons[reason] = (compactionReasons[reason] || 0) + 1;
+    }
+
+    const total = normalizeBucket(usage && usage.total);
+    const subAgent = normalizeBucket(usage && usage.subAgent);
+    const perStage = {};
+    const byStage = usage && usage.byStage && typeof usage.byStage === "object" ? usage.byStage : {};
+    for (const [key, value] of Object.entries(byStage)) {
+        const stageTotal = normalizeBucket(value && value.total);
+        const stageSubAgent = normalizeBucket(value && value.subAgent);
+        perStage[key] = {
+            stageName: (value && value.stageName) || "",
+            ...stageTotal,
+            tokens: billableTokens(stageTotal),
+            uncachedTokens: uncachedTokens(stageTotal),
+            subAgent: { ...stageSubAgent, tokens: billableTokens(stageSubAgent), uncachedTokens: uncachedTokens(stageSubAgent) },
+        };
+    }
+
+    const hasUsage = total.modelCalls > 0;
+    if (!gauge && !hasUsage && !compactions.length && !truncations.length) return null;
+
+    return {
+        gauge,
+        totals: hasUsage ? { ...total, tokens: billableTokens(total), uncachedTokens: uncachedTokens(total) } : null,
+        subAgentTotals:
+            hasUsage && subAgent.modelCalls > 0
+                ? { ...subAgent, tokens: billableTokens(subAgent), uncachedTokens: uncachedTokens(subAgent) }
+                : null,
+        perStage,
+        models: usage && Array.isArray(usage.models) ? usage.models.slice().sort() : [],
+        compactionCount: compactions.length,
+        compactionReasons,
+        truncationCount: truncations.length,
+        truncatedTokens: truncations.reduce((sum, t) => sum + (Number(t && t.removedTokens) || 0), 0),
+    };
 }
 
 function addToSet(map, key, value) {

@@ -2,7 +2,15 @@
 // `/api/runs/:id/report` download endpoint and reusable for any future
 // export format.
 
-import { summarizeInsights } from "./insight.mjs";
+import { summarizeInsights, summarizeContext } from "./insight.mjs";
+
+function fmtTokens(n) {
+    if (n === null || n === undefined || !Number.isFinite(Number(n))) return "n/a";
+    const value = Number(n);
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+    return String(Math.round(value));
+}
 
 function fmtDuration(ms) {
     if (ms === null || ms === undefined) return "n/a";
@@ -14,6 +22,7 @@ function fmtDuration(ms) {
 
 export function renderReportMarkdown(run) {
     const insight = summarizeInsights(run);
+    const context = summarizeContext(run);
     const lines = [];
     lines.push(`# ${run.title}`);
     lines.push("");
@@ -120,6 +129,64 @@ export function renderReportMarkdown(run) {
     if (insight.mcpServersUsed.length) lines.push(`- **MCP servers used:** ${insight.mcpServersUsed.join(", ")}`);
     if (insight.modelsUsed.length) lines.push(`- **Models used:** ${insight.modelsUsed.join(", ")}`);
     lines.push("");
+
+    // Context tracking is omitted entirely for runs recorded before it
+    // existed (summarizeContext returns null in that case).
+    if (context) {
+        lines.push("## Context");
+        lines.push("");
+        if (context.gauge) {
+            const g = context.gauge;
+            const pct = g.percent === null || g.percent === undefined ? "" : ` (${g.percent}%)`;
+            const limit = g.tokenLimit ? ` / ${fmtTokens(g.tokenLimit)}` : "";
+            lines.push(`- **Run-level context gauge:** ${fmtTokens(g.currentTokens)}${limit}${pct}`);
+            if (g.peakTokens) {
+                const peakPct = g.peakPercent === null || g.peakPercent === undefined ? "" : ` (${g.peakPercent}%)`;
+                lines.push(`- **Peak context:** ${fmtTokens(g.peakTokens)}${peakPct}`);
+            }
+            const breakdown = [];
+            if (g.systemTokens !== null) breakdown.push(`system ${fmtTokens(g.systemTokens)}`);
+            if (g.conversationTokens !== null) breakdown.push(`conversation ${fmtTokens(g.conversationTokens)}`);
+            if (g.toolDefinitionsTokens !== null) breakdown.push(`tool definitions ${fmtTokens(g.toolDefinitionsTokens)}`);
+            if (breakdown.length) lines.push(`- **Breakdown:** ${breakdown.join(", ")}`);
+        }
+        if (context.totals) {
+            lines.push(`- **Tokens consumed:** ${fmtTokens(context.totals.tokens)} over ${context.totals.modelCalls} model call${context.totals.modelCalls === 1 ? "" : "s"} (${fmtTokens(context.totals.uncachedTokens)} not served from the prompt cache)`);
+            if (context.totals.reasoningTokens) lines.push(`- **Reasoning tokens:** ${fmtTokens(context.totals.reasoningTokens)}`);
+            if (context.totals.cacheReadTokens || context.totals.cacheWriteTokens) {
+                lines.push(`- **Prompt cache:** ${fmtTokens(context.totals.cacheReadTokens)} read, ${fmtTokens(context.totals.cacheWriteTokens)} written`);
+            }
+            if (context.subAgentTotals) {
+                lines.push(`- **Delegated to sub-agents:** ${fmtTokens(context.subAgentTotals.tokens)} over ${context.subAgentTotals.modelCalls} model call${context.subAgentTotals.modelCalls === 1 ? "" : "s"}`);
+            }
+        }
+        if (context.compactionCount) {
+            const reasons = Object.entries(context.compactionReasons || {})
+                .map(([reason, count]) => `${reason} x${count}`)
+                .join(", ");
+            lines.push(`- **Compactions:** ${context.compactionCount}${reasons ? ` (${reasons})` : ""}`);
+        }
+        if (context.truncationCount) {
+            lines.push(`- **Truncations:** ${context.truncationCount} (${fmtTokens(context.truncatedTokens)} tokens removed)`);
+        }
+        lines.push("");
+
+        const stageRows = (run.stages || [])
+            .map((stage, i) => ({ stage, i, usage: context.perStage[String(i)] }))
+            .filter((row) => row.usage && row.usage.tokens);
+        if (stageRows.length) {
+            lines.push("**Per-stage token delta:**");
+            lines.push("");
+            lines.push("| # | Stage | Token delta | Uncached | Input | Output | Reasoning | Model calls | Sub-agent tokens |");
+            lines.push("| - | ----- | ----------- | -------- | ----- | ------ | --------- | ----------- | ---------------- |");
+            stageRows.forEach(({ stage, i, usage }) => {
+                lines.push(
+                    `| ${i + 1} | ${stage.name} | ${fmtTokens(usage.tokens)} | ${fmtTokens(usage.uncachedTokens)} | ${fmtTokens(usage.inputTokens)} | ${fmtTokens(usage.outputTokens)} | ${fmtTokens(usage.reasoningTokens)} | ${usage.modelCalls} | ${usage.subAgent && usage.subAgent.tokens ? fmtTokens(usage.subAgent.tokens) : "-"} |`
+                );
+            });
+            lines.push("");
+        }
+    }
 
     return lines.join("\n");
 }
