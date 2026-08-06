@@ -18,6 +18,10 @@ Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retr
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
+>
+> Model choice per stage follows `instructions/orch-model-selection.instructions.md`
+> (category defaults, overridable via `.github/copilot-model-selection.md` in the
+> consuming repo).
 
 ### Stage 1: Debt Context Retrieval
 - **Clarify the debt item** and affected scope

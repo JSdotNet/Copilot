@@ -1,6 +1,5 @@
 ---
 description: Copilot agent for managing the lifecycle of preferred Copilot CLI plugins.
-model: auto
 tools: ['read/readFile', 'vscode/askQuestions', 'vscode/openFile', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
 ---
 

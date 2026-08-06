@@ -1,6 +1,5 @@
 ---
 description: "QA Monitor Agent — continuously watches Aspire logs, traces, and metrics for a running app under test and reports anomalies. Focused, single-purpose persona invoked by the qa agent."
-model: GPT-5.3-Codex
 tools: ['read/readFile', 'search/codebase', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'terminal/runInTerminal']
 ---
 

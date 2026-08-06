@@ -1,6 +1,5 @@
 ---
 description: "QA Agent — runs Aspire-orchestrated apps, validates features end-to-end with Playwright MCP (screenshots/video evidence), and continuously monitors Aspire logs/traces during test execution."
-model: GPT-5.3-Codex
 tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal']
 ---
 
