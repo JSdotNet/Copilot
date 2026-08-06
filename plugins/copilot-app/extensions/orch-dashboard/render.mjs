@@ -340,11 +340,11 @@ export function renderShell() {
         const breakdown = [];
         if (g.systemTokens !== null && g.systemTokens !== undefined) breakdown.push('system ' + fmtTokens(g.systemTokens));
         if (g.conversationTokens !== null && g.conversationTokens !== undefined) breakdown.push('conversation ' + fmtTokens(g.conversationTokens));
-        if (g.toolDefinitionsTokens !== null && g.toolDefinitionsTokens !== undefined) breakdown.push('tool defs ' + fmtTokens(g.toolDefinitionsTokens));
+        if (g.toolDefinitionsTokens !== null && g.toolDefinitionsTokens !== undefined) breakdown.push('tool definitions ' + fmtTokens(g.toolDefinitionsTokens));
         if (g.messagesLength !== null && g.messagesLength !== undefined) breakdown.push(g.messagesLength + ' messages');
         parts.push(
           '<div class="ctx-gauge">' +
-            '<div class="bar-row"><span class="bar-label">Context window</span>' +
+            '<div class="bar-row"><span class="bar-label">Context gauge</span>' +
               '<div class="ctx-track"><div class="ctx-fill ' + cls + '" style="width:' + (pct === null ? 0 : pct) + '%"></div></div>' +
               '<span class="bar-value">' + esc(label) + '</span></div>' +
             (breakdown.length ? '<div class="ctx-meta">' + esc(breakdown.join(" · ")) + '</div>' : "") +
@@ -386,9 +386,10 @@ export function renderShell() {
       const sub = stage.subAgent && stage.subAgent.tokens
         ? ', ' + fmtTokens(stage.subAgent.tokens) + ' sub-agent'
         : "";
-      const title = 'Input + output tokens of model calls during this stage. ' +
-        'Input counts the whole prompt, most of which is normally served from the prompt cache.';
-      return '<div class="stage-used"><span class="tag tokens" title="' + esc(title) + '">Tokens: ' +
+      const title = 'Per-stage token delta: input + output tokens of model calls that ' +
+        'completed while this stage was in progress. Input counts the whole prompt, ' +
+        'most of which is normally served from the prompt cache.';
+      return '<div class="stage-used"><span class="tag tokens" title="' + esc(title) + '">Token delta: ' +
         esc(fmtTokens(stage.tokens) + ' (' + fmtTokens(stage.uncachedTokens) + ' uncached' + sub + ')') + '</span></div>';
     }
 

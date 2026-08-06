@@ -139,7 +139,7 @@ export function renderReportMarkdown(run) {
             const g = context.gauge;
             const pct = g.percent === null || g.percent === undefined ? "" : ` (${g.percent}%)`;
             const limit = g.tokenLimit ? ` / ${fmtTokens(g.tokenLimit)}` : "";
-            lines.push(`- **Context window:** ${fmtTokens(g.currentTokens)}${limit}${pct}`);
+            lines.push(`- **Run-level context gauge:** ${fmtTokens(g.currentTokens)}${limit}${pct}`);
             if (g.peakTokens) {
                 const peakPct = g.peakPercent === null || g.peakPercent === undefined ? "" : ` (${g.peakPercent}%)`;
                 lines.push(`- **Peak context:** ${fmtTokens(g.peakTokens)}${peakPct}`);
@@ -175,8 +175,10 @@ export function renderReportMarkdown(run) {
             .map((stage, i) => ({ stage, i, usage: context.perStage[String(i)] }))
             .filter((row) => row.usage && row.usage.tokens);
         if (stageRows.length) {
-            lines.push("| # | Stage | Tokens | Uncached | Input | Output | Reasoning | Model calls | Sub-agent tokens |");
-            lines.push("| - | ----- | ------ | -------- | ----- | ------ | --------- | ----------- | ---------------- |");
+            lines.push("**Per-stage token delta:**");
+            lines.push("");
+            lines.push("| # | Stage | Token delta | Uncached | Input | Output | Reasoning | Model calls | Sub-agent tokens |");
+            lines.push("| - | ----- | ----------- | -------- | ----- | ------ | --------- | ----------- | ---------------- |");
             stageRows.forEach(({ stage, i, usage }) => {
                 lines.push(
                     `| ${i + 1} | ${stage.name} | ${fmtTokens(usage.tokens)} | ${fmtTokens(usage.uncachedTokens)} | ${fmtTokens(usage.inputTokens)} | ${fmtTokens(usage.outputTokens)} | ${fmtTokens(usage.reasoningTokens)} | ${usage.modelCalls} | ${usage.subAgent && usage.subAgent.tokens ? fmtTokens(usage.subAgent.tokens) : "-"} |`
