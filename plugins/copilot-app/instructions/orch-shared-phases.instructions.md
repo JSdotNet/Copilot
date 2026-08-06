@@ -30,6 +30,9 @@ description: Defines the reusable delivery and validation phases shared by all o
   - **QA Validation** → `skills/phase-qa-validation/SKILL.md`.
 - Personal Validation, Create Pull Request, and Summary stay defined in this file (short,
   linear phases where a separate skill would only add indirection).
+- Model choice for every phase (and every skill-specific stage) is resolved once, centrally,
+  from `instructions/orch-model-selection.instructions.md` — do not describe model choice
+  here or in individual skills.
 
 ## Agent Transition Rule (Shared)
 
@@ -64,6 +67,7 @@ rather than re-describing the steps.
 
 **Agents:** `csharp-coding:coding`, `development:testing` (recommended); performed manually
 when those plugins are not installed.
+**Model Category:** Implementation & Coding (see `orch-model-selection.instructions.md`).
 
 ## Phase: QA Validation
 
@@ -92,6 +96,7 @@ invokes it and passes the change kind so depth is selected automatically:
 **Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`,
 `csharp-coding:coding`, `review:reviewer` running validation manually when the `qa` plugin
 isn't installed.
+**Model Category:** Testing, QA & Monitoring (see `orch-model-selection.instructions.md`).
 
 ## Phase: Personal Validation
 
@@ -123,6 +128,7 @@ Applies to every orchestration.
 
 **Agents:** `review:reviewer`
 **Skills Used:** `pr-jsdotnet`
+**Model Category:** Review (see `orch-model-selection.instructions.md`).
 
 ## Phase: Summary
 
@@ -133,6 +139,7 @@ Applies to every orchestration.
   one.
 
 **Agents:** `review:reviewer`
+**Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
 
 ## Dashboard Reporting Contract (Shared)
 
@@ -178,3 +185,5 @@ contract, and `instructions/canvas-usage.instructions.md` for when to also open 
 - [ ] QA Validation depth matches the change kind (functional/bug vs. startup-only vs.
       skipped).
 - [ ] Personal Validation waits for the user and uses no agent.
+- [ ] Model choice per phase follows `instructions/orch-model-selection.instructions.md`
+      and is never hardcoded in a skill or phase.

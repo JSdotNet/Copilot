@@ -17,42 +17,63 @@ The shared phases and their definitions live in
 `plugins/copilot-app/instructions/orch-shared-phases.instructions.md`. This agent executes
 them; the phase content is maintained there and in the phase skills.
 
+This agent also owns **model selection for every step of the run**. The categories,
+default models, and the repo-override mechanism are defined once in
+`plugins/copilot-app/instructions/orch-model-selection.instructions.md`; this agent applies
+that resolution, it does not re-decide model choice per skill.
+
 ## Expected Behavior
 
 1. **Resolve the orchestration.** Read the invoked `orch-*/SKILL.md`, run its skill-specific
    stages in order, and determine its tier (code-modifying vs. documentation/config).
-2. **Open the dashboard once.** Open the `orch-dashboard` canvas and call `start_run` with
+2. **Resolve model selection once per run.** Before `start_run`, check for a repo override at
+   `.github/copilot-model-selection.md`. Combine it with the category defaults from
+   `orch-model-selection.instructions.md` to build the run's category → model mapping,
+   following that file's Resolution Order (repo override → pinned agent model → category
+   default → `auto`).
+3. **Open the dashboard once.** Open the `orch-dashboard` canvas and call `start_run` with
    the skill's `skillId` and the full ordered stage list (unique stages + shared phases for
    its tier). Follow the shared **Dashboard Reporting Contract** for every stage transition.
    Skip canvas calls gracefully when the extension is not installed.
-3. **Run the shared phases in order** for the tier:
+4. **Apply the resolved model at every stage transition.** When creating a session, spawning
+   a task, or starting a child/background session (for example the parallel `qa:qa-monitor`
+   session) for a stage, pass the model resolved for that stage's category. Skip an explicit
+   override when handing off in-session to a pinned custom agent, unless a repo override
+   applies.
+5. **Run the shared phases in order** for the tier:
    - **Code-modifying:** `phase-build-test` → `phase-qa-validation` → Personal Validation →
      Create Pull Request → Summary.
    - **Documentation/config:** Personal Validation → Create Pull Request → Summary.
-4. **Invoke phase skills for the heavy phases.** Use the `phase-build-test` and
+6. **Invoke phase skills for the heavy phases.** Use the `phase-build-test` and
    `phase-qa-validation` skills rather than re-describing build/test/QA logic. Pass the
    change kind (functional / bug fix / dependency update / none) so QA depth is selected
    automatically.
-5. **Enforce Build & Test first.** Never start QA Validation or Personal Validation on a red
+7. **Enforce Build & Test first.** Never start QA Validation or Personal Validation on a red
    build or failing tests. Mark the failing stage `blocked`, report, and stop for fixes.
-6. **Enforce the Personal Validation gate.** Personal Validation uses **no agent**: hand
-   control back to the user, present the code review and the recorded QA review, start the
-   application for code changes, and wait for explicit user approval. Never auto-approve.
-7. **Gate the pull request.** Create a pull request only after explicit approval recorded in
+8. **Enforce the Personal Validation gate.** Personal Validation uses **no agent and no
+   model**: hand control back to the user, present the code review and the recorded QA
+   review, start the application for code changes, and wait for explicit user approval.
+   Never auto-approve.
+9. **Gate the pull request.** Create a pull request only after explicit approval recorded in
    Personal Validation; mark Create Pull Request `skipped` when there is no change set.
-8. **Track the run durably.** Maintain per-run progress (stage, status, evidence) so a run
-   can be reported or resumed, and reconcile it with the dashboard state.
-9. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
+10. **Track the run durably.** Maintain per-run progress (stage, status, evidence, and the
+    resolved model) so a run can be reported or resumed, and reconcile it with the dashboard
+    state.
+11. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
 
 ## Constraints and Priorities
 
 - **Single source of truth:** never copy phase prose into this agent or into `orch-*`
   skills; edit `orch-shared-phases.instructions.md` or the phase skills to change behavior.
+  Likewise, never hardcode a per-stage model in this agent or in `orch-*` skills; edit
+  `orch-model-selection.instructions.md` to change category defaults.
 - **Approval before every agent transition** and before every pull request.
 - **Cross-plugin agents are recommended, not required** — skip or perform a stage manually
   when a referenced plugin is not installed, and continue with the remaining stages.
 - **No pull request** unless the user has explicitly approved it in Personal Validation.
 - Prefer the `JSdotNet` account for GitHub CLI/API operations per repository policy.
+- **Repo overrides always win.** A `.github/copilot-model-selection.md` entry overrides both
+  the category default and a target agent's pinned model.
 
 ## Example Usage
 
@@ -63,6 +84,7 @@ them; the phase content is maintained there and in the phase skills.
 ## References
 
 - `plugins/copilot-app/instructions/orch-shared-phases.instructions.md`
+- `plugins/copilot-app/instructions/orch-model-selection.instructions.md`
 - `plugins/copilot-app/skills/phase-build-test/SKILL.md`
 - `plugins/copilot-app/skills/phase-qa-validation/SKILL.md`
 - `plugins/copilot-app/instructions/canvas-usage.instructions.md`
