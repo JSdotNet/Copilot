@@ -1,6 +1,5 @@
 ---
 description: Authoring specialist for creating and refining GitHub customization assets with the plugin create-* skills.
-model: GPT-5.3-Codex
 tools: ['read/readFile', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'vscode/memory', 'agent', 'vscode/askQuestions', 'terminal/runInTerminal', 'extensions_manage', 'extensions_reload']
 agents: ['Explore']
 ---

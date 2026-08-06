@@ -1,6 +1,6 @@
 ---
 name: phase-qa-validation
-description: 'Shared QA Validation phase for code-modifying orch-* orchestrations. Runs after Build & Test; depth is driven by change kind (functional/bug fix = full Playwright QA with monitoring, dependency update = startup-only, otherwise skipped). Invoked by the orchestrator agent.'
+description: 'Shared QA Validation phase for code-modifying orch-* orchestrations. Runs after Build & Test; depth is driven by change kind (new functionality = Playwright QA with capture, bug/existing-flow change = targeted verification, dependency update = startup-only, otherwise skipped). Invoked by the orchestrator agent.'
 ---
 
 # Phase: QA Validation
@@ -16,21 +16,28 @@ automatically from the kind of change so callers do not re-describe QA rules.
 
 ## Depth Selection (Automatic)
 
-- **Functional change or bug fix → full QA validation:**
-  1. **Run the application locally** via the `qa:qa` agent's `aspire-run` skill.
-  2. **Execute the changed/affected scenarios with Playwright** — `qa:qa` drives each
-     scenario (for a bug fix, the original reproduction steps plus the regression
-     scenario), capturing screenshot/video evidence per checkpoint and failure.
+- **New functionality → QA validation with capture:**
+  1. **Run the application locally** via the `qa:qa` agent using the `aspire` /
+     `aspire-run` skill.
+  2. **Execute the changed/affected scenarios with Playwright** — via the `playwright` MCP
+    server, `qa:qa` drives each scenario, capturing screenshot/video evidence per
+    checkpoint and failure.
   3. **Monitor runtime behavior continuously** — `qa:qa-monitor` watches Aspire logs,
-     traces, and metrics. Inside the GitHub Copilot App, run `qa-monitor` in a parallel
-     child session (`create_session` + cross-session messaging) so monitoring runs
-     concurrently with Playwright validation; otherwise use the `qa` plugin's
-     `delegate-to-qa-monitor` skill for a same-session handoff.
+    traces, and metrics. Inside the GitHub Copilot App, run `qa-monitor` in a parallel
+    child session (`create_session` + cross-session messaging) so monitoring runs
+    concurrently with Playwright validation; otherwise use the `qa` plugin's
+    `delegate-to-qa-monitor` skill for a same-session handoff.
   4. **Record the QA result** with pass/fail per scenario and the captured evidence.
+- **Bug fix or change to existing functionality → targeted QA validation without required capture:**
+  1. **Run the application locally** via the `aspire` / `aspire-run` skill and verify the
+     affected scenarios.
+  2. **Use Playwright when it helps validate the flow**, but capture screenshot/video
+    evidence only when explicitly requested or when a failure needs supporting evidence.
+  3. **Record pass/fail and monitoring findings** for the affected scenarios.
 - **Dependency, package, framework, or SDK update with no functional change → startup-only
   validation:** start the application, confirm the dashboard/health endpoints report
-  healthy, and confirm the logs show no new errors. Full functional Playwright scenarios are
-  not required unless the update changes user-facing behavior.
+  healthy, and confirm the logs show no new errors. Full functional Playwright scenarios and
+  capture are not required unless the update introduces new user-facing behavior.
 - **No functional change and nothing to run → skip:** mark this phase `skipped` and record
   why.
 
@@ -42,7 +49,7 @@ automatically from the kind of change so callers do not re-describe QA rules.
 
 ## Outputs
 
-- QA result: per-scenario pass/fail with Playwright evidence paths (full mode), or the
+- QA result: per-scenario pass/fail with optional Playwright evidence paths, or the
   startup/health outcome (startup-only mode), or a skip reason.
 - Monitoring findings (Aspire log/trace/metric anomalies) when monitoring ran.
 - These outputs feed the shared Personal Validation phase (the recorded QA review the user
@@ -57,9 +64,19 @@ automatically from the kind of change so callers do not re-describe QA rules.
 
 ## Agents
 
-- `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`,
-  `csharp-coding:coding`, `review:reviewer` running validation manually when the `qa`
-  plugin is not installed. Agent transitions require explicit user approval.
+- `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`
+  running validation manually when the `qa` plugin is not installed. Agent transitions
+  require explicit user approval.
+
+## Skills Used
+
+- `aspire`, `aspire-run`
+
+## MCP Servers
+
+- `playwright` for browser automation and smoke/E2E execution when QA runs browser-facing
+  scenarios; evidence capture is required only for new functionality unless explicitly
+  requested.
 
 ## Reference
 

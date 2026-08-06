@@ -1,6 +1,6 @@
 ---
 name: orch-arc42
-description: 'Orchestrate arc42 architecture documentation with GitHub Copilot App canvas. Uses the architecture:architect agent for section drafting and `jsdotnet-project-guidelines-mcpserver` for guideline and ADR grounding before governed asset changes.'
+description: 'Orchestrate arc42 architecture documentation with GitHub Copilot App canvas. Uses the architecture:architect agent for section drafting and `jsdotnet-guidelines-mcpserver` for guideline and ADR grounding before governed asset changes.'
 ---
 
 # Orchestrate arc42 Documentation
@@ -19,15 +19,19 @@ Execute an arc42 documentation workflow in GitHub Copilot App canvas while keepi
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
+>
+> Model choice per stage follows `instructions/orch-model-selection.instructions.md`
+> (category defaults, overridable via `.github/copilot-model-selection.md` in the
+> consuming repo).
 
 ### Stage 1: Context & Guideline Retrieval
 - **Clarify target sections** and documentation goals
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations and ADRs
+- **Query `jsdotnet-guidelines-mcpserver`** for standards, relevant guidance, ADR context, and governed asset constraints
 - **Collect repository-specific constraints** for governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Servers:** `jsdotnet-guidelines-mcpserver`
 
 ### Stage 2: Section Drafting
 - **Load arc42 global instructions** and target section instructions
@@ -43,7 +47,7 @@ Execute an arc42 documentation workflow in GitHub Copilot App canvas while keepi
 - **Highlight gaps** between current documentation and retrieved guidance
 - **Prepare a review-ready update set** for the requested sections
 
-**Agents:** `architecture:architect`, `review:reviewer`
+**Agents:** `architecture:architect`
 
 ### Final Phases (Shared)
 

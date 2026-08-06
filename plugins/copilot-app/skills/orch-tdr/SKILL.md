@@ -1,6 +1,6 @@
 ---
 name: orch-tdr
-description: 'Orchestrate technical debt record creation in GitHub Copilot App canvas. Uses the architecture:architect agent for debt documentation and `jsdotnet-project-guidelines-mcpserver` to ground the record in project guidance and related decisions.'
+description: 'Orchestrate technical debt record creation in GitHub Copilot App canvas. Uses the architecture:architect agent for debt documentation plus `jsdotnet-guidelines-mcpserver` to ground the record in project guidance and related decisions.'
 ---
 
 # Orchestrate Technical Debt Record
@@ -18,15 +18,20 @@ Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retr
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
+>
+> Model choice per stage follows `instructions/orch-model-selection.instructions.md`
+> (category defaults, overridable via `.github/copilot-model-selection.md` in the
+> consuming repo).
 
 ### Stage 1: Debt Context Retrieval
 - **Clarify the debt item** and affected scope
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations, ADRs, and constraints
+- **Query `jsdotnet-guidelines-mcpserver`** for standards, relevant guidance, ADR context,
+  and governed asset constraints
 - **Capture remediation boundaries** for governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Servers:** `jsdotnet-guidelines-mcpserver`
 
 ### Stage 2: TDR Drafting
 - **Describe the debt origin** and current impact
@@ -42,7 +47,7 @@ Execute a TDR workflow in GitHub Copilot App canvas with MCP-guided context retr
 - **Identify related ADR, blueprint, or arc42 follow-up**
 - **Prepare a review-ready TDR** with an actionable remediation path
 
-**Agents:** `architecture:architect`, `review:reviewer`
+**Agents:** `architecture:architect`
 
 ### Final Phases (Shared)
 

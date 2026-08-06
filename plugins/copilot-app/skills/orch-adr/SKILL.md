@@ -1,6 +1,6 @@
 ---
 name: orch-adr
-description: 'Orchestrate ADR creation in GitHub Copilot App canvas. Uses the architecture:architect agent for decision documentation and `jsdotnet-project-guidelines-mcpserver` to retrieve relevant project guidance and existing ADR context first.'
+description: 'Orchestrate ADR creation in GitHub Copilot App canvas. Uses the architecture:architect agent for decision documentation plus `jsdotnet-guidelines-mcpserver` to retrieve relevant project guidance and existing ADR context first.'
 ---
 
 # Orchestrate Architectural Decision Record
@@ -18,15 +18,19 @@ Execute an ADR workflow in GitHub Copilot App canvas with upfront MCP-based guid
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
+>
+> Model choice per stage follows `instructions/orch-model-selection.instructions.md`
+> (category defaults, overridable via `.github/copilot-model-selection.md` in the
+> consuming repo).
 
 ### Stage 1: Decision Context Retrieval
 - **Clarify the decision statement** and affected scope
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations and existing ADRs
+- **Query `jsdotnet-guidelines-mcpserver`** for standards, relevant guidance, governed asset constraints, and existing decision context
 - **Capture constraints and decision drivers** that govern the requested change
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Servers:** `jsdotnet-guidelines-mcpserver`
 
 ### Stage 2: ADR Drafting
 - **Document context** and competing alternatives
@@ -42,7 +46,7 @@ Execute an ADR workflow in GitHub Copilot App canvas with upfront MCP-based guid
 - **Identify dependent blueprint, arc42, or TDR updates**
 - **Prepare a review-ready ADR** with explicit follow-up actions
 
-**Agents:** `architecture:architect`, `review:reviewer`
+**Agents:** `architecture:architect`
 
 ### Final Phases (Shared)
 

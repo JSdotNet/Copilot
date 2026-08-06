@@ -1,6 +1,6 @@
 ---
 name: orch-architecture
-description: 'Orchestrate general architecture work in GitHub Copilot App canvas. Uses the architecture:architect agent directly and `jsdotnet-project-guidelines-mcpserver` for guideline and ADR retrieval before governed asset changes.'
+description: 'Orchestrate general architecture work in GitHub Copilot App canvas. Uses the architecture:architect agent directly plus `jsdotnet-guidelines-mcpserver` for governed asset guidance before edits.'
 ---
 
 # Orchestrate Architecture Work
@@ -18,15 +18,19 @@ Execute a general architecture workflow in GitHub Copilot App canvas for request
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
+>
+> Model choice per stage follows `instructions/orch-model-selection.instructions.md`
+> (category defaults, overridable via `.github/copilot-model-selection.md` in the
+> consuming repo).
 
 ### Stage 1: Goal & Guideline Retrieval
 - **Clarify the architecture objective** and expected output
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations and ADRs
+- **Query `jsdotnet-guidelines-mcpserver`** for standards, relevant guidance, and governed asset constraints
 - **Capture repository constraints** that affect governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Servers:** `jsdotnet-guidelines-mcpserver`
 
 ### Stage 2: Architecture Investigation
 - **Inspect the current repository context** and affected architecture surfaces
@@ -41,7 +45,7 @@ Execute a general architecture workflow in GitHub Copilot App canvas for request
 - **Check internal consistency** across scope, constraints, risks, and traceability
 - **Prepare a review-ready result** with explicit follow-up actions when needed
 
-**Agents:** `architecture:architect`, `review:reviewer`
+**Agents:** `architecture:architect`
 
 ### Final Phases (Shared)
 
@@ -64,7 +68,7 @@ Invoke: orch-architecture
 - Goal: evaluate and document the architecture impact of a plugin boundary change
 - Scope: "architecture and copilot-app plugins"
 - Output: proposal with risks, trade-offs, and recommended follow-up artifacts
-- Use `jsdotnet-project-guidelines-mcpserver` before governed asset edits
+- Use `jsdotnet-guidelines-mcpserver` before governed asset edits
 ```
 
 ## Output Expectations

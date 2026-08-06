@@ -1,6 +1,6 @@
 ---
 name: orch-blueprint
-description: 'Orchestrate architecture blueprint creation or refresh in GitHub Copilot App canvas. Uses the architecture:architect agent for blueprint work and `jsdotnet-project-guidelines-mcpserver` to ground governed asset changes in project guidance.'
+description: 'Orchestrate architecture blueprint creation or refresh in GitHub Copilot App canvas. Uses the architecture:architect agent for blueprint work and `jsdotnet-guidelines-mcpserver` to ground governed asset changes in project guidance.'
 ---
 
 # Orchestrate Architecture Blueprint
@@ -19,15 +19,19 @@ Execute a blueprint workflow in GitHub Copilot App canvas with MCP-guided contex
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
 > not required, and every transition needs explicit user approval.
+>
+> Model choice per stage follows `instructions/orch-model-selection.instructions.md`
+> (category defaults, overridable via `.github/copilot-model-selection.md` in the
+> consuming repo).
 
 ### Stage 1: Scope & Guideline Retrieval
 - **Define blueprint scope** and target audience
-- **Query `jsdotnet-project-guidelines-mcpserver`** for relevant recommendations and ADRs
+- **Query `jsdotnet-guidelines-mcpserver`** for standards, relevant guidance, ADR context, and governed asset constraints
 - **Capture repository constraints** that affect governed plugin or guidance assets
 - **Stop for MCP setup** if the required guideline tools are unavailable
 
 **Agents:** `architecture:architect`
-**MCP Server:** `jsdotnet-project-guidelines-mcpserver`
+**MCP Servers:** `jsdotnet-guidelines-mcpserver`
 
 ### Stage 2: Blueprint Drafting
 - **Identify system boundaries** and major components
@@ -43,7 +47,7 @@ Execute a blueprint workflow in GitHub Copilot App canvas with MCP-guided contex
 - **Highlight missing decisions** that should become ADRs or TDRs
 - **Prepare a review-ready blueprint** with explicit follow-up items
 
-**Agents:** `architecture:architect`, `review:reviewer`
+**Agents:** `architecture:architect`
 
 ### Final Phases (Shared)
 

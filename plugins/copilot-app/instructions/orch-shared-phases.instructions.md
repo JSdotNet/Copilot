@@ -30,6 +30,9 @@ description: Defines the reusable delivery and validation phases shared by all o
   - **QA Validation** → `skills/phase-qa-validation/SKILL.md`.
 - Personal Validation, Create Pull Request, and Summary stay defined in this file (short,
   linear phases where a separate skill would only add indirection).
+- Model choice for every phase (and every skill-specific stage) is resolved once, centrally,
+  from `instructions/orch-model-selection.instructions.md` — do not describe model choice
+  here or in individual skills.
 
 ## Agent Transition Rule (Shared)
 
@@ -37,6 +40,40 @@ description: Defines the reusable delivery and validation phases shared by all o
   installed, skip the stage or perform it manually and continue with the remaining
   stages.
 - All agent transitions require explicit user approval before switching.
+
+## Code-Modifying Orchestration Preconditions
+
+- `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`,
+  `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, and
+  `orch-project` are **implementation-focused** orchestrations.
+- These skills assume the requested change already has enough approved context to build
+  from: specification, acceptance criteria, architecture decisions, or equivalent
+  implementation notes.
+- Treat documentation and specification orchestrations — `orch-architecture`,
+  `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, and future spec-update
+  workflows — as the upstream source of that context.
+- Code-modifying orchestrations may review and align to those inputs, but they should not
+  restart broad requirements discovery or architecture definition from scratch.
+- If the required implementation context is missing or unapproved, stop and ask the user
+  to provide it or run the appropriate documentation/specification orchestration first.
+
+## MCP Server Strategy (Shared)
+
+- Use `jsdotnet-guidelines-mcpserver` for repository standards, governed asset
+  constraints, template conventions, and Copilot instruction guidance.
+- Use `jsdotnet-design-mcpserver` only for UX-specific design work such as wireframes,
+  user flows, and design artifacts. Do not use it for the architecture, ADR, TDR, or
+  general implementation phases documented in the current `orch-*` skills unless a flow
+  explicitly adds UX design work.
+- Use `microsoft-learn` during implementation-focused phases when official
+  Microsoft/.NET/Azure/Aspire documentation or code samples are needed. Prefer targeted
+  lookups tied to the stack being changed; do not turn implementation phases back into
+  broad research passes.
+- Use `playwright` in QA Validation when browser-based scenarios or visual evidence are
+  required. Skip it when the validation mode is startup-only or the change has no browser
+  surface.
+- Prefer the narrowest server that matches the phase. Do not query all four servers by
+  default.
 
 ## Phase Tiers
 
@@ -62,8 +99,12 @@ rather than re-describing the steps.
 - **Stop and fix** before continuing when build, unit, or E2E tests fail — do not proceed
   to QA Validation or Personal Validation on a red build.
 
-**Agents:** `csharp-coding:coding`, `development:testing` (recommended); performed manually
-when those plugins are not installed.
+**Agents:** `csharp-coding:coding` (recommended); performed manually when that plugin is not
+installed.
+
+**MCP Servers:** `microsoft-learn` *(optional, targeted official lookup only)*
+
+**Model Category:** Implementation & Coding (see `orch-model-selection.instructions.md`).
 
 ## Phase: QA Validation
 
@@ -71,27 +112,40 @@ Applies to code-modifying orchestrations. Runs after Build & Test. Packaged as t
 `phase-qa-validation` skill (`skills/phase-qa-validation/SKILL.md`); the orchestrator
 invokes it and passes the change kind so depth is selected automatically:
 
-- **Functional change or bug fix** → run automatic QA validation:
-  - **Run the application locally** via the `qa:qa` agent's `aspire-run` skill.
-  - **Execute the changed/affected scenarios with Playwright** — `qa:qa` drives each
-    scenario (for a bug fix, the original reproduction steps plus the regression
-    scenario), capturing screenshot/video evidence per checkpoint and failure.
+- **New functionality** → run automatic QA validation with capture:
+  - **Run the application locally** via the `qa:qa` agent using the `aspire` /
+    `aspire-run` skill.
+  - **Execute the changed/affected scenarios with Playwright** — via the `playwright` MCP
+    server, `qa:qa` drives each scenario, capturing screenshot/video evidence per
+    checkpoint and failure.
   - **Monitor runtime behavior continuously** — `qa:qa-monitor` watches Aspire logs,
     traces, and metrics. Inside the GitHub Copilot App, run `qa-monitor` in a parallel
     child session (`create_session` + cross-session messaging) so monitoring runs
     concurrently with Playwright validation; otherwise use the `qa` plugin's
     `delegate-to-qa-monitor` skill for a same-session handoff.
   - **Record the QA result** with pass/fail per scenario and the captured evidence.
+- **Bug fix or change to existing functionality** → run targeted QA validation without
+  required capture:
+  - **Run the application locally** via the `aspire` / `aspire-run` skill and exercise the
+    affected scenarios.
+  - **Use Playwright when it helps reproduce or verify the flow**, but only capture
+    screenshot/video evidence when the user asks for it or when a failure needs evidence.
+  - **Record pass/fail and monitoring findings** for the affected scenarios.
 - **Dependency, package, framework, or SDK update with no functional change** (for example
   `orch-update-packages`) → reduce QA to a **startup-without-errors validation**: start the
   application, confirm the dashboard/health endpoints report healthy, and confirm the logs
-  show no new errors. Full functional Playwright scenarios are not required unless the
-  update changes user-facing behavior.
+  show no new errors. Full functional Playwright scenarios and capture are not required
+  unless the update introduces new user-facing behavior.
 - **No functional change and nothing to run** → mark this phase `skipped` and record why.
 
-**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to `development:testing`,
-`csharp-coding:coding`, `review:reviewer` running validation manually when the `qa` plugin
-isn't installed.
+**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to
+`csharp-coding:coding` running validation manually when the `qa` plugin isn't installed.
+
+**MCP Servers:** `playwright` *(when browser-based validation is needed; capture is required only for new functionality unless explicitly requested)*
+
+**Skills Used:** `aspire`, `aspire-run`
+
+**Model Category:** Testing, QA & Monitoring (see `orch-model-selection.instructions.md`).
 
 ## Phase: Personal Validation
 
@@ -101,8 +155,8 @@ back to the user and waits for them.
 - **Do not delegate to an agent and do not auto-approve.** Pause and wait for the user's
   explicit decision.
 - **Present the code review** of the change set for the user to read.
-- **Present the recorded QA review** from the QA agent (scenarios, pass/fail, evidence,
-  and monitoring findings) when QA Validation ran.
+- **Present the recorded QA review** from the QA agent (scenarios, pass/fail, monitoring
+  findings, and any captured evidence when applicable) when QA Validation ran.
 - **Start the application for the user** when the run produced a code change, so they can
   review the running result themselves before deciding.
 - **Wait for explicit user approval** before any pull request is created, and fold
@@ -119,10 +173,12 @@ Applies to every orchestration.
 - **Apply any PR-time improvements** (final polish, labels, changelog) as part of this
   phase.
 - **Skip this phase** (mark it `skipped`) when the run produces no change set to submit.
-- **Prefer the `JSdotNet` account** for GitHub CLI/API operations per repository policy.
 
-**Agents:** `review:reviewer`
-**Skills Used:** `pr-jsdotnet`
+**Agents:** *(default)*
+
+**Model Category:** Review (see `orch-model-selection.instructions.md`). No dedicated agent
+runs this phase by default, so the orchestrator performs it directly under the category's
+resolved model.
 
 ## Phase: Summary
 
@@ -132,7 +188,11 @@ Applies to every orchestration.
 - **Emit the run summary** once the pull request is created, or the run concludes without
   one.
 
-**Agents:** `review:reviewer`
+**Agents:** `orchestrator` agent
+
+**Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
+No dedicated agent runs this phase; the orchestrator summarizes directly under the
+category's resolved model.
 
 ## Dashboard Reporting Contract (Shared)
 
@@ -147,10 +207,10 @@ skip the canvas calls and continue through standard chat interaction.
 - **After each stage**, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary.
 - **For the QA Validation phase**, also pass `scenarios` (one entry per tested scenario
-  with `status: "pass"|"fail"|"flaky"`, `notes`, and Playwright screenshot/recording
-  `evidence` paths) and `monitoring` (the Aspire log/trace summary and any
-  Error/Critical/Warning findings) so the dashboard renders QA results with evidence
-  inline.
+  with `status: "pass"|"fail"|"flaky"`, `notes`, and optional Playwright
+  screenshot/recording `evidence` paths) and `monitoring` (the Aspire log/trace summary
+  and any Error/Critical/Warning findings) so the dashboard renders QA results with
+  evidence inline when it exists.
 - **Keep Personal Validation and Create Pull Request as separate stages**: gate Create
   Pull Request on explicit user approval recorded in Personal Validation (mark it
   `skipped` when there is no change set to submit), and record all PR-time changes under
@@ -175,6 +235,8 @@ contract, and `instructions/canvas-usage.instructions.md` for when to also open 
 - [ ] Each skill names its shared phases and links to this file.
 - [ ] Build & Test runs before QA Validation and Personal Validation for code-modifying
       skills.
-- [ ] QA Validation depth matches the change kind (functional/bug vs. startup-only vs.
-      skipped).
+- [ ] QA Validation depth matches the change kind (new functionality vs. bug/existing-flow
+      verification vs. startup-only vs. skipped).
 - [ ] Personal Validation waits for the user and uses no agent.
+- [ ] Model choice per phase follows `instructions/orch-model-selection.instructions.md`
+      and is never hardcoded in a skill or phase.
