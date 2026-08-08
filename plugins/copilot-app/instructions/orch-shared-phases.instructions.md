@@ -270,6 +270,17 @@ pointless commit.
   per-chapter format), then **commit and push onto the existing pull request branch** so the open
   PR is updated in place — a doc change that stays uncommitted is a bug. Record what changed in the
   stage `output`, and reflect it in the PR body when it helps the reviewer.
+- **Never rewrite the PR branch history.** Add a **new commit** only. By the time this phase runs
+  the pull request is open and a reviewer may already be reading it, so this phase must never
+  amend, rebase, squash, or force-push the branch — doing so silently detaches existing review
+  comments and changes code under someone mid-review.
+- **Fail loudly if the commit or push is rejected.** A rejected push is expected in practice when
+  the branch has moved (a reviewer pushed a suggestion or a maintainer updated the branch). On a
+  failed commit or push, **mark this stage `blocked` (never `done`) with the actual error surfaced
+  in the `output`** — marking it `done` would let the user believe the documentation shipped when
+  it did not, the exact silent drift this phase exists to prevent. Recovery: pull/rebase the
+  **local** work onto the updated remote branch and retry the push once (this rebases your own
+  unpushed doc commit, not the PR branch's published history); if it still fails, stop and report.
 - **When nothing is stale**, mark this phase `done` with an `output` naming what was checked and why
   no change was needed. **Do not create a commit.**
 
@@ -330,9 +341,11 @@ skip the canvas calls and continue through standard chat interaction.
   validation.
 - **For the Documentation Update phase** (code-modifying tier only), run it after Create
   Pull Request: mark it `in_progress`, then `done` with an `output` naming the governed docs
-  updated and the commit pushed onto the existing PR branch, or `done` describing what was
+  updated and the new commit pushed onto the existing PR branch, or `done` describing what was
   checked when no update was needed, or `skipped` when Create Pull Request was skipped. It
-  never creates a commit when no documentation is stale.
+  adds a new commit only — never amend, rebase, squash, or force-push the PR branch — and it
+  never creates a commit when no documentation is stale. If the commit or push is rejected,
+  mark the stage `blocked` with the actual error in the `output`, never `done`.
 - **Mark the Summary stage** `in_progress` then `done`, and call `finish_run` with the
   final status and summary once the pull request is created (or the run concludes without
   one).
