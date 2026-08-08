@@ -57,6 +57,18 @@ description: Defines the reusable delivery and validation phases shared by all o
 - If the required implementation context is missing or unapproved, stop and ask the user
   to provide it or run the appropriate documentation/specification orchestration first.
 
+### Exception: `orch-feature` and `orch-bug`
+
+- `orch-feature` and `orch-bug` handle the most common ad-hoc requests, so they own a
+  **Stage 0: Scope Discovery** that derives missing scope, acceptance or verification
+  criteria, and impacted code paths together with the user.
+- For those two skills, missing context is a reason to run Stage 0 — not a reason to stop,
+  and never a reason to skip the orchestration and implement inline.
+- Stopping still applies when the change requires a new architectural decision, a new
+  bounded context, or a cross-cutting redesign. In that case recommend `orch-adr`,
+  `orch-architecture`, or `orch-blueprint` and ask the user before continuing.
+- The other code-modifying orchestrations keep the stop-and-ask rule above unchanged.
+
 ## MCP Server Strategy (Shared)
 
 - Use `jsdotnet-guidelines-mcpserver` for repository standards, governed asset

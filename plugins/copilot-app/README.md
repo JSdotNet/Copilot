@@ -37,8 +37,8 @@ review rather than restarting broad discovery.
 - `skills/orch-blueprint/SKILL.md` - Architecture blueprint orchestration with traceability review (canvas)
 - `skills/orch-adr/SKILL.md` - ADR orchestration with guideline and ADR retrieval (canvas)
 - `skills/orch-tdr/SKILL.md` - TDR orchestration with guideline and ADR retrieval (canvas)
-- `skills/orch-feature/SKILL.md` - Feature development lifecycle management with local validation (canvas)
-- `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with local monitoring (canvas)
+- `skills/orch-feature/SKILL.md` - Feature development lifecycle management with scope discovery and local validation (canvas)
+- `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with scope discovery and local monitoring (canvas)
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
 - `skills/orch-create-service/SKILL.md` - Create and wire a new service in an existing project (canvas)
 
