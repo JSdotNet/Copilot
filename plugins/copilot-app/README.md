@@ -25,6 +25,12 @@ review rather than restarting broad discovery.
 
 ## Includes
 
+### Session Hook
+
+- `hooks.json` - `sessionStart` prompt hook that routes governed task categories to the
+  matching `orch-*` skill in every session of every project where the plugin is installed.
+  See **Configuration Layers** below.
+
 ### Skills
 
 - `skills/orch-repo/SKILL.md` - Create and configure a new GitHub repository (branch protection, CI/CD, templates)
@@ -63,6 +69,55 @@ plugin). Each reports progress through the `orch-dashboard` canvas extension.
 - `extensions/orch-dashboard/` - Live progress and output dashboard for all `orch-*` and automation skills. See `extensions/orch-dashboard/README.md` for the canvas action contract and install instructions.
 - `extensions/diagram-canvas/` - Mermaid diagram viewer canvas (`mermaid-diagram`), opened by `orch-*` skills on behalf of the `architecture`, `domain-design`, and `ux-design` agents they coordinate — those plugins have no direct dependency on it. Installs and runs independently of `copilot-app` — see `extensions/diagram-canvas/README.md`.
 - `extensions/markdown-canvas/` - Markdown document preview canvas (`markdown-preview`), opened by `orch-*` skills on behalf of the `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` agents they coordinate — those plugins have no direct dependency on it. Installs and runs independently of `copilot-app` — see `extensions/markdown-canvas/README.md`.
+
+## Configuration Layers
+
+Orchestration behavior comes from four layers. Only the first is shipped by this plugin;
+the rest live in the consuming repository, and all repo-side files are optional.
+
+### 1. Plugin-Global Routing and Soft Enforcement (Automatic)
+
+`hooks.json` registers a `sessionStart` prompt hook, so every session in every project that
+has this plugin installed is told which `orch-*` skill owns which task category, which
+specialist agent to fall back to when a skill is unavailable, and that choosing **not** to
+use an orchestration for one of those categories must be stated explicitly with a reason.
+
+Enforcement is deliberately **soft**: there is no blocking `preToolUse` hook. A consuming
+repository therefore does not need to hand-write its own routing instruction file. The
+plugin's `orch-*` list is a baseline, not an exhaustive catalog — a repository may ship its
+own `orch-*` skills under `.github/skills/`, and those take precedence for the task
+categories they cover.
+
+### 2. Per-Repo Model Override — `.github/copilot-model-selection.md`
+
+A repository may override the model chosen for any orchestration category. Categories,
+defaults, and the resolution order (repo override → category family/tier → `auto`) are
+defined in `instructions/orch-model-selection.instructions.md`. The orchestrator reads the
+file once per run.
+
+### 3. Per-Repo Startup and QA Context — `.github/copilot-orch-context.md`
+
+A repository may declare how its application starts and how it should be validated, so the
+QA phase stops guessing the AppHost or interrupting the run to ask. The convention is defined
+in `instructions/orch-repo-context.instructions.md`, with a copy-paste starting point at
+[`resources/copilot-orch-context-template.md`](resources/copilot-orch-context-template.md).
+
+Sections: `## Application`, `## How to Run`, `## Base URLs`, `## Test Credentials`,
+`## MCP Servers`, `## Healthy Startup`, `## QA Depth`, and the optional
+`## Repo-Native Orchestration Skills`. A repository with nothing to start declares
+`**Runnable application:** none`, and QA Validation is then marked `skipped` cleanly. The
+file must never contain secrets and never pins a model.
+
+### 4. MCP Servers Stay Repository-Specific
+
+This plugin routes work to MCP servers (see **MCP Server Routing** below) but does not own
+or configure them. The repository's own `.mcp.json` and instruction files remain the source
+of truth; the `## MCP Servers` section of the context file is informational only.
+
+> **Plugin changes require a reinstall.** Hook, skill, agent, and instruction changes take
+> effect only after the plugin is reinstalled or updated from GitHub — run
+> `copilot plugin install <owner>/<repo>:plugins/copilot-app`, or use
+> `scripts/install-or-update-plugins.ps1` in this repository.
 
 ## Install
 
@@ -369,9 +424,15 @@ The orchestration skills are designed to coordinate with other plugin skills:
 
 ## Reinstall After Changes
 
+Changes to this plugin — including `hooks.json`, skills, agents, and instruction files —
+take effect only after the plugin is reinstalled or updated from GitHub:
+
 ```bash
 copilot plugin install <owner>/<repo>:plugins/copilot-app
 ```
+
+Repository maintainers can update every local plugin at once with
+`scripts/install-or-update-plugins.ps1`.
 
 ## Uninstall
 
