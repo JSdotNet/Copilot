@@ -12,7 +12,7 @@ Track GitHub Copilot plugins used by this repository so team members can install
 ## Installed Plugins
 
 | Plugin | Source | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `dotnet` | `awesome-copilot` | Installed in local environment (`copilot plugin install dotnet@awesome-copilot`). |
 | `awesome-copilot` | `awesome-copilot` | Meta discovery plugin for finding and generating curated Copilot resources. |
 | `csharp-dotnet-development` | `awesome-copilot` | C#/.NET development guidance plugin. |
