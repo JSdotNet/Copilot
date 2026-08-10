@@ -63,6 +63,11 @@ Track skill provenance and avoid duplicate local skills when plugin-provided ski
 | `knowledge-base-validate` | Plugin: `knowledge-base` | Runs the knowledge-metadata check and repairs broken references, malformed `meta` blocks, inconsistent reading order, and stale `_meta` indexes. |
 | `microsoft-code-reference` | Local: `.github/skills` (copied from awesome-copilot collection) | Finds official Microsoft API references and working code examples. |
 | `nuget-manager` | Local: `.github/skills` (copied from awesome-copilot collection) | Manages NuGet package add/update/remove workflows safely. |
+| `orch-arc42-content` | Plugin: `knowledge-base` | Orchestrates direct `.arc42` chapter content edits with metadata enforcement, deferring decision-record and blueprint work to the architecture orchestrations. |
+| `orch-backlog` | Plugin: `knowledge-base` | Orchestrates `.backlog` work-item chapters, including drafting quality and GitHub Issue publishing. |
+| `orch-design` | Plugin: `knowledge-base` | Orchestrates `.design` guideline, token, interaction, and accessibility changes grounded in the repository's authoritative design source. |
+| `orch-domain` | Plugin: `knowledge-base` | Orchestrates `.domain` bounded-context modeling, features, diagrams, dependencies, and naming. |
+| `orch-tech` | Plugin: `knowledge-base` | Orchestrates `.tech` technology-graph changes and keeps the graph diagram in sync with `depends-on` edges. |
 | `playwright-automation-fill-in-form` | Local: `.github/skills` (copied from awesome-copilot collection) | Automates form interactions using Playwright tooling. |
 | `playwright-explore-website` | Plugin: `testing-automation` | Explores website flows and captures Playwright automation paths. |
 | `playwright-generate-test` | Plugin: `testing-automation` | Generates Playwright test cases from observed user flows. |

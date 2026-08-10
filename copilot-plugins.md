@@ -92,10 +92,10 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/qa`
   - Notes: Runtime QA validation — runs projects via .NET Aspire, validates features end-to-end with the Playwright MCP server (screenshot/video evidence), and continuously monitors Aspire MCP logs/traces during testing. Requires the Aspire MCP server and the Playwright MCP server (`@playwright/mcp`).
 
-- `knowledge-base` (`0.1.0`)
+- `knowledge-base` (`0.2.0`)
   - Source path: `plugins/knowledge-base`
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/knowledge-base`
-  - Notes: Repository knowledge-folder convention for `.arc42`, `.domain`, `.tech`, `.design`, and `.backlog` — parseable chapter metadata, derived `_meta/` indexes, a reference-graph canvas, a session-start guardrail, and a `knowledge-meta` generator with a `--check` mode plus a CI workflow template. Adoption is partial by design; scaffold with `knowledge-base-init`, repair with `knowledge-base-validate`. Requires Node 18+ for the generator.
+  - Notes: Repository knowledge-folder convention for `.arc42`, `.domain`, `.tech`, `.design`, and `.backlog` — parseable chapter metadata, derived `_meta/` indexes, a reference-graph canvas, a session-start guardrail, and a `knowledge-meta` generator with a `--check` mode plus a CI workflow template. Adoption is partial by design; scaffold with `knowledge-base-init`, repair with `knowledge-base-validate`, and route per-folder edits through `orch-arc42-content`, `orch-domain`, `orch-tech`, `orch-design`, and `orch-backlog`. Requires Node 18+ for the generator.
 
 ## Skills
 
