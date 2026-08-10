@@ -13,8 +13,35 @@ automatically from the kind of change so callers do not re-describe QA rules.
 
 - Run for code-modifying orchestrations, after Build & Test passes.
 - Documentation/config orchestrations skip this phase.
+- Skip when the repository declares it has no runnable application (see **Repo Context**).
+
+## Repo Context
+
+The consuming repository may supply `.github/copilot-orch-context.md`, read once per run by
+the orchestrator. The convention is defined in
+`instructions/orch-repo-context.instructions.md` — do not restate it here. Use it as
+follows:
+
+- **How to run** — use the declared startup command and AppHost path instead of discovering
+  or guessing them, and instead of asking the user.
+- **Base URLs** — validate against the declared dashboard, front end, and API entry points.
+- **Healthy startup** — judge startup against the declared resources, health endpoints, and
+  log signals, and do not report the declared benign warnings as failures.
+- **Test credentials** — follow the declared pointer to obtain credentials; the file never
+  contains secrets.
+- **QA depth** — the declared depth overrides the automatic change-kind selection below, and
+  any repo-specific caveats it lists still apply.
+- **No runnable application** — when the repository declares
+  `**Runnable application:** none`, mark this phase `skipped`, record that the repository
+  declares no runnable application, and attempt no startup, Playwright run, or `qa:qa`
+  delegation.
+
+When the file is absent, a section is missing, or a value is unrecognized, fall back to the
+behavior described below, note the fallback once, and continue.
 
 ## Depth Selection (Automatic)
+
+Applies when the repository does not declare a QA depth in `.github/copilot-orch-context.md`.
 
 - **New functionality → QA validation with capture:**
   1. **Run the application locally** via the `qa:qa` agent using the `aspire` /
@@ -49,6 +76,9 @@ automatically from the kind of change so callers do not re-describe QA rules.
 - The change kind (functional / bug fix / dependency update / none) from the calling
   orchestration.
 - The affected scenarios or critical paths to exercise.
+- The repo context resolved by the orchestrator from `.github/copilot-orch-context.md`
+  (startup command, AppHost path, base URLs, healthy-startup signals, credential pointer,
+  QA depth), when the repository supplies it.
 
 ## Outputs
 
@@ -95,3 +125,4 @@ automatically from the kind of change so callers do not re-describe QA rules.
 
 Source skill location: `plugins/copilot-app/skills/phase-qa-validation/SKILL.md`.
 Phase definition: `plugins/copilot-app/instructions/orch-shared-phases.instructions.md`.
+Repo context convention: `plugins/copilot-app/instructions/orch-repo-context.instructions.md`.

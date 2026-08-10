@@ -19,5 +19,6 @@
     "session"
   ],
   "agents": "agents/",
-  "skills": "skills/"
+  "skills": "skills/",
+  "hooks": "hooks.json"
 }

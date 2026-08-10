@@ -48,6 +48,10 @@ Automate the complete project scaffolding workflow for an existing, configured r
   - Release procedures
 - **Create `.github/instructions/` files** for developer guidance
 - **Create `.github/copilot-settings.json`** for Copilot configuration
+- **Create `.github/copilot-orch-context.md`** so later orchestrations know how to start and
+  validate this project — see `instructions/orch-repo-context.instructions.md` and the
+  template at `resources/copilot-orch-context-template.md`. A repository with nothing to run
+  declares that explicitly instead of omitting the file.
 
 **Agents:** `csharp-coding:coding`  
 **MCP Server:** `jsdotnet-guidelines-mcpserver` for guideline generation
@@ -129,9 +133,10 @@ in order:
    suites, run first; fail fast on build or test errors.
 2. **QA Validation** — new runnable scaffold, so run QA validation with capture: start the Aspire
    AppHost, confirm the dashboard and service health endpoints are green (default
-   dashboard `localhost:18888`) and database connectivity works, and run Playwright smoke
-   checks on the example service, with `qa:qa-monitor` runtime monitoring and evidence
-   recorded.
+   dashboard `localhost:18888`, or the entry points declared in
+   `.github/copilot-orch-context.md` when Stage 1 wrote one) and database connectivity
+   works, and run Playwright smoke checks on the example service, with `qa:qa-monitor`
+   runtime monitoring and evidence recorded.
 3. **Personal Validation** — hand back to the user (no agent); present the code review and
    the recorded QA review, and start the application for the user to review.
 4. **Create Pull Request** — only after explicit user approval.
