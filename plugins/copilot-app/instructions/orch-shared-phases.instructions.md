@@ -1,6 +1,6 @@
 ---
 applyTo: 'skills/orch-*/SKILL.md'
-description: Defines the reusable delivery and validation phases shared by all orch-* orchestration skills (Build & Test, QA Validation, Personal Validation, Create Pull Request, Summary) and the orch-dashboard reporting contract, so the shared content is maintained in one place.
+description: Defines the reusable delivery and validation phases shared by all orch-* orchestration skills (Build & Test, QA Validation, Personal Validation, Create Pull Request, Documentation Update, Summary) and the orch-dashboard reporting contract, so the shared content is maintained in one place.
 ---
 
 # Shared Orchestration Phases (Orchestration-Owned)
@@ -28,8 +28,8 @@ description: Defines the reusable delivery and validation phases shared by all o
   once:
   - **Build & Test** → `skills/phase-build-test/SKILL.md`.
   - **QA Validation** → `skills/phase-qa-validation/SKILL.md`.
-- Personal Validation, Create Pull Request, and Summary stay defined in this file (short,
-  linear phases where a separate skill would only add indirection).
+- Personal Validation, Create Pull Request, Documentation Update, and Summary stay defined in
+  this file (short, linear phases where a separate skill would only add indirection).
 - Model choice for every phase (and every skill-specific stage) is resolved once, centrally,
   from `instructions/orch-model-selection.instructions.md` — do not describe model choice
   here or in individual skills.
@@ -147,7 +147,7 @@ When a child session is used (`create_session` + cross-session messaging):
 - **Code-modifying orchestrations** — `orch-feature`, `orch-bug`, `orch-create-module`,
   `orch-create-service`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`,
   `orch-project` — run, in order: **Build & Test → QA Validation → Personal Validation →
-  Create Pull Request → Summary**.
+  Create Pull Request → Documentation Update → Summary**.
 - **Documentation/config orchestrations** — `orch-adr`, `orch-tdr`, `orch-arc42`,
   `orch-blueprint`, `orch-architecture`, `orch-repo` — run: **Personal Validation →
   Create Pull Request → Summary** (no Build & Test or QA Validation, because they
@@ -250,6 +250,55 @@ Applies to every orchestration.
 runs this phase by default, so the orchestrator performs it directly under the category's
 resolved model.
 
+## Phase: Documentation Update
+
+Applies to code-modifying orchestrations. Runs **after** Create Pull Request and before Summary.
+Its job is to stop a change from shipping while the repository's own governed documentation drifts
+out of date. It is **conditional**: it is a clean no-op when nothing is stale, and never forces a
+pointless commit.
+
+- **Skip this phase** (mark it `skipped`) when Create Pull Request was skipped — there is no change
+  set and no PR branch to update.
+- **Discover the repository's documentation surface.** Read the target repo's own conventions —
+  `.github/copilot-instructions.md`, any repo `*.instructions.md`, and the checked-in
+  knowledge/doc folders it governs (for example `.arc42/`, `.domain/`, `.tech/`, `.design/`,
+  `.backlog/`, `docs/`, and `README.md`) together with their per-chapter metadata format.
+- **Decide whether documentation is now stale.** Compare the landed change set against that surface:
+  did architecture, technology, deployment, a public API/contract, configuration, dependencies, or
+  user-facing behavior change in a way the governed docs should record?
+- **When updates are needed**, make them following the repo's own conventions (metadata blocks,
+  per-chapter format), then **commit and push onto the existing pull request branch** so the open
+  PR is updated in place — a doc change that stays uncommitted is a bug. Record what changed in the
+  stage `output`, and reflect it in the PR body when it helps the reviewer.
+- **Never rewrite the PR branch history.** Add a **new commit** only. By the time this phase runs
+  the pull request is open and a reviewer may already be reading it, so this phase must never
+  amend, rebase, squash, or force-push the branch — doing so silently detaches existing review
+  comments and changes code under someone mid-review.
+- **Fail loudly if the commit or push is rejected.** A rejected push is expected in practice when
+  the branch has moved (a reviewer pushed a suggestion or a maintainer updated the branch). On a
+  failed commit or push, **mark this stage `blocked` (never `done`) with the actual error surfaced
+  in the `output`** — marking it `done` would let the user believe the documentation shipped when
+  it did not, the exact silent drift this phase exists to prevent. Recovery: pull/rebase the
+  **local** work onto the updated remote branch and retry the push once (this rebases your own
+  unpushed doc commit, not the PR branch's published history); if it still fails, stop and report.
+- **When nothing is stale**, mark this phase `done` with an `output` naming what was checked and why
+  no change was needed. **Do not create a commit.**
+
+Because this phase runs after the user-approved Create Pull Request and touches **documentation
+only, never code**, it does not re-open the Personal Validation gate; the documentation commit is
+surfaced in the pull request for the reviewer. If a documentation change turns out to require code
+edits, treat that as new implementation work and route it back through the earlier phases rather
+than committing code here.
+
+**Agents:** `documentation:documentation` (recommended), run as a sub-agent in the **same worktree**
+so its commit lands on the pull request branch; falls back to `csharp-coding:coding` or the
+orchestrator performing it directly when that plugin is not installed.
+
+**MCP Servers:** `jsdotnet-guidelines-mcpserver` *(optional, for governed-asset documentation
+conventions)*
+
+**Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
+
 ## Phase: Summary
 
 Applies to every orchestration.
@@ -290,6 +339,13 @@ skip the canvas calls and continue through standard chat interaction.
   `skipped` when there is no change set to submit), and record all PR-time changes under
   the Create Pull Request stage output — never create the pull request before personal
   validation.
+- **For the Documentation Update phase** (code-modifying tier only), run it after Create
+  Pull Request: mark it `in_progress`, then `done` with an `output` naming the governed docs
+  updated and the new commit pushed onto the existing PR branch, or `done` describing what was
+  checked when no update was needed, or `skipped` when Create Pull Request was skipped. It
+  adds a new commit only — never amend, rebase, squash, or force-push the PR branch — and it
+  never creates a commit when no documentation is stale. If the commit or push is rejected,
+  mark the stage `blocked` with the actual error in the `output`, never `done`.
 - **Mark the Summary stage** `in_progress` then `done`, and call `finish_run` with the
   final status and summary once the pull request is created (or the run concludes without
   one).
@@ -370,6 +426,9 @@ alongside the run.
 - [ ] `start_run` reattaches to an existing `in_progress` run instead of duplicating it.
 - [ ] Change kind and the Personal Validation approval are persisted with
       `set_run_context`, and no pull request is created while approval is `pending`.
+- [ ] For code-modifying skills, Documentation Update runs after Create Pull Request, commits any
+      governed-doc changes onto the existing PR branch, and is a no-op (no commit) when nothing is
+      stale.
 - [ ] Model choice per phase follows `instructions/orch-model-selection.instructions.md`
       and is never hardcoded in a skill or phase.
 - [ ] Token and context figures are left to the dashboard's automatic capture and are never
