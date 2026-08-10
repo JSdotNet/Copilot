@@ -46,6 +46,11 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager`
   - Notes: Plugin lifecycle management — install, update, uninstall, list, and check for updates.
 
+- `knowledge-base` (`0.1.0`)
+  - Source path: `plugins/knowledge-base`
+  - Install: `copilot plugin install JSdotNet/Copilot:plugins/knowledge-base`
+  - Notes: Repository knowledge-folder convention for `.arc42`, `.domain`, `.tech`, `.design`, and `.backlog` — parseable chapter metadata, derived `_meta/` indexes, a reference-graph canvas, and enforcement tooling. Requires Node 18+ for the generator.
+
 ## Skills
 
 - See [Copilot Skills](./copilot-skills.md) for skill inventory and provenance.

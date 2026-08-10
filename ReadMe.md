@@ -53,6 +53,9 @@ JSdotNet-Copilot
 |  |     |- markdown-canvas/
 |  |     \- orch-dashboard/
 |  |- wip-convention/
+|  |- knowledge-base/
+|  |  \- extensions/
+|  |     \- knowledge-canvas/
 |  \- worktree-parallel/
 \- scripts/
 ```
@@ -111,6 +114,10 @@ plugin (its own `.github/plugin/plugin.json`), so install the same way:
 See `plugins/copilot-app/extensions/diagram-canvas/README.md` and
 `plugins/copilot-app/extensions/markdown-canvas/README.md` for details.
 
+The `knowledge-base` plugin additionally bundles a `knowledge-canvas` extension that renders
+the repository's knowledge-folder reference graph. It has no standalone manifest and installs
+with its parent: `copilot plugin install JSdotNet/Copilot:plugins/knowledge-base`.
+
 ## Project Structure
 
 Repository organization centers on reusable Copilot plugin bundles:
@@ -126,6 +133,7 @@ Repository organization centers on reusable Copilot plugin bundles:
     - `copilot-spec-builder`
     - `copilot-plugin-manager`
     - `wip-convention`
+    - `knowledge-base`
     - `worktree-parallel`
     - `product-owner`
 - `docs/copilot/`
@@ -205,6 +213,7 @@ Helpful references:
 License metadata is plugin-specific in current manifests:
 
 - Most local plugins declare `UNLICENSED`.
-- `plugins/wip-convention/.github/plugin/plugin.json` declares `MIT`.
+- `plugins/wip-convention/.github/plugin/plugin.json` and
+  `plugins/knowledge-base/.github/plugin/plugin.json` declare `MIT`.
 
 No single top-level repository license file was identified in the scanned sources.
