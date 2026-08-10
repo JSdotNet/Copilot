@@ -237,6 +237,12 @@ invokes it and passes the change kind so depth is selected automatically:
   unless the update introduces new user-facing behavior.
 - **No functional change and nothing to run** → mark this phase `skipped` and record why.
 
+**Repo Context:** when the consuming repository supplies `.github/copilot-orch-context.md`,
+its startup command, base URLs, healthy-startup signals, and declared QA depth take
+precedence over discovery and over the automatic depth selection above, and a repository
+declaring no runnable application makes this phase `skipped`. See
+`orch-repo-context.instructions.md`; the `phase-qa-validation` skill applies it.
+
 **Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to
 `csharp-coding:coding` running validation manually when the `qa` plugin isn't installed.
 

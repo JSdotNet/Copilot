@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "prompt",
+        "prompt": "Route these task categories through the matching orch-* skill: architecture, ADR, arc42, blueprint, TDR -> orch-architecture, orch-adr, orch-arc42, orch-blueprint, orch-tdr; feature work -> orch-feature; bug fixes -> orch-bug; new module or service -> orch-create-module, orch-create-service; dependency or package updates -> orch-update-packages; Aspire upgrades -> orch-aspire-update; MVP creation -> orch-create-mvp; repository or project scaffolding -> orch-repo, orch-project. This list is the plugin-provided baseline, not an exhaustive catalog: a repository may provide additional repo-native orch-* skills under .github/skills/, and those take precedence for the task categories they cover. When a skill is unavailable, fall back to the closest specialist agent: architecture:architect, csharp-coding:coding, product-owner:product-owner, qa:qa. If you decide not to use an orchestration skill for one of these categories, say so explicitly and give the reason before continuing. A repo may override behavior via .github/copilot-model-selection.md (model choice) and .github/copilot-orch-context.md (app startup and QA context); the repo's own .mcp.json and instructions remain the source of truth for MCP servers."
+      }
+    ]
+  }
+}
