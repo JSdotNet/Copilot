@@ -77,6 +77,18 @@ Everything else — an unwritten specification, absent acceptance criteria, a bu
 reproduction, a request that arrived as one sentence — is derived in the skill's first
 stage, not escalated.
 
+### Exception: `orch-feature` and `orch-bug`
+
+- `orch-feature` and `orch-bug` handle the most common ad-hoc requests, so they own a
+  **Stage 0: Scope Discovery** that derives missing scope, acceptance or verification
+  criteria, and impacted code paths together with the user.
+- For those two skills, missing context is a reason to run Stage 0 — not a reason to stop,
+  and never a reason to skip the orchestration and implement inline.
+- Stopping still applies when the change requires a new architectural decision, a new
+  bounded context, or a cross-cutting redesign. In that case recommend `orch-adr`,
+  `orch-architecture`, or `orch-blueprint` and ask the user before continuing.
+- The other code-modifying orchestrations keep the stop-and-ask rule above unchanged.
+
 ## MCP Server Strategy (Shared)
 
 - Use `jsdotnet-guidelines-mcpserver` for repository standards, governed asset
