@@ -12,11 +12,12 @@ Track GitHub Copilot plugins used by this repository so team members can install
 ## Installed Plugins
 
 | Plugin | Source | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `dotnet` | `awesome-copilot` | Installed in local environment (`copilot plugin install dotnet@awesome-copilot`). |
 | `awesome-copilot` | `awesome-copilot` | Meta discovery plugin for finding and generating curated Copilot resources. |
 | `csharp-dotnet-development` | `awesome-copilot` | C#/.NET development guidance plugin. |
 | `testing-automation` | `awesome-copilot` | Testing workflows and automation guidance plugin. |
+| `impeccable` | `awesome-copilot` | Frontend design and UI-craft skill (impeccable.style). Used by the `ux-design` plugin when installed. Requires Node 18+ for automation scripts; falls back to design guidance without it. |
 | `azure` | `awesome-copilot` | Azure skills and MCP workflows plugin. |
 | `azure-cloud-development` | `awesome-copilot` | Azure architecture and IaC development plugin. |
 | `project-planning` | `awesome-copilot` | Planning support for epics, feature breakdown, and implementation planning workflows. |
@@ -26,25 +27,26 @@ Track GitHub Copilot plugins used by this repository so team members can install
 
 ## Local Plugin Bundles
 
-- `development` (`0.1.0`)
-  - Source path: `plugins/development`
-  - Install: `copilot plugin install JSdotNet/Copilot:plugins/development`
-  - Notes: Development planning and execution workflows.
-
-- `architecture` (`0.1.0`)
-  - Source path: `plugins/architecture`
-  - Install: `copilot plugin install JSdotNet/Copilot:plugins/architecture`
-  - Notes: Architecture-focused workflows for arc42, blueprints, ADRs, and technical debt records.
-
-- `copilot-spec-builder` (`0.1.0`)
-  - Source path: `plugins/copilot-spec-builder`
-  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-spec-builder`
-  - Notes: GitHub customization asset authoring — agents, instructions, plugins, and skills.
-
-- `copilot-plugin-manager` (`0.1.0`)
-  - Source path: `plugins/copilot-plugin-manager`
-  - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager`
-  - Notes: Plugin lifecycle management — install, update, uninstall, list, and check for updates.
+| Plugin | Version | Source path | Install | Notes |
+| --- | --- | --- | --- | --- |
+| `aikido` | `0.1.0` | `plugins/aikido` | `copilot plugin install JSdotNet/Copilot:plugins/aikido` | Aikido Security integration for SAST, secret scanning, finding fixes, posture review, and GitHub issue sync. Requires the Aikido MCP server (`@aikidosec/mcp`). |
+| `architecture` | `0.4.0` | `plugins/architecture` | `copilot plugin install JSdotNet/Copilot:plugins/architecture` | Architecture documentation, blueprints, ADRs, technical debt records, and architecture diagrams. |
+| `copilot-app` | `0.1.0` | `plugins/copilot-app` | `copilot plugin install JSdotNet/Copilot:plugins/copilot-app` | Copilot App orchestration workflows, pull request handoff, scheduled automation, and canvas progress reporting. |
+| `copilot-plugin-manager` | `0.1.0` | `plugins/copilot-plugin-manager` | `copilot plugin install JSdotNet/Copilot:plugins/copilot-plugin-manager` | Preferred Copilot CLI plugin management via GitHub URLs. |
+| `copilot-spec-builder` | `0.1.0` | `plugins/copilot-spec-builder` | `copilot plugin install JSdotNet/Copilot:plugins/copilot-spec-builder` | GitHub customization asset authoring for agents, instructions, plugins, and skills. |
+| `csharp-coding` | `0.1.0` | `plugins/csharp-coding` | `copilot plugin install JSdotNet/Copilot:plugins/csharp-coding` | Focused C# .NET coding, review, optimization, and testing expertise. |
+| `development` | `0.1.0` | `plugins/development` | `copilot plugin install JSdotNet/Copilot:plugins/development` | Development planning and implementation workflows. |
+| `documentation` | `0.3.0` | `plugins/documentation` | `copilot plugin install JSdotNet/Copilot:plugins/documentation` | Documentation, infographic, and profile authoring workflows. |
+| `domain-design` | `0.2.0` | `plugins/domain-design` | `copilot plugin install JSdotNet/Copilot:plugins/domain-design` | Domain-Driven Design workflows for contexts, language, models, and context mapping. |
+| `fincent` | `0.1.0` | `plugins/fincent` | `copilot plugin install JSdotNet/Copilot:plugins/fincent` | Fincent project story review, development, domain alignment, estimation, PR review, sprint reporting, and demo workflows. |
+| `github` | `0.1.0` | `plugins/github` | `copilot plugin install JSdotNet/Copilot:plugins/github` | GitHub issue sync, pull requests, GitHub Actions CI/CD, and Dependabot configuration. |
+| `jira` | `0.1.0` | `plugins/jira` | `copilot plugin install JSdotNet/Copilot:plugins/jira` | Jira issue creation and update workflows from approved Markdown backlog artifacts. |
+| `product-owner` | `0.2.0` | `plugins/product-owner` | `copilot plugin install JSdotNet/Copilot:plugins/product-owner` | Product backlog authoring for epics, stories, and bugs as Markdown artifacts. |
+| `qa` | `0.1.0` | `plugins/qa` | `copilot plugin install JSdotNet/Copilot:plugins/qa` | Runtime QA validation with Aspire, Playwright evidence, and log/trace monitoring. |
+| `review` | `0.3.0` | `plugins/review` | `copilot plugin install JSdotNet/Copilot:plugins/review` | Reusable TODO-driven, question-driven, and improvement-driven review skills. |
+| `ux-design` | `0.2.0` | `plugins/ux-design` | `copilot plugin install JSdotNet/Copilot:plugins/ux-design` | UX wireframes, design guidelines, user flows, and design reviews. |
+| `wip-convention` | `0.1.0` | `plugins/wip-convention` | `copilot plugin install JSdotNet/Copilot:plugins/wip-convention` | Shared `.wip` work-in-progress artifact conventions. |
+| `worktree-parallel` | `0.1.0` | `plugins/worktree-parallel` | `copilot plugin install JSdotNet/Copilot:plugins/worktree-parallel` | Work decomposition across isolated git worktrees with per-worktree agent continuity. |
 
 ## Skills
 

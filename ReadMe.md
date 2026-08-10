@@ -9,7 +9,6 @@ Primary technologies and formats observed in this repository:
 - GitHub Copilot customization assets (`.agent.md`, `.instructions.md`, `SKILL.md`, `.prompt.md`)
 - Markdown (`.md`) for agent/instruction/skill documentation
 - JSON plugin manifests (`plugin.json`) with SemVer versions (for example `0.1.0`, `1.0.0`)
-- PowerShell (`.ps1`) scripts for plugin installation and update automation
 - GitHub Copilot CLI or `gh copilot` command surface for plugin operations
 
 Version and runtime notes:
@@ -41,20 +40,28 @@ JSdotNet-Copilot
 |  |- agents/
 |  \- skills/
 |- plugins/
+|  |- aikido/
 |  |- architecture/
-|  |- development/
-|  |- documentation/
-|  |- review/
-|  |- copilot-plugin-manager/
-|  |- copilot-spec-builder/
 |  |- copilot-app/
 |  |  \- extensions/
 |  |     |- diagram-canvas/
 |  |     |- markdown-canvas/
 |  |     \- orch-dashboard/
+|  |- copilot-plugin-manager/
+|  |- copilot-spec-builder/
+|  |- csharp-coding/
+|  |- development/
+|  |- documentation/
+|  |- domain-design/
+|  |- fincent/
+|  |- github/
+|  |- jira/
+|  |- product-owner/
+|  |- qa/
+|  |- review/
+|  |- ux-design/
 |  |- wip-convention/
 |  \- worktree-parallel/
-\- scripts/
 ```
 
 ## Getting Started
@@ -63,28 +70,23 @@ JSdotNet-Copilot
 
 - Git
 - GitHub CLI with Copilot extension (`gh copilot`) or standalone `copilot` CLI
-- PowerShell 5.1+ (Windows) for local automation scripts
 
 ### Installation and Setup
 
 1. Clone the repository.
 2. Open the repository in VS Code.
-3. Install all local plugins:
+3. Install the local plugins you need directly from this repository:
 
-```powershell
-./scripts/install-local-plugins.ps1
+```bash
+copilot plugin install JSdotNet/Copilot:plugins/architecture
+copilot plugin install JSdotNet/Copilot:plugins/copilot-app
+copilot plugin install JSdotNet/Copilot:plugins/development
 ```
 
-Alternative install/update flow:
+Update an already installed plugin by name:
 
-```powershell
-./scripts/install-or-update-plugins.ps1 -Mode install-or-update
-```
-
-Update already installed local plugins:
-
-```powershell
-./scripts/update-local-plugins.ps1
+```bash
+copilot plugin update architecture
 ```
 
 Verify plugins are available:
@@ -96,20 +98,25 @@ copilot plugin list
 ### Canvas Extensions
 
 Unlike plugins (skills, agents, instructions), canvas extensions add interactive UI
-surfaces the agent can open in a side panel. This repository ships two independent canvas
-extensions inside `plugins/copilot-app/extensions/`: `diagram-canvas` (Mermaid diagram
-viewer) and `markdown-canvas` (Markdown document preview). Only `copilot-app`'s `orch-*`
-orchestration skills open/update these canvases directly, on behalf of the
-`architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner` agents
-they coordinate — those content plugins have no direct dependency on either extension and
-work identically with or without them installed.
-Both ship inside `copilot-app` but install and run independently of it and of each other —
-install either one on its own. Each is packaged like any other
-plugin (its own `.github/plugin/plugin.json`), so install the same way:
+surfaces the agent can open in a side panel. This repository ships canvas
+extensions inside `plugins/copilot-app/extensions/`: `diagram-canvas` (Mermaid
+diagram viewer), `markdown-canvas` (Markdown document preview), and
+`orch-dashboard` (orchestration progress dashboard). Only `copilot-app`'s
+`orch-*` orchestration skills open/update these canvases directly, on behalf of
+the `architecture`, `domain-design`, `ux-design`, `documentation`, and
+`product-owner` agents they coordinate — those content plugins have no direct
+dependency on these extensions and work identically with or without them
+installed.
+`diagram-canvas` and `markdown-canvas` ship inside `copilot-app` but install and
+run independently of it and of each other — install either one on its own. Each
+is packaged like any other plugin (its own `.github/plugin/plugin.json`), so
+install the same way:
 `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/diagram-canvas` and
 `copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas`.
 See `plugins/copilot-app/extensions/diagram-canvas/README.md` and
 `plugins/copilot-app/extensions/markdown-canvas/README.md` for details.
+`orch-dashboard` is installed with the app extension installer from
+`https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard`.
 
 ## Project Structure
 
@@ -125,13 +132,20 @@ Repository organization centers on reusable Copilot plugin bundles:
     - `review`
     - `copilot-spec-builder`
     - `copilot-plugin-manager`
+    - `csharp-coding`
+    - `aikido`
+    - `copilot-app`
+    - `domain-design`
+    - `fincent`
+    - `github`
+    - `jira`
+    - `qa`
+    - `ux-design`
     - `wip-convention`
     - `worktree-parallel`
     - `product-owner`
 - `docs/copilot/`
   - Plugin inventory/reference docs.
-- `scripts/`
-  - Install/update automation for local plugin workflows.
 
 ## Key Features
 
@@ -140,6 +154,7 @@ Repository organization centers on reusable Copilot plugin bundles:
 - Skill catalogs that encapsulate repeatable guidance and authoring processes.
 - Spec-driven asset authoring with `copilot-spec-builder`.
 - Plugin lifecycle management via `copilot-plugin-manager`.
+- GitHub, Jira, QA, UX, domain design, and security-focused workflow plugins.
 - Work-in-progress artifact conventions via `wip-convention`.
 - Parallel task decomposition patterns via `worktree-parallel`.
 
@@ -191,7 +206,7 @@ Contribution guidelines for this repository:
 2. Keep changes minimal and aligned with existing plugin patterns.
 3. Reuse nearby examples when creating new assets:
    - existing plugin `agents/`, `instructions/`, and `skills/` folders are the primary exemplars.
-4. Reinstall and validate plugins after edits.
+4. Install or update the affected plugin directly and validate its behavior after edits.
 5. Document notable changes in related plugin README files where relevant.
 
 Helpful references:
