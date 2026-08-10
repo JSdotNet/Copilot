@@ -37,8 +37,8 @@ review rather than restarting broad discovery.
 - `skills/orch-blueprint/SKILL.md` - Architecture blueprint orchestration with traceability review (canvas)
 - `skills/orch-adr/SKILL.md` - ADR orchestration with guideline and ADR retrieval (canvas)
 - `skills/orch-tdr/SKILL.md` - TDR orchestration with guideline and ADR retrieval (canvas)
-- `skills/orch-feature/SKILL.md` - Feature development lifecycle management with local validation (canvas)
-- `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with local monitoring (canvas)
+- `skills/orch-feature/SKILL.md` - Feature development lifecycle management with scope discovery and local validation (canvas)
+- `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with scope discovery and local monitoring (canvas)
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
 - `skills/orch-create-service/SKILL.md` - Create and wire a new service in an existing project (canvas)
 
@@ -305,7 +305,7 @@ copilot-app plugin
 
 Each orchestration skill follows a staged workflow tailored to the scenario (project setup, MVP, feature, package updates, bug fix, module creation, or service creation):
 
-1. **Intake and alignment stages** - Review approved specification, architecture, constraints, and validation targets
+1. **Intake and alignment stages** - Establish or confirm specification, architecture, constraints, and validation targets; missing inputs are derived here, not treated as a reason to stop
 2. **Implementation stage** - Every code-modifying orchestration includes an explicit Implementation phase; it can appear after intake/planning stages instead of always being first
 3. **Validation stages** - Unit, integration, and local runtime validation with recorded outcomes
 4. **Quality stage** - Review readiness and blocker resolution
@@ -345,8 +345,8 @@ The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-repo` creates and configures the repository; `orch-project` scaffolds the development project inside it — use them sequentially
 - Documentation/specification orchestrations (`orch-architecture`, `orch-arc42`,
   `orch-blueprint`, `orch-adr`, `orch-tdr`, and future spec-update workflows) are the
-  upstream source for approved implementation context used by the code-modifying
-  orchestrations
+  preferred upstream source of implementation context when they have run; the
+  code-modifying orchestrations derive that context themselves when they have not
 - `orch-project` uses the `aspire` skill for AppHost setup
 - `orch-aspire-update` uses `aspire` and `nuget-manager` skills with plan refinement before updates
 - `orch-architecture` uses the `architecture:architect` agent directly after MCP-based context gathering

@@ -70,7 +70,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["MVP Scope Intake"] --> B["Implementation Planning"]
+    S["Scope Discovery"] --> A["MVP Scope Intake"]
+    A --> B["Implementation Planning"]
     B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
@@ -84,6 +85,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | MVP Scope Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
@@ -270,7 +272,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Specification & Architecture Intake"] --> B["Implementation"]
+    S["Scope Discovery"] --> A["Specification & Architecture Intake"]
+    A --> B["Implementation"]
     B --> C["Build & Test"]
     C --> D["QA Validation"]
     D --> E["Personal Validation"]
@@ -283,6 +286,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Specification & Architecture Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
 | Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
@@ -295,7 +299,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Bug Intake & Reproduction"] --> B["Root Cause Analysis"]
+    S["Scope Discovery"] --> A["Bug Intake & Reproduction"]
+    A --> B["Root Cause Analysis"]
     B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
@@ -309,6 +314,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Bug Intake & Reproduction | `product-owner:product-owner` | — |
 | Root Cause Analysis | `csharp-coding:coding` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
@@ -322,7 +328,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Specification Intake"] --> B["Implementation Planning"]
+    S["Scope Discovery"] --> A["Specification Intake"]
+    A --> B["Implementation Planning"]
     B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
@@ -336,6 +343,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Specification Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
@@ -349,7 +357,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Specification Intake"] --> B["Implementation Planning"]
+    S["Scope Discovery"] --> A["Specification Intake"]
+    A --> B["Implementation Planning"]
     B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
@@ -363,6 +372,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Specification Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |

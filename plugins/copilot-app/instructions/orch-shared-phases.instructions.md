@@ -41,21 +41,41 @@ description: Defines the reusable delivery and validation phases shared by all o
   stages.
 - All agent transitions require explicit user approval before switching.
 
-## Code-Modifying Orchestration Preconditions
+## Code-Modifying Orchestration Context
 
 - `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`,
   `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, and
   `orch-project` are **implementation-focused** orchestrations.
-- These skills assume the requested change already has enough approved context to build
-  from: specification, acceptance criteria, architecture decisions, or equivalent
-  implementation notes.
-- Treat documentation and specification orchestrations — `orch-architecture`,
-  `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, and future spec-update
-  workflows — as the upstream source of that context.
-- Code-modifying orchestrations may review and align to those inputs, but they should not
-  restart broad requirements discovery or architecture definition from scratch.
-- If the required implementation context is missing or unapproved, stop and ask the user
-  to provide it or run the appropriate documentation/specification orchestration first.
+- Each of these skills **owns establishing its own implementation context** in its first
+  stage — scope, acceptance or verification criteria, impacted code paths, and the
+  governing instructions and guidelines for the affected area.
+- When a specification, acceptance criteria, architecture decision, or equivalent
+  implementation note already exists, that first stage is a short intake: read it, align
+  to it, and continue. Documentation and specification orchestrations —
+  `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, and `orch-tdr` — remain
+  the preferred upstream source of that context when they have already run.
+- When it does not exist, the first stage **derives it from the request and the codebase**
+  and confirms it with the user. Missing context is a reason to run that stage — never a
+  reason to stop, hand the request back, or skip the orchestration and implement inline.
+- Ad-hoc, incremental, and one-line requests are in scope for these skills. They enter
+  through the same first stage as fully specified work.
+
+### Escalation (the only stop conditions)
+
+Stop and route the work when the request needs a decision the orchestration does not own.
+Name the successor and invoke it after user approval; do not end the turn by asking the
+user to run something themselves.
+
+| Situation | Route to |
+|---|---|
+| The change requires a new architectural decision | `orch-adr` |
+| The change requires a new bounded context or service boundary | `orch-create-service`, or `orch-architecture` for the boundary decision |
+| The change requires a cross-cutting redesign | `orch-blueprint`, or `orch-arc42` for structured architecture documentation |
+| Accepting known debt instead of fixing it | `orch-tdr` |
+
+Everything else — an unwritten specification, absent acceptance criteria, a bug with no
+reproduction, a request that arrived as one sentence — is derived in the skill's first
+stage, not escalated.
 
 ## MCP Server Strategy (Shared)
 

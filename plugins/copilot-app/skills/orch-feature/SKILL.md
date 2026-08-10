@@ -1,25 +1,32 @@
 ---
 name: orch-feature
-description: 'Orchestrate feature implementation through local run and monitoring using GitHub Copilot App canvas. Focuses on coding, validation, review, and personal approval once the feature scope is already known.'
+description: 'Orchestrate feature work end to end using GitHub Copilot App canvas — from an ad-hoc request or an approved specification through implementation, validation, review, and personal approval. Use for new features, incremental changes to existing features, and small UI tweaks; missing scope, acceptance criteria, or architecture context is derived in Stage 0 rather than being a reason to skip orchestration.'
 ---
 
 # Orchestrate Feature Development
 
-Execute a feature implementation workflow from approved requirements and architecture
-through local validation using canvas interface.
+Execute a feature implementation workflow — from an ad-hoc request or approved
+requirements and architecture — through local validation using canvas interface.
 
-> **Precondition:** This skill assumes the feature specification, acceptance criteria, and
-> architecture are already approved — typically from an earlier documentation or
-> specification orchestration. Use this skill to implement that approved scope, not to
-> discover it from scratch.
+> **Scope:** This skill covers feature work whether or not a prior specification or
+> architecture orchestration ran. When an approved specification, acceptance criteria,
+> and architecture notes exist, Stage 0 is a short intake and Stage 1 proceeds as usual.
+> When they do not — an ad-hoc request, an incremental change, or a small UI tweak —
+> Stage 0 derives them with the user. Missing inputs are a reason to run Stage 0, never
+> a reason to skip this skill and implement inline.
 
 ## Input Expectations
 
-- Feature name and description.
-- Approved feature specification or story context.
-- Approved architecture constraints or design notes for the affected area.
-- Parent epic or project context.
+**Required:**
+
+- Feature name, or a one-line description of the desired behavior.
+
+**Derived in Stage 0 when absent:**
+
 - Acceptance criteria (at least one measurable criterion).
+- Impacted code paths and architecture constraints for the affected area.
+- Approved feature specification or story context.
+- Parent epic or project context.
 - Target milestone or sprint.
 - Runtime validation target (e.g., local run + monitoring).
 
@@ -33,8 +40,31 @@ through local validation using canvas interface.
 > (category defaults, overridable via `.github/copilot-model-selection.md` in the
 > consuming repo).
 
+### Stage 0: Scope Discovery
+
+Run this stage first, always. It is a quick confirmation when approved inputs already
+exist, and a full derivation when they do not.
+
+- **Restate the requested behavior** in one or two sentences, in the user's terms
+- **Derive at least one measurable acceptance criterion** that makes the change
+  verifiable; add more only where the request is genuinely multi-part
+- **Identify the impacted code paths** and the integration points they touch
+- **Identify governing instructions** — `.github/copilot-instructions.md`, any matching
+  `**/*.instructions.md`, and relevant guidelines or ADRs via
+  `jsdotnet-guidelines-mcpserver`
+- **Confirm the derived scope with the user** before any code is written; do not proceed
+  to Stage 1 without that confirmation
+
+Escalate instead of continuing when the request needs a new architectural decision, a new
+bounded context, or a cross-cutting redesign — recommend `orch-adr`, `orch-architecture`,
+or `orch-blueprint` first and ask the user.
+
+**Agents:** none required (orchestrator). Optionally `product-owner:product-owner` for
+acceptance criteria wording; `architecture:architect` only when architectural impact is
+suspected.
+
 ### Stage 1: Specification & Architecture Intake
-- **Review the approved feature scope** and acceptance criteria
+- **Review the scope confirmed in Stage 0** and its acceptance criteria
 - **Map the existing architecture guidance** to the impacted code paths
 - **Confirm implementation constraints** and affected integration points
 - **Define the local validation target** for the approved change
@@ -71,6 +101,8 @@ update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
+With an approved specification:
+
 ```
 Orchestrate feature development for:
 - Feature: "User Role-Based Access Control"
@@ -83,8 +115,17 @@ Orchestrate feature development for:
 - Runtime target: Local run + monitoring
 ```
 
+Ad-hoc request — Stage 0 derives the rest:
+
+```
+Orchestrate feature development for:
+- Feature: "Extend the desktop app so sub-items can be dragged to reorder them"
+```
+
 ## Definition of Done Checklist
 
+- [ ] Scope restated and confirmed with the user
+- [ ] At least one measurable acceptance criterion agreed
 - [ ] Code complete and reviewed
 - [ ] Unit tests written (>80% coverage)
 - [ ] Integration tests passing
@@ -115,9 +156,11 @@ shared **Dashboard Reporting Contract** in
 gating. If the extension is not installed, skip the canvas calls and continue through
 standard chat interaction.
 
-- Call `start_run` with `skillId: "orch-feature"` and these stages: Specification &
-  Architecture Intake, Implementation, Build & Test, QA Validation, Personal Validation,
-  Create Pull Request, Documentation Update, Summary.
+- Call `start_run` with `skillId: "orch-feature"` and these stages: Scope Discovery,
+  Specification & Architecture Intake, Implementation, Build & Test, QA Validation,
+  Personal Validation, Create Pull Request, Documentation Update, Summary.
+- During **Scope Discovery**, present the restated behavior, derived acceptance criteria,
+  and impacted code paths as the stage output so the user can confirm or correct them.
 - During **Specification & Architecture Intake**, optionally open/update
   `markdown-canvas` (`markdown-preview`) or `diagram-canvas` (`mermaid-diagram`) with the
   provided specification or architecture artifacts, per

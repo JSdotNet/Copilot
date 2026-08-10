@@ -26,10 +26,14 @@ that resolution, it does not re-decide model choice per skill.
 
 1. **Resolve the orchestration.** Read the invoked `orch-*/SKILL.md`, run its skill-specific
    stages in order, and determine its tier (code-modifying vs. documentation/config).
-2. **Enforce implementation preconditions.** For code-modifying orchestrations, require
-   approved specification and architecture context. If that context is missing, stop and
-   ask the user to provide it or to run the appropriate documentation/specification
-   orchestration first.
+2. **Establish implementation context.** For code-modifying orchestrations, run the
+   skill's first stage to establish scope, acceptance or verification criteria, and
+   impacted code paths. Read them when they already exist; derive them from the request
+   and the codebase and confirm them with the user when they do not. Missing context is
+   never grounds for stopping the run or letting the work proceed outside the
+   orchestration. Escalate only for the decision classes listed under **Escalation** in
+   `orch-shared-phases.instructions.md`, and then invoke the named successor
+   orchestration after user approval.
 3. **Resolve model selection once per run.** Before `start_run`, check for a repo override at
    `.github/copilot-model-selection.md`. Combine it with the category families/tiers from
    `orch-model-selection.instructions.md`, resolving each to the current latest non-legacy
