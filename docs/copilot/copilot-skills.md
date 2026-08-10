@@ -59,6 +59,8 @@ Track skill provenance and avoid duplicate local skills when plugin-provided ski
 | `github-issues` | Local: `.github/skills` (copied from awesome-copilot collection) | Creates and manages GitHub issues and related metadata. |
 | `import-infrastructure-as-code` | Plugin: `azure-cloud-development` | Imports existing cloud resources into IaC workflows. |
 | `java-junit` | Plugin: `testing-automation` | Helps author and improve Java tests with JUnit. |
+| `knowledge-base-init` | Plugin: `knowledge-base` | Scaffolds the `.arc42`/`.domain`/`.tech`/`.design`/`.backlog` knowledge folders, installs the `knowledge-meta` generator and CI check, and generates the first derived indexes. |
+| `knowledge-base-validate` | Plugin: `knowledge-base` | Runs the knowledge-metadata check and repairs broken references, malformed `meta` blocks, inconsistent reading order, and stale `_meta` indexes. |
 | `microsoft-code-reference` | Local: `.github/skills` (copied from awesome-copilot collection) | Finds official Microsoft API references and working code examples. |
 | `nuget-manager` | Local: `.github/skills` (copied from awesome-copilot collection) | Manages NuGet package add/update/remove workflows safely. |
 | `playwright-automation-fill-in-form` | Local: `.github/skills` (copied from awesome-copilot collection) | Automates form interactions using Playwright tooling. |
