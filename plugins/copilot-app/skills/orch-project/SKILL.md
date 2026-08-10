@@ -9,14 +9,23 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 > **Note:** This skill assumes your repository already exists and is configured (README, Copilot instructions, MCP servers, branch protection, templates). Use `orch-repo` first to create and configure the repository, then use this skill to scaffold the development project inside it.
 >
-> **Precondition:** This skill also assumes the target project structure and architecture
-> direction are already approved. Use it to scaffold and implement that agreed setup.
+> **Scope:** The target project structure and architecture direction do not need to be
+> written down first. When approved structure or architecture notes exist, Stage 3 is a
+> short intake. When they do not, Stage 3 derives them from the project type, the
+> repository, and the repository guidelines, and confirms them with the user. Missing
+> notes are a reason to run Stage 3, never a reason to stop or to scaffold outside this
+> orchestration.
 
 ## Input Expectations
 
+**Required:**
+
 - Repository name (must already exist on GitHub and be configured via `orch-repo`).
-- Approved project structure or architecture notes for the scaffold.
 - Project type (e.g., ASP.NET Core API with Aspire).
+
+**Derived in Stage 3 when absent:**
+
+- Approved project structure or architecture notes for the scaffold.
 - Language and framework preferences.
 - Aspire services to include (API, Database, Cache, Worker).
 
@@ -54,12 +63,25 @@ Automate the complete project scaffolding workflow for an existing, configured r
 **Agents:** `csharp-coding:coding`
 
 ### Stage 3: Specification & Architecture Intake
-- **Review the approved target architecture** for the initial setup
-- **Load the approved implementation context** and repository constraints from
+
+Establish the target architecture for the initial setup: read it where it already exists,
+derive it from the project type and the repository where it does not.
+
+- **Determine the target architecture** for the initial setup — review approved
+  architecture notes when they exist, otherwise derive the structure, service split, and
+  technology choices from the project type and repository conventions
+- **Load the implementation context** and repository constraints from
   `jsdotnet-guidelines-mcpserver`
-- **Capture API contracts** and data model boundaries already agreed
+- **Determine API contracts** and data model boundaries — confirm those already agreed,
+  and derive the rest at signature level
 - **Plan integration points** across services
 - **Capture implementation risks and assumptions** for local development
+- **Confirm the resulting architecture direction with the user** before Stage 4 installs
+  dependencies or Stage 5 scaffolds anything
+
+Escalate instead of continuing when the project needs a documented target architecture or
+a recorded decision in its own right — recommend `orch-blueprint`, `orch-arc42`, or
+`orch-adr` and ask the user.
 
 **Agents:** `architecture:architect`
 **MCP Servers:** `jsdotnet-guidelines-mcpserver`
@@ -156,8 +178,8 @@ standard chat interaction.
   Dependencies, Implementation, Build & Test, QA Validation, Personal Validation,
   Create Pull Request, Summary.
 - During **Specification & Architecture Intake**, also open/update `markdown-canvas`
-  (`markdown-preview`) with the drafted architecture documentation and `diagram-canvas`
-  (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
+  (`markdown-preview`) with the reviewed or derived architecture documentation and
+  `diagram-canvas` (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
   `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action

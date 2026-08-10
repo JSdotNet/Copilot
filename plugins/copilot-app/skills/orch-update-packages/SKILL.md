@@ -7,16 +7,28 @@ description: 'Orchestrate dependency and package update workflows using GitHub C
 
 Execute a complete package update workflow with validation, testing, and local runtime monitoring using canvas interface.
 
-> **Precondition:** This skill assumes the update scope, risk tolerance, and maintenance
-> intent are already known. Use it to implement the approved update run, not to define the
-> overall maintenance policy.
+> **Scope:** This skill derives its own update scope. Stage 1 (Dependency Analysis) and
+> Stage 2 (Update Planning) scan the dependency graph, classify what is available, and
+> produce the categorized, prioritized update run — so a request as small as "update the
+> packages" is in scope. When an approved maintenance directive or update scope already
+> exists, those stages confirm and align to it instead of deriving from scratch.
+>
+> Escalate only when the request is really a maintenance *policy* decision — for example
+> standing rules on major-version adoption or supported framework baselines. Recommend
+> `orch-architecture` for the policy, or `orch-adr` to record it, and ask the user.
 
 ## Input Expectations
 
+**Required:**
+
 - Project name and location.
+
+**Derived in Stages 1–2 when absent:**
+
 - Approved update scope or maintenance directive.
 - Update scope (security, critical patches, minor, major).
 - Testing strategy (core tests, full suite, extended).
+- Risk tolerance and rollback boundaries.
 - Runtime validation target (e.g., local run + monitoring).
 - Notification preferences on completion.
 
@@ -42,6 +54,8 @@ Execute a complete package update workflow with validation, testing, and local r
 - **Categorize updates** (security, patch, minor, major)
 - **Prioritize critical/security updates** first
 - **Plan rollback strategy** for risky updates
+- **Confirm the resulting update run with the user** — the categorized scope, the testing
+  strategy, and anything deliberately deferred
 - **Coordinate with stakeholders** for major version upgrades
 
 **Agents:** `product-owner:product-owner`
@@ -85,6 +99,8 @@ update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
+With an agreed update scope:
+
 ```
 Orchestrate package updates for:
 - Project: "PaymentService"
@@ -92,6 +108,14 @@ Orchestrate package updates for:
 - Testing: Full integration test suite
 - Runtime target: Local run + monitoring
 - Notify: On completion with changelog summary
+```
+
+Ad-hoc request — Stages 1–2 derive the rest:
+
+```
+Orchestrate package updates for:
+- Project: "PaymentService"
+- "Update the packages"
 ```
 
 ## Update Categories

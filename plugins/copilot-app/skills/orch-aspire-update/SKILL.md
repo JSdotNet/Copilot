@@ -7,16 +7,29 @@ description: 'Orchestrate .NET Aspire upgrades with a plan-first workflow in Git
 
 Execute a complete Aspire update workflow using canvas interface, starting with a plan, refining it, then implementing and adopting new features safely.
 
-> **Precondition:** This skill assumes the target upgrade scope, success criteria, and
-> architecture/runtime constraints are already agreed. Use it to execute that approved
-> upgrade path.
+> **Scope:** This skill derives its own upgrade scope. Stage 1 (Upgrade Intake &
+> Baseline) inventories the current Aspire stack, captures the baseline, and defines the
+> success criteria; Stage 2 (Plan Refinement) turns that into the batched upgrade path —
+> so a request as small as "move us to the latest Aspire" is in scope. When an approved
+> upgrade scope or maintenance directive already exists, those stages confirm and align to
+> it instead of deriving from scratch.
+>
+> Escalate only when the upgrade forces a new architectural decision, or when adopting a
+> new Aspire capability changes the target architecture. Recommend `orch-adr` or
+> `orch-architecture` and ask the user.
 
 ## Input Expectations
 
+**Required:**
+
 - Repository or project name.
+
+**Derived in Stages 1–2 when absent:**
+
 - Approved upgrade scope or maintenance directive.
 - Current Aspire version.
 - Target Aspire version.
+- Success criteria for upgrade completion and feature adoption.
 - New Aspire features to adopt (if any).
 - Constraints (e.g., preserve local developer workflow stability).
 
@@ -32,9 +45,20 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 
 ### Stage 1: Upgrade Intake & Baseline
 - **Inventory current Aspire stack** (packages, SDK constraints, AppHost integrations)
-- **Capture baseline behavior** (build, tests, runtime health)
-- **Confirm the approved upgrade scope** and rollback boundaries
+- **Capture baseline behavior** (build, tests, runtime health) before any package changes
+- **Determine the upgrade scope** — current and target versions, and rollback boundaries —
+  confirming an approved scope where one exists and deriving it from the inventory where
+  one does not
 - **Define success criteria** for upgrade completion and feature adoption
+- **Confirm the derived scope and success criteria with the user** before Stage 3 changes
+  anything
+
+**Baseline gate:** a green baseline is required before upgrading, so that post-upgrade
+failures are attributable. If the baseline is red, record the failing build, tests, or
+health checks as pre-existing, then either fix them first within this run or agree with
+the user to proceed with the known-red items explicitly excluded from the upgrade's
+success criteria. Do not decline the request and do not upgrade over an unrecorded red
+baseline.
 
 **Agents:** `csharp-coding:coding`
 
@@ -85,6 +109,8 @@ update that file to change these phases for every orchestration.
 
 ## Usage Pattern
 
+With an agreed upgrade scope:
+
 ```
 Orchestrate Aspire update for:
 - Repository: "Orders.Platform"
@@ -95,9 +121,18 @@ Orchestrate Aspire update for:
 - Output: refined upgrade plan + validation recording report
 ```
 
+Ad-hoc request — Stages 1–2 derive the rest:
+
+```
+Orchestrate Aspire update for:
+- Repository: "Orders.Platform"
+- "Get us onto the latest Aspire"
+```
+
 ## Definition of Done Checklist
 
-- [ ] Baseline inventory completed
+- [ ] Baseline inventory completed and baseline state recorded (green, or red with the
+      pre-existing failures agreed and excluded)
 - [ ] Initial update plan created
 - [ ] Plan refined with risks and batch sequencing
 - [ ] Aspire packages and integrations upgraded

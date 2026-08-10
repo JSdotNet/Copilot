@@ -70,7 +70,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["MVP Scope Intake"] --> B["Implementation Planning"]
+    S["Scope Discovery"] --> A["MVP Scope Intake"]
+    A --> B["Implementation Planning"]
     B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
@@ -84,6 +85,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | MVP Scope Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
@@ -326,7 +328,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Specification Intake"] --> B["Implementation Planning"]
+    S["Scope Discovery"] --> A["Specification Intake"]
+    A --> B["Implementation Planning"]
     B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
@@ -340,6 +343,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Specification Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
@@ -353,7 +357,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Specification Intake"] --> B["Implementation Planning"]
+    S["Scope Discovery"] --> A["Specification Intake"]
+    A --> B["Implementation Planning"]
     B --> C["Implementation"]
     C --> D["Build & Test"]
     D --> E["QA Validation"]
@@ -367,6 +372,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Specification Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
