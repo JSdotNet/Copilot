@@ -51,6 +51,52 @@ malformed `meta` blocks, inconsistent reading order, stale committed indexes.
 **Trigger keywords:** `knowledge-meta failed`, `broken reference`, `stale _meta`,
 `validate knowledge folders`, `knowledge base check`, `build.mjs --check`
 
+### Skill: `orch-arc42-content`
+
+Orchestrates direct content edits to `.arc42/` chapters — refreshing a chapter,
+section, or diagram — with metadata enforcement and a consistency review. Defers
+decision-record and blueprint-scale work to `orch-adr`, `orch-tdr`,
+`orch-blueprint`, and `orch-architecture`.
+
+**Trigger keywords:** `update arc42 chapter`, `refresh runtime view`,
+`arc42 diagram`, `add glossary term`, `edit .arc42`, `quality requirements`
+
+### Skill: `orch-domain`
+
+Orchestrates `.domain/` changes — bounded-context model, features, model and
+flow diagrams, dependencies, and naming — through `domain-design:domain-architect`
+with template and metadata enforcement.
+
+**Trigger keywords:** `bounded context`, `context map`, `new aggregate`,
+`domain model`, `ubiquitous language`, `domain flow`, `edit .domain`
+
+### Skill: `orch-backlog`
+
+Orchestrates `.backlog/` work-item chapters — Items and Sub-items grouped by
+concern — drafting through `write-epic` / `write-story` / `write-bug` and
+publishing through `create-github-issue` / `update-github-issue`.
+
+**Trigger keywords:** `backlog item`, `add sub-item`, `work item chapter`,
+`publish to issue`, `edit .backlog`, `concern file`
+
+### Skill: `orch-tech`
+
+Orchestrates `.tech/` technology-graph changes — adding a technology, pinning a
+version, promoting or retiring a status, adding a layer — and keeps the graph
+diagram in sync with the `depends-on` edges.
+
+**Trigger keywords:** `technology graph`, `add technology`, `pin version`,
+`promote to adopted`, `retire technology`, `edit .tech`
+
+### Skill: `orch-design`
+
+Orchestrates `.design/` guideline changes — principles, tokens, typography and
+layout, interaction, accessibility, component libraries — grounded in the
+repository's authoritative design source, through `ux-design:ux-designer`.
+
+**Trigger keywords:** `design tokens`, `color scheme`, `design guideline`,
+`interaction rule`, `accessibility guideline`, `component library`, `edit .design`
+
 ### Instructions (auto-applied)
 
 | File | Pattern | Purpose |

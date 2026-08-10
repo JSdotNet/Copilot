@@ -9,6 +9,10 @@ Copy the relevant parts below into the target repository, then edit them to name
 the orchestrations, agents, and MCP servers that repository actually has
 installed. Delete any knowledge folder the repository did not adopt.
 
+The plugin does ship per-folder orchestration skills — `orch-arc42-content`,
+`orch-domain`, `orch-tech`, `orch-design`, and `orch-backlog` — so a routing
+policy can name them directly as the entry point for each folder.
+
 ## For `.github/copilot-instructions.md`
 
 ```markdown
@@ -29,13 +33,16 @@ installed. Delete any knowledge folder the repository did not adopt.
 
 - Architecture, arc42, blueprint, ADR, and TDR workflows may load `.arc42/` as
   working context, but should load only the chapter(s) relevant to the requested
-  scope.
+  scope. Route direct `.arc42/` chapter edits through `orch-arc42-content`.
 - Domain modeling workflows may load `.domain/` as working context, but should
-  load only the relevant bounded-context chapters.
+  load only the relevant bounded-context chapters. Route `.domain/` edits through
+  `orch-domain`.
 - Design and UX workflows may load `.design/`, and stack, dependency, or upgrade
-  workflows may load `.tech/` — in both cases only the relevant file(s).
+  workflows may load `.tech/` — in both cases only the relevant file(s). Route
+  edits through `orch-design` and `orch-tech`.
 - Backlog-writing and issue-writing workflows may load `.backlog/`, but should
-  load only the relevant work-item chapters.
+  load only the relevant work-item chapters. Route `.backlog/` edits through
+  `orch-backlog`.
 - Non-architecture implementation, bug-fix, package-update, documentation, and UX
   flows should not load `.arc42/` by default. Consult it only when the user
   explicitly asks for architecture context or when implementation depends on a
