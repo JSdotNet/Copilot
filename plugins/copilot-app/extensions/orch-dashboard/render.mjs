@@ -117,7 +117,6 @@ export function renderShell() {
   .stage.blocked { border-left-color: var(--true-color-red, #cf222e); }
   .stage-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
   .stage-name { font-weight: var(--font-weight-semibold, 600); }
-  .stage-agents { font-size: 12px; color: var(--text-color-muted, #59636e); margin-bottom: 4px; }
   .stage-used { font-size: 12px; color: var(--text-color-muted, #59636e); margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
   .tag {
     display: inline-block;
@@ -136,15 +135,34 @@ export function renderShell() {
     font-size: var(--text-code-inline, 12px);
     background: var(--background-color-muted, rgba(127,127,127,0.06));
     border-radius: 6px;
-    padding: 8px 10px;
+    padding: 7px 10px;
     margin-top: 4px;
   }
+  .stage-output-wrap { margin-top: 4px; }
+  .stage-output.clamped {
+    max-height: 116px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+  }
+  .show-more {
+    background: transparent;
+    border: none;
+    color: var(--true-color-blue, #0969da);
+    font: inherit;
+    font-size: 12px;
+    font-weight: var(--font-weight-semibold, 600);
+    cursor: pointer;
+    padding: 2px 0;
+    margin-top: 2px;
+  }
+  .show-more:hover { text-decoration: underline; }
   .qa-block { margin-top: 8px; }
   .qa-block h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-color-muted, #59636e); margin: 8px 0 4px; }
   .qa-scenario {
     border-radius: 6px;
     padding: 6px 10px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     background: var(--background-color-muted, rgba(127,127,127,0.05));
   }
   .qa-scenario-head { display: flex; align-items: center; gap: 8px; }
@@ -154,11 +172,19 @@ export function renderShell() {
   .qa-status.fail { background: rgba(207,34,46,0.15); color: var(--true-color-red, #cf222e); }
   .qa-status.flaky { background: rgba(191,135,0,0.18); color: #9a6700; }
   .qa-notes { font-size: 12px; color: var(--text-color-muted, #59636e); margin-top: 2px; }
-  .qa-evidence { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .qa-evidence img { max-width: 140px; max-height: 90px; border-radius: 4px; border: 1px solid var(--border-color-default, #d0d7de); display: block; }
+  .qa-evidence { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .qa-evidence img { max-width: 150px; max-height: 96px; border-radius: 4px; border: 1px solid var(--border-color-default, #d0d7de); display: block; object-fit: cover; }
   .qa-evidence a { font-size: 11px; color: var(--true-color-blue, #0969da); text-decoration: none; }
   .qa-evidence a:hover { text-decoration: underline; }
-  .qa-evidence-file { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
+  .qa-evidence-file { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; max-width: 150px; }
+  .qa-evidence-file span { font-size: 11px; color: var(--text-color-muted, #59636e); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+  .evidence-missing {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    width: 150px; height: 96px; padding: 6px;
+    border: 1px dashed var(--border-color-default, #d0d7de); border-radius: 4px;
+    font-size: 11px; color: var(--text-color-muted, #59636e);
+    background: var(--background-color-muted, rgba(127,127,127,0.05));
+  }
   .qa-monitoring { border-radius: 6px; padding: 6px 10px; background: var(--background-color-muted, rgba(127,127,127,0.05)); }
   .qa-finding { font-size: 12px; margin-bottom: 3px; }
   .qa-finding .qa-level { font-weight: var(--font-weight-semibold, 600); text-transform: uppercase; font-size: 10px; margin-right: 6px; }
@@ -186,6 +212,8 @@ export function renderShell() {
     cursor: pointer;
   }
   .btn:hover { background: var(--background-color-muted, rgba(127,127,127,0.08)); }
+  .btn[disabled] { opacity: 0.6; cursor: default; }
+  .download-error { color: var(--true-color-red, #cf222e); font-size: 12px; margin: 4px 0 0; text-align: right; }
   .insight { margin-top: 20px; }
   .insight h2 { font-size: var(--text-body-large, 15px); margin: 0 0 8px; }
   .insight-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -224,7 +252,20 @@ export function renderShell() {
       return '<span class="badge ' + esc(s) + '">' + esc(STATUS_LABEL[s] || s) + '</span>';
     }
 
+    // A run has a declared trailing Summary stage when its last stage is named
+    // "Summary" (orch-feature and friends declare one). finish_run also sets
+    // run.summary; without this check the nav/detail would render Summary twice
+    // — once for the declared stage and once synthesised from run.summary.
+    function declaredSummaryIndex(run) {
+      const stages = run.stages || [];
+      for (let i = stages.length - 1; i >= 0; i--) {
+        if (/^summary$/i.test((stages[i].name || "").trim())) return i;
+      }
+      return -1;
+    }
+
     function renderStageNav(run) {
+      const summaryIdx = declaredSummaryIndex(run);
       const items = (run.stages || []).map((s, i) => (
         '<button class="stage-nav-item ' + (activeStage === i ? "active" : "") + '" data-stage="' + i + '">' +
           '<span class="stage-nav-dot ' + esc(s.status) + '"></span>' +
@@ -232,7 +273,9 @@ export function renderShell() {
           badge(s.status) +
         '</button>'
       ));
-      if (run.summary) {
+      // Only synthesise a Summary nav entry when the run has a summary AND no
+      // stage already represents it, so it never appears twice.
+      if (run.summary && summaryIdx < 0) {
         items.push(
           '<button class="stage-nav-item ' + (activeStage === "summary" ? "active" : "") + '" data-stage="summary">' +
             '<span class="stage-nav-dot done"></span>' +
@@ -379,7 +422,10 @@ export function renderShell() {
       return '<div class="insight"><h2>Context</h2>' + parts.join("") + '</div>';
     }
 
-    function renderStageTokens(run, index) {
+    // Returns just the token-delta pill span (no wrapper) so it can sit in the
+    // same badge row as the agent/MCP/model pills for a consistent stage meta
+    // line. Empty string when the stage recorded no token usage.
+    function stageTokenPill(run, index) {
       const ctx = run.contextSummary;
       const stage = ctx && ctx.perStage && ctx.perStage[index];
       if (!stage || !stage.tokens) return "";
@@ -389,10 +435,13 @@ export function renderShell() {
       const title = 'Per-stage token delta: input + output tokens of model calls that ' +
         'completed while this stage was in progress. Input counts the whole prompt, ' +
         'most of which is normally served from the prompt cache.';
-      return '<div class="stage-used"><span class="tag tokens" title="' + esc(title) + '">Token delta: ' +
-        esc(fmtTokens(stage.tokens) + ' (' + fmtTokens(stage.uncachedTokens) + ' uncached' + sub + ')') + '</span></div>';
+      return '<span class="tag tokens" title="' + esc(title) + '">Token delta: ' +
+        esc(fmtTokens(stage.tokens) + ' (' + fmtTokens(stage.uncachedTokens) + ' uncached' + sub + ')') + '</span>';
     }
 
+    // Overall Insight-panel usage tags (full, unshortened labels). Kept
+    // separate from per-stage rendering, which merges declared + observed
+    // agents and shortens plugin-qualified names.
     function renderUsedTags(perStageEntry) {
       if (!perStageEntry) return "";
       const groups = [
@@ -410,6 +459,70 @@ export function renderShell() {
       return '<div class="stage-used">' + parts.join("") + '</div>';
     }
 
+    function shortAgentLabel(name) {
+      const s = String(name || "");
+      const i = s.indexOf(":");
+      return i >= 0 ? s.slice(i + 1) : s;
+    }
+
+    // Merges declared agents (e.g. "csharp-coding:coding") with observed ones
+    // (e.g. "coding") into one deduped, display-ready set. The redundant plugin
+    // prefix is dropped so it reads "coding", unless two genuinely different
+    // agents collapse to the same short name (two distinct prefixes), in which
+    // case the full qualified names are kept so they stay unambiguous.
+    function mergeAgentLabels(names) {
+      const groups = new Map();
+      (names || []).filter(Boolean).forEach((n) => {
+        const short = shortAgentLabel(n);
+        if (!groups.has(short)) groups.set(short, new Set());
+        groups.get(short).add(n);
+      });
+      const labels = [];
+      groups.forEach((fulls, short) => {
+        const prefixes = new Set();
+        fulls.forEach((f) => { const i = f.indexOf(":"); if (i >= 0) prefixes.add(f.slice(0, i)); });
+        if (prefixes.size >= 2) {
+          Array.from(fulls).sort().forEach((f) => labels.push(f));
+        } else {
+          labels.push(short);
+        }
+      });
+      return labels.sort();
+    }
+
+    // Single code path for every stage's meta badge row: purple Agent pills
+    // (declared + observed, merged), MCP/Model pills, and the token-delta pill.
+    function renderStageMeta(run, index, stage) {
+      const insight = run.insightSummary && run.insightSummary.perStage && run.insightSummary.perStage[index];
+      const declared = (stage && stage.agents) || [];
+      const observed = (insight && insight.agents) || [];
+      const agents = mergeAgentLabels(declared.concat(observed));
+      const pills = [];
+      agents.forEach((a) => pills.push('<span class="tag agent">Agent: ' + esc(a) + '</span>'));
+      ((insight && insight.mcpServers) || []).forEach((m) => pills.push('<span class="tag mcp">MCP: ' + esc(m) + '</span>'));
+      ((insight && insight.models) || []).forEach((m) => pills.push('<span class="tag model">Model: ' + esc(m) + '</span>'));
+      const tokenPill = stageTokenPill(run, index);
+      if (tokenPill) pills.push(tokenPill);
+      if (!pills.length) return "";
+      return '<div class="stage-used">' + pills.join("") + '</div>';
+    }
+
+    // Long stage output is clamped by default with a Show more/less toggle so a
+    // wall of monospace text doesn't dominate the panel; short output renders
+    // in full with no toggle.
+    function renderStageOutput(output) {
+      if (!output) return "";
+      const text = String(output);
+      const long = text.split("\\n").length > 8 || text.length > 600;
+      if (!long) {
+        return '<div class="stage-output-wrap"><div class="stage-output">' + esc(text) + '</div></div>';
+      }
+      return '<div class="stage-output-wrap">' +
+        '<div class="stage-output clamped">' + esc(text) + '</div>' +
+        '<button class="show-more" type="button">Show more</button>' +
+      '</div>';
+    }
+
     function evidenceUrl(runId, filePath) {
       return "/api/runs/" + encodeURIComponent(runId) + "/evidence?path=" + encodeURIComponent(filePath);
     }
@@ -423,10 +536,13 @@ export function renderShell() {
       if (!Array.isArray(evidence) || !evidence.length) return "";
       const items = evidence.map((e) => {
         const url = evidenceUrl(runId, e.path);
-        const label = esc(e.description || e.path.split(/[\\/]/).pop());
+        const label = esc(e.description || e.path.split(/[\\\\/]/).pop());
         if (isImageEvidence(e.type, e.path)) {
+          // A single caption under the thumbnail. If the file can't be served
+          // (missing/deleted/forbidden), onerror swaps the broken image for a
+          // clear placeholder instead of the browser's broken-image glyph.
           return '<a class="qa-evidence-file" href="' + url + '" target="_blank" rel="noopener" title="' + label + '">' +
-            '<img src="' + url + '" alt="' + label + '" loading="lazy" />' +
+            '<img src="' + url + '" alt="' + label + '" loading="lazy" onerror="evidenceError(this)" />' +
             '<span>' + label + '</span></a>';
         }
         return '<a class="qa-evidence-file" href="' + url + '" target="_blank" rel="noopener">' + esc(e.type || "file") + ': ' + label + '</a>';
@@ -469,23 +585,35 @@ export function renderShell() {
         renderRunList();
         return;
       }
-      const stages = (run.stages || []).map((s, i) => (
-        '<div class="stage ' + esc(s.status) + '" id="stage-' + i + '">' +
+      const summaryIdx = declaredSummaryIndex(run);
+      const stages = (run.stages || []).map((s, i) => {
+        // When a run declares a trailing Summary stage, fold the finish_run
+        // summary into that stage instead of appending a separate block, so
+        // the summary never appears twice.
+        const inlineSummary = i === summaryIdx && run.summary && run.summary.trim() !== (s.output || "").trim()
+          ? '<div class="summary">' + esc(run.summary) + '</div>'
+          : "";
+        return '<div class="stage ' + esc(s.status) + '" id="stage-' + i + '">' +
           '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + '</div>' +
-          (s.agents && s.agents.length ? '<div class="stage-agents">Agents: ' + esc(s.agents.join(", ")) + '</div>' : "") +
-          renderUsedTags(run.insightSummary && run.insightSummary.perStage && run.insightSummary.perStage[i]) +
-          renderStageTokens(run, i) +
-          (s.output ? '<div class="stage-output">' + esc(s.output) + '</div>' : "") +
+          renderStageMeta(run, i, s) +
+          renderStageOutput(s.output) +
+          inlineSummary +
           renderScenarios(run.id, s.scenarios) +
           renderMonitoring(s.monitoring) +
-        '</div>'
-      )).join("");
+        '</div>';
+      }).join("");
+      const filenameBase = (run.skillId + '-' + run.id).replace(/[^a-zA-Z0-9._-]/g, "-");
+      // Only render a standalone summary block when no declared stage covers it.
+      const trailingSummary = run.summary && summaryIdx < 0
+        ? '<div class="summary" id="summary-block"><h2>Summary</h2>' + esc(run.summary) + '</div>'
+        : "";
       el.innerHTML =
         '<div class="header-row"><h1 style="margin:0;">' + esc(run.title) + '</h1>' +
           '<div class="header-actions">' + badge(run.status) +
-            '<a class="btn" href="/api/runs/' + esc(run.id) + '/report" download>Download report</a>' +
+            '<button class="btn" type="button" id="download-report" data-run="' + esc(run.id) + '" data-filename="' + esc(filenameBase) + '">Download report</button>' +
           '</div>' +
         '</div>' +
+        '<p class="download-error" id="download-error" hidden></p>' +
         '<p class="subtitle">' + esc(run.skillId) + ' &middot; started ' + esc(new Date(run.startedAt).toLocaleString()) +
           (run.updatedAt ? ' &middot; updated ' + esc(new Date(run.updatedAt).toLocaleString()) : "") +
           (run.changeKind ? ' &middot; change: ' + esc(run.changeKind) : "") +
@@ -493,10 +621,62 @@ export function renderShell() {
             ? ' &middot; personal validation: ' + esc(run.approval.personalValidation)
             : "") + '</p>' +
         stages +
-        (run.summary ? '<div class="summary" id="summary-block"><h2>Summary</h2>' + esc(run.summary) + '</div>' : "") +
+        trailingSummary +
         renderInsight(run) +
         renderContext(run);
+      wireDetailHandlers();
       renderRunList();
+    }
+
+    function wireDetailHandlers() {
+      const dl = document.getElementById("download-report");
+      if (dl) dl.addEventListener("click", () => downloadReport(dl.dataset.run, dl.dataset.filename, dl));
+      document.querySelectorAll("#detail .show-more").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const out = btn.previousElementSibling;
+          if (!out) return;
+          const clamped = out.classList.toggle("clamped");
+          btn.textContent = clamped ? "Show more" : "Show less";
+        });
+      });
+    }
+
+    // Downloads the run's self-contained HTML report (evidence images inlined
+    // as data URIs) via a blob URL, which works inside the canvas webview where
+    // a plain <a download> navigation is silently dropped. Any failure is
+    // surfaced inline rather than failing silently.
+    async function downloadReport(runId, filenameBase, btn) {
+      const errEl = document.getElementById("download-error");
+      if (errEl) { errEl.hidden = true; errEl.textContent = ""; }
+      const original = btn ? btn.textContent : "";
+      if (btn) { btn.disabled = true; btn.textContent = "Preparing…"; }
+      try {
+        const res = await fetch("/api/runs/" + encodeURIComponent(runId) + "/report.html");
+        if (!res.ok) throw new Error("report request failed (HTTP " + res.status + ")");
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = (filenameBase || runId || "orchestration-report") + ".html";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      } catch (err) {
+        if (errEl) {
+          errEl.hidden = false;
+          errEl.textContent = "Download failed: " + (err && err.message ? err.message : String(err));
+        }
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = original; }
+      }
+    }
+
+    function evidenceError(img) {
+      const ph = document.createElement("span");
+      ph.className = "evidence-missing";
+      ph.textContent = "Evidence unavailable";
+      img.replaceWith(ph);
     }
 
     async function selectRun(id) {
