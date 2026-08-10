@@ -1,6 +1,7 @@
-// Markdown report generator for orch-dashboard runs. Used by the
-// `/api/runs/:id/report` download endpoint and reusable for any future
-// export format.
+// Report generators for orch-dashboard runs. `renderReportMarkdown` backs the
+// `/api/runs/:id/report` download endpoint; `renderReportHtml` backs the
+// `/api/runs/:id/report.html` endpoint and produces a single self-contained
+// HTML file with evidence images inlined as `data:` URIs.
 
 import { summarizeInsights, summarizeContext } from "./insight.mjs";
 
@@ -189,4 +190,153 @@ export function renderReportMarkdown(run) {
     }
 
     return lines.join("\n");
+}
+
+function escHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (c) => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+    ));
+}
+
+const REPORT_HTML_STYLE = `
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0 auto; max-width: 900px; padding: 32px 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px; line-height: 1.5; color: #1f2328; background: #ffffff; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 28px 0 8px; border-bottom: 1px solid #d0d7de; padding-bottom: 4px; }
+  h3 { font-size: 14px; margin: 18px 0 6px; }
+  .meta { color: #59636e; font-size: 13px; margin: 0 0 8px; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 13px; }
+  th, td { border: 1px solid #d0d7de; padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: rgba(127,127,127,0.08); }
+  pre { white-space: pre-wrap; background: rgba(127,127,127,0.08); border-radius: 6px;
+    padding: 10px 12px; font-size: 12.5px; overflow-x: auto; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: .02em; }
+  .badge.done { background: rgba(31,136,61,.15); color: #1f883d; }
+  .badge.pending { background: rgba(127,127,127,.18); color: #59636e; }
+  .badge.in_progress { background: rgba(9,105,218,.15); color: #0969da; }
+  .badge.blocked, .badge.cancelled { background: rgba(207,34,46,.15); color: #cf222e; }
+  .badge.skipped { background: rgba(127,127,127,.1); color: #59636e; }
+  .badge.pass { background: rgba(31,136,61,.15); color: #1f883d; }
+  .badge.fail { background: rgba(207,34,46,.15); color: #cf222e; }
+  .badge.flaky { background: rgba(191,135,0,.18); color: #9a6700; }
+  .scenario { border: 1px solid #d0d7de; border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+  .scenario-head { display: flex; align-items: center; gap: 8px; }
+  .scenario-name { font-weight: 600; }
+  .scenario-notes { color: #59636e; margin: 4px 0 0; }
+  .evidence { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .evidence figure { margin: 0; max-width: 320px; }
+  .evidence img { max-width: 320px; border-radius: 6px; border: 1px solid #d0d7de; display: block; }
+  .evidence figcaption { font-size: 12px; color: #59636e; margin-top: 2px; }
+  .evidence .missing { padding: 24px; border: 1px dashed #d0d7de; border-radius: 6px;
+    color: #59636e; font-size: 12px; text-align: center; }
+  .summary { background: rgba(31,136,61,.08); border-left: 3px solid #1f883d;
+    border-radius: 6px; padding: 12px 14px; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e6edf3; background: #0d1117; }
+    h2 { border-bottom-color: #30363d; }
+    th, td { border-color: #30363d; }
+    .scenario { border-color: #30363d; }
+    .evidence img, .evidence .missing { border-color: #30363d; }
+  }`;
+
+// Builds a single self-contained HTML document for a run. `evidenceDataUris`
+// maps an evidence `path` to a `data:` URI (or `null` when the file is not an
+// image or could not be read); it is supplied by the caller so this module
+// stays free of filesystem access.
+export function renderReportHtml(run, evidenceDataUris = {}) {
+    const insight = summarizeInsights(run);
+    const parts = [];
+    parts.push(`<h1>${escHtml(run.title)}</h1>`);
+    const metaBits = [
+        `<span class="badge ${escHtml(run.status)}">${escHtml(run.status)}</span>`,
+        `<code>${escHtml(run.skillId)}</code>`,
+        `started ${escHtml(run.startedAt)}`,
+    ];
+    if (run.changeKind) metaBits.push(`change: ${escHtml(run.changeKind)}`);
+    if (run.approval && run.approval.personalValidation) {
+        metaBits.push(`personal validation: ${escHtml(run.approval.personalValidation)}`);
+    }
+    parts.push(`<p class="meta">${metaBits.join(" &middot; ")}</p>`);
+
+    parts.push("<h2>Stages</h2>");
+    parts.push("<table><thead><tr><th>#</th><th>Stage</th><th>Status</th><th>Agents (planned)</th><th>Agents (used)</th><th>MCP</th><th>Models</th></tr></thead><tbody>");
+    (run.stages || []).forEach((stage, i) => {
+        const observed = insight.perStage[i] || { agents: [], mcpServers: [], models: [] };
+        parts.push(
+            `<tr><td>${i + 1}</td><td>${escHtml(stage.name)}</td>` +
+            `<td><span class="badge ${escHtml(stage.status)}">${escHtml(stage.status)}</span></td>` +
+            `<td>${escHtml((stage.agents || []).join(", ") || "-")}</td>` +
+            `<td>${escHtml(observed.agents.join(", ") || "-")}</td>` +
+            `<td>${escHtml(observed.mcpServers.join(", ") || "-")}</td>` +
+            `<td>${escHtml(observed.models.join(", ") || "-")}</td></tr>`
+        );
+    });
+    parts.push("</tbody></table>");
+
+    (run.stages || []).forEach((stage, i) => {
+        const hasOutput = Boolean(stage.output);
+        const hasScenarios = Array.isArray(stage.scenarios) && stage.scenarios.length;
+        const hasMonitoring = stage.monitoring && (stage.monitoring.summary || (stage.monitoring.findings || []).length);
+        if (!hasOutput && !hasScenarios && !hasMonitoring) return;
+        parts.push(`<h3>${i + 1}. ${escHtml(stage.name)}</h3>`);
+        if (hasOutput) parts.push(`<pre>${escHtml(stage.output)}</pre>`);
+        if (hasScenarios) {
+            stage.scenarios.forEach((s) => {
+                parts.push('<div class="scenario">');
+                parts.push(
+                    `<div class="scenario-head"><span class="badge ${escHtml(s.status)}">${escHtml(s.status)}</span>` +
+                    `<span class="scenario-name">${escHtml(s.name)}</span></div>`
+                );
+                if (s.notes) parts.push(`<p class="scenario-notes">${escHtml(s.notes)}</p>`);
+                const evidence = (s.evidence || []).filter((e) => e && e.path);
+                if (evidence.length) {
+                    parts.push('<div class="evidence">');
+                    evidence.forEach((e) => {
+                        const caption = escHtml(e.description || e.path.split(/[\\/]/).pop());
+                        const dataUri = evidenceDataUris[e.path];
+                        if (dataUri) {
+                            parts.push(`<figure><img src="${dataUri}" alt="${caption}" /><figcaption>${caption}</figcaption></figure>`);
+                        } else {
+                            parts.push(`<figure><div class="missing">Evidence unavailable<br>${escHtml(e.type || "file")}: ${caption}</div></figure>`);
+                        }
+                    });
+                    parts.push("</div>");
+                }
+                parts.push("</div>");
+            });
+        }
+        if (hasMonitoring) {
+            if (stage.monitoring.summary) parts.push(`<p>${escHtml(stage.monitoring.summary)}</p>`);
+            if ((stage.monitoring.findings || []).length) {
+                parts.push("<table><thead><tr><th>Level</th><th>Resource</th><th>Message</th><th>Timestamp</th></tr></thead><tbody>");
+                stage.monitoring.findings.forEach((f) => {
+                    parts.push(`<tr><td>${escHtml(f.level)}</td><td>${escHtml(f.resource || "-")}</td><td>${escHtml(f.message)}</td><td>${escHtml(f.timestamp || "-")}</td></tr>`);
+                });
+                parts.push("</tbody></table>");
+            }
+        }
+    });
+
+    if (run.summary) {
+        parts.push("<h2>Summary</h2>");
+        parts.push(`<div class="summary">${escHtml(run.summary)}</div>`);
+    }
+
+    const doc = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${escHtml(run.title)} — orchestration report</title>
+<style>${REPORT_HTML_STYLE}</style>
+</head>
+<body>
+${parts.join("\n")}
+</body>
+</html>`;
+    return doc;
 }
