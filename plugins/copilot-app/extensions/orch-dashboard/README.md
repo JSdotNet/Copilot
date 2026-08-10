@@ -87,14 +87,23 @@ App, instead of plain chat narration.
   thumbnails for screenshot evidence and download links for
   video/log/trace evidence, and a runtime-monitoring findings list (Error/
   Critical/Warning/Info) from Aspire log/trace/metric checks. Evidence
-  files are served from `<session workspace>/<evidence path>` via
-  `/api/runs/:id/evidence?path=...` (path-traversal guarded).
-- A **Download report** button on each run that downloads a Markdown report
-  (stages with planned vs. actually-used agents/MCP servers/models, output,
-  QA scenario/evidence tables, monitoring findings, summary, the insight
-  breakdown, and a **Context** section carrying the run-level context gauge,
-  compaction/truncation counts, and a per-stage token delta table) via
-  `/api/runs/:id/report`.
+  files are served from `<worktree root>/<evidence path>` via
+  `/api/runs/:id/evidence?path=...` (path-traversal guarded). The worktree
+  root is the git checkout the agent operates in — read from the session
+  state directory's `workspace.yaml` (`git_root`/`cwd`), **not** the
+  infinite-sessions state directory itself. When an image cannot be served
+  (deleted, moved, or forbidden) the thumbnail is replaced with an inline
+  "Evidence unavailable" placeholder rather than a broken-image glyph.
+- A **Download report** button on each run that downloads a single,
+  self-contained **HTML** report (stages with planned vs. actually-used
+  agents/MCP servers/models, output, QA scenario/evidence tables with the
+  screenshots **inlined as `data:` URIs** so the file opens standalone,
+  monitoring findings, summary, the insight breakdown, and a per-stage token
+  delta) via `/api/runs/:id/report.html`. The download is performed from a
+  blob in the browser (a plain `<a download>` navigation is silently dropped
+  inside the canvas webview); any failure is surfaced inline next to the
+  button instead of failing silently. A plain-text **Markdown** export of the
+  same data remains available at `/api/runs/:id/report`.
 - Live updates over server-sent events, so the panel refreshes automatically
   as the orchestrating agent moves through stages.
 
@@ -124,10 +133,12 @@ Canvas id: `orch-dashboard`. Actions:
   finishes, with the result captured in `output`. For QA/validation stages,
   also pass:
   - `scenarios: [{ name, status: "pass"|"fail"|"flaky", notes?, evidence?: [{ type?, path, description? }] }]`
-    — one entry per tested scenario. `evidence[].path` is relative to the
-    session workspace (e.g. the `qa` plugin's
-    `.wip/qa/<feature>/screenshots/...` convention). Replaces any scenarios
-    previously recorded for this stage.
+    — one entry per tested scenario. `evidence[].path` is resolved against the
+    **git worktree root** the owner session operates in (e.g. a
+    `.qa-evidence/...` folder in the repo root, or the `qa` plugin's
+    `.wip/qa/<feature>/screenshots/...` convention) — not the infinite-sessions
+    state directory. A path that escapes the worktree root is refused. Replaces
+    any scenarios previously recorded for this stage.
   - `monitoring: { summary?, findings?: [{ level: "error"|"critical"|"warning"|"info", resource?, message, timestamp? }] }`
     — a runtime log/trace/metric summary, e.g. from the `qa` plugin's
     `aspire-log-monitor` skill. Replaces any monitoring previously recorded
@@ -156,8 +167,8 @@ The orchestrating session is the **sole owner** of a run: only it calls
 worktree** so the change set and evidence paths stay valid. A child session
 (`create_session`) gets a different worktree and should be used only for
 genuinely concurrent work such as `qa:qa-monitor`; its evidence must be written
-into — or copied back to — the owner session's workspace, because the evidence
-endpoint rejects paths outside it. See
+into — or copied back to — the owner session's **worktree root**, because the
+evidence endpoint refuses any path that resolves outside it. See
 `plugins/copilot-app/instructions/orch-shared-phases.instructions.md` for the
 full Execution Model.
 

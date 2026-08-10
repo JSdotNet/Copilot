@@ -53,7 +53,7 @@ that resolution, it does not re-decide model choice per skill.
    applies — there is nothing to defer to.
 6. **Run the shared phases in order** for the tier:
    - **Code-modifying:** `phase-build-test` → `phase-qa-validation` → Personal Validation →
-     Create Pull Request → Summary.
+     Create Pull Request → Documentation Update → Summary.
    - **Documentation/config:** Personal Validation → Create Pull Request → Summary.
 7. **Invoke phase skills for the heavy phases.** Use the `phase-build-test` and
    `phase-qa-validation` skills rather than re-describing build/test/QA logic. Pass the
@@ -69,7 +69,11 @@ that resolution, it does not re-decide model choice per skill.
 10. **Gate the pull request.** Create a pull request only when the persisted `approval` in
     the run state is `approved`; mark Create Pull Request `skipped` when there is no change
     set. If a resumed run shows `pending`, re-run Personal Validation rather than trusting
-    conversation memory.
+    conversation memory. After the pull request exists, run the **Documentation Update** phase
+    (code-modifying tier): check whether the repository's own governed documentation is now
+    stale, and if so update it and **commit onto the existing PR branch** so the open PR
+    reflects it — never leave the doc change uncommitted. It is a no-op with no commit when
+    nothing is stale, and `skipped` when Create Pull Request was skipped.
 11. **Stay in one owner session and delegate deliberately.** Run the orchestration in the
     invoking session and keep sole ownership of the dashboard actions and the approval gate.
     Delegate build, test, Playwright execution, and large code changes to **sub-agents in the

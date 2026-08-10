@@ -103,7 +103,10 @@ After Module Implementation, this skill runs the shared delivery phases defined 
 3. **Personal Validation** — hand back to the user (no agent); present the code review and
    the recorded QA review, and start the application for the user to review.
 4. **Create Pull Request** — only after explicit user approval.
-5. **Summary** — emit the run summary.
+5. **Documentation Update** — after the pull request exists, check whether the repository's
+   governed documentation is now stale and, if so, update it and commit onto the PR branch;
+   a clean no-op when nothing needs changing.
+6. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -150,7 +153,7 @@ standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-create-module"` and these stages: Scope Discovery,
   Specification Intake, Implementation Planning, Implementation, Build & Test, QA
-  Validation, Personal Validation, Create Pull Request, Summary.
+  Validation, Personal Validation, Create Pull Request, Documentation Update, Summary.
 - During **Scope Discovery**, present the restated module purpose, derived boundaries and
   public interfaces, and derived acceptance criteria as the stage output so the user can
   confirm or correct them.

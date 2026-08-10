@@ -32,7 +32,7 @@
 
 import { createServer } from "node:http";
 import { createReadStream } from "node:fs";
-import { stat as fsStat } from "node:fs/promises";
+import { stat as fsStat, readFile as fsReadFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { EventEmitter } from "node:events";
@@ -50,7 +50,7 @@ import {
     recordCompaction,
     recordTruncation,
 } from "./insight.mjs";
-import { renderReportMarkdown } from "./report.mjs";
+import { renderReportMarkdown, renderReportHtml } from "./report.mjs";
 
 const VALID_STATUSES = ["pending", "in_progress", "done", "blocked", "skipped", "cancelled"];
 const VALID_SCENARIO_STATUSES = ["pass", "fail", "flaky"];
@@ -174,6 +174,85 @@ function evidenceContentType(filePath) {
     return EVIDENCE_CONTENT_TYPES[ext] || "application/octet-stream";
 }
 
+// Evidence lives in the git worktree the agent is operating in (e.g.
+// `.qa-evidence/...` or the qa plugin's `.wip/qa/<feature>/screenshots/...`),
+// NOT in `session.workspacePath`. The SDK's `session.workspacePath` points at
+// the infinite-sessions *state* directory (checkpoints/, files/, plan.md),
+// which is a different tree entirely — resolving evidence against it makes
+// every path fail the containment check and the image never loads. The state
+// directory's `workspace.yaml` records the real worktree as `git_root`/`cwd`,
+// so we read that once and resolve evidence against it, falling back to the
+// state dir only when no workspace.yaml is present (infinite sessions off).
+let cachedWorkspaceRoot; // undefined = unresolved; string|null once resolved.
+async function resolveWorkspaceRoot(session) {
+    if (cachedWorkspaceRoot !== undefined) return cachedWorkspaceRoot;
+    const stateDir = session.workspacePath || null;
+    let root = null;
+    if (stateDir) {
+        try {
+            const yaml = await fsReadFile(path.join(stateDir, "workspace.yaml"), "utf8");
+            const match = yaml.match(/^\s*git_root:\s*(.+?)\s*$/m) || yaml.match(/^\s*cwd:\s*(.+?)\s*$/m);
+            if (match && match[1]) root = match[1].trim().replace(/^["']|["']$/g, "");
+        } catch {
+            // No workspace.yaml — fall back to the state dir below.
+        }
+    }
+    cachedWorkspaceRoot = root || stateDir;
+    return cachedWorkspaceRoot;
+}
+
+// Resolves a workspace-relative (or absolute-inside-workspace) evidence path
+// and confirms it stays inside the worktree root. Returns `{ error }` on any
+// failure so both the streaming route and the HTML export can handle a
+// missing/forbidden file the same way.
+const EVIDENCE_IMAGE_EXT = /\.(png|jpe?g|gif|webp)$/i;
+async function resolveEvidencePath(session, relPath) {
+    const root = await resolveWorkspaceRoot(session);
+    if (!relPath || !root) return { error: "not_available" };
+    const resolved = path.resolve(root, relPath);
+    if (resolved !== root && !resolved.startsWith(root + path.sep)) return { error: "forbidden" };
+    let stats;
+    try {
+        stats = await fsStat(resolved);
+    } catch {
+        return { error: "not_found" };
+    }
+    if (!stats.isFile()) return { error: "not_found" };
+    return { resolved, size: stats.size };
+}
+
+// Reads every image evidence file referenced by a run and returns a map of
+// evidence path -> `data:` URI, so a downloaded HTML report is fully
+// self-contained. Non-image or unreadable/forbidden evidence maps to `null`
+// so the report can show a placeholder instead of a broken image.
+async function collectEvidenceDataUris(session, run) {
+    const map = {};
+    for (const stage of run.stages || []) {
+        for (const scenario of stage.scenarios || []) {
+            for (const ev of scenario.evidence || []) {
+                if (!ev || !ev.path || Object.prototype.hasOwnProperty.call(map, ev.path)) continue;
+                const isImage = EVIDENCE_IMAGE_EXT.test(ev.path) || /screenshot|image/i.test(ev.type || "");
+                if (!isImage) {
+                    map[ev.path] = null;
+                    continue;
+                }
+                const info = await resolveEvidencePath(session, ev.path);
+                if (info.error) {
+                    map[ev.path] = null;
+                    continue;
+                }
+                try {
+                    const bytes = await fsReadFile(info.resolved);
+                    map[ev.path] = `data:${evidenceContentType(info.resolved)};base64,${bytes.toString("base64")}`;
+                } catch {
+                    map[ev.path] = null;
+                }
+            }
+        }
+    }
+    return map;
+}
+
 async function startServer(instanceId, baseDir) {
     const server = createServer(async (req, res) => {
         try {
@@ -203,41 +282,39 @@ async function startServer(instanceId, baseDir) {
                 res.end(renderReportMarkdown(run));
                 return;
             }
+            const reportHtmlMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/report\.html$/);
+            if (req.method === "GET" && reportHtmlMatch) {
+                const run = await readRun(baseDir, decodeURIComponent(reportHtmlMatch[1]));
+                if (!run) {
+                    res.statusCode = 404;
+                    res.end("not found");
+                    return;
+                }
+                const evidenceDataUris = await collectEvidenceDataUris(session, run);
+                const filename = `${run.skillId}-${run.id}.html`.replace(/[^a-zA-Z0-9._-]/g, "-");
+                res.setHeader("Content-Type", "text/html; charset=utf-8");
+                res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+                res.end(renderReportHtml(run, evidenceDataUris));
+                return;
+            }
             const evidenceMatch = url.pathname.match(/^\/api\/runs\/([^/]+)\/evidence$/);
             if (req.method === "GET" && evidenceMatch) {
                 const relPath = url.searchParams.get("path");
-                const root = session.workspacePath;
-                if (!relPath || !root) {
-                    res.statusCode = 404;
-                    res.end("evidence not available");
+                const info = await resolveEvidencePath(session, relPath);
+                if (info.error) {
+                    res.statusCode = info.error === "forbidden" ? 403 : 404;
+                    res.end(
+                        info.error === "forbidden"
+                            ? "forbidden"
+                            : info.error === "not_available"
+                              ? "evidence not available"
+                              : "evidence file not found"
+                    );
                     return;
                 }
-                // Evidence paths are relative to the session workspace (e.g. the
-                // `.wip/qa/<feature>/screenshots/...` convention from the qa
-                // plugin's playwright-screenshot skill). Resolve and confirm the
-                // result stays inside the workspace before serving it.
-                const resolved = path.resolve(root, relPath);
-                if (resolved !== root && !resolved.startsWith(root + path.sep)) {
-                    res.statusCode = 403;
-                    res.end("forbidden");
-                    return;
-                }
-                let stats;
-                try {
-                    stats = await fsStat(resolved);
-                } catch {
-                    res.statusCode = 404;
-                    res.end("evidence file not found");
-                    return;
-                }
-                if (!stats.isFile()) {
-                    res.statusCode = 404;
-                    res.end("evidence file not found");
-                    return;
-                }
-                res.setHeader("Content-Type", evidenceContentType(resolved));
-                res.setHeader("Content-Length", String(stats.size));
-                createReadStream(resolved).pipe(res);
+                res.setHeader("Content-Type", evidenceContentType(info.resolved));
+                res.setHeader("Content-Length", String(info.size));
+                createReadStream(info.resolved).pipe(res);
                 return;
             }
             const detailMatch = url.pathname.match(/^\/api\/runs\/([^/]+)$/);
