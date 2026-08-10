@@ -63,8 +63,8 @@ consuming repository's optional runtime context file, whose convention is define
    applies — there is nothing to defer to.
 6. **Run the shared phases in order** for the tier:
    - **Code-modifying:** `phase-build-test` → `phase-qa-validation` → Personal Validation →
-     Create Pull Request → Documentation Update → Summary.
-   - **Documentation/config:** Personal Validation → Create Pull Request → Summary.
+     Create Pull Request → Documentation Update → GitHub Issue Update → Summary.
+   - **Documentation/config:** Personal Validation → Create Pull Request → GitHub Issue Update → Summary.
 7. **Invoke phase skills for the heavy phases.** Use the `phase-build-test` and
    `phase-qa-validation` skills rather than re-describing build/test/QA logic. Pass the
    change kind (functional / bug fix / dependency update / none) so QA depth is selected
@@ -84,7 +84,7 @@ consuming repository's optional runtime context file, whose convention is define
     (code-modifying tier): check whether the repository's own governed documentation is now
     stale, and if so update it and **commit onto the existing PR branch** so the open PR
     reflects it — never leave the doc change uncommitted. It is a no-op with no commit when
-    nothing is stale, and `skipped` when Create Pull Request was skipped.
+    nothing is stale, and `skipped` when Create Pull Request was skipped. Then run **GitHub Issue Update**: when the session was started from a GitHub issue, post a comment to that issue containing the captured result and QA report; otherwise mark the phase `skipped` with the reason.
 11. **Stay in one owner session and delegate deliberately.** Run the orchestration in the
     invoking session and keep sole ownership of the dashboard actions and the approval gate.
     Delegate build, test, Playwright execution, and large code changes to **sub-agents in the
@@ -106,7 +106,8 @@ consuming repository's optional runtime context file, whose convention is define
     sub-agent in the same worktree — the gauge ignores sub-agent samples, so delegation
     genuinely relieves it — rather than continuing inline until compaction interrupts the
     run. See the shared **Context and Token Insight**.
-14. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
+14. **Update the originating GitHub issue when present.** Before Summary, detect issue-origin sessions from session linkage metadata or `start-session-from-issue` kickoff metadata, then comment on that issue with the captured result, pull request link when available, Personal Validation decision, and QA report. Skip with a reason when no issue origin is present; block on posting errors.
+15. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
 
 ## Constraints and Priorities
 
@@ -138,7 +139,7 @@ consuming repository's optional runtime context file, whose convention is define
 
 - "Run `orch-feature` for the new export endpoint and stop at Personal Validation."
 - "Orchestrate `orch-update-packages`; QA should be startup-only."
-- "Drive `orch-adr` through Personal Validation, Create Pull Request, and Summary."
+- "Drive `orch-adr` through Personal Validation, Create Pull Request, GitHub Issue Update, and Summary."
 
 ## References
 

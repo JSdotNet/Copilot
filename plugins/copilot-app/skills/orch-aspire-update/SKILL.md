@@ -105,7 +105,9 @@ After New Feature Adoption, this skill runs the shared delivery phases defined o
 5. **Documentation Update** — after the pull request exists, check whether the repository's
    governed documentation is now stale and, if so, update it and commit onto the PR branch;
    a clean no-op when nothing needs changing.
-6. **Summary** — emit the run summary.
+6. **GitHub Issue Update** — when the session was started from a GitHub issue, add a
+   comment to that issue with the captured result and QA report; otherwise skip.
+7. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -166,7 +168,7 @@ standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-aspire-update"` and these stages: Upgrade Intake &
   Baseline, Plan Refinement, Implementation, New Feature Adoption, Build & Test, QA
-  Validation, Personal Validation, Create Pull Request, Documentation Update, Summary.
+  Validation, Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Plan Refinement**, also open/update `markdown-canvas` (`markdown-preview`) with
   the refined upgrade plan, per `instructions/canvas-usage.instructions.md`. Optional; skip
   gracefully if not installed.
