@@ -104,7 +104,9 @@ in `instructions/orch-shared-phases.instructions.md` (code-modifying tier), in o
 5. **Documentation Update** — after the pull request exists, check whether the repository's
    governed documentation is now stale and, if so, update it and commit onto the PR branch;
    a clean no-op when nothing needs changing.
-6. **Summary** — emit the run summary.
+6. **GitHub Issue Update** — when the session was started from a GitHub issue, add a
+   comment to that issue with the captured result and QA report; otherwise skip.
+7. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -174,7 +176,7 @@ standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-create-mvp"` and these stages: Scope Discovery,
   MVP Scope Intake, Implementation Planning, Implementation, Build & Test, QA Validation,
-  Personal Validation, Create Pull Request, Documentation Update, Summary.
+  Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Scope Discovery**, present the restated product outcome, derived core feature
   list with priority order, and derived acceptance criteria as the stage output so the
   user can confirm or correct them.

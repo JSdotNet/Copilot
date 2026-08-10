@@ -109,7 +109,9 @@ After Fix Implementation, this skill runs the shared delivery phases defined onc
 5. **Documentation Update** — after the pull request exists, check whether the repository's
    governed documentation is now stale and, if so, update it and commit onto the PR branch;
    a clean no-op when nothing needs changing.
-6. **Summary** — emit the run summary.
+6. **GitHub Issue Update** — when the session was started from a GitHub issue, add a
+   comment to that issue with the captured result and QA report; otherwise skip.
+7. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -177,7 +179,7 @@ standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-bug"` and these stages: Scope Discovery, Bug
   Intake & Reproduction, Root Cause Analysis, Implementation, Build & Test, QA
-  Validation, Personal Validation, Create Pull Request, Documentation Update, Summary.
+  Validation, Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Scope Discovery**, present the restated observed versus expected behavior, the
   derived verification criterion, and the suspected code paths as the stage output so the
   user can confirm or correct them.

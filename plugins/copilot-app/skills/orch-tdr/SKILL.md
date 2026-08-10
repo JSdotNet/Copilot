@@ -58,7 +58,9 @@ After Risk & Follow-Up Review, this skill runs the shared closing phases defined
    artifacts and any review for the user to approve.
 2. **Create Pull Request** — only after explicit user approval (mark skipped when there is
    no change set).
-3. **Summary** — emit the run summary.
+3. **GitHub Issue Update** — when the session was started from a GitHub issue, add a
+   comment to that issue with the captured result and QA report; otherwise skip.
+4. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -91,7 +93,7 @@ Request gating. If the extension is not installed, skip the canvas calls and con
 through standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-tdr"` and these stages: Debt Context Retrieval, TDR
-  Drafting, Risk & Follow-Up Review, Personal Validation, Create Pull Request, Summary.
+  Drafting, Risk & Follow-Up Review, Personal Validation, Create Pull Request, GitHub Issue Update, Summary.
 - During **TDR Drafting**, also open/update `markdown-canvas` (`markdown-preview`) with the
   drafted TDR content, per `instructions/canvas-usage.instructions.md`. Optional; skip
   gracefully if not installed.

@@ -117,7 +117,9 @@ After Repository Governance, this skill runs the shared closing phases defined o
    artifacts and any review for the user to approve.
 2. **Create Pull Request** — only after explicit user approval (mark skipped when there is
    no change set).
-3. **Summary** — emit the run summary.
+3. **GitHub Issue Update** — when the session was started from a GitHub issue, add a
+   comment to that issue with the captured result and QA report; otherwise skip.
+4. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -177,7 +179,7 @@ through standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-repo"` and these stages: Repository Creation,
   README, MCP Configuration, Copilot Instructions, Branch Protection, Issue and PR
-  Templates, Repository Governance, Personal Validation, Create Pull Request, Summary.
+  Templates, Repository Governance, Personal Validation, Create Pull Request, GitHub Issue Update, Summary.
 - During **README**, also open/update `markdown-canvas` (`markdown-preview`) with the
   expanded README content, per `instructions/canvas-usage.instructions.md`. Optional; skip
   gracefully if not installed.

@@ -19,7 +19,8 @@ flowchart TD
     I -->|Yes| J["Create Pull Request or Skip"]
     I -->|No| K["Return to the relevant earlier stage"]
     K --> A
-    J --> L["Summary"]
+    J --> U["GitHub Issue Update or Skip"]
+    U --> L["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -33,6 +34,7 @@ flowchart TD
 | Repository Governance | Default agent | — |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-project
@@ -50,7 +52,8 @@ flowchart TD
     I -->|Yes| J["Create Pull Request or Skip"]
     I -->|No| K["Return to the relevant earlier stage"]
     K --> A
-    J --> L["Summary"]
+    J --> U["GitHub Issue Update or Skip"]
+    U --> L["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -64,6 +67,7 @@ flowchart TD
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-create-mvp
@@ -80,7 +84,8 @@ flowchart TD
     G -->|Yes| H["Create Pull Request or Skip"]
     G -->|No| I["Return to the relevant earlier stage"]
     I --> A
-    H --> J["Summary"]
+    H --> U["GitHub Issue Update or Skip"]
+    U --> J["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -93,6 +98,7 @@ flowchart TD
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-update-packages
@@ -109,7 +115,8 @@ flowchart TD
     H -->|Yes| I["Create Pull Request or Skip"]
     H -->|No| J["Return to the relevant earlier stage"]
     J --> A
-    I --> K["Summary"]
+    I --> U["GitHub Issue Update or Skip"]
+    U --> K["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -122,6 +129,7 @@ flowchart TD
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(only when new user-facing behavior is introduced)* |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-aspire-update
@@ -138,7 +146,8 @@ flowchart TD
     H -->|Yes| I["Create Pull Request or Skip"]
     H -->|No| J["Return to the relevant earlier stage"]
     J --> A
-    I --> K["Summary"]
+    I --> U["GitHub Issue Update or Skip"]
+    U --> K["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -151,6 +160,7 @@ flowchart TD
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture only for adopted new functionality)* |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-architecture
@@ -164,7 +174,8 @@ flowchart TD
     E -->|Yes| F["Create Pull Request or Skip"]
     E -->|No| G["Return to the relevant earlier stage"]
     G --> A
-    F --> H["Summary"]
+    F --> U["GitHub Issue Update or Skip"]
+    U --> H["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -174,6 +185,7 @@ flowchart TD
 | Drafting & Review | `architecture:architect` | — |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-arc42
@@ -187,7 +199,8 @@ flowchart TD
     E -->|Yes| F["Create Pull Request or Skip"]
     E -->|No| G["Return to the relevant earlier stage"]
     G --> A
-    F --> H["Summary"]
+    F --> U["GitHub Issue Update or Skip"]
+    U --> H["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -197,6 +210,7 @@ flowchart TD
 | Cross-Section Review | `architecture:architect` | — |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-blueprint
@@ -210,7 +224,8 @@ flowchart TD
     E -->|Yes| F["Create Pull Request or Skip"]
     E -->|No| G["Return to the relevant earlier stage"]
     G --> A
-    F --> H["Summary"]
+    F --> U["GitHub Issue Update or Skip"]
+    U --> H["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -220,6 +235,7 @@ flowchart TD
 | Review & Traceability | `architecture:architect` | — |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-adr
@@ -233,7 +249,8 @@ flowchart TD
     E -->|Yes| F["Create Pull Request or Skip"]
     E -->|No| G["Return to the relevant earlier stage"]
     G --> A
-    F --> H["Summary"]
+    F --> U["GitHub Issue Update or Skip"]
+    U --> H["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -243,6 +260,7 @@ flowchart TD
 | Traceability Review | `architecture:architect` | — |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-tdr
@@ -256,7 +274,8 @@ flowchart TD
     E -->|Yes| F["Create Pull Request or Skip"]
     E -->|No| G["Return to the relevant earlier stage"]
     G --> A
-    F --> H["Summary"]
+    F --> U["GitHub Issue Update or Skip"]
+    U --> H["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -266,6 +285,7 @@ flowchart TD
 | Risk & Follow-Up Review | `architecture:architect` | — |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-feature
@@ -281,7 +301,8 @@ flowchart TD
     F -->|Yes| G["Create Pull Request or Skip"]
     F -->|No| H["Return to the relevant earlier stage"]
     H --> A
-    G --> I["Summary"]
+    G --> U["GitHub Issue Update or Skip"]
+    U --> I["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -293,6 +314,7 @@ flowchart TD
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-bug
@@ -309,7 +331,8 @@ flowchart TD
     G -->|Yes| H["Create Pull Request or Skip"]
     G -->|No| I["Return to the relevant earlier stage"]
     I --> A
-    H --> J["Summary"]
+    H --> U["GitHub Issue Update or Skip"]
+    U --> J["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -322,6 +345,7 @@ flowchart TD
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture only when needed for failure or on request)* |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-create-module
@@ -338,7 +362,8 @@ flowchart TD
     G -->|Yes| H["Create Pull Request or Skip"]
     G -->|No| I["Return to the relevant earlier stage"]
     I --> A
-    H --> J["Summary"]
+    H --> U["GitHub Issue Update or Skip"]
+    U --> J["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -351,6 +376,7 @@ flowchart TD
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
 ## orch-create-service
@@ -367,7 +393,8 @@ flowchart TD
     G -->|Yes| H["Create Pull Request or Skip"]
     G -->|No| I["Return to the relevant earlier stage"]
     I --> A
-    H --> J["Summary"]
+    H --> U["GitHub Issue Update or Skip"]
+    U --> J["Summary"]
 ```
 
 | Phase | Agents | MCP servers |
@@ -380,4 +407,5 @@ flowchart TD
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
 | Personal Validation | — | — |
 | Create Pull Request | *(default)* | — |
+| GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |

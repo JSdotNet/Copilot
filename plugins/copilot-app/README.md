@@ -366,7 +366,8 @@ Each orchestration skill follows a staged workflow tailored to the scenario (pro
 4. **Quality stage** - Review readiness and blocker resolution
 5. **Personal Validation stage** - The user reviews the result and explicitly approves before any pull request is created
 6. **Create Pull Request stage** - A separate stage after personal validation; all PR-time changes belong here and the pull request is never opened before approval
-7. **Summary stage** - Emitted once the pull request is created (or the run concludes without one)
+7. **GitHub Issue Update stage** - When a session was started from a GitHub issue, comments on that issue with the captured result and QA report; otherwise skipped with a reason
+8. **Summary stage** - Emitted once the pull request and any applicable issue update are complete (or the run concludes without one)
 
 Agent selection per stage is recommended based on task context. All agent transitions
 require explicit user approval per the repository handoff policy.

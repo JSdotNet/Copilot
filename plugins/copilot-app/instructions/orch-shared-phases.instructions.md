@@ -1,6 +1,6 @@
 ---
 applyTo: 'skills/orch-*/SKILL.md'
-description: Defines the reusable delivery and validation phases shared by all orch-* orchestration skills (Build & Test, QA Validation, Personal Validation, Create Pull Request, Documentation Update, Summary) and the orch-dashboard reporting contract, so the shared content is maintained in one place.
+description: Defines the reusable delivery and validation phases shared by all orch-* orchestration skills (Build & Test, QA Validation, Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary) and the orch-dashboard reporting contract, so the shared content is maintained in one place.
 ---
 
 # Shared Orchestration Phases (Orchestration-Owned)
@@ -28,7 +28,7 @@ description: Defines the reusable delivery and validation phases shared by all o
   once:
   - **Build & Test** → `skills/phase-build-test/SKILL.md`.
   - **QA Validation** → `skills/phase-qa-validation/SKILL.md`.
-- Personal Validation, Create Pull Request, Documentation Update, and Summary stay defined in
+- Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, and Summary stay defined in
   this file (short, linear phases where a separate skill would only add indirection).
 - Model choice for every phase (and every skill-specific stage) is resolved once, centrally,
   from `instructions/orch-model-selection.instructions.md` — do not describe model choice
@@ -179,10 +179,10 @@ When a child session is used (`create_session` + cross-session messaging):
 - **Code-modifying orchestrations** — `orch-feature`, `orch-bug`, `orch-create-module`,
   `orch-create-service`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`,
   `orch-project` — run, in order: **Build & Test → QA Validation → Personal Validation →
-  Create Pull Request → Documentation Update → Summary**.
+  Create Pull Request → Documentation Update → GitHub Issue Update → Summary**.
 - **Documentation/config orchestrations** — `orch-adr`, `orch-tdr`, `orch-arc42`,
   `orch-blueprint`, `orch-architecture`, `orch-repo` — run: **Personal Validation →
-  Create Pull Request → Summary** (no Build & Test or QA Validation, because they
+  Create Pull Request → GitHub Issue Update → Summary** (no Build & Test or QA Validation, because they
   produce no runnable code change).
 
 ## Phase: Build & Test
@@ -337,12 +337,45 @@ conventions)*
 
 **Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
 
+## Phase: GitHub Issue Update
+
+Applies to every orchestration. Runs after the pull request and any documentation update
+work, and before Summary.
+
+- **Detect whether the session was started from a GitHub issue** by checking the session's
+  issue linkage metadata when available, then the kickoff prompt metadata produced by
+  `start-session-from-issue` (`GitHub issue origin`, `Repository`, `Issue Number`, and
+  `Issue URL`).
+- **Skip this phase** (mark it `skipped`) when no GitHub issue origin is present, when the
+  issue number or repository cannot be determined, or when GitHub issue tooling is not
+  available. Include the reason in the stage `output`.
+- **Add a new issue comment instead of rewriting the issue body.** The comment must include
+  the captured orchestration result, pull request link when one exists, Personal Validation
+  decision, and the recorded QA report.
+- **Include the QA report from the QA Validation stage** for code-modifying orchestrations:
+  scenario pass/fail/flaky status, monitoring findings, and captured evidence or dashboard
+  report links when available. If QA Validation was skipped or does not apply, state that
+  explicitly in the comment rather than inventing a result.
+- **Use configured GitHub issue tooling first**, such as an installed GitHub plugin skill or
+  MCP integration; fall back to `gh issue comment --repo <owner/repo> <number> --body-file
+  <file>` when available. Do not create a new issue.
+- **Fail loudly on update errors.** If posting the comment fails, mark this stage `blocked`
+  with the actual error in `output`; do not mark it `done` or silently continue to Summary.
+
+**Agents:** *(default)*
+
+**Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
+No dedicated agent runs this phase by default, so the orchestrator performs it directly under
+the category's resolved model.
+
 ## Phase: Summary
 
 Applies to every orchestration.
 
-- **Summarize the delivered outcome** and the created pull request (if any).
-- **Emit the run summary** once the pull request is created, or the run concludes without
+- **Summarize the delivered outcome**, the created pull request (if any), and the
+  GitHub issue update outcome when applicable.
+- **Emit the run summary** once the pull request and any applicable GitHub issue update are
+  complete, or the run concludes without
   one.
 
 **Agents:** `orchestrator` agent
@@ -384,9 +417,14 @@ skip the canvas calls and continue through standard chat interaction.
   adds a new commit only — never amend, rebase, squash, or force-push the PR branch — and it
   never creates a commit when no documentation is stale. If the commit or push is rejected,
   mark the stage `blocked` with the actual error in the `output`, never `done`.
-- **Mark the Summary stage** `in_progress` then `done`, and call `finish_run` with the
-  final status and summary once the pull request is created (or the run concludes without
-  one).
+- **For the GitHub Issue Update phase**, run it after Documentation Update for code-modifying
+  orchestrations and after Create Pull Request for documentation/config orchestrations. Mark
+  it `done` after adding the result and QA report comment to the originating issue, `skipped`
+  when the session was not started from a GitHub issue, or `blocked` with the actual error
+  when the comment cannot be posted.
+- **Mark the Summary stage** `in_progress` then `done`, and call `finish_run` with the final
+  status and summary once the pull request and any applicable GitHub issue update are complete
+  (or the run concludes without one).
 
 See `plugins/copilot-app/extensions/orch-dashboard/README.md` for the full canvas action
 contract, and `instructions/canvas-usage.instructions.md` for when to also open the
@@ -467,6 +505,8 @@ alongside the run.
 - [ ] For code-modifying skills, Documentation Update runs after Create Pull Request, commits any
       governed-doc changes onto the existing PR branch, and is a no-op (no commit) when nothing is
       stale.
+- [ ] GitHub Issue Update runs before Summary, posts the captured result and QA report only when
+      the session was started from a GitHub issue, and is skipped with a reason otherwise.
 - [ ] Model choice per phase follows `instructions/orch-model-selection.instructions.md`
       and is never hardcoded in a skill or phase.
 - [ ] Token and context figures are left to the dashboard's automatic capture and are never

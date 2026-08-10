@@ -57,7 +57,9 @@ After Traceability Review, this skill runs the shared closing phases defined onc
    artifacts and any review for the user to approve.
 2. **Create Pull Request** — only after explicit user approval (mark skipped when there is
    no change set).
-3. **Summary** — emit the run summary.
+3. **GitHub Issue Update** — when the session was started from a GitHub issue, add a
+   comment to that issue with the captured result and QA report; otherwise skip.
+4. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -89,7 +91,7 @@ Request gating. If the extension is not installed, skip the canvas calls and con
 through standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-adr"` and these stages: Decision Context Retrieval,
-  ADR Drafting, Traceability Review, Personal Validation, Create Pull Request, Summary.
+  ADR Drafting, Traceability Review, Personal Validation, Create Pull Request, GitHub Issue Update, Summary.
 - During **ADR Drafting**, also open/update `markdown-canvas` (`markdown-preview`) with the
   drafted ADR content, per `instructions/canvas-usage.instructions.md`. Optional; skip
   gracefully if not installed.

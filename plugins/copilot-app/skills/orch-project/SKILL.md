@@ -143,7 +143,9 @@ in order:
 5. **Documentation Update** — after the pull request exists, check whether the repository's
    governed documentation is now stale and, if so, update it and commit onto the PR branch;
    a clean no-op when nothing needs changing.
-6. **Summary** — emit the run summary.
+6. **GitHub Issue Update** — when the session was started from a GitHub issue, add a
+   comment to that issue with the captured result and QA report; otherwise skip.
+7. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -184,7 +186,7 @@ standard chat interaction.
 - Call `start_run` with `skillId: "orch-project"` and these stages: GitHub Folder Setup
   (Foundation), GitHub Actions Workflows, Specification & Architecture Intake, Tooling &
   Dependencies, Implementation, Build & Test, QA Validation, Personal Validation,
-  Create Pull Request, Documentation Update, Summary.
+  Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Specification & Architecture Intake**, also open/update `markdown-canvas`
   (`markdown-preview`) with the reviewed or derived architecture documentation and
   `diagram-canvas` (`mermaid-diagram`) with any accompanying Mermaid diagrams, per

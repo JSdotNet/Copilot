@@ -56,7 +56,9 @@ After Drafting & Review, this skill runs the shared closing phases defined once 
    artifacts and any review for the user to approve.
 2. **Create Pull Request** — only after explicit user approval (mark skipped when there is
    no change set).
-3. **Summary** — emit the run summary.
+3. **GitHub Issue Update** — when the session was started from a GitHub issue, add a
+   comment to that issue with the captured result and QA report; otherwise skip.
+4. **Summary** — emit the run summary.
 
 See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
@@ -90,7 +92,7 @@ through standard chat interaction.
 
 - Call `start_run` with `skillId: "orch-architecture"` and these stages: Goal & Guideline
   Retrieval, Architecture Investigation, Drafting & Review, Personal Validation, Create
-  Pull Request, Summary.
+  Pull Request, GitHub Issue Update, Summary.
 - During **Drafting & Review**, also open/update `markdown-canvas` (`markdown-preview`) with
   the drafted Markdown result, and `diagram-canvas` (`mermaid-diagram`) if the result
   includes Mermaid diagrams, per `instructions/canvas-usage.instructions.md`. Optional;

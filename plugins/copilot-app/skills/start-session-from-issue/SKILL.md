@@ -49,6 +49,11 @@ the issue and proposes a plan before writing any code.
 ```
 You are working on GitHub issue #<number>: "<issue title>".
 
+GitHub issue origin:
+Repository: <owner/repo>
+Issue Number: <number>
+Issue URL: <issue url>
+
 Issue description:
 <issue body>
 
@@ -62,7 +67,9 @@ Your task:
    - Files to create or modify.
    - Key design decisions.
    - Risks or assumptions.
-4. Wait for user approval of the plan before proceeding to implementation.
+4. Preserve the GitHub issue origin metadata for any subsequent `orch-*` orchestration so
+   it can report the captured result and QA report back to the issue.
+5. Wait for user approval of the plan before proceeding to implementation.
 
 Do not start coding until the plan is approved.
 ```
