@@ -43,7 +43,7 @@ description: Defines the reusable delivery and validation phases shared by all o
 
 ## Code-Modifying Orchestration Context
 
-- `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`,
+- `orch-feature`, `orch-bug`, `orch-structure`, `orch-create-module`, `orch-create-service`,
   `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, and
   `orch-project` are **implementation-focused** orchestrations.
 - Each of these skills **owns establishing its own implementation context** in its first
@@ -176,7 +176,7 @@ When a child session is used (`create_session` + cross-session messaging):
 
 ## Phase Tiers
 
-- **Code-modifying orchestrations** — `orch-feature`, `orch-bug`, `orch-create-module`,
+- **Code-modifying orchestrations** — `orch-feature`, `orch-bug`, `orch-structure`, `orch-create-module`,
   `orch-create-service`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`,
   `orch-project` — run, in order: **Build & Test → QA Validation → Personal Validation →
   Create Pull Request → Documentation Update → GitHub Issue Update → Summary**.

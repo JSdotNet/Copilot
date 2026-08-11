@@ -11,9 +11,9 @@ Validation — so build and test behavior lives in one place instead of in each 
 
 ## When To Run
 
-- Run for code-modifying orchestrations (`orch-feature`, `orch-bug`, `orch-create-module`,
-  `orch-create-service`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`,
-  `orch-project`).
+- Run for code-modifying orchestrations (`orch-feature`, `orch-bug`, `orch-structure`,
+  `orch-create-module`, `orch-create-service`, `orch-create-mvp`, `orch-update-packages`,
+  `orch-aspire-update`, `orch-project`).
 - Always run this phase **first**, after the skill's own unique stages produce a change set.
 - Documentation/config orchestrations skip this phase.
 
