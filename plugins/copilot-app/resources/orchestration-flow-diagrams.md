@@ -348,6 +348,39 @@ flowchart TD
 | GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
 
+## orch-structure
+
+```mermaid
+flowchart TD
+    S["Scope Discovery"] --> A["Structure & Architecture Intake"]
+    A --> B["Refactor Planning"]
+    B --> C["Implementation"]
+    C --> D["Build & Test"]
+    D --> E["QA Validation"]
+    E --> F["Personal Validation"]
+    F --> G{User approves?}
+    G -->|Yes| H["Create Pull Request or Skip"]
+    G -->|No| I["Return to the relevant earlier stage"]
+    I --> A
+    H --> V["Documentation Update or Skip"]
+    V --> U["GitHub Issue Update or Skip"]
+    U --> J["Summary"]
+```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Scope Discovery | `orchestrator` agent, optionally `architecture:architect`, `product-owner:product-owner` | `jsdotnet-guidelines-mcpserver` |
+| Structure & Architecture Intake | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Refactor Planning | `architecture:architect`, `csharp-coding:coding` | — |
+| Implementation | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(targeted validation when a runnable surface exists)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Documentation Update | `documentation:documentation` | `jsdotnet-guidelines-mcpserver` *(optional, governed docs only)* |
+| GitHub Issue Update | *(default)* | — |
+| Summary | `orchestrator` agent | — |
+
 ## orch-create-module
 
 ```mermaid

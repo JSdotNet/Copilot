@@ -45,6 +45,7 @@ review rather than restarting broad discovery.
 - `skills/orch-tdr/SKILL.md` - TDR orchestration with guideline and ADR retrieval (canvas)
 - `skills/orch-feature/SKILL.md` - Feature development lifecycle management with scope discovery and local validation (canvas)
 - `skills/orch-bug/SKILL.md` - Bug triage and TDD-based fix workflow with scope discovery and local monitoring (canvas)
+- `skills/orch-structure/SKILL.md` - Existing repository structure/layout refactors, folder moves, project/solution organization fixes, and test/harness placement changes (canvas)
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
 - `skills/orch-create-service/SKILL.md` - Create and wire a new service in an existing project (canvas)
 
@@ -164,7 +165,7 @@ mechanism itself, and each has its own install method):
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-create-module`, `orch-create-service`
+- In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-structure`, `orch-create-module`, `orch-create-service`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -187,7 +188,7 @@ This plugin works best with the following installed plugins:
 - `product-owner` - For user stories and backlog management
 - `qa` - For runtime QA validation (Aspire + Playwright), used in the Local Run &
   Monitoring / E2E validation stage of `orch-feature`, `orch-bug`,
-  `orch-update-packages`, `orch-create-module`, `orch-create-service`,
+  `orch-update-packages`, `orch-structure`, `orch-create-module`, `orch-create-service`,
   `orch-create-mvp`, `orch-project`, and `orch-aspire-update`
 
 Install recommended plugins:
@@ -336,6 +337,14 @@ Invoke: orch-bug
 - Runtime target: Local run + monitoring
 ```
 
+### Orchestrate Structure Refactor
+
+```text
+Invoke: orch-structure
+- Change: "Fix folder structure. harness should be below src"
+- Validation: "Solution references and structure tests still pass"
+```
+
 ### Orchestrate Module Creation
 
 ```
@@ -408,6 +417,7 @@ live in one central document: [`resources/orchestration-flow-diagrams.md`](resou
 | `orch-tdr` | [`resources/orchestration-flow-diagrams.md#orch-tdr`](resources/orchestration-flow-diagrams.md#orch-tdr) |
 | `orch-feature` | [`resources/orchestration-flow-diagrams.md#orch-feature`](resources/orchestration-flow-diagrams.md#orch-feature) |
 | `orch-bug` | [`resources/orchestration-flow-diagrams.md#orch-bug`](resources/orchestration-flow-diagrams.md#orch-bug) |
+| `orch-structure` | [`resources/orchestration-flow-diagrams.md#orch-structure`](resources/orchestration-flow-diagrams.md#orch-structure) |
 | `orch-create-module` | [`resources/orchestration-flow-diagrams.md#orch-create-module`](resources/orchestration-flow-diagrams.md#orch-create-module) |
 | `orch-create-service` | [`resources/orchestration-flow-diagrams.md#orch-create-service`](resources/orchestration-flow-diagrams.md#orch-create-service) |
 
@@ -428,8 +438,10 @@ The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-adr` uses `create-architectural-decision-record` after MCP-based context gathering
 - `orch-tdr` uses `create-technical-debt-record` after MCP-based context gathering
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
+- `orch-structure` handles existing repository structure/layout refactors and keeps
+  `orch-project` focused on initial project scaffolding
 - `orch-create-service` can use `aspire` for AppHost wiring
-- `orch-feature`, `orch-bug`, `orch-update-packages`, `orch-create-module`,
+- `orch-feature`, `orch-bug`, `orch-update-packages`, `orch-structure`, `orch-create-module`,
   `orch-create-service`, `orch-create-mvp`, `orch-project`, and `orch-aspire-update`
   use the `qa` plugin's `qa` agent (Playwright validation with evidence) and
   `qa-monitor` agent (continuous Aspire log/trace/metric monitoring) in their

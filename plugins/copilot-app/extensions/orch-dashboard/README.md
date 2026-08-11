@@ -4,7 +4,7 @@ A canvas extension that gives copilot-app `orch-*` orchestration skills
 (`orch-feature`, `orch-bug`, `orch-adr`, `orch-arc42`, `orch-blueprint`,
 `orch-tdr`, `orch-architecture`, `orch-project`, `orch-repo`,
 `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`,
-`orch-create-module`, `orch-create-service`) and the copilot-app automation
+`orch-structure`, `orch-create-module`, `orch-create-service`) and the copilot-app automation
 skills (`automation-bug-fix`, `automation-package-update`,
 `automation-performance-review`, `automation-review`, `automation-week-starter`,
 `automation-weekly-cost-analysis`, `automation-whats-new`,
