@@ -1,6 +1,6 @@
 ---
 applyTo: 'skills/orch-*/SKILL.md'
-description: Defines the model-selection categories the orchestrator uses to pick a model for each orchestration step, the family/tier to pick per category, and how a consuming repo can override those defaults.
+description: Defines the model-selection categories the orchestrator uses to pick a model for each orchestration step, the family/tier to pick per category, and how personal and team configuration can override those defaults.
 ---
 
 # Orchestration Model Selection (Orchestration-Owned)
@@ -17,7 +17,8 @@ description: Defines the model-selection categories the orchestrator uses to pic
   drive the rest of the process.
 - Define the categories **once** so a maintainer edits this file instead of re-describing
   model choice in every `orch-*/SKILL.md`.
-- Let a consuming repository override any category's default without editing plugin files.
+- Let an individual user override model choice outside the repository, and let a consuming
+  repository define team-shared overrides without editing plugin files.
 - Pick the **best-matching model family per category** — never default to a cheap family
   just because it is cheap, and never pin an exact version number that goes stale the moment
   a newer release ships.
@@ -35,10 +36,11 @@ description: Defines the model-selection categories the orchestrator uses to pic
   Previous versions" group.
 - If the named family has no non-legacy release available (rare), fall back to `auto` for
   that category for the run and note it, rather than reaching into the Legacy tier.
-- Never write a specific version number into this file's category table, an override file,
-  or `orchestrator.agent.md` — the only version-pinned model in this whole flow is the
-  orchestrator's own frontmatter `model`, because that one has to be fixed for the
-  orchestrator to run at all.
+- Do not write a specific version number into this file's category table. Override files
+  should prefer family names; exact model IDs are an advanced explicit pin and should be
+  used only when the user or team deliberately accepts the maintenance cost. The only
+  version-pinned model required in this flow is the orchestrator's own frontmatter `model`,
+  because that one has to be fixed for the orchestrator to run at all.
 
 ## Model Families & Tiers
 
@@ -84,8 +86,8 @@ agent still gets its own category's model.
 
 - Use it for the **Fallback / Unclassified** category above (an agent not yet mapped to a
   category), so an uncategorized stage never gets a blind guess.
-- A repo may also opt any specific category into `auto` via the override file below, if it
-  prefers the runtime to pick dynamically for that category (for example, a repo with highly
+- A user or repo may also opt any specific category into `auto` via the override files below,
+  if it prefers the runtime to pick dynamically for that category (for example, highly
   variable planning tasks).
 - Do not treat `auto` as a universal default "because it's price efficient" — the whole point
   of this file is that the orchestrator makes a deliberate, explainable choice per category
@@ -96,12 +98,17 @@ agent still gets its own category's model.
 For every stage transition, the orchestrator resolves the model to use in this order,
 stopping at the first match:
 
-1. **Repo override** — if the consuming repository defines `.github/copilot-model-selection.md`
-   (see below) and it lists an entry for the stage's category, use that (family, or an exact
-   model ID if the repo chose to pin one).
-2. **Category family + tier** — otherwise resolve the category's family/tier from the table
+1. **Current run instruction** — if the user explicitly gives a model-selection instruction
+   for this run, use it for the categories it covers.
+2. **Personal global override** — if `COPILOT_ORCH_MODEL_SELECTION_PATH` points to a readable
+   file, read that file; otherwise check the default user-global file path for the current
+   OS (see below). If the file lists an entry for the stage's category, use that value.
+3. **Team repo override** — if the consuming repository defines
+   `.github/copilot-model-selection.md` (see below) and it lists an entry for the stage's
+   category, use that value.
+4. **Category family + tier** — otherwise resolve the category's family/tier from the table
    above to the current latest matching model ID, per "No Hardcoded Version Numbers" above.
-3. **`auto`** — if the stage's agent is not yet categorized, use `auto` and flag it for
+5. **`auto`** — if the stage's agent is not yet categorized, use `auto` and flag it for
    follow-up (add the agent to the table above).
 
 None of the agents invoked by an orchestration pin their own `model`, so there is no
@@ -110,15 +117,47 @@ source of truth. Apply the resolved model explicitly wherever the orchestrator c
 the `model` parameter on `create_session`/`task`/kickoff calls it makes for that stage, and
 any background/child session it spawns (for example the parallel `qa:qa-monitor` session).
 
-## Repo Override File
+## Personal Global Override File
+
+- A user may define personal model preferences outside every repository. This keeps personal
+  cost, speed, and provider preferences out of team-shared instructions and avoids accidental
+  commits.
+- Preferred explicit path: set `COPILOT_ORCH_MODEL_SELECTION_PATH` to a Markdown file using
+  the same table format as the team repo override below.
+- Default path when the environment variable is unset:
+
+| OS | Default path |
+| --- | --- |
+| Windows | `%APPDATA%\GitHub Copilot\orchestration\model-selection.md` |
+| macOS/Linux | `~/.config/github-copilot/orchestration/model-selection.md` |
+
+- The orchestrator reads at most one personal file: the environment-variable path when set,
+  otherwise the OS default path. If the selected file is missing, unreadable, malformed, or a
+  category is not listed, fall back to the next step in the Resolution Order.
+- Do **not** support repo-local personal files such as
+  `.github/copilot-model-selection.local.md`. Personal overrides belong outside the repo;
+  repository files are team-shared by default.
+
+```markdown
+# Copilot Model Selection Overrides
+
+| Category | Model |
+| --- | --- |
+| Implementation & Coding | Gemini Pro |
+| Review | auto |
+```
+
+## Team Repo Override File
 
 - A consuming repository may create `.github/copilot-model-selection.md` at its repo root to
-  override any category's default.
+  override any category's default for the whole team.
 - Format: a Markdown table with two columns, `Category` and `Model`, using the exact category
   names from the table above. The `Model` value may be a family name (for example "Gemini
-  Pro") for the orchestrator to resolve to the latest release, or an exact model ID if the
-  repo wants to pin a specific version deliberately. Only include the rows being overridden;
-  omitted categories keep the plugin defaults.
+  Pro") for the orchestrator to resolve to the latest release, `auto`, or an exact model ID
+  when the repo deliberately pins a specific version. Prefer family names unless there is a
+  clear reason to accept the maintenance cost of an exact pin. Only include the rows being
+  overridden; omitted categories keep the plugin defaults unless a personal global override
+  already supplied that category.
 
 ```markdown
 # Copilot Model Selection Overrides
@@ -129,10 +168,10 @@ any background/child session it spawns (for example the parallel `qa:qa-monitor`
 | Review | GPT flagship |
 ```
 
-- The orchestrator reads this file once per run (if present) before `start_run`, and reuses
-  the resolved mapping for every stage in that run.
-- If the file is missing, malformed, or a category is not listed, fall back to the next step
-  in the Resolution Order.
+- The orchestrator reads the personal and team files once per run (if present) before
+  `start_run`, and reuses the resolved mapping for every stage in that run.
+- If a file is missing, malformed, or a category is not listed, fall back to the next step in
+  the Resolution Order.
 
 ## Quality Checks
 
@@ -142,10 +181,13 @@ any background/child session it spawns (for example the parallel `qa:qa-monitor`
       its own `model` in frontmatter.
 - [ ] The orchestrator resolves and applies a model before each stage transition, following
       the Resolution Order, and never hardcodes a version number while doing so.
-- [ ] A repo override in `.github/copilot-model-selection.md`, when present, takes precedence
-      over the category default.
+- [ ] A personal global override, when present, takes precedence over a team repo override.
+- [ ] A team repo override in `.github/copilot-model-selection.md`, when present, takes
+      precedence over the category default.
 - [ ] Personal Validation never receives a model or agent assignment.
 - [ ] This file names families and tiers, not exact version-pinned model IDs, so it does not
       need an edit every time a new model ships.
-- [ ] `auto` is used deliberately (Fallback/Unclassified, or an explicit repo override), not
-      set as the blanket default for every category.
+- [ ] `auto` is used deliberately (Fallback/Unclassified, or an explicit override), not set
+      as the blanket default for every category.
+- [ ] No repo-local personal override path such as `.github/copilot-model-selection.local.md`
+      is supported or treated as a readable config source.

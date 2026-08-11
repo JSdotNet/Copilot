@@ -36,8 +36,8 @@ Automate the complete project scaffolding workflow for an existing, configured r
 > not required, and every transition needs explicit user approval.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
-> (category defaults, overridable via `.github/copilot-model-selection.md` in the
-> consuming repo).
+> (category defaults, overridable via personal global model selection or
+> `.github/copilot-model-selection.md` in the consuming repo).
 
 ### Stage 1: GitHub Folder Setup (Foundation)
 - **Initialize `.github/` directory structure** with recommended layouts
