@@ -79,15 +79,49 @@ flowchart LR
 
 - `resources/dor.md` — Fincent Definition of Ready (the shared readiness baseline)
 - `resources/templates/story-review-checklist.md` — review and estimation checklist
+- `resources/jira-setup.md` — shared Jira project configuration reference
+
+## Scripts
+
+- `scripts/FincentJira.psm1` — shared Jira primitives: authentication, paged search, field
+  discovery, issue normalization, completion classification, ordering, totals, and dataset
+  hashing. Both collection scripts import it, so the two reports cannot drift apart.
+- `scripts/Get-SprintData.ps1` — deterministic sprint collection for `sprint-report`. Owns
+  sprint resolution and emits a fixed-schema `sprint-data.json` for **one team**.
+- `scripts/Get-ReleaseData.ps1` — deterministic release collection for `release-report`. Owns
+  fixVersion resolution and emits a fixed-schema `release-data.json`.
+
+Each dataset carries a `datasetHash` computed over its content excluding the generation
+timestamp, so the same Jira state always produces the same hash and the same report.
+
+```powershell
+$env:JIRA_BASE_URL = 'https://innovadis.atlassian.net'
+$env:JIRA_EMAIL    = 'you@innovadis.nl'
+$env:JIRA_API_TOKEN = '<api token>'
+
+./plugins/fincent/scripts/Get-ReleaseData.ps1 `
+  -Release 'release/2026.32.0' `
+  -OutputPath ./release-data.json
+
+./plugins/fincent/scripts/Get-SprintData.ps1 `
+  -Sprint 'Sprint A - Xanadu','Sprint B - Xanadu' `
+  -Team 'Team B' `
+  -ExpectedSprintCount 2 `
+  -OutputPath ./sprint-data-team-b.json
+```
 
 ## Dependencies
 
-All Jira interactions are handled by a **discovered Jira skill**. The automation skills
-scan installed skills at runtime for one that can retrieve, create, or update Jira issues.
+Story and PR review skills use a **discovered Jira skill**: the automation skills scan
+installed skills at runtime for one that can retrieve, create, or update Jira issues.
 No specific plugin name is required.
 
-If no Jira skill is found, automations fall back gracefully: ask the user to paste story
-content and skip Jira write-back steps.
+If no Jira skill is found, those automations fall back gracefully: ask the user to paste
+story content and skip Jira write-back steps.
+
+The sprint review pipeline is the exception — it does not use skill discovery. It reads Jira
+exclusively through `scripts/Get-SprintData.ps1` and `scripts/Get-ReleaseData.ps1`, which need
+`JIRA_BASE_URL`, `JIRA_EMAIL`, and `JIRA_API_TOKEN`.
 
 ## Install
 

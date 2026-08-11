@@ -18,51 +18,69 @@ Refer to `plugins/fincent/resources/jira-setup.md` for the Fincent Jira project
 configuration including the status flow, custom fields, fix version naming, labels,
 and epic ordering conventions.
 
-## Jira Skill Discovery
+## Data source (deterministic)
 
-When this skill is run directly, discover what Jira skills are available:
+This skill renders a report from the dataset produced by
+`plugins/fincent/scripts/Get-SprintData.ps1`. That script owns sprint resolution, JQL,
+pagination, completion classification, epic ordering, and totals. It fetches sprint data
+only — never release data.
 
-1. Check installed skills for skills whose name or description mentions "jira".
-2. Identify a **query-capable** skill — can search or list issues by sprint/filter.
-3. Identify a **retrieval-capable** skill — can fetch a single existing issue.
-4. If no query skill is found: ask the user to paste story content manually.
+One dataset covers **one team**. Run the script once per team.
 
-If this skill is invoked by an orchestration skill such as `automation-sprint-review`,
-prefer the caller-provided Jira capability context instead of rediscovering Jira skills.
+```powershell
+./plugins/fincent/scripts/Get-SprintData.ps1 `
+  -Sprint 'Sprint A - Xanadu','Sprint B - Xanadu' `
+  -Team 'Team B' `
+  -OutputPath ./sprint-data-team-b.json
+```
 
-All Jira field mapping, project keys, status values, and API conventions are owned by
-the selected Jira skill. Never reproduce that knowledge in this skill.
+Sprint scope alternatives when the names are not known up front:
+
+- `-ActiveSprints -BoardId {board id}` — the active sprints of a board.
+- `-Release '{release name}'` — the sprints that appear on that release's issues.
+- `-ExpectedSprintCount {n}` — fail the run when the resolved count differs.
+
+When invoked by `automation-sprint-review`, use the dataset path and team passed by the
+orchestrator instead of running the script again.
+
+The script requires `JIRA_BASE_URL`, `JIRA_EMAIL`, and `JIRA_API_TOKEN`. If it fails, stop
+and report the error — never fall back to ad-hoc Jira queries or model-discovered Jira skills.
+
+Determinism rules:
+
+- Read every number from `sprints[].totals`; never recount or re-add story points.
+- Use `sprints[].epicOrder` verbatim for section grouping and epic order.
+- Use `sprints[].issues` in the given order for table rows; never re-sort or re-filter.
+- Use `sprints[].removedIssues` for scope changes.
+- Treat `issue.isCompleted` as the completion verdict; do not reinterpret status text.
+- Copy `status`, `epicName`, `labels`, and `summary` verbatim.
+- The same `metadata.datasetHash` must always yield an identical report.
 
 ## Goals
 
-- Load all stories that were in the sprint at its start using the discovered Jira skill.
-- Determine the original scope (stories added before or at sprint start).
-- Classify each story by its final status.
-- Any story with status **Test, Acceptatie klant, Done, Closed**, or any status at or
-  beyond Test in the workflow is considered **completed** for this report.
-- Group by epic.
+- Render the sprint summary from `sprints[].totals`.
+- Split issues into completed and not-completed using `isCompleted`.
+- Group by epic using `epicOrder`.
 - Output a structured report in the sections below.
 
-This skill owns the sprint-report logic: data fetching, scope interpretation, completion
-classification, grouping, and report rendering.
+This skill owns the sprint-report rendering: section layout, table formatting, sprint-goal
+evaluation, and narrative summary. It does not own data fetching or classification.
 
-## Finding the sprint stories
+## Field mapping
 
-Use the discovered query-capable Jira skill with the following JQL:
-
-- JQL: `project = FIN AND sprint = "{sprint name}" AND "Fincent Team" = "Team B" ORDER BY epic ASC, status ASC`
-- Fields: summary, status, issuetype, epic, story points, labels, assignee, fixVersions.
-- Paginate if needed.
-- If the user names a different team, substitute in the JQL.
-
-Also retrieve sprint metadata when available:
-
-- sprint start date
-- sprint end date
-- sprint goal
-
-Also query stories that were **removed from the sprint** (added then removed) if accessible:
-- JQL: `project = FIN AND sprint was "{sprint name}" AND sprint != "{sprint name}" AND "Fincent Team" = "Team B"`
+| Report field | Dataset path |
+|--------------|--------------|
+| Sprint | `sprints[].name` |
+| Team | `metadata.team` |
+| Period | `sprints[].metadata.startDate` – `sprints[].metadata.endDate` |
+| Sprint goal | `sprints[].metadata.goal` |
+| Original scope | `sprints[].totals.issueCount` / `totals.totalPoints` |
+| Completed | `sprints[].totals.completedCount` / `totals.completedPoints` |
+| Not completed | `sprints[].totals.notCompletedCount` / `totals.notCompletedPoints` |
+| Completion rate | `sprints[].totals.completionRatePercent` |
+| Epic sections | `sprints[].epicOrder` |
+| Issue rows | `sprints[].issues` |
+| Scope changes | `sprints[].removedIssues` |
 
 ## Report structure
 
@@ -146,24 +164,23 @@ End with one short narrative paragraph suitable for a sprint retrospective or st
 
 ## Working rules
 
-- Original scope is determined from stories in the sprint at start; mid-sprint additions
-  are flagged in Scope Changes, not counted in the original completion rate.
-- **Completed** means status is Test, Acceptatie klant, Done, Closed, or any status at
-  or beyond Test in the team's workflow. These items are shown in section 2 with their
-  actual State so readers can distinguish fully done from still-in-testing items.
-- **Not Completed** means status is earlier than Test (e.g. Open, Just in, Ready,
-  In Progress, Analyze).
-- Group every section by epic — never mix stories from different epics in the same table.
-- Always render the **No epic** group as the last epic sub-section in every grouped section.
-- Include labels in every issue row when present; omit the cell content when the issue
-  has no labels.
-- Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `?`.
+- Render only from the dataset; never query Jira and never estimate a missing value.
+- Original scope is the dataset issue set; items in `removedIssues` are reported in Scope
+  Changes and excluded from the completion rate.
+- **Completed** means `isCompleted` is `true` in the dataset. These items appear in section 2
+  with their actual `status` so readers can distinguish fully done from still-in-testing items.
+- **Not Completed** means `isCompleted` is `false`.
+- Group every section by epic using `epicOrder` — never mix stories from different epics in
+  the same table and never reorder the groups.
+- The **No epic** group is already last in `epicOrder`; keep that position.
+- Include labels in every issue row when present; use `-` when the list is empty.
+- Use `storyPoints` as-is; render `?` when it is `null`.
 - Do not duplicate bugs: completed bugs appear only in section 2; section 5 lists only
   bugs that are not yet completed.
-- If sprint-goal data is available, include section 6 instead of dropping that context.
+- If `metadata.goal` is available, include section 6 instead of dropping that context.
 - After producing the report, present section 7 as the final narrative summary.
+- Quote `metadata.datasetHash` at the end of the report for reproducibility.
 
 ## Tools used
 
-- Discovered query-capable Jira skill — fetch sprint stories via JQL.
-- Discovered retrieval-capable Jira skill — fetch individual story detail when needed.
+- `plugins/fincent/scripts/Get-SprintData.ps1` — deterministic sprint data collection.

@@ -1,9 +1,11 @@
 ---
 name: automation-sprint-review
 description: >
-  End-to-end sprint review automation: generates the sprint report, then the release
-  report for the latest fixVersion, and finally a demo presentation as PowerPoint.
-  Orchestrates sprint-report, release-report, and demo-presentation skills sequentially.
+  End-to-end sprint review automation: collects deterministic Jira datasets with
+  Get-ReleaseData.ps1 and Get-SprintData.ps1, then generates the sprint report(s) per team,
+  the release report for the resolved fixVersion, and a demo presentation as PowerPoint.
+  Orchestrates sprint-report, release-report, and demo-presentation sequentially over those
+  datasets so repeated runs on unchanged Jira data produce identical output.
 ---
 
 # Automation: Sprint Review (Full Pipeline)
@@ -15,9 +17,10 @@ This skill is optimized for sprint reviews that cover one or more sprints. The f
 must keep the detailed reporting signal from the underlying reports instead of collapsing it
 to a minimal status note.
 
-This is an **orchestration skill**. It owns the end-to-end flow, cross-step context, artifact
-handoff, and Jira skill discovery. It must not duplicate the detailed reporting logic that
-already belongs inside `sprint-report`, `release-report`, or `demo-presentation`.
+This is an **orchestration skill**. It owns the end-to-end flow, cross-step context, and
+artifact handoff. It must not duplicate the detailed reporting logic that already belongs
+inside `sprint-report`, `release-report`, or `demo-presentation`, and it must not query Jira
+itself — all Jira data comes from the collection script described below.
 
 ## Jira Setup Reference
 
@@ -25,110 +28,161 @@ Refer to `plugins/fincent/resources/jira-setup.md` for the Fincent Jira project
 configuration including the status flow, custom fields, fix version naming, labels,
 and epic ordering conventions.
 
+## Determinism Contract (mandatory)
+
+All Jira data for this pipeline comes from two deterministic collection scripts:
+
+- `plugins/fincent/scripts/Get-ReleaseData.ps1` — release scope for `release-report`.
+- `plugins/fincent/scripts/Get-SprintData.ps1` — sprint scope for `sprint-report`, one
+  dataset per team.
+
+Both share `plugins/fincent/scripts/FincentJira.psm1`, so completion classification, epic
+ordering, issue ordering, and totals cannot drift between the two reports.
+
+Rules:
+
+- Run the scripts **first** (phase 0) and use their JSON datasets as the **only** data source
+  for phases 1 to 3.
+- Never issue ad-hoc Jira queries, and never recompute counts, points, completion rates,
+  or epic ordering by hand — read them from the datasets.
+- Never re-sort, re-group, or re-filter dataset content; the dataset order is the report order.
+- Do not paraphrase status values, sprint names, epic names, or labels.
+- The same `datasetHash` must yield an identical report. If a rerun on the same dataset would
+  change a number, table row, or ordering, that is a defect in the skill, not a judgement call.
+- If a dataset is missing or a script fails, stop and report the error. Do not fall back
+  to model-driven Jira exploration.
+
 ## Input
 
 Provide:
 
-- **Sprint name(s)**: one or more sprint names (e.g. `"Sprint A - Xanadu"`)
-- **Team**: defaults to all teams; specify if single-team report is needed
-- **Release**: optional. If omitted, automatically resolved to the latest fixVersion
-  (see "Resolving the latest release" below).
+- **Sprint name(s)**: one or more sprint names (e.g. `"Sprint A - Xanadu"`). Optional when
+  the sprints should be derived from the release.
+- **Team(s)**: the teams to report on. One sprint dataset and one sprint report set is
+  produced per team. Omit for a single all-teams sprint dataset.
+- **Release**: optional. If omitted, `Get-ReleaseData.ps1` resolves the latest fixVersion.
+- **Expected sprint count**: optional but recommended when the user states a number; it is
+  passed to `Get-SprintData.ps1` as `-ExpectedSprintCount` so the run fails loudly on a
+  mismatch.
 
-If the user asks for active sprints, a release, or a date range, resolve **all matching
-sprints** first and keep that full resolved list for the rest of the run.
-Never continue with only the first match when more than one sprint is found.
+Translate the request into script parameters — do not resolve scope yourself. If the user
+asks for active sprints, pass `-ActiveSprints -BoardId {board id}`; ask for the board id when
+it is unknown. If the user does not name the teams, ask which teams are in scope rather than
+guessing.
 
 ## Orchestration responsibilities
 
 This skill is responsible for:
 
-- Discovering the Jira skill or Jira tool capability **once** for the whole pipeline.
-- Resolving sprint names, team, and release scope.
-- Calling `sprint-report` and `release-report` in the right order.
+- Running `Get-ReleaseData.ps1` once and `Get-SprintData.ps1` once per team.
+- Passing each dataset path forward to the phase that consumes it.
+- Calling `sprint-report` per team and `release-report` for the resolved version.
 - Persisting each generated report as an artifact.
 - Passing the generated sprint and release reports forward into `demo-presentation`.
-- Producing the final artifact summary for the user.
+- Producing the final artifact summary for the user, including every `datasetHash`.
 
 This skill is **not** responsible for:
 
+- Resolving sprints or releases itself — the scripts own that.
 - Reimplementing the internal report logic of `sprint-report`.
 - Reimplementing release classification logic from `release-report`.
 - Re-fetching story detail for the demo once the needed report artifacts already exist.
 
-## Jira skill discovery
+## Jira access
 
-Before running any phase, discover what Jira skills are available:
+Jira access runs through the collection scripts using the environment variables
+`JIRA_BASE_URL`, `JIRA_EMAIL`, and `JIRA_API_TOKEN`.
 
-1. Check installed skills for skills whose name or description mentions "jira".
-2. Identify a **query-capable** Jira skill — can search or list issues by JQL, sprint, or release.
-3. Identify a **retrieval-capable** Jira skill — can fetch one existing issue when detail lookup is needed.
-4. Reuse that discovered Jira capability across all phases in this run.
-5. If no query-capable Jira skill is found, stop and ask the user for manual source data.
-
-Pass the discovered Jira capability context into `sprint-report` and `release-report` so the
-pipeline uses one consistent Jira integration instead of rediscovering it at every step.
+Do not discover, select, or call a Jira skill or Jira MCP tool in this pipeline. If a
+script cannot authenticate, stop and ask the user to configure the environment variables.
 
 Example invocations:
 
-- `automation-sprint-review for "Sprint A - Xanadu", "Sprint B - Xanadu"`
+- `automation-sprint-review for "Sprint A - Xanadu", "Sprint B - Xanadu" for Team A and Team B`
 - `automation-sprint-review for active sprints`
 
-## Resolving the latest release
+## Resolving release and sprints
 
-When no explicit release is given, resolve the latest fixVersion automatically:
+Both are resolved by the scripts, not by this skill:
 
-1. Use the discovered Jira capability to query Jira project versions for project `FIN`.
-2. Sort by release date descending (or by version name if dates are absent).
-3. Pick the most recent version — it does not need to be released/final.
-   Unreleased versions are valid (e.g. `release/2026.32.0`).
+- Release: when `-Release` is omitted, `Get-ReleaseData.ps1` picks the latest fixVersion for
+  project `FIN`, sorted by release date descending then name descending. Unreleased versions
+  are valid (e.g. `release/2026.32.0`).
+- Sprints: `Get-SprintData.ps1` unions explicit `-Sprint` names, sprint names found on the
+  issues of `-Release`, and active board sprints (with `-ActiveSprints -BoardId`),
+  de-duplicates them, and orders them chronologically.
 
-Alternatively use JQL:
-```
-project = FIN AND fixVersion is not EMPTY ORDER BY fixVersion DESC
-```
-Then extract the highest fixVersion from the results.
+Use `-ExpectedSprintCount` whenever the user states how many sprints are in scope. The script
+fails the run on a mismatch instead of silently dropping sprints.
 
-## Resolving all sprints (mandatory completeness check)
-
-When sprint scope is not a single explicit sprint name, resolve sprints with an exhaustive
-union strategy before phase 1:
-
-1. Resolve direct sprint matches from user input (single or multiple named sprints).
-2. When scope is inferred (active sprint(s), release, or date range), query sprint lists
-   across all relevant states (`active`, `closed`, and `future` when applicable) and paginate.
-3. Cross-check with release issues by extracting all sprint names from matching issues
-   (for example from `project = FIN AND fixVersion = "{release name}"` with team filter when used).
-4. Union and de-duplicate sprint names from all sources, then sort chronologically.
-5. If the user stated an expected sprint count (for example "2 sprints"), verify the resolved
-   list count matches that expectation before generating artifacts.
-6. If there is a mismatch or ambiguity, stop and ask for confirmation instead of silently
-   dropping unresolved sprints.
-
-Before phase 2 starts, assert that phase 1 produced one sprint report artifact per resolved
-sprint. If not, rerun phase 1 for missing sprints and only continue when the set is complete.
+Read `metadata.sprintResolution.resolved` from each sprint dataset for the authoritative
+sprint list, and `release.name` from the release dataset for the authoritative release name.
+Never re-derive either.
 
 ## Execution Plan
 
-Execute the three phases **sequentially**. Each phase must receive the outputs and context
-from the previous phase instead of independently starting over.
+Execute phase 0 first, then the three reporting phases **sequentially**.
 
-### Phase 1 — Sprint Report
+### Phase 0a — Release data collection (mandatory)
 
-Run the `sprint-report` skill **once per resolved sprint** for the requested team.
-Pass in:
+Run the release collection script from the repository root:
 
-- the resolved sprint name
-- the selected team
-- the discovered Jira capability context
+```powershell
+./plugins/fincent/scripts/Get-ReleaseData.ps1 `
+  -Release 'release/2026.32.0' `
+  -OutputPath ./release-data.json
+```
 
-Collect the full sprint report output (completed stories, bugs, scope changes, labels,
-story points, and sprint-goal evaluation).
-Save **one file per sprint** as `sprint-report-{sprint-name}.md` in the working directory.
-If the resolved sprint list contains `N` sprints, phase 1 must output exactly `N`
-per-sprint files.
+Omit `-Release` to let the script resolve the latest fixVersion.
 
-If more than one sprint is included, also produce a consolidated comparison file named
-`sprint-report-overview-{first-sprint-name}.md` that contains:
+After it completes:
+
+1. Record `metadata.datasetHash` as the release dataset hash.
+2. Read `release.name` as the authoritative release name.
+3. Read `release.sprintsCovered` as the authoritative sprint list when the user did not
+   name the sprints explicitly.
+4. If the script exits non-zero, stop the pipeline and report the error.
+
+### Phase 0b — Sprint data collection, once per team (mandatory)
+
+Run the sprint collection script **once per team in scope**. Each run produces its own
+dataset and its own hash:
+
+```powershell
+./plugins/fincent/scripts/Get-SprintData.ps1 `
+  -Sprint 'Sprint A - Xanadu','Sprint B - Xanadu' `
+  -Team 'Team B' `
+  -ExpectedSprintCount 2 `
+  -OutputPath ./sprint-data-team-b.json
+```
+
+Variants:
+
+- Active sprints: replace `-Sprint` with `-ActiveSprints -BoardId {board id}`.
+- Sprints derived from the release: replace `-Sprint` with `-Release '{release name}'`.
+- All teams in a single dataset: omit `-Team` and run the script once.
+
+Record each dataset path, its `metadata.team`, its `metadata.datasetHash`, and its
+`metadata.sprintResolution.resolved` sprint list.
+
+### Phase 1 — Sprint Report (per team, per sprint)
+
+Run the `sprint-report` skill for each team dataset, once per sprint in that dataset's
+`metadata.sprintResolution.resolved`. Pass in:
+
+- the sprint name
+- the team
+- the sprint dataset path for that team
+- the matching `sprints[]` entry
+
+Render strictly from that entry: `totals` for summary numbers, `epicOrder` for section
+grouping and order, `issues` for rows, `removedIssues` for scope changes.
+
+Save **one file per team per sprint** as `sprint-report-{team}-{sprint-name}.md`. When only
+one team is in scope, `sprint-report-{sprint-name}.md` is acceptable.
+
+If more than one sprint is included for a team, also produce a consolidated comparison file
+named `sprint-report-overview-{first-sprint-name}.md` that contains:
 
 - A trend table with one row per sprint.
 - The full per-sprint reports appended in chronological order.
@@ -136,15 +190,14 @@ If more than one sprint is included, also produce a consolidated comparison file
 
 ### Phase 2 — Release Report
 
-Run the `release-report` skill for the resolved fixVersion.
-Pass in:
+Run the `release-report` skill for `release.name` from the phase 0a dataset. Pass in:
 
-- the resolved release name
-- the discovered Jira capability context
-- the resolved sprint list from phase 1 when it helps identify covered sprints
+- the release dataset path
+- the `release` object
 
-Use the latest fixVersion (released or unreleased). Do not restrict to final releases.
-Save the complete report as `release-report-{release-name}.md` in the working directory.
+Render from `release.totals`, `release.statusBreakdown`, `release.typeBreakdown`,
+`release.epicOrder`, `release.issues`, and `release.removedIssues`.
+Save the complete report as `release-report-{release-name}.md`.
 
 ### Phase 3 — Demo Presentation (PowerPoint)
 
@@ -157,7 +210,7 @@ Pass in:
 - the generated release report artifact or its full content
 - the resolved sprint list
 - the resolved release name
-- the team
+- the team(s)
 
 The preferred data source for `demo-presentation` is the generated report content from phases
 1 and 2. Do **not** ask `demo-presentation` to fetch sprint or release data from Jira.
@@ -177,13 +230,16 @@ If multiple sprints are requested, produce one combined `.pptx` covering all spr
 
 The automation produces file artifacts saved to the working directory:
 
-1. **Sprint report(s)** — one Markdown file per sprint: `sprint-report-{sprint-name}.md`
-2. **Sprint overview** — when multiple sprints are included: `sprint-report-overview-{first-sprint-name}.md`
-3. **Release report** — Markdown file: `release-report-{release-name}.md`
-4. **Demo presentation** — PowerPoint file: `demo-{sprint-name}.pptx`
+1. **Datasets** — deterministic Jira snapshots: `release-data.json` and one
+   `sprint-data-{team}.json` per team
+2. **Sprint report(s)** — one Markdown file per team per sprint: `sprint-report-{team}-{sprint-name}.md`
+3. **Sprint overview** — when multiple sprints are included: `sprint-report-overview-{first-sprint-name}.md`
+4. **Release report** — Markdown file: `release-report-{release-name}.md`
+5. **Demo presentation** — PowerPoint file: `demo-{sprint-name}.pptx`
 
 After all phases complete, present a **summary** that includes:
 
+- Every `datasetHash` from phase 0 (release plus one per team), so the run is reproducible.
 - A brief status per artifact (success or failure with error).
 - A **file URI link** for each produced file, plus the plain absolute path.
 - A sprint snapshot table with one row per sprint so the final answer still contains the
@@ -229,19 +285,23 @@ name or only a single sprint-report row.
 
 ## Working Rules
 
-- Run phases sequentially: sprint-report → release-report → demo-presentation.
+- Always run phase 0 first; never start a reporting phase without the required dataset file.
+- Run phases sequentially: collect release → collect sprints per team → sprint-report →
+  release-report → demo-presentation.
+- Treat the datasets as the single source of truth; do not query Jira directly at any point.
+- Take counts, points, completion rates, epic order, and sprint order verbatim from the datasets.
+- Never read sprint numbers from the release dataset or release numbers from a sprint dataset.
 - Treat this skill as orchestration only: it coordinates, passes context, and saves artifacts.
 - Save every phase result as a file — never only display in chat.
-- Save one sprint-report file per sprint; do not merge multiple sprint reports into a
+- Save one sprint-report file per team per sprint; do not merge multiple sprint reports into a
   single per-sprint artifact.
-- Discover Jira capability once and reuse it across the full flow.
 - Use the latest fixVersion even if it is unreleased; do not skip it.
 - The demo presentation must be a `.pptx` file, not Markdown.
 - Pass report artifacts forward to `demo-presentation`; do not force it to rebuild those
   inputs from Jira.
 - Use Dutch language for slide content (the Fincent Review template is Dutch).
 - After all phases finish, always present the artifact table plus sprint/release snapshot
-  tables with links to all artifacts.
+  tables with links to all artifacts, and include every `datasetHash`.
 - Preserve the detailed reporting signal from the generated reports: include labels,
   story points, carry-over, and sprint-by-sprint totals in the final chat summary.
 - If a phase fails, report the error in the summary table and continue with subsequent phases where possible.
@@ -249,7 +309,9 @@ name or only a single sprint-report row.
 
 ## Tools Used
 
-- Discovered Jira skill — shared Jira capability for the full orchestration run.
-- `sprint-report` skill — phase 1 reporting logic.
-- `release-report` skill — phase 2 reporting logic.
+- `plugins/fincent/scripts/Get-ReleaseData.ps1` — deterministic release collection (phase 0a).
+- `plugins/fincent/scripts/Get-SprintData.ps1` — deterministic sprint collection per team (phase 0b).
+- `plugins/fincent/scripts/FincentJira.psm1` — shared classification, ordering, and hashing rules.
+- `sprint-report` skill — phase 1 rendering logic over each sprint dataset.
+- `release-report` skill — phase 2 rendering logic over the release dataset.
 - `demo-presentation` skill — phase 3 slide logic, using the generated reports as primary input.
