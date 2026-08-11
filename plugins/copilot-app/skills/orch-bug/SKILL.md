@@ -10,7 +10,7 @@ Execute a complete bug fix workflow from identification through local runtime va
 > **Scope:** This skill covers bug work whether or not a written report, triage, or
 > reproduction already exists. When they do, Stage 0 is a short intake and Stage 1
 > proceeds as usual. When they do not — an ad-hoc "X is broken" observation or an
-> unreported defect noticed while working — Stage 0 derives them with the user. Missing
+> unreported defect noticed while working — Stage 0 derives them from the request and codebase. Missing
 > inputs are a reason to run Stage 0, never a reason to skip this skill and patch inline.
 
 ## Input Expectations
@@ -33,7 +33,8 @@ Execute a complete bug fix workflow from identification through local runtime va
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -41,7 +42,7 @@ Execute a complete bug fix workflow from identification through local runtime va
 
 ### Stage 0: Scope Discovery
 
-Run this stage first, always. It is a quick confirmation when a triaged report already
+Run this stage first, always. It is a quick intake when a triaged report already
 exists, and a full derivation when it does not.
 
 - **Restate the observed versus expected behavior** in one or two sentences, in the
@@ -52,8 +53,7 @@ exists, and a full derivation when it does not.
 - **Identify governing instructions** — `.github/copilot-instructions.md`, any matching
   `**/*.instructions.md`, and relevant guidelines or ADRs via
   `jsdotnet-guidelines-mcpserver`
-- **Confirm the derived scope with the user** before any code is written; do not proceed
-  to Stage 1 without that confirmation
+- **Record the derived scope and assumptions** in the stage output and continue to Stage 1 unless escalation is required
 
 Escalate instead of continuing when the defect is really a missing feature, or when the
 fix needs a new architectural decision or cross-cutting redesign — recommend
@@ -158,7 +158,7 @@ Orchestrate bug fix for:
 
 ## Output Expectations
 
-- Scope restated and confirmed with the user.
+- Scope restated and recorded in the stage output.
 - Root cause documented.
 - Failing test created that reproduces the bug.
 - Minimal fix implemented; test passes.
@@ -182,7 +182,7 @@ standard chat interaction.
   Validation, Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Scope Discovery**, present the restated observed versus expected behavior, the
   derived verification criterion, and the suspected code paths as the stage output so the
-  user can confirm or correct them.
+  user can review them at Personal Validation.
 - During **Bug Intake & Reproduction**, also open/update `markdown-canvas` (`markdown-preview`)
   with the drafted bug report content, per `instructions/canvas-usage.instructions.md`.
   Optional; skip gracefully if not installed.

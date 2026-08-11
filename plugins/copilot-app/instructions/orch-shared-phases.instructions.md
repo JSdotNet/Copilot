@@ -39,7 +39,11 @@ description: Defines the reusable delivery and validation phases shared by all o
 - Cross-plugin agents are recommended, not required. When a referenced plugin is not
   installed, skip the stage or perform it manually and continue with the remaining
   stages.
-- All agent transitions require explicit user approval before switching.
+- Internal orchestration transitions **do not require separate user approval**. The
+  orchestrator may move between its own stages, sub-agents, and phase skills without
+  pausing, so the run can build, test, and continue up to Personal Validation.
+- The required user approval gate is **Personal Validation**. Stop there before creating a
+  pull request, updating issues, or marking the orchestration complete.
 
 ## Code-Modifying Orchestration Context
 
@@ -55,8 +59,9 @@ description: Defines the reusable delivery and validation phases shared by all o
   `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, and `orch-tdr` — remain
   the preferred upstream source of that context when they have already run.
 - When it does not exist, the first stage **derives it from the request and the codebase**
-  and confirms it with the user. Missing context is a reason to run that stage — never a
-  reason to stop, hand the request back, or skip the orchestration and implement inline.
+  and records the derived assumptions before continuing. Missing context is a reason to run
+  that stage — never a reason to stop, hand the request back, or skip the orchestration and
+  implement inline.
 - Ad-hoc, incremental, and one-line requests are in scope for these skills. They enter
   through the same first stage as fully specified work.
 
@@ -81,13 +86,14 @@ stage, not escalated.
 
 - `orch-feature` and `orch-bug` handle the most common ad-hoc requests, so they own a
   **Stage 0: Scope Discovery** that derives missing scope, acceptance or verification
-  criteria, and impacted code paths together with the user.
+  criteria, and impacted code paths from the request and codebase.
 - For those two skills, missing context is a reason to run Stage 0 — not a reason to stop,
   and never a reason to skip the orchestration and implement inline.
 - Stopping still applies when the change requires a new architectural decision, a new
-  bounded context, or a cross-cutting redesign. In that case recommend `orch-adr`,
-  `orch-architecture`, or `orch-blueprint` and ask the user before continuing.
-- The other code-modifying orchestrations keep the stop-and-ask rule above unchanged.
+  bounded context, or a cross-cutting redesign. In that case route to `orch-adr`,
+  `orch-architecture`, or `orch-blueprint` only after the user approves that escalation.
+- The other code-modifying orchestrations use the same Personal Validation gate and only
+  stop early for the escalation cases above.
 
 ## MCP Server Strategy (Shared)
 
@@ -196,7 +202,8 @@ rather than re-describing the steps.
 - **Run the unit test suite** and require it to pass.
 - **Run the automated end-to-end (E2E) test suite** and require it to pass.
 - **Stop and fix** before continuing when build, unit, or E2E tests fail — do not proceed
-  to QA Validation or Personal Validation on a red build.
+  to QA Validation or Personal Validation on a red build. When build and tests are green,
+  continue directly to QA Validation and then Personal Validation.
 
 **Agents:** `csharp-coding:coding` (recommended); performed manually when that plugin is not
 installed.
@@ -494,6 +501,8 @@ alongside the run.
 - [ ] Each skill names its shared phases and links to this file.
 - [ ] Build & Test runs before QA Validation and Personal Validation for code-modifying
       skills.
+- [ ] Code-modifying orchestrations continue through Build & Test and QA Validation without
+      extra confirmation prompts, stopping at Personal Validation for the user's decision.
 - [ ] QA Validation depth matches the change kind (new functionality vs. bug/existing-flow
       verification vs. startup-only vs. skipped).
 - [ ] Personal Validation waits for the user and uses no agent.

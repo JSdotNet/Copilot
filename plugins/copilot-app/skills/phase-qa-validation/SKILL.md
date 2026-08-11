@@ -98,8 +98,8 @@ Applies when the repository does not declare a QA depth in `.github/copilot-orch
 ## Agents
 
 - `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`
-  running validation manually when the `qa` plugin is not installed. Agent transitions
-  require explicit user approval.
+  running validation manually when the `qa` plugin is not installed. Continue without a
+  separate approval prompt before this phase.
 
 ## Skills Used
 

@@ -21,8 +21,8 @@ description: Defines the optional .github/copilot-orch-context.md convention a c
 
 - A consuming repository may create `.github/copilot-orch-context.md` at its repo root.
 - The file is **optional**. When it is missing, behavior is unchanged: orchestrations
-  discover the AppHost and entry points as they do today, and ask the user when discovery is
-  ambiguous.
+  discover the AppHost and entry points as they do today, record ambiguous discovery in the
+  relevant stage output, and continue with the appropriate validation result.
 - The orchestrator reads it **once per run**, alongside `.github/copilot-model-selection.md`,
   before `start_run`, and persists the relevant values into the run context so every stage
   that needs them gets the same answer.

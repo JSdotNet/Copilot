@@ -12,7 +12,7 @@ Automate the complete project scaffolding workflow for an existing, configured r
 > **Scope:** The target project structure and architecture direction do not need to be
 > written down first. When approved structure or architecture notes exist, Stage 3 is a
 > short intake. When they do not, Stage 3 derives them from the project type, the
-> repository, and the repository guidelines, and confirms them with the user. Missing
+> repository, and the repository guidelines, and records the derived assumptions. Missing
 > notes are a reason to run Stage 3, never a reason to stop or to scaffold outside this
 > orchestration.
 
@@ -33,7 +33,8 @@ Automate the complete project scaffolding workflow for an existing, configured r
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -76,11 +77,11 @@ derive it from the project type and the repository where it does not.
   technology choices from the project type and repository conventions
 - **Load the implementation context** and repository constraints from
   `jsdotnet-guidelines-mcpserver`
-- **Determine API contracts** and data model boundaries — confirm those already agreed,
+- **Determine API contracts** and data model boundaries — use those already agreed,
   and derive the rest at signature level
 - **Plan integration points** across services
 - **Capture implementation risks and assumptions** for local development
-- **Confirm the resulting architecture direction with the user** before Stage 4 installs
+- **Record the resulting architecture direction** before Stage 4 installs
   dependencies or Stage 5 scaffolds anything
 
 Escalate instead of continuing when the project needs a documented target architecture or
