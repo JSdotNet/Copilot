@@ -11,7 +11,7 @@ Execute a complete workflow for adding a new service to an existing project, wit
 > architecture orchestration ran. When an approved service specification, responsibilities,
 > and architecture context exist, Stage 0 is a short intake and Stage 1 proceeds as usual.
 > When they do not — an ad-hoc request or an extraction from existing code — Stage 0
-> derives them with the user. Missing inputs are a reason to run Stage 0, never a reason
+> derives them from the request and codebase. Missing inputs are a reason to run Stage 0, never a reason
 > to skip this skill and implement inline.
 
 ## Input Expectations
@@ -34,7 +34,8 @@ Execute a complete workflow for adding a new service to an existing project, wit
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -42,7 +43,7 @@ Execute a complete workflow for adding a new service to an existing project, wit
 
 ### Stage 0: Scope Discovery
 
-Run this stage first, always. It is a quick confirmation when an approved service
+Run this stage first, always. It is a quick intake when an approved service
 specification already exists, and a full derivation when it does not.
 
 - **Restate the service's responsibility** in one or two sentences, in the user's terms
@@ -55,8 +56,7 @@ specification already exists, and a full derivation when it does not.
 - **Identify governing instructions** — `.github/copilot-instructions.md`, any matching
   `**/*.instructions.md`, and relevant guidelines or ADRs via
   `jsdotnet-guidelines-mcpserver`
-- **Confirm the derived scope with the user** before any code is written; do not proceed
-  to Stage 1 without that confirmation
+- **Record the derived scope and assumptions** in the stage output and continue to Stage 1 unless escalation is required
 
 Escalate instead of continuing when the work is really a module inside an existing
 service, or when the service boundary itself is an open architectural question — recommend
@@ -68,15 +68,15 @@ acceptance criteria wording; `architecture:architect` when the service boundary 
 review.
 
 ### Stage 1: Specification Intake
-- **Review the service responsibility and boundaries confirmed in Stage 0**
-- **Confirm API or messaging contracts** for the new service
+- **Review the service responsibility and boundaries recorded in Stage 0**
+- **Capture API or messaging contracts** for the new service
 - **Identify upstream/downstream dependencies**
 - **Set acceptance criteria** and operational expectations
 
 **Agents:** `product-owner:product-owner`, `architecture:architect`
 
 ### Stage 2: Implementation Planning
-- **Map the confirmed design** to the repository structure
+- **Map the recorded design** to the repository structure
 - **Plan service discovery and references** for the host project
 - **Define configuration model** (env vars, secrets, defaults)
 - **Define health checks and observability signals**
@@ -157,10 +157,10 @@ standard chat interaction.
   Specification Intake, Implementation Planning, Implementation, Build & Test, QA
   Validation, Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Scope Discovery**, present the restated responsibility, derived boundaries and
-  contracts, and derived acceptance criteria as the stage output so the user can confirm
+  contracts, and derived acceptance criteria as the stage output so the user can review
   or correct them.
 - During **Specification Intake**, also open/update `markdown-canvas`
-  (`markdown-preview`) with the confirmed service contract, and during
+  (`markdown-preview`) with the recorded service contract, and during
   **Implementation Planning**, open/update `markdown-canvas` with the design
   documentation and `diagram-canvas` (`mermaid-diagram`) with any accompanying Mermaid
   diagrams, per `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if

@@ -22,7 +22,8 @@ Automate the complete GitHub repository creation and configuration workflow usin
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or

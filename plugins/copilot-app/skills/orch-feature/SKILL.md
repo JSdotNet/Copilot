@@ -12,7 +12,7 @@ requirements and architecture — through local validation using canvas interfac
 > architecture orchestration ran. When an approved specification, acceptance criteria,
 > and architecture notes exist, Stage 0 is a short intake and Stage 1 proceeds as usual.
 > When they do not — an ad-hoc request, an incremental change, or a small UI tweak —
-> Stage 0 derives them with the user. Missing inputs are a reason to run Stage 0, never
+> Stage 0 derives them from the request and codebase. Missing inputs are a reason to run Stage 0, never
 > a reason to skip this skill and implement inline.
 
 ## Input Expectations
@@ -34,7 +34,8 @@ requirements and architecture — through local validation using canvas interfac
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -42,7 +43,7 @@ requirements and architecture — through local validation using canvas interfac
 
 ### Stage 0: Scope Discovery
 
-Run this stage first, always. It is a quick confirmation when approved inputs already
+Run this stage first, always. It is a quick intake when approved inputs already
 exist, and a full derivation when they do not.
 
 - **Restate the requested behavior** in one or two sentences, in the user's terms
@@ -52,8 +53,7 @@ exist, and a full derivation when they do not.
 - **Identify governing instructions** — `.github/copilot-instructions.md`, any matching
   `**/*.instructions.md`, and relevant guidelines or ADRs via
   `jsdotnet-guidelines-mcpserver`
-- **Confirm the derived scope with the user** before any code is written; do not proceed
-  to Stage 1 without that confirmation
+- **Record the derived scope and assumptions** in the stage output and continue to Stage 1 unless escalation is required
 
 Escalate instead of continuing when the request needs a new architectural decision, a new
 bounded context, or a cross-cutting redesign — recommend `orch-adr`, `orch-architecture`,
@@ -64,9 +64,9 @@ acceptance criteria wording; `architecture:architect` only when architectural im
 suspected.
 
 ### Stage 1: Specification & Architecture Intake
-- **Review the scope confirmed in Stage 0** and its acceptance criteria
+- **Review the scope recorded in Stage 0** and its acceptance criteria
 - **Map the existing architecture guidance** to the impacted code paths
-- **Confirm implementation constraints** and affected integration points
+- **Capture implementation constraints** and affected integration points
 - **Define the local validation target** for the approved change
 
 **Agents:** `product-owner:product-owner`, `architecture:architect`
@@ -126,8 +126,8 @@ Orchestrate feature development for:
 
 ## Definition of Done Checklist
 
-- [ ] Scope restated and confirmed with the user
-- [ ] At least one measurable acceptance criterion agreed
+- [ ] Scope restated and recorded in the stage output
+- [ ] At least one measurable acceptance criterion recorded
 - [ ] Code complete and reviewed
 - [ ] Unit tests written (>80% coverage)
 - [ ] Integration tests passing
@@ -162,7 +162,7 @@ standard chat interaction.
   Specification & Architecture Intake, Implementation, Build & Test, QA Validation,
   Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Scope Discovery**, present the restated behavior, derived acceptance criteria,
-  and impacted code paths as the stage output so the user can confirm or correct them.
+  and impacted code paths as the stage output for later Personal Validation.
 - During **Specification & Architecture Intake**, optionally open/update
   `markdown-canvas` (`markdown-preview`) or `diagram-canvas` (`mermaid-diagram`) with the
   provided specification or architecture artifacts, per

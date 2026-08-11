@@ -31,8 +31,8 @@ consuming repository's optional runtime context file, whose convention is define
 2. **Establish implementation context.** For code-modifying orchestrations, run the
    skill's first stage to establish scope, acceptance or verification criteria, and
    impacted code paths. Read them when they already exist; derive them from the request
-   and the codebase and confirm them with the user when they do not. Missing context is
-   never grounds for stopping the run or letting the work proceed outside the
+   and the codebase and record the derived assumptions when they do not. Missing context
+   is never grounds for stopping the run or letting the work proceed outside the
    orchestration. Escalate only for the decision classes listed under **Escalation** in
    `orch-shared-phases.instructions.md`, and then invoke the named successor
    orchestration after user approval.
@@ -74,8 +74,9 @@ consuming repository's optional runtime context file, whose convention is define
 8. **Enforce Build & Test first.** Never start QA Validation or Personal Validation on a red
    build or failing tests. Mark the failing stage `blocked`, report, and stop for fixes.
 9. **Enforce the Personal Validation gate.** Personal Validation uses **no agent and no
-   model**: hand control back to the user, present the code review and the recorded QA
-   review, start the application for code changes, and wait for explicit user approval.
+   model** and is the first required user approval checkpoint: hand control back to the
+   user, present the code review and the recorded QA review, start the application for code
+   changes, and wait for explicit user approval.
    Never auto-approve. Record the decision with `set_run_context` (`approval`, plus the
    user's wording as `approvalNote`).
 10. **Gate the pull request.** Create a pull request only when the persisted `approval` in
@@ -117,7 +118,8 @@ consuming repository's optional runtime context file, whose convention is define
   Likewise, never hardcode a per-stage model or a version-pinned model ID in this agent or
   in `orch-*` skills; edit `orch-model-selection.instructions.md` to change category
   families/tiers.
-- **Approval before every agent transition** and before every pull request.
+- **No separate approval before internal agent transitions.** Continue through Build & Test
+  and QA Validation, then stop for Personal Validation before any pull request.
 - **Cross-plugin agents are recommended, not required** — skip or perform a stage manually
   when a referenced plugin is not installed, and continue with the remaining stages.
 - **No pull request** unless the user has explicitly approved it in Personal Validation and

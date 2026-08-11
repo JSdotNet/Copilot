@@ -15,8 +15,9 @@ This plugin provides specialized skills for GitHub Copilot App users who need to
 4. **Track progress visually** through shared dashboard and content-preview canvases
 
 Each orchestration skill coordinates specialist agents from other plugins where useful.
-Agent transitions require explicit user approval. Cross-plugin agents are recommended but
-not required — skills degrade gracefully when optional plugins are missing.
+Internal transitions do not require separate user approval; orchestrations continue through
+build, test, and QA and stop at Personal Validation before pull requests. Cross-plugin
+agents are recommended but not required — skills degrade gracefully when optional plugins are missing.
 
 Code-modifying orchestrations assume the specification and architecture work is already
 done. They are intended to be triggered from the results of documentation and
@@ -177,7 +178,7 @@ After installation, the plugin skills should appear in GitHub Copilot App:
 - **Aspire Integration** - Project setup includes .NET Aspire AppHost scaffolding
 - **MCP-Aware Orchestration** - Routes standards and governed-asset checks through `jsdotnet-guidelines-mcpserver`, official Microsoft stack lookups through `microsoft-learn`, browser QA automation through `playwright`, and reserves `jsdotnet-design-mcpserver` for UX-specific flows
 - **Local-First Validation** - Workflows focus on local run, health checks, and monitoring
-- **Approval-Based Handoffs** - Agent transitions require explicit user approval
+- **Personal Validation Gate** - Runs continue through validation and pause for user approval before PR work
 
 ## Dependencies
 
@@ -386,7 +387,7 @@ copilot-app plugin
 
 Each orchestration skill follows a staged workflow tailored to the scenario (project setup, MVP, feature, package updates, bug fix, module creation, or service creation):
 
-1. **Intake and alignment stages** - Establish or confirm specification, architecture, constraints, and validation targets; missing inputs are derived here, not treated as a reason to stop
+1. **Intake and alignment stages** - Establish or align to specification, architecture, constraints, and validation targets; missing inputs are derived here, not treated as a reason to stop
 2. **Implementation stage** - Every code-modifying orchestration includes an explicit Implementation phase; it can appear after intake/planning stages instead of always being first
 3. **Validation stages** - Unit, integration, and local runtime validation with recorded outcomes
 4. **Quality stage** - Review readiness and blocker resolution
@@ -395,8 +396,8 @@ Each orchestration skill follows a staged workflow tailored to the scenario (pro
 7. **GitHub Issue Update stage** - When a session was started from a GitHub issue, comments on that issue with the captured result and QA report; otherwise skipped with a reason
 8. **Summary stage** - Emitted once the pull request and any applicable issue update are complete (or the run concludes without one)
 
-Agent selection per stage is recommended based on task context. All agent transitions
-require explicit user approval per the repository handoff policy.
+Agent selection per stage is recommended based on task context. Internal orchestration
+transitions proceed without separate approval until the Personal Validation gate.
 
 ## Orchestration Flow Diagrams
 

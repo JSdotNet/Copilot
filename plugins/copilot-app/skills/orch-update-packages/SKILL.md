@@ -11,7 +11,7 @@ Execute a complete package update workflow with validation, testing, and local r
 > Stage 2 (Update Planning) scan the dependency graph, classify what is available, and
 > produce the categorized, prioritized update run — so a request as small as "update the
 > packages" is in scope. When an approved maintenance directive or update scope already
-> exists, those stages confirm and align to it instead of deriving from scratch.
+> exists, those stages align to it instead of deriving from scratch.
 >
 > Escalate only when the request is really a maintenance *policy* decision — for example
 > standing rules on major-version adoption or supported framework baselines. Recommend
@@ -36,7 +36,8 @@ Execute a complete package update workflow with validation, testing, and local r
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -54,7 +55,7 @@ Execute a complete package update workflow with validation, testing, and local r
 - **Categorize updates** (security, patch, minor, major)
 - **Prioritize critical/security updates** first
 - **Plan rollback strategy** for risky updates
-- **Confirm the resulting update run with the user** — the categorized scope, the testing
+- **Record the resulting update run** — the categorized scope, the testing
   strategy, and anything deliberately deferred
 - **Coordinate with stakeholders** for major version upgrades
 

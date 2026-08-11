@@ -11,7 +11,7 @@ Execute a complete workflow for adding a new module to an existing project using
 > architecture orchestration ran. When an approved module specification, boundaries, and
 > architecture context exist, Stage 0 is a short intake and Stage 1 proceeds as usual.
 > When they do not — an ad-hoc request or a small module carved out of existing code —
-> Stage 0 derives them with the user. Missing inputs are a reason to run Stage 0, never a
+> Stage 0 derives them from the request and codebase. Missing inputs are a reason to run Stage 0, never a
 > reason to skip this skill and implement inline.
 
 ## Input Expectations
@@ -34,7 +34,8 @@ Execute a complete workflow for adding a new module to an existing project using
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -42,7 +43,7 @@ Execute a complete workflow for adding a new module to an existing project using
 
 ### Stage 0: Scope Discovery
 
-Run this stage first, always. It is a quick confirmation when an approved module
+Run this stage first, always. It is a quick intake when an approved module
 specification already exists, and a full derivation when it does not.
 
 - **Restate the module's purpose** in one or two sentences, in the user's terms
@@ -55,8 +56,7 @@ specification already exists, and a full derivation when it does not.
 - **Identify governing instructions** — `.github/copilot-instructions.md`, any matching
   `**/*.instructions.md`, and relevant guidelines or ADRs via
   `jsdotnet-guidelines-mcpserver`
-- **Confirm the derived scope with the user** before any code is written; do not proceed
-  to Stage 1 without that confirmation
+- **Record the derived scope and assumptions** in the stage output and continue to Stage 1 unless escalation is required
 
 Escalate instead of continuing when the module is really a separate deployable service,
 or when it needs a new architectural decision, a new bounded context, or a cross-cutting
@@ -68,15 +68,15 @@ acceptance criteria wording; `architecture:architect` only when architectural im
 suspected.
 
 ### Stage 1: Specification Intake
-- **Review the module purpose and boundaries confirmed in Stage 0**
-- **Confirm public interfaces** and expected consumers
+- **Review the module purpose and boundaries recorded in Stage 0**
+- **Capture public interfaces** and expected consumers
 - **Capture acceptance criteria** and non-functional requirements
 - **Identify dependencies** and integration risks
 
 **Agents:** `product-owner:product-owner`, `architecture:architect`
 
 ### Stage 2: Implementation Planning
-- **Map the confirmed design** to the existing project structure
+- **Map the recorded design** to the existing project structure
 - **Define data contracts** and error handling behavior for implementation
 - **Plan integration points** with existing modules/services
 - **Create an implementation checklist** for incremental delivery
@@ -158,9 +158,9 @@ standard chat interaction.
   Validation, Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Scope Discovery**, present the restated module purpose, derived boundaries and
   public interfaces, and derived acceptance criteria as the stage output so the user can
-  confirm or correct them.
+  review them at Personal Validation.
 - During **Specification Intake**, also open/update `markdown-canvas` (`markdown-preview`)
-  with the confirmed acceptance criteria, and during **Implementation Planning**, open/update
+  with the recorded acceptance criteria, and during **Implementation Planning**, open/update
   `markdown-canvas` with the module design documentation and `diagram-canvas`
   (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
   `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.

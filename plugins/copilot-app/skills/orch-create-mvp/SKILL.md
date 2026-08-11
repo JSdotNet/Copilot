@@ -10,7 +10,7 @@ Execute a complete MVP development workflow from planning through local run and 
 > **Scope:** This skill covers MVP work whether or not a prior product or architecture
 > orchestration ran. When an approved MVP scope, priority order, and architecture exist,
 > Stage 0 is a short intake and Stage 1 proceeds as usual. When they do not — a product
-> idea described in a sentence or two — Stage 0 derives them with the user. Missing
+> idea described in a sentence or two — Stage 0 derives them from the request and codebase. Missing
 > inputs are a reason to run Stage 0, never a reason to skip this skill and implement
 > inline.
 
@@ -33,7 +33,8 @@ Execute a complete MVP development workflow from planning through local run and 
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -41,7 +42,7 @@ Execute a complete MVP development workflow from planning through local run and 
 
 ### Stage 0: Scope Discovery
 
-Run this stage first, always. It is a quick confirmation when an approved MVP scope
+Run this stage first, always. It is a quick intake when an approved MVP scope
 already exists, and a full derivation when it does not.
 
 - **Restate the product outcome** the MVP must deliver, in one or two sentences, in the
@@ -54,8 +55,7 @@ already exists, and a full derivation when it does not.
 - **Identify governing instructions** — `.github/copilot-instructions.md`, any matching
   `**/*.instructions.md`, and relevant guidelines or ADRs via
   `jsdotnet-guidelines-mcpserver`
-- **Confirm the derived scope with the user** before any code is written; do not proceed
-  to Stage 1 without that confirmation
+- **Record the derived scope and assumptions** in the stage output and continue to Stage 1 unless escalation is required
 
 Escalate instead of continuing when the product direction itself is the open question, or
 when the MVP needs a new architectural decision or a documented target architecture before
@@ -67,15 +67,15 @@ feature framing and acceptance criteria; `architecture:architect` when the targe
 architecture needs shaping.
 
 ### Stage 1: MVP Scope Intake
-- **Review the MVP scope confirmed in Stage 0** and its acceptance criteria
-- **Confirm feature priorities** and delivery order
+- **Review the MVP scope recorded in Stage 0** and its acceptance criteria
+- **Record feature priorities** and delivery order
 - **Identify dependencies** and risks
-- **Confirm the validation target** for the implementation run
+- **Record the validation target** for the implementation run
 
 **Agents:** `product-owner:product-owner`, `architecture:architect`
 
 ### Stage 2: Implementation Planning
-- **Break the confirmed MVP into implementation slices**
+- **Break the recorded MVP into implementation slices**
 - **Map API contracts and data models** to the current codebase
 - **Plan integration points** with external services
 - **Define the local runtime validation strategy**
@@ -179,9 +179,9 @@ standard chat interaction.
   Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary.
 - During **Scope Discovery**, present the restated product outcome, derived core feature
   list with priority order, and derived acceptance criteria as the stage output so the
-  user can confirm or correct them.
+  user can review them at Personal Validation.
 - During **MVP Scope Intake**, also open/update `markdown-canvas`
-  (`markdown-preview`) with the confirmed MVP scope, and during **Implementation Planning**,
+  (`markdown-preview`) with the recorded MVP scope, and during **Implementation Planning**,
   open/update `markdown-canvas` with the architecture documentation and `diagram-canvas`
   (`mermaid-diagram`) with any accompanying Mermaid diagrams, per
   `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.

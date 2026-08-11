@@ -45,7 +45,7 @@ Validation — so build and test behavior lives in one place instead of in each 
 ## Agents
 
 - `csharp-coding:coding` (recommended); performed manually when that plugin is not
-  installed. Agent transitions require explicit user approval.
+  installed. Continue without a separate approval prompt before this phase.
 
 ## MCP Servers
 

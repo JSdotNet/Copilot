@@ -11,7 +11,7 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 > Baseline) inventories the current Aspire stack, captures the baseline, and defines the
 > success criteria; Stage 2 (Plan Refinement) turns that into the batched upgrade path —
 > so a request as small as "move us to the latest Aspire" is in scope. When an approved
-> upgrade scope or maintenance directive already exists, those stages confirm and align to
+> upgrade scope or maintenance directive already exists, those stages align to
 > it instead of deriving from scratch.
 >
 > Escalate only when the upgrade forces a new architectural decision, or when adopting a
@@ -37,7 +37,8 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -47,10 +48,10 @@ Execute a complete Aspire update workflow using canvas interface, starting with 
 - **Inventory current Aspire stack** (packages, SDK constraints, AppHost integrations)
 - **Capture baseline behavior** (build, tests, runtime health) before any package changes
 - **Determine the upgrade scope** — current and target versions, and rollback boundaries —
-  confirming an approved scope where one exists and deriving it from the inventory where
+  aligning to an approved scope where one exists and deriving it from the inventory where
   one does not
 - **Define success criteria** for upgrade completion and feature adoption
-- **Confirm the derived scope and success criteria with the user** before Stage 3 changes
+- **Record the derived scope and success criteria** in the stage output before Stage 3 changes
   anything
 
 **Baseline gate:** a green baseline is required before upgrading, so that post-upgrade

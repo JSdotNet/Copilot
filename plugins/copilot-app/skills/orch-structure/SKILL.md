@@ -35,7 +35,8 @@ reference updates needed to keep the repository working after the move.
 
 > Agent transitions follow the shared rule in
 > `instructions/orch-shared-phases.instructions.md`: cross-plugin agents are recommended,
-> not required, and every transition needs explicit user approval.
+> not required, and internal transitions continue without separate user approval until
+> Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
 > (category defaults, overridable via personal global model selection or
@@ -43,7 +44,7 @@ reference updates needed to keep the repository working after the move.
 
 ### Stage 0: Scope Discovery
 
-Run this stage first, always. It is a quick confirmation when approved layout guidance
+Run this stage first, always. It is a quick intake when approved layout guidance
 already exists, and a full derivation when it does not.
 
 - **Restate the structure change** in one or two sentences, in the user's terms.
@@ -57,8 +58,7 @@ already exists, and a full derivation when it does not.
 - **Identify governing instructions** - `.github/copilot-instructions.md`, any matching
   `**/*.instructions.md`, and relevant guidelines or ADRs via
   `jsdotnet-guidelines-mcpserver`.
-- **Confirm the derived scope with the user** before any files are moved; do not proceed
-  to Stage 1 without that confirmation.
+- **Record the derived scope and assumptions** in the stage output and continue to Stage 1 unless escalation is required.
 
 Escalate instead of continuing when the request needs a different work type:
 
@@ -77,7 +77,7 @@ verification criteria need backlog wording.
 
 ### Stage 1: Structure & Architecture Intake
 
-- **Review the confirmed scope** and target layout rule from Stage 0.
+- **Review the recorded scope** and target layout rule from Stage 0.
 - **Map the target layout** to repository structure guidance, ADRs, and existing patterns.
 - **Identify required compatibility updates** across references, build/test discovery,
   scripts, docs, and CI path filters.
@@ -101,7 +101,7 @@ verification criteria need backlog wording.
 
 ### Stage 3: Implementation
 
-- **Move or reorganize folders/projects** according to the confirmed target layout.
+- **Move or reorganize folders/projects** according to the recorded target layout.
 - **Update all affected references** discovered in Stage 2.
 - **Update documentation or architecture tests** that encode the old structure.
 - **Keep behavior unchanged** except for the intended layout change.
@@ -149,7 +149,7 @@ Invoke: orch-structure
 
 ## Output Expectations
 
-- Repository structure matches the confirmed target layout.
+- Repository structure matches the recorded target layout.
 - Moved folders/projects retain working references from solution files, scripts, CI,
   tests, docs, and runtime configuration.
 - Architecture tests or documentation that encode folder rules are updated when needed.
@@ -172,10 +172,10 @@ standard chat interaction.
   Validation, Personal Validation, Create Pull Request, Documentation Update, GitHub Issue
   Update, Summary.
 - During **Scope Discovery**, present the restated structure change, derived target layout,
-  affected surfaces, and verification criteria as the stage output so the user can confirm
+  affected surfaces, and verification criteria as the stage output so the user can review
   or correct them.
 - During **Structure & Architecture Intake** or **Refactor Planning**, optionally
-  open/update `markdown-canvas` (`markdown-preview`) with the confirmed structure plan and
+  open/update `markdown-canvas` (`markdown-preview`) with the recorded structure plan and
   `diagram-canvas` (`mermaid-diagram`) with any accompanying layout diagram, per
   `instructions/canvas-usage.instructions.md`. Optional; skip gracefully if not installed.
 
