@@ -72,8 +72,8 @@ plugin). Each reports progress through the `orch-dashboard` canvas extension.
 
 ## Configuration Layers
 
-Orchestration behavior comes from four layers. Only the first is shipped by this plugin;
-the rest live in the consuming repository, and all repo-side files are optional.
+Orchestration behavior comes from five layers. Only the first is shipped by this plugin; the
+personal model override lives outside the repository, and all repo-side files are optional.
 
 ### 1. Plugin-Global Routing and Soft Enforcement (Automatic)
 
@@ -88,14 +88,31 @@ plugin's `orch-*` list is a baseline, not an exhaustive catalog — a repository
 own `orch-*` skills under `.github/skills/`, and those take precedence for the task
 categories they cover.
 
-### 2. Per-Repo Model Override — `.github/copilot-model-selection.md`
+### 2. Personal Global Model Override (Optional)
+
+A user may override orchestration model choice outside every repository, so personal cost,
+speed, or provider preferences are not committed as team instructions. The orchestrator first
+checks `COPILOT_ORCH_MODEL_SELECTION_PATH`. When it is unset, it checks the default
+user-global file path for the current OS:
+
+| OS | Default path |
+| --- | --- |
+| Windows | `%APPDATA%\GitHub Copilot\orchestration\model-selection.md` |
+| macOS/Linux | `~/.config/github-copilot/orchestration/model-selection.md` |
+
+The file uses the same `Category` / `Model` Markdown table as the team repo override below.
+Do not use repo-local personal files such as `.github/copilot-model-selection.local.md`;
+personal configuration belongs outside the repo.
+
+### 3. Team Repo Model Override — `.github/copilot-model-selection.md`
 
 A repository may override the model chosen for any orchestration category. Categories,
-defaults, and the resolution order (repo override → category family/tier → `auto`) are
-defined in `instructions/orch-model-selection.instructions.md`. The orchestrator reads the
-file once per run.
+defaults, and the resolution order (current run instruction → personal global override →
+team repo override → category family/tier → `auto`) are defined in
+`instructions/orch-model-selection.instructions.md`. The orchestrator reads the personal and
+team files once per run.
 
-### 3. Per-Repo Startup and QA Context — `.github/copilot-orch-context.md`
+### 4. Per-Repo Startup and QA Context — `.github/copilot-orch-context.md`
 
 A repository may declare how its application starts and how it should be validated, so the
 QA phase stops guessing the AppHost or interrupting the run to ask. The convention is defined
@@ -108,7 +125,7 @@ Sections: `## Application`, `## How to Run`, `## Base URLs`, `## Test Credential
 `**Runnable application:** none`, and QA Validation is then marked `skipped` cleanly. The
 file must never contain secrets and never pins a model.
 
-### 4. MCP Servers Stay Repository-Specific
+### 5. MCP Servers Stay Repository-Specific
 
 This plugin routes work to MCP servers (see **MCP Server Routing** below) but does not own
 or configure them. The repository's own `.mcp.json` and instruction files remain the source

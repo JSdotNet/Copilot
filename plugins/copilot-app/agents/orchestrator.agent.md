@@ -36,14 +36,15 @@ consuming repository's optional runtime context file, whose convention is define
    orchestration. Escalate only for the decision classes listed under **Escalation** in
    `orch-shared-phases.instructions.md`, and then invoke the named successor
    orchestration after user approval.
-3. **Resolve model selection and repo context once per run.** Before `start_run`, check for a
-   repo override at `.github/copilot-model-selection.md`. Combine it with the category
-   families/tiers from `orch-model-selection.instructions.md`, resolving each to the current
-   latest non-legacy model ID (never a hardcoded version number), to build the run's
-   category → model mapping, following that file's Resolution Order (repo override →
-   category family/tier → `auto`). In the same step, read the optional
-   `.github/copilot-orch-context.md` per `orch-repo-context.instructions.md`, persist its
-   startup command, AppHost path, base URLs, healthy-startup signals, credential pointer,
+3. **Resolve model selection and repo context once per run.** Before `start_run`, resolve
+   model selection from the current run instruction, the personal global override
+   (`COPILOT_ORCH_MODEL_SELECTION_PATH`, otherwise the OS default user-global file), the team
+   repo override at `.github/copilot-model-selection.md`, and the category families/tiers
+   from `orch-model-selection.instructions.md`. Resolve each family to the current latest
+   non-legacy model ID, avoid hardcoded version numbers except deliberate exact pins in
+   override files, and persist the run's category → model mapping. In the same step, read the
+   optional `.github/copilot-orch-context.md` per `orch-repo-context.instructions.md`, persist
+   its startup command, AppHost path, base URLs, healthy-startup signals, credential pointer,
    QA depth, and any declared repo-native `orch-*` skills with `set_run_context`, and pass
    them to the stages that need them (notably `phase-qa-validation`). A repo-native skill
    declared there takes precedence over the plugin-provided skill for the categories it
@@ -121,11 +122,12 @@ consuming repository's optional runtime context file, whose convention is define
   when a referenced plugin is not installed, and continue with the remaining stages.
 - **No pull request** unless the user has explicitly approved it in Personal Validation and
   that approval is persisted in the run state.
-- **Repo overrides always win.** A `.github/copilot-model-selection.md` entry overrides the
-  category default for that category, and a `.github/copilot-orch-context.md` entry overrides
-  the discovered or change-kind default for startup and QA depth. Both files are optional and
-  neither may pin a model outside its own scope: runtime context never sets a model, and the
-  model file never sets startup or QA context.
+- **Personal and repo overrides have separate scopes.** A personal global model-selection
+  entry overrides the team repo model-selection file for that user only; a team
+  `.github/copilot-model-selection.md` entry overrides the category default for that
+  category. A `.github/copilot-orch-context.md` entry overrides the discovered or change-kind
+  default for startup and QA depth. Runtime context never sets a model, and model-selection
+  files never set startup or QA context.
 - **Sub-agents before child sessions:** a child session gets its own worktree and cannot see
   this session's uncommitted change set, so use it only for concurrent monitoring.
 - **One orchestration per session** while a run is `in_progress`, because dashboard insight
