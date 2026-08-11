@@ -21,6 +21,27 @@ function fmtDuration(ms) {
     return m > 0 ? `${m}m ${s}s` : `${s}s`;
 }
 
+function stageElapsedMs(stage) {
+    if (!stage) return null;
+    if (Number.isFinite(Number(stage.durationMs))) return Number(stage.durationMs);
+    if (!stage.startedAt) return null;
+    const started = new Date(stage.startedAt).getTime();
+    if (!Number.isFinite(started)) return null;
+    const endedAt = stage.completedAt || stage.updatedAt;
+    if (!endedAt) return null;
+    const ended = new Date(endedAt).getTime();
+    return Number.isFinite(ended) ? Math.max(0, ended - started) : null;
+}
+
+function summaryCostLine(context) {
+    const totals = context && context.totals;
+    if (!totals) return "";
+    const bits = [`${fmtTokens(totals.tokens)} total token cost`, `${fmtTokens(totals.uncachedTokens)} uncached`, `${totals.modelCalls} model call${totals.modelCalls === 1 ? "" : "s"}`];
+    if (totals.reasoningTokens) bits.push(`${fmtTokens(totals.reasoningTokens)} reasoning`);
+    if (totals.cacheReadTokens) bits.push(`${fmtTokens(totals.cacheReadTokens)} cache read`);
+    return bits.join("; ");
+}
+
 export function renderReportMarkdown(run) {
     const insight = summarizeInsights(run);
     const context = summarizeContext(run);
@@ -41,12 +62,12 @@ export function renderReportMarkdown(run) {
 
     lines.push("## Stages");
     lines.push("");
-    lines.push("| # | Stage | Status | Agents (planned) | Agents (used) | MCP Servers | Models |");
-    lines.push("| - | ----- | ------ | ----------------- | -------------- | ----------- | ------ |");
+    lines.push("| # | Stage | Status | Elapsed | Agents (planned) | Agents (used) | MCP Servers | Models |");
+    lines.push("| - | ----- | ------ | ------- | ----------------- | -------------- | ----------- | ------ |");
     (run.stages || []).forEach((stage, i) => {
         const observed = insight.perStage[i] || { agents: [], mcpServers: [], models: [] };
         lines.push(
-            `| ${i + 1} | ${stage.name} | ${stage.status} | ${(stage.agents || []).join(", ") || "-"} | ${observed.agents.join(", ") || "-"} | ${observed.mcpServers.join(", ") || "-"} | ${observed.models.join(", ") || "-"} |`
+            `| ${i + 1} | ${stage.name} | ${stage.status} | ${fmtDuration(stageElapsedMs(stage))} | ${(stage.agents || []).join(", ") || "-"} | ${observed.agents.join(", ") || "-"} | ${observed.mcpServers.join(", ") || "-"} | ${observed.models.join(", ") || "-"} |`
         );
     });
     lines.push("");
@@ -108,6 +129,11 @@ export function renderReportMarkdown(run) {
         lines.push("");
         lines.push(run.summary);
         lines.push("");
+        const costLine = summaryCostLine(context);
+        if (costLine) {
+            lines.push(`**Total cost:** ${costLine}`);
+            lines.push("");
+        }
     }
 
     lines.push("## Insight");
@@ -249,6 +275,7 @@ const REPORT_HTML_STYLE = `
 // stays free of filesystem access.
 export function renderReportHtml(run, evidenceDataUris = {}) {
     const insight = summarizeInsights(run);
+    const context = summarizeContext(run);
     const parts = [];
     parts.push(`<h1>${escHtml(run.title)}</h1>`);
     const metaBits = [
@@ -263,12 +290,13 @@ export function renderReportHtml(run, evidenceDataUris = {}) {
     parts.push(`<p class="meta">${metaBits.join(" &middot; ")}</p>`);
 
     parts.push("<h2>Stages</h2>");
-    parts.push("<table><thead><tr><th>#</th><th>Stage</th><th>Status</th><th>Agents (planned)</th><th>Agents (used)</th><th>MCP</th><th>Models</th></tr></thead><tbody>");
+    parts.push("<table><thead><tr><th>#</th><th>Stage</th><th>Status</th><th>Elapsed</th><th>Agents (planned)</th><th>Agents (used)</th><th>MCP</th><th>Models</th></tr></thead><tbody>");
     (run.stages || []).forEach((stage, i) => {
         const observed = insight.perStage[i] || { agents: [], mcpServers: [], models: [] };
         parts.push(
             `<tr><td>${i + 1}</td><td>${escHtml(stage.name)}</td>` +
             `<td><span class="badge ${escHtml(stage.status)}">${escHtml(stage.status)}</span></td>` +
+            `<td>${escHtml(fmtDuration(stageElapsedMs(stage)))}</td>` +
             `<td>${escHtml((stage.agents || []).join(", ") || "-")}</td>` +
             `<td>${escHtml(observed.agents.join(", ") || "-")}</td>` +
             `<td>${escHtml(observed.mcpServers.join(", ") || "-")}</td>` +
@@ -323,7 +351,11 @@ export function renderReportHtml(run, evidenceDataUris = {}) {
 
     if (run.summary) {
         parts.push("<h2>Summary</h2>");
-        parts.push(`<div class="summary">${escHtml(run.summary)}</div>`);
+        const costLine = summaryCostLine(context);
+        parts.push(
+            `<div class="summary">${escHtml(run.summary)}` +
+            (costLine ? `<p><strong>Total cost:</strong> ${escHtml(costLine)}</p>` : "") + `</div>`
+        );
     }
 
     const doc = `<!doctype html>

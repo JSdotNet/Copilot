@@ -434,7 +434,10 @@ const session = await joinSession({
                                 agents: Array.isArray(s.agents) ? s.agents : [],
                                 status: "pending",
                                 output: "",
+                                startedAt: null,
+                                completedAt: null,
                                 updatedAt: null,
+                                durationMs: null,
                             })),
                             summary: "",
                             insights: [],
@@ -569,12 +572,27 @@ const session = await joinSession({
                                 throw new CanvasError("stage_not_found", "Provide a valid stageIndex or stageName.");
                             }
                             const stage = run.stages[idx];
+                            const nowIso = new Date().toISOString();
                             stage.status = status;
                             if (status === "in_progress") {
                                 activeStageByRun.set(runId, { index: idx, name: stage.name });
                             } else {
                                 const active = activeStageByRun.get(runId);
                                 if (active && active.index === idx) activeStageByRun.delete(runId);
+                            }
+                            if (status === "in_progress") {
+                                if (!stage.startedAt) stage.startedAt = nowIso;
+                                stage.completedAt = null;
+                                stage.durationMs = null;
+                            } else if (["done", "blocked", "skipped", "cancelled"].includes(status)) {
+                                if (stage.startedAt) {
+                                    stage.completedAt = nowIso;
+                                    const started = new Date(stage.startedAt).getTime();
+                                    const completed = new Date(stage.completedAt).getTime();
+                                    if (Number.isFinite(started) && Number.isFinite(completed)) {
+                                        stage.durationMs = Math.max(0, completed - started);
+                                    }
+                                }
                             }
                             if (typeof output === "string" && output.length > 0) {
                                 stage.output = appendOutput && stage.output ? `${stage.output}\n${output}` : output;
@@ -583,8 +601,8 @@ const session = await joinSession({
                             if (normalizedScenarios) stage.scenarios = normalizedScenarios;
                             const normalizedMonitoring = normalizeMonitoring(monitoring);
                             if (normalizedMonitoring) stage.monitoring = normalizedMonitoring;
-                            stage.updatedAt = new Date().toISOString();
-                            run.updatedAt = stage.updatedAt;
+                            stage.updatedAt = nowIso;
+                            run.updatedAt = nowIso;
                             await writeRun(baseDir, run);
                         });
                         bus.emit("update");
