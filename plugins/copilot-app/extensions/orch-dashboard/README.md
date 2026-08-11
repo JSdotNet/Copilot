@@ -22,8 +22,10 @@ App, instead of plain chat narration.
 - A run detail view (right panel) with every workflow stage, its status
   (`pending` / `in_progress` / `done` / `blocked` / `skipped` / `cancelled`),
   the agent(s) assigned, and the captured output text for that stage. The
+  elapsed time for each stage is shown when timing data is available. The
   `finish_run` **Summary** is rendered as a highlighted block at the end of the
-  run and is reachable from the stage navigation.
+  run, includes the total token cost/usage when telemetry is available, and is
+  reachable from the stage navigation.
 - An **Insight** panel showing total tool calls, elapsed time, measured tool
   time, an estimated thinking/reasoning remainder, and a time-by-category
   breakdown (Shell, Edit, Read, `QA (Playwright/Aspire)`, MCP tool, Agent
@@ -94,16 +96,8 @@ App, instead of plain chat narration.
   infinite-sessions state directory itself. When an image cannot be served
   (deleted, moved, or forbidden) the thumbnail is replaced with an inline
   "Evidence unavailable" placeholder rather than a broken-image glyph.
-- A **Download report** button on each run that downloads a single,
-  self-contained **HTML** report (stages with planned vs. actually-used
-  agents/MCP servers/models, output, QA scenario/evidence tables with the
-  screenshots **inlined as `data:` URIs** so the file opens standalone,
-  monitoring findings, summary, the insight breakdown, and a per-stage token
-  delta) via `/api/runs/:id/report.html`. The download is performed from a
-  blob in the browser (a plain `<a download>` navigation is silently dropped
-  inside the canvas webview); any failure is surfaced inline next to the
-  button instead of failing silently. A plain-text **Markdown** export of the
-  same data remains available at `/api/runs/:id/report`.
+- Report endpoints remain available for automation at `/api/runs/:id/report`
+  (Markdown) and `/api/runs/:id/report.html` (self-contained HTML).
 - Live updates over server-sent events, so the panel refreshes automatically
   as the orchestrating agent moves through stages.
 

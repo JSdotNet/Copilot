@@ -117,6 +117,7 @@ export function renderShell() {
   .stage.blocked { border-left-color: var(--true-color-red, #cf222e); }
   .stage-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
   .stage-name { font-weight: var(--font-weight-semibold, 600); }
+  .stage-elapsed { font-size: 12px; color: var(--text-color-muted, #59636e); }
   .stage-used { font-size: 12px; color: var(--text-color-muted, #59636e); margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
   .tag {
     display: inline-block;
@@ -194,26 +195,10 @@ export function renderShell() {
   .empty { color: var(--text-color-muted, #59636e); padding: 24px; text-align: center; }
   .summary { margin-top: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(31,136,61,0.08); border-left: 3px solid #1f883d; }
   .summary h2 { font-size: var(--text-body-large, 15px); margin: 0 0 6px; }
+  .summary-cost { margin-top: 8px; margin-bottom: 0; }
   .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
   .header-actions { display: flex; align-items: center; gap: 8px; }
   .subtitle { color: var(--text-color-muted, #59636e); font-size: 12px; margin: 0 0 16px; }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color-default, #d0d7de);
-    background: var(--background-color-default, #ffffff);
-    color: var(--text-color-default, #1f2328);
-    font-size: 12px;
-    font-weight: var(--font-weight-semibold, 600);
-    text-decoration: none;
-    cursor: pointer;
-  }
-  .btn:hover { background: var(--background-color-muted, rgba(127,127,127,0.08)); }
-  .btn[disabled] { opacity: 0.6; cursor: default; }
-  .download-error { color: var(--true-color-red, #cf222e); font-size: 12px; margin: 4px 0 0; text-align: right; }
   .insight { margin-top: 20px; }
   .insight h2 { font-size: var(--text-body-large, 15px); margin: 0 0 8px; }
   .insight-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -225,6 +210,9 @@ export function renderShell() {
   .bar-fill { height: 100%; background: var(--true-color-blue, #0969da); border-radius: 4px; }
   .bar-value { width: 70px; flex: none; text-align: right; color: var(--text-color-muted, #59636e); }
   .ctx-gauge { margin: 4px 0 10px; }
+  .ctx-row { display: grid; grid-template-columns: 120px minmax(160px, 1fr) max-content; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+  .ctx-label { color: var(--text-color-muted, #59636e); white-space: nowrap; }
+  .ctx-value { color: var(--text-color-muted, #59636e); text-align: right; white-space: nowrap; }
   .ctx-track { background: var(--background-color-muted, rgba(127,127,127,0.08)); border-radius: 4px; overflow: hidden; height: 12px; }
   .ctx-fill { height: 100%; background: var(--true-color-blue, #0969da); border-radius: 4px; }
   .ctx-fill.warn { background: #9a6700; }
@@ -326,6 +314,26 @@ export function renderShell() {
       return m > 0 ? (m + "m " + s + "s") : (s + "s");
     }
 
+    function stageElapsedMs(stage) {
+      if (!stage) return null;
+      if (Number.isFinite(Number(stage.durationMs))) return Number(stage.durationMs);
+      if (!stage.startedAt) return null;
+      const started = new Date(stage.startedAt).getTime();
+      if (!Number.isFinite(started)) return null;
+      if (stage.status === "in_progress") return Math.max(0, Date.now() - started);
+      const endedAt = stage.completedAt || stage.updatedAt;
+      if (!endedAt) return null;
+      const ended = new Date(endedAt).getTime();
+      return Number.isFinite(ended) ? Math.max(0, ended - started) : null;
+    }
+
+    function renderStageElapsed(stage) {
+      const elapsed = stageElapsedMs(stage);
+      if (elapsed === null) return "";
+      const label = stage.status === "in_progress" ? "elapsed so far" : "elapsed";
+      return '<span class="stage-elapsed">' + esc(label + ': ' + fmtDuration(elapsed)) + '</span>';
+    }
+
     function renderInsight(run) {
       const insight = run.insightSummary;
       if (!insight || !insight.totalCalls) return "";
@@ -387,9 +395,9 @@ export function renderShell() {
         if (g.messagesLength !== null && g.messagesLength !== undefined) breakdown.push(g.messagesLength + ' messages');
         parts.push(
           '<div class="ctx-gauge">' +
-            '<div class="bar-row"><span class="bar-label">Context gauge</span>' +
+            '<div class="ctx-row"><span class="ctx-label">Context gauge</span>' +
               '<div class="ctx-track"><div class="ctx-fill ' + cls + '" style="width:' + (pct === null ? 0 : pct) + '%"></div></div>' +
-              '<span class="bar-value">' + esc(label) + '</span></div>' +
+              '<span class="ctx-value">' + esc(label) + '</span></div>' +
             (breakdown.length ? '<div class="ctx-meta">' + esc(breakdown.join(" · ")) + '</div>' : "") +
             (g.peakTokens ? '<div class="ctx-meta">Peak ' + esc(fmtTokens(g.peakTokens)) + (g.peakPercent !== null && g.peakPercent !== undefined ? ' (' + g.peakPercent + '%)' : "") + '</div>' : "") +
           '</div>'
@@ -437,6 +445,29 @@ export function renderShell() {
         'most of which is normally served from the prompt cache.';
       return '<span class="tag tokens" title="' + esc(title) + '">Token delta: ' +
         esc(fmtTokens(stage.tokens) + ' (' + fmtTokens(stage.uncachedTokens) + ' uncached' + sub + ')') + '</span>';
+    }
+
+    function renderSummaryCost(run) {
+      const ctx = run.contextSummary;
+      const totals = ctx && ctx.totals;
+      if (!totals) return "";
+      const stats = [
+        '<div class="insight-stat"><strong>' + esc(fmtTokens(totals.tokens)) + '</strong>total token cost</div>',
+        '<div class="insight-stat"><strong>' + esc(fmtTokens(totals.uncachedTokens)) + '</strong>uncached</div>',
+        '<div class="insight-stat"><strong>' + totals.modelCalls + '</strong>model calls</div>',
+      ];
+      if (totals.reasoningTokens) {
+        stats.push('<div class="insight-stat"><strong>' + esc(fmtTokens(totals.reasoningTokens)) + '</strong>reasoning</div>');
+      }
+      if (totals.cacheReadTokens) {
+        stats.push('<div class="insight-stat"><strong>' + esc(fmtTokens(totals.cacheReadTokens)) + '</strong>cache read</div>');
+      }
+      return '<div class="summary-cost insight-stats">' + stats.join("") + '</div>';
+    }
+
+    function renderSummaryBlock(run, withHeading) {
+      if (!run.summary) return "";
+      return '<div class="summary" id="summary-block">' + (withHeading ? '<h2>Summary</h2>' : "") + esc(run.summary) + renderSummaryCost(run) + '</div>';
     }
 
     // Overall Insight-panel usage tags (full, unshortened labels). Kept
@@ -591,10 +622,10 @@ export function renderShell() {
         // summary into that stage instead of appending a separate block, so
         // the summary never appears twice.
         const inlineSummary = i === summaryIdx && run.summary && run.summary.trim() !== (s.output || "").trim()
-          ? '<div class="summary">' + esc(run.summary) + '</div>'
+          ? renderSummaryBlock(run, false)
           : "";
         return '<div class="stage ' + esc(s.status) + '" id="stage-' + i + '">' +
-          '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + '</div>' +
+          '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + renderStageElapsed(s) + '</div>' +
           renderStageMeta(run, i, s) +
           renderStageOutput(s.output) +
           inlineSummary +
@@ -602,18 +633,14 @@ export function renderShell() {
           renderMonitoring(s.monitoring) +
         '</div>';
       }).join("");
-      const filenameBase = (run.skillId + '-' + run.id).replace(/[^a-zA-Z0-9._-]/g, "-");
       // Only render a standalone summary block when no declared stage covers it.
       const trailingSummary = run.summary && summaryIdx < 0
-        ? '<div class="summary" id="summary-block"><h2>Summary</h2>' + esc(run.summary) + '</div>'
+        ? renderSummaryBlock(run, true)
         : "";
       el.innerHTML =
         '<div class="header-row"><h1 style="margin:0;">' + esc(run.title) + '</h1>' +
-          '<div class="header-actions">' + badge(run.status) +
-            '<button class="btn" type="button" id="download-report" data-run="' + esc(run.id) + '" data-filename="' + esc(filenameBase) + '">Download report</button>' +
-          '</div>' +
+          '<div class="header-actions">' + badge(run.status) + '</div>' +
         '</div>' +
-        '<p class="download-error" id="download-error" hidden></p>' +
         '<p class="subtitle">' + esc(run.skillId) + ' &middot; started ' + esc(new Date(run.startedAt).toLocaleString()) +
           (run.updatedAt ? ' &middot; updated ' + esc(new Date(run.updatedAt).toLocaleString()) : "") +
           (run.changeKind ? ' &middot; change: ' + esc(run.changeKind) : "") +
@@ -629,8 +656,6 @@ export function renderShell() {
     }
 
     function wireDetailHandlers() {
-      const dl = document.getElementById("download-report");
-      if (dl) dl.addEventListener("click", () => downloadReport(dl.dataset.run, dl.dataset.filename, dl));
       document.querySelectorAll("#detail .show-more").forEach((btn) => {
         btn.addEventListener("click", () => {
           const out = btn.previousElementSibling;
@@ -639,37 +664,6 @@ export function renderShell() {
           btn.textContent = clamped ? "Show more" : "Show less";
         });
       });
-    }
-
-    // Downloads the run's self-contained HTML report (evidence images inlined
-    // as data URIs) via a blob URL, which works inside the canvas webview where
-    // a plain <a download> navigation is silently dropped. Any failure is
-    // surfaced inline rather than failing silently.
-    async function downloadReport(runId, filenameBase, btn) {
-      const errEl = document.getElementById("download-error");
-      if (errEl) { errEl.hidden = true; errEl.textContent = ""; }
-      const original = btn ? btn.textContent : "";
-      if (btn) { btn.disabled = true; btn.textContent = "Preparing…"; }
-      try {
-        const res = await fetch("/api/runs/" + encodeURIComponent(runId) + "/report.html");
-        if (!res.ok) throw new Error("report request failed (HTTP " + res.status + ")");
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = (filenameBase || runId || "orchestration-report") + ".html";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-      } catch (err) {
-        if (errEl) {
-          errEl.hidden = false;
-          errEl.textContent = "Download failed: " + (err && err.message ? err.message : String(err));
-        }
-      } finally {
-        if (btn) { btn.disabled = false; btn.textContent = original; }
-      }
     }
 
     function evidenceError(img) {
