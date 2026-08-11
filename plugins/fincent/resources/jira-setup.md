@@ -2,6 +2,21 @@
 
 Shared reference for all Fincent skills that interact with Jira.
 
+## Deterministic Collection Scripts
+
+The sprint review pipeline (`automation-sprint-review`, `sprint-report`, `release-report`)
+does **not** query Jira directly. It reads fixed-schema datasets produced by:
+
+- `plugins/fincent/scripts/Get-SprintData.ps1` — sprint scope, one team per dataset.
+- `plugins/fincent/scripts/Get-ReleaseData.ps1` — release scope for one fixVersion.
+- `plugins/fincent/scripts/FincentJira.psm1` — the shared module both scripts import.
+
+Together they encode every rule on this page: project key, team filter, story point field,
+completion statuses, fix version resolution, and epic ordering. Change a rule here and in the
+module together.
+
+Required environment variables: `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`.
+
 ## Project
 
 - Project key: `FIN`

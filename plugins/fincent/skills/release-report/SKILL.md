@@ -19,46 +19,66 @@ Refer to `plugins/fincent/resources/jira-setup.md` for the Fincent Jira project
 configuration including the status flow, custom fields, fix version naming, labels,
 and epic ordering conventions.
 
-## Jira Skill Discovery
+## Data source (deterministic)
 
-When this skill is run directly, discover what Jira skills are available:
+This skill renders a report from the dataset produced by
+`plugins/fincent/scripts/Get-ReleaseData.ps1`. That script owns release resolution, JQL,
+pagination, delivery classification, epic ordering, and totals. It fetches release data
+only — never per-sprint data.
 
-1. Check installed skills for skills whose name or description mentions "jira".
-2. Identify a **query-capable** skill — can search or list issues by filter/JQL.
-3. Identify a **retrieval-capable** skill — can fetch a single existing issue.
-4. If no query skill is found: ask the user to paste story content manually.
+```powershell
+./plugins/fincent/scripts/Get-ReleaseData.ps1 -Release 'release/2026.32.0' -OutputPath ./release-data.json
+```
 
-If this skill is invoked by an orchestration skill such as `automation-sprint-review`,
-prefer the caller-provided Jira capability context instead of rediscovering Jira skills.
+Omit `-Release` to let the script resolve the latest fixVersion (released or unreleased).
+Omit `-Team` for the default all-teams release report.
 
-All Jira field mapping, project keys, status values, and API conventions are owned by
-the selected Jira skill. Never reproduce that knowledge in this skill.
+When invoked by `automation-sprint-review`, use the dataset path passed by the orchestrator
+instead of running the script again.
+
+The script requires `JIRA_BASE_URL`, `JIRA_EMAIL`, and `JIRA_API_TOKEN`. If it fails, stop
+and report the error — never fall back to ad-hoc Jira queries or model-discovered Jira skills.
+
+Determinism rules:
+
+- Read every number from `release.totals`, `release.statusBreakdown`, and
+  `release.typeBreakdown`; never recount or re-add story points.
+- Use `release.epicOrder` verbatim for section grouping and epic order.
+- Use `release.issues` in the given order for table rows; never re-sort or re-filter.
+- Use `release.removedIssues` for scope changes and `release.sprintsCovered` for the
+  sprint list.
+- Treat `issue.isCompleted` as the delivery verdict; do not reinterpret status text.
+- The same `metadata.datasetHash` must always yield an identical report.
 
 ## Goals
 
-- Load all stories targeted for the release using the discovered Jira skill.
-- Classify each story by its final delivery status.
-- Any story with status **Test, Acceptatie klant, Done, Closed**, or any status at or
-  beyond Test in the workflow is considered **delivered** for this report.
-- Group by epic.
-- Identify deferred items (in scope but status earlier than Test).
+- Render the release summary from `release.totals`.
+- Split issues into delivered and deferred using `isCompleted`.
+- Group by epic using `release.epicOrder`.
 - Output a structured report in the sections below.
 - Produce a release notes draft suitable for stakeholders.
 
-This skill owns the release-report logic: release scope analysis, delivery classification,
-epic grouping, release-note drafting, and report rendering.
+This skill owns the release-report rendering: section layout, table formatting, and
+release-note drafting. It does not own data fetching or classification.
 
-## Finding the release stories
+## Field mapping
 
-Use the discovered query-capable Jira skill with the following JQL:
-
-- JQL: `project = FIN AND fixVersion = "{release name}" ORDER BY issuetype ASC, epic ASC, status ASC`
-- Fields: summary, status, issuetype, epic, story points, labels, assignee, fixVersions, sprints.
-- Paginate if needed.
-
-Also query stories that were **removed from the release** (had this fixVersion then lost it):
-
-- JQL: `project = FIN AND fixVersion was "{release name}" AND fixVersion != "{release name}"`
+| Report field | Dataset path |
+|--------------|--------------|
+| Release | `release.name` |
+| Release date | `release.version.releaseDate` |
+| Released flag | `release.version.released` |
+| Sprints covered | `release.sprintsCovered` |
+| Original scope | `release.totals.issueCount` / `totals.totalPoints` |
+| Delivered | `release.totals.completedCount` / `totals.completedPoints` |
+| Deferred | `release.totals.notCompletedCount` / `totals.notCompletedPoints` |
+| Delivery rate | `release.totals.completionRatePercent` |
+| Bug fixes | `release.totals.completedBugCount` |
+| Status table | `release.statusBreakdown` |
+| Type table | `release.typeBreakdown` |
+| Epic sections | `release.epicOrder` |
+| Issue rows | `release.issues` |
+| Scope changes | `release.removedIssues` |
 
 ## Report structure
 
@@ -160,22 +180,20 @@ Example format:
 
 ## Working rules
 
-- **Delivered** means status is Test, Acceptatie klant, Done, Closed, or any status at
-  or beyond Test in the team's workflow. These items are shown in section 2 with their
-  actual State so readers can distinguish fully done from still-in-testing items.
-- **Deferred** means status is earlier than Test (e.g. Open, Just in, Ready, In Progress,
-  Analyze).
-- Delivery rate is calculated from the original scope only; late additions are noted in
-  Scope Changes but excluded from the rate denominator.
-- Group every section by epic — never mix stories from different epics in the same table.
-- Always render the **No epic** group as the last epic sub-section in every grouped section.
-- Include labels in every issue row when present; omit the cell content when the issue
-  has no labels.
-- Point totals use the `story_points` / `customfield_10016` field; if empty, mark as `?`.
+- Render only from the dataset; never query Jira and never estimate a missing value.
+- **Delivered** means `isCompleted` is `true` in the dataset. These items appear in section 2
+  with their actual `status` so readers can distinguish fully done from still-in-testing items.
+- **Deferred** means `isCompleted` is `false`.
+- Delivery rate comes from `release.totals.completionRatePercent`; do not recompute it.
+- Group every section by epic using `release.epicOrder` — never mix stories from different
+  epics in the same table and never reorder the groups.
+- The **No epic** group is already last in `epicOrder`; keep that position.
+- Include labels in every issue row when present; use `-` when the list is empty.
+- Use `storyPoints` as-is; render `?` when it is `null`.
 - After producing the report, present a one-paragraph executive summary suitable for
   pasting into a release email or stakeholder update.
+- Quote `metadata.datasetHash` at the end of the report for reproducibility.
 
 ## Tools used
 
-- Discovered query-capable Jira skill — fetch release stories via JQL.
-- Discovered retrieval-capable Jira skill — fetch individual story detail when needed.
+- `plugins/fincent/scripts/Get-ReleaseData.ps1` — deterministic release data collection.
