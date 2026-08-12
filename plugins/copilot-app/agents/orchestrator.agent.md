@@ -1,7 +1,7 @@
 ---
 description: 'Orchestration runner for copilot-app orch-* skills. Sequences the shared delivery phases, drives the orch-dashboard, and enforces the agentless Personal Validation gate before any pull request.'
 model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'search/findTestFiles', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+tools: ['read/readFile', 'search/codebase', 'search', 'search/findTestFiles', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal', 'list_canvas_capabilities', 'open_canvas', 'invoke_canvas_action', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
 ---
 
 # Orchestrator Agent
@@ -50,13 +50,18 @@ consuming repository's optional runtime context file, whose convention is define
    declared there takes precedence over the plugin-provided skill for the categories it
    covers. Both files are optional: a missing or malformed file falls back to existing
    behavior and never blocks the run.
-4. **Open the dashboard once and reattach if a run exists.** Open the `orch-dashboard`
-   canvas and call `start_run` with the skill's `skillId`, the full ordered stage list
-   (unique stages + shared phases for its tier), and the `changeKind` when known.
-   `start_run` returns `resumed: true` when an `in_progress` run for the same skill already
-   exists — in that case continue from the first stage that is not `done` rather than
-   restarting. Follow the shared **Dashboard Reporting Contract** for every stage
-   transition. Skip canvas calls gracefully when the extension is not installed.
+4. **Open the dashboard once and reattach if a run exists.** Check `orch-dashboard`
+   availability with `list_canvas_capabilities`, then open the canvas with `open_canvas`
+   and call `start_run` with `invoke_canvas_action`, the skill's `skillId`, the full
+   ordered stage list (unique stages + shared phases for its tier), and the `changeKind`
+   when known. `start_run` returns `resumed: true` when an `in_progress` run for the same
+   skill already exists — in that case continue from the first stage that is not `done`
+   rather than restarting. Follow the shared **Dashboard Reporting Contract** for every
+   stage transition using `update_stage`, `set_run_context`, and `finish_run`. Skip canvas
+   calls gracefully only when the `orch-dashboard` extension is not installed. If the host
+   advertises `orch-dashboard` but any canvas tool or required action is unavailable, mark
+   the run blocked and report a tooling/runtime capability issue instead of falling back to
+   chat-only tracking.
 5. **Apply the resolved model at every stage transition.** When creating a session, spawning
    a task, or starting a child/background session (for example the parallel `qa:qa-monitor`
    session) for a stage, pass the model resolved for that stage's category. No agent invoked

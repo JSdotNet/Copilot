@@ -18,8 +18,8 @@
 // file references) and `monitoring` (a runtime log/trace/metric findings
 // summary) — see update_stage below. The orchestrating agent drives the run
 // through canvas actions (start_run, update_stage, finish_run) as it works
-// through a skill's workflow stages; list_runs/get_run let the agent re-read
-// state after a resume. The canvas itself is a read-only live dashboard: a
+// through a skill's workflow stages; set_run_context persists gating decisions,
+// and list_runs/get_run let the agent re-read state after a resume. The canvas itself is a read-only live dashboard: a
 // run list on the left, stage-by-stage progress, QA results/evidence, and
 // captured output on the right, refreshed over SSE whenever an action
 // mutates state.
@@ -360,7 +360,7 @@ const session = await joinSession({
             id: "orch-dashboard",
             displayName: "Orchestration dashboard",
             description:
-                "Live progress and output dashboard for copilot-app orch-* orchestration skills (orch-feature, orch-bug, orch-adr, orch-arc42, orch-blueprint, orch-tdr, orch-architecture, orch-project, orch-repo, orch-create-mvp, orch-update-packages, orch-aspire-update, orch-create-module, orch-create-service) and the copilot-app automation skills (automation-bug-fix, automation-package-update, automation-performance-review, automation-review, automation-week-starter, automation-weekly-cost-analysis, automation-whats-new, azure-sre-to-github-issue, start-session-from-issue, update-open-sessions). Open once per session; drive it with start_run/update_stage/finish_run as a workflow progresses.",
+                "Live progress and output dashboard for copilot-app orch-* orchestration skills (orch-feature, orch-bug, orch-adr, orch-arc42, orch-blueprint, orch-tdr, orch-architecture, orch-project, orch-repo, orch-create-mvp, orch-update-packages, orch-aspire-update, orch-create-module, orch-create-service) and the copilot-app automation skills (automation-bug-fix, automation-package-update, automation-performance-review, automation-review, automation-week-starter, automation-weekly-cost-analysis, automation-whats-new, azure-sre-to-github-issue, start-session-from-issue, update-open-sessions). Open once per session; drive it with start_run/update_stage/set_run_context/finish_run as a workflow progresses.",
             inputSchema: {
                 type: "object",
                 properties: {
