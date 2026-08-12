@@ -394,8 +394,16 @@ category's resolved model.
 ## Dashboard Reporting Contract (Shared)
 
 Every `orch-*` skill reports progress through the `orch-dashboard` canvas extension
-(`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not installed,
-skip the canvas calls and continue through standard chat interaction.
+(`plugins/copilot-app/extensions/orch-dashboard/`). First check the canvas with
+`list_canvas_capabilities`.
+
+- If `orch-dashboard` is not installed or not advertised, skip the canvas calls and
+  continue through standard chat interaction.
+- If `orch-dashboard` is advertised but `open_canvas`, `invoke_canvas_action`, or any
+  required dashboard action (`start_run`, `update_stage`, `set_run_context`,
+  `finish_run`) is unavailable, treat it as a tooling/runtime capability issue. Do not
+  silently fall back to chat-only tracking; block the orchestration and report the missing
+  capability.
 
 - **Open** canvas `orch-dashboard`, then call `start_run` with the skill's `skillId`, the
   full ordered stage list (its skill-specific stages followed by the shared phase names for
