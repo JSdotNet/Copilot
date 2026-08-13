@@ -24,12 +24,18 @@ App, instead of plain chat narration.
 - A run detail view (right panel) with every relevant workflow stage, its status
   (`pending` / `in_progress` / `done` / `blocked` / `skipped` / `cancelled`),
   the agent(s) assigned, captured output text, and any quick-action links for
-  that stage. When the original user prompt is provided to `start_run`, it is
-  shown near the top of the run detail and included in exported reports. The
-  elapsed time for each stage is shown on its own second line when timing data
-  is available. The `finish_run` **Summary** is rendered as a highlighted block at the end of the
-  run, includes the total token cost/usage when telemetry is available, and is
-  reachable from the stage navigation.
+  that stage. Stage output and the `finish_run` **Summary** render as a safe
+  Markdown subset so headings, paragraphs, bullet lists, ordered lists, links,
+  inline code, fenced code, and emphasis appear as readable sections instead of
+  compressed monospace text. Each stage output also includes an **Open rich view**
+  action for a focused rich-text reading panel, and the run header links to an
+  inline **HTML report** with the same rich rendering for sharing or browser
+  review. When the original user prompt is provided to `start_run`, it is shown
+  near the top of the run detail and included in exported reports. The elapsed
+  time for each stage is shown on its own second line when timing data is
+  available. The `finish_run` **Summary** is rendered as a highlighted block at
+  the end of the run, includes the total token cost/usage when telemetry is
+  available, and is reachable from the stage navigation.
 - An **Insight** panel showing total tool calls, elapsed time, measured tool
   time, an estimated thinking/reasoning remainder, and a time-by-category
   breakdown (Shell, Edit, Read, `QA (Playwright/Aspire)`, MCP tool, Agent
