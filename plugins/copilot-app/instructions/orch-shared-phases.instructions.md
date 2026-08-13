@@ -175,10 +175,16 @@ When a child session is used (`create_session` + cross-session messaging):
 - **Persist the decisions that gate later phases** with `set_run_context`:
   - `changeKind` (`new-functionality` / `bug-fix` / `dependency-update` / `none`) as soon
     as it is known, so a resumed run selects the same QA depth.
-  - `approval` (`pending` / `approved` / `rejected`) at the Personal Validation decision.
+  - `approval` (`pending` / `approved` / `rejected`) at every Personal Validation decision.
 - **Never create a pull request unless the persisted `approval` is `approved`.** If the
   run state says `pending` after a resume, re-run Personal Validation — do not rely on
   conversation memory of an approval.
+- **When Personal Validation rejects or requests changes**, set `approval: "rejected"` with
+  the user's wording, return to the appropriate implementation/specification stage, mark that
+  stage `in_progress`, apply the requested changes, and then repeat Build & Test, QA
+  Validation, and Personal Validation. Before the repeated Personal Validation handoff, reset
+  `approval: "pending"` so Create Pull Request remains locked until the user approves the
+  revised change set.
 
 ## Phase Tiers
 
@@ -294,11 +300,17 @@ back to the user and waits for them.
   findings, and any captured evidence when applicable) when QA Validation ran.
 - **Start the application for the user** when the run produced a code change, using the resolved repo context startup command or the command proven during QA Validation. Do not stop at listing commands unless startup is impossible; if startup fails, block Personal Validation with the actual failure and recovery command.
 - **Publish quick review links in the dashboard** for the running target, such as the primary app URL, Aspire dashboard, health page, or any route that needs review. Pass them to `update_stage` as `links` on the Personal Validation stage so the user can open the review target directly from the dashboard.
-- **Wait for explicit user approval** before any pull request is created, and fold
-  requested changes back into the earlier stages when needed.
-- **Record the decision durably** with `set_run_context` (`approval: "approved"` or
-  `"rejected"`, plus the user's wording as `approvalNote`) so the gate survives a session
-  resume.
+- **Wait for explicit user approval** before any pull request is created.
+- **When the user requests changes**, record `approval: "rejected"` with the user's wording,
+  reopen the appropriate implementation or specification stage in the same run, apply the
+  requested changes, and then repeat Build & Test, QA Validation, and Personal Validation.
+  The run must not advance to Create Pull Request while the rejected decision is persisted.
+- **When returning to Personal Validation after requested changes**, record
+  `approval: "pending"` before the handoff so the revised change set still requires
+  explicit approval.
+- **Record every Personal Validation decision durably** with `set_run_context`
+  (`approval: "pending"`, `"approved"`, or `"rejected"`, plus the user's wording as
+  `approvalNote`) so the gate survives a session resume.
 
 ## Phase: Create Pull Request
 
@@ -442,8 +454,15 @@ not identify a registered canvas provider.
   determined, and the `approval` decision recorded in Personal Validation.
 - **Before each stage**, call `update_stage` with `status: "in_progress"`.
 - **After each stage**, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary.
+  `"blocked"`/`"skipped"`) and an `output` summary. The dashboard increments the stage's
+  completion count every time it transitions to `done`, so repeated Build & Test, QA
+  Validation, or Personal Validation passes after requested changes remain visible.
 - **For the Personal Validation phase**, pass `links` for the started app and any dashboard or review target URLs, so the dashboard renders direct buttons next to the stage output instead of making the user copy commands.
+- **When Personal Validation requests changes**, record the rejected decision, move the
+  relevant earlier stage back to `in_progress`, and continue the same run through the repeated
+  phases instead of starting a new run. Before handing back for the revised Personal
+  Validation pass, record `approval: "pending"`; only `approval: "approved"` unlocks Create
+  Pull Request.
 - **For the QA Validation phase**, also pass `scenarios` (one entry per tested scenario
   with `status: "pass"|"fail"|"flaky"`, `notes`, and optional Playwright
   screenshot/recording `evidence` paths) and `monitoring` (the Aspire log/trace summary

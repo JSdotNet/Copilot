@@ -464,6 +464,7 @@ const session = await joinSession({
                             changeKind: changeKind || null,
                             approval: { personalValidation: "pending", decidedAt: null, note: "" },
                             originalPrompt: typeof originalPrompt === "string" && originalPrompt.trim() ? originalPrompt.trim() : "",
+                            phaseDoneCounts: {},
                             githubIssue: normalizeGithubIssue(githubIssue),
                             startedAt: new Date().toISOString(),
                             updatedAt: new Date().toISOString(),
@@ -473,6 +474,7 @@ const session = await joinSession({
                                 status: "pending",
                                 output: "",
                                 startedAt: null,
+                                doneCount: 0,
                                 completedAt: null,
                                 updatedAt: null,
                                 durationMs: null,
@@ -624,7 +626,13 @@ const session = await joinSession({
                             }
                             const stage = run.stages[idx];
                             const nowIso = new Date().toISOString();
+                            const previousStatus = stage.status;
                             stage.status = status;
+                            if (status === "in_progress" && ["done", "blocked", "skipped", "cancelled"].includes(previousStatus)) {
+                                stage.startedAt = nowIso;
+                                stage.completedAt = null;
+                                stage.durationMs = null;
+                            }
                             if (status === "in_progress") {
                                 activeStageByRun.set(runId, { index: idx, name: stage.name });
                             } else {
@@ -644,6 +652,11 @@ const session = await joinSession({
                                         stage.durationMs = Math.max(0, completed - started);
                                     }
                                 }
+                            }
+                            if (status === "done" && previousStatus !== "done") {
+                                stage.doneCount = Math.max(0, Number(stage.doneCount) || 0) + 1;
+                                run.phaseDoneCounts = run.phaseDoneCounts || {};
+                                run.phaseDoneCounts[stage.name] = Math.max(0, Number(run.phaseDoneCounts[stage.name]) || 0) + 1;
                             }
                             if (typeof output === "string" && output.length > 0) {
                                 stage.output = appendOutput && stage.output ? `${stage.output}\n${output}` : output;
