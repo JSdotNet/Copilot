@@ -190,11 +190,22 @@ export function renderShell() {
   .qa-status.flaky { background: rgba(191,135,0,0.18); color: #9a6700; }
   .qa-notes { font-size: 12px; color: var(--text-color-muted, #59636e); margin-top: 2px; }
   .qa-evidence { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .qa-evidence-image-button { background: transparent; border: none; border-radius: 4px; cursor: zoom-in; display: block; padding: 0; }
+  .qa-evidence-image-button:focus-visible { outline: 2px solid var(--color-focus-outline, #0969da); outline-offset: 2px; }
+  .qa-evidence-image-button:hover img { border-color: var(--true-color-blue, #0969da); }
   .qa-evidence img { max-width: 150px; max-height: 96px; border-radius: 4px; border: 1px solid var(--border-color-default, #d0d7de); display: block; object-fit: cover; }
   .qa-evidence a { font-size: 11px; color: var(--true-color-blue, #0969da); text-decoration: none; }
   .qa-evidence a:hover { text-decoration: underline; }
   .qa-evidence-file { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; max-width: 150px; }
-  .qa-evidence-file span { font-size: 11px; color: var(--text-color-muted, #59636e); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+  .qa-evidence-file span, .qa-evidence-file a { font-size: 11px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+  .qa-evidence-file span { color: var(--text-color-muted, #59636e); }
+  .evidence-lightbox[hidden] { display: none; }
+  .evidence-lightbox { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .evidence-lightbox-backdrop { position: absolute; inset: 0; border: 0; background: rgba(0,0,0,0.72); cursor: zoom-out; }
+  .evidence-lightbox-content { position: relative; display: flex; flex-direction: column; gap: 8px; max-width: min(96vw, 1200px); max-height: 96vh; color: #ffffff; }
+  .evidence-lightbox img { max-width: 100%; max-height: calc(96vh - 48px); border-radius: 6px; object-fit: contain; background: #000000; box-shadow: 0 12px 48px rgba(0,0,0,0.4); }
+  .evidence-lightbox-caption { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .evidence-lightbox-close { position: absolute; top: -14px; right: -14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; width: 32px; height: 32px; background: rgba(0,0,0,0.8); color: #ffffff; cursor: pointer; font-size: 20px; line-height: 28px; }
   .evidence-missing {
     display: flex; align-items: center; justify-content: center; text-align: center;
     width: 150px; height: 96px; padding: 6px;
@@ -627,11 +638,14 @@ export function renderShell() {
           // A single caption under the thumbnail. If the file can't be served
           // (missing/deleted/forbidden), onerror swaps the broken image for a
           // clear placeholder instead of the browser's broken-image glyph.
-          return '<a class="qa-evidence-file" href="' + url + '" target="_blank" rel="noopener" title="' + label + '">' +
-            '<img src="' + url + '" alt="' + label + '" loading="lazy" onerror="evidenceError(this)" />' +
-            '<span>' + label + '</span></a>';
+          return '<div class="qa-evidence-file" title="' + label + '">' +
+            '<button class="qa-evidence-image-button" type="button" data-full-src="' + esc(url) + '" data-label="' + label + '" aria-label="Open evidence image: ' + label + '">' +
+              '<img src="' + esc(url) + '" alt="' + label + '" loading="lazy" onerror="evidenceError(this)" />' +
+            '</button>' +
+            '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + label + '</a>' +
+          '</div>';
         }
-        return '<a class="qa-evidence-file" href="' + url + '" target="_blank" rel="noopener">' + esc(e.type || "file") + ': ' + label + '</a>';
+        return '<a class="qa-evidence-file" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(e.type || "file") + ': ' + label + '</a>';
       }).join("");
       return '<div class="qa-evidence">' + items + '</div>';
     }
@@ -722,6 +736,53 @@ export function renderShell() {
           btn.textContent = clamped ? "Show more" : "Show less";
         });
       });
+      document.querySelectorAll("#detail .qa-evidence-image-button").forEach((btn) => {
+        btn.addEventListener("click", () => openEvidenceLightbox(btn.dataset.fullSrc, btn.dataset.label));
+      });
+    }
+
+    let evidenceLightbox = null;
+
+    function ensureEvidenceLightbox() {
+      if (evidenceLightbox) return evidenceLightbox;
+      const el = document.createElement("div");
+      el.className = "evidence-lightbox";
+      el.hidden = true;
+      el.setAttribute("role", "dialog");
+      el.setAttribute("aria-modal", "true");
+      el.innerHTML =
+        '<button class="evidence-lightbox-backdrop" type="button" aria-label="Close evidence image"></button>' +
+        '<div class="evidence-lightbox-content">' +
+          '<button class="evidence-lightbox-close" type="button" aria-label="Close evidence image">&times;</button>' +
+          '<img alt="" />' +
+          '<div class="evidence-lightbox-caption"></div>' +
+        '</div>';
+      el.querySelector(".evidence-lightbox-backdrop").addEventListener("click", closeEvidenceLightbox);
+      el.querySelector(".evidence-lightbox-close").addEventListener("click", closeEvidenceLightbox);
+      document.addEventListener("keydown", (ev) => {
+        if (ev.key === "Escape" && !el.hidden) closeEvidenceLightbox();
+      });
+      document.body.appendChild(el);
+      evidenceLightbox = el;
+      return el;
+    }
+
+    function openEvidenceLightbox(src, label) {
+      if (!src) return;
+      const el = ensureEvidenceLightbox();
+      const img = el.querySelector("img");
+      const caption = el.querySelector(".evidence-lightbox-caption");
+      img.src = src;
+      img.alt = label || "Evidence image";
+      caption.textContent = label || "Evidence image";
+      el.hidden = false;
+      el.querySelector(".evidence-lightbox-close").focus();
+    }
+
+    function closeEvidenceLightbox() {
+      if (!evidenceLightbox) return;
+      evidenceLightbox.hidden = true;
+      evidenceLightbox.querySelector("img").removeAttribute("src");
     }
 
     function evidenceError(img) {

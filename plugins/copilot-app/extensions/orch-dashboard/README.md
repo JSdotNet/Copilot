@@ -90,7 +90,7 @@ App, instead of plain chat narration.
   entirely for them rather than rendered as `0` or `NaN`.
 - **QA results** on any stage driven by the `qa` plugin (`qa:qa`,
   `qa:qa-monitor`): per-scenario Pass/Fail/Flaky badges with notes, inline
-  thumbnails for screenshot evidence and download links for
+  thumbnails for screenshot evidence, click-to-enlarge image previews, and download links for
   video/log/trace evidence, and a runtime-monitoring findings list (Error/
   Critical/Warning/Info) from Aspire log/trace/metric checks. Evidence
   files are served from `<worktree root>/<evidence path>` via
