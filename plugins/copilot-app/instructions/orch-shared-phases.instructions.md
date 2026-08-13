@@ -395,7 +395,11 @@ category's resolved model.
 
 Every `orch-*` skill reports progress through the `orch-dashboard` canvas extension
 (`plugins/copilot-app/extensions/orch-dashboard/`). First check the canvas with
-`list_canvas_capabilities`.
+`list_canvas_capabilities`. Start with only `canvasId: "orch-dashboard"`; when the host
+reports multiple matching providers, retry with the exact advertised provider identifier
+for this extension, usually `plugin:copilot-app:orch-dashboard`. Do not use the
+package-level identifier `plugin:copilot-app` as a canvas `extensionId`, because it does
+not identify a registered canvas provider.
 
 - If `orch-dashboard` is not installed or not advertised, skip the canvas calls and
   continue through standard chat interaction.
@@ -405,9 +409,10 @@ Every `orch-*` skill reports progress through the `orch-dashboard` canvas extens
   silently fall back to chat-only tracking; block the orchestration and report the missing
   capability.
 
-- **Open** canvas `orch-dashboard`, then call `start_run` with the skill's `skillId`, the
-  full ordered stage list (its skill-specific stages followed by the shared phase names for
-  its tier), and the `changeKind` when it is already known. `start_run` reattaches to an
+- **Open** canvas `orch-dashboard` with the same resolved provider identifier when one was
+  required, then call `start_run` with the skill's `skillId`, the full ordered stage list
+  (its skill-specific stages followed by the shared phase names for its tier), and the
+  `changeKind` when it is already known. `start_run` reattaches to an
   existing `in_progress` run for the same skill and returns `resumed: true`; continue from
   the first stage that is not `done` instead of restarting the orchestration.
 - **Persist gating state** with `set_run_context`: the `changeKind` as soon as it is
