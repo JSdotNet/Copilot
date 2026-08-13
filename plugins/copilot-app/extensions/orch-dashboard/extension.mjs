@@ -170,6 +170,20 @@ function normalizeMonitoring(monitoring) {
     };
 }
 
+function normalizeGithubIssue(githubIssue) {
+    if (!githubIssue || typeof githubIssue !== "object") return null;
+    const issue = {};
+    ["owner", "repo", "url", "title"].forEach((key) => {
+        if (typeof githubIssue[key] === "string" && githubIssue[key].trim()) {
+            issue[key] = githubIssue[key].trim();
+        }
+    });
+    const rawNumber = githubIssue.number ?? githubIssue.issueNumber;
+    const number = Number(rawNumber);
+    if (Number.isInteger(number) && number > 0) issue.number = number;
+    return Object.keys(issue).length ? issue : null;
+}
+
 function normalizeLinks(links) {
     if (!Array.isArray(links)) return undefined;
     return links
@@ -181,7 +195,6 @@ function normalizeLinks(links) {
         }))
         .filter((link) => /^(https?:\/\/|\/)/i.test(link.url));
 }
-
 function evidenceContentType(filePath) {
     const ext = path.extname(filePath).toLowerCase();
     return EVIDENCE_CONTENT_TYPES[ext] || "application/octet-stream";
@@ -402,6 +415,14 @@ const session = await joinSession({
                                     required: ["name"],
                                 },
                             },
+                            originalPrompt: {
+                                type: "string",
+                                description: "Original user prompt or request text that started this orchestration run.",
+                            },
+                            githubIssue: {
+                                type: "object",
+                                description: "Originating GitHub issue metadata. When omitted, GitHub Issue Update stages are hidden as not relevant.",
+                            },
                             changeKind: {
                                 type: "string",
                                 enum: VALID_CHANGE_KINDS,
@@ -415,7 +436,7 @@ const session = await joinSession({
                         required: ["skillId", "title", "stages"],
                     },
                     handler: async (ctx) => {
-                        const { skillId, title, stages, changeKind, resume } = ctx.input || {};
+                        const { skillId, title, stages, originalPrompt, githubIssue, changeKind, resume } = ctx.input || {};
                         if (!skillId || !title || !Array.isArray(stages) || stages.length === 0) {
                             throw new CanvasError("canvas_input_invalid", "skillId, title, and a non-empty stages[] are required.");
                         }
@@ -440,6 +461,8 @@ const session = await joinSession({
                             status: "in_progress",
                             changeKind: changeKind || null,
                             approval: { personalValidation: "pending", decidedAt: null, note: "" },
+                            originalPrompt: typeof originalPrompt === "string" && originalPrompt.trim() ? originalPrompt.trim() : "",
+                            githubIssue: normalizeGithubIssue(githubIssue),
                             startedAt: new Date().toISOString(),
                             updatedAt: new Date().toISOString(),
                             stages: stages.map((s) => ({
