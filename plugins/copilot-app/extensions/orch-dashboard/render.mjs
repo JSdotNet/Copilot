@@ -117,7 +117,7 @@ export function renderShell() {
   .stage.blocked { border-left-color: var(--true-color-red, #cf222e); }
   .stage-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
   .stage-name { font-weight: var(--font-weight-semibold, 600); }
-  .stage-elapsed { font-size: 12px; color: var(--text-color-muted, #59636e); }
+  .stage-elapsed { display: block; font-size: 12px; color: var(--text-color-muted, #59636e); margin: -2px 0 4px; }
   .stage-used { font-size: 12px; color: var(--text-color-muted, #59636e); margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
   .tag {
     display: inline-block;
@@ -231,6 +231,22 @@ export function renderShell() {
   }
   .rich-viewer-body { overflow: auto; padding: 18px; }
   .rich-viewer-body .stage-output { max-height: none; margin-top: 0; }
+  .stage-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .stage-link {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 1px;
+    max-width: 260px;
+    border: 1px solid var(--border-color-default, #d0d7de);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--true-color-blue, #0969da);
+    background: var(--background-color-muted, rgba(127,127,127,0.05));
+    text-decoration: none;
+  }
+  .stage-link:hover { text-decoration: none; border-color: var(--true-color-blue, #0969da); }
+  .stage-link-label { font-weight: var(--font-weight-semibold, 600); }
+  .stage-link-description { font-size: 12px; color: var(--text-color-muted, #59636e); }
   .qa-block { margin-top: 8px; }
   .qa-block h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-color-muted, #59636e); margin: 8px 0 4px; }
   .qa-scenario {
@@ -269,6 +285,14 @@ export function renderShell() {
   .summary { margin-top: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(31,136,61,0.08); border-left: 3px solid #1f883d; }
   .summary h2 { font-size: var(--text-body-large, 15px); margin: 0 0 6px; }
   .summary-cost { margin-top: 8px; margin-bottom: 0; }
+  .original-prompt {
+    margin: 0 0 14px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: var(--background-color-muted, rgba(127,127,127,0.06));
+  }
+  .original-prompt h2 { font-size: var(--text-body-large, 15px); margin: 0 0 6px; }
+  .original-prompt pre { white-space: pre-wrap; margin: 0; font: inherit; color: inherit; }
   .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
   .header-actions { display: flex; align-items: center; gap: 8px; }
   .report-link { color: var(--true-color-blue, #0969da); font-size: 12px; font-weight: var(--font-weight-semibold, 600); text-decoration: none; }
@@ -336,9 +360,23 @@ export function renderShell() {
       return -1;
     }
 
+    function isGithubIssueUpdateStage(stage) {
+      return /^github issue update$/i.test(String((stage && stage.name) || "").trim());
+    }
+
+    function hasGithubIssue(run) {
+      const issue = run && run.githubIssue;
+      return Boolean(issue && (issue.url || issue.number || issue.issueNumber));
+    }
+
+    function visibleStages(run) {
+      return (run.stages || []).map((stage, index) => ({ stage, index }))
+        .filter(({ stage }) => !isGithubIssueUpdateStage(stage) || hasGithubIssue(run));
+    }
+
     function renderStageNav(run) {
       const summaryIdx = declaredSummaryIndex(run);
-      const items = (run.stages || []).map((s, i) => (
+      const items = visibleStages(run).map(({ stage: s, index: i }) => (
         '<button class="stage-nav-item ' + (activeStage === i ? "active" : "") + '" data-stage="' + i + '">' +
           '<span class="stage-nav-dot ' + esc(s.status) + '"></span>' +
           '<span class="stage-nav-name">' + esc(s.name) + '</span>' +
@@ -415,7 +453,7 @@ export function renderShell() {
       const elapsed = stageElapsedMs(stage);
       if (elapsed === null) return "";
       const label = stage.status === "in_progress" ? "elapsed so far" : "elapsed";
-      return '<span class="stage-elapsed">' + esc(label + ': ' + fmtDuration(elapsed)) + '</span>';
+      return '<div class="stage-elapsed">' + esc(label + ': ' + fmtDuration(elapsed)) + '</div>';
     }
 
     function renderInsight(run) {
@@ -552,6 +590,12 @@ export function renderShell() {
     function renderSummaryBlock(run, withHeading) {
       if (!run.summary) return "";
       return '<div class="summary" id="summary-block">' + (withHeading ? '<h2>Summary</h2>' : "") + '<div class="stage-output">' + renderMarkdownBlocks(run.summary) + '</div>' + renderSummaryCost(run) + '</div>';
+    }
+
+
+    function renderOriginalPrompt(run) {
+      if (!run.originalPrompt) return "";
+      return '<section class="original-prompt"><h2>Original prompt</h2><pre>' + esc(run.originalPrompt) + '</pre></section>';
     }
 
     // Overall Insight-panel usage tags (full, unshortened labels). Kept
@@ -782,6 +826,18 @@ export function renderShell() {
       modal.hidden = true;
       content.innerHTML = "";
     }
+
+    function renderStageLinks(links) {
+      if (!Array.isArray(links) || !links.length) return "";
+      const items = links.map((link) => (
+        '<a class="stage-link" href="' + esc(link.url) + '" target="_blank" rel="noopener">' +
+          '<span class="stage-link-label">' + esc(link.label || link.url) + '</span>' +
+          (link.description ? '<span class="stage-link-description">' + esc(link.description) + '</span>' : "") +
+        '</a>'
+      )).join("");
+      return '<div class="stage-links">' + items + '</div>';
+    }
+
     function evidenceUrl(runId, filePath) {
       return "/api/runs/" + encodeURIComponent(runId) + "/evidence?path=" + encodeURIComponent(filePath);
     }
@@ -845,7 +901,7 @@ export function renderShell() {
         return;
       }
       const summaryIdx = declaredSummaryIndex(run);
-      const stages = (run.stages || []).map((s, i) => {
+      const stages = visibleStages(run).map(({ stage: s, index: i }) => {
         // When a run declares a trailing Summary stage, fold the finish_run
         // summary into that stage instead of appending a separate block, so
         // the summary never appears twice.
@@ -853,9 +909,11 @@ export function renderShell() {
           ? renderSummaryBlock(run, false)
           : "";
         return '<div class="stage ' + esc(s.status) + '" id="stage-' + i + '">' +
-          '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + renderStageElapsed(s) + '</div>' +
+          '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + '</div>' +
+          renderStageElapsed(s) +
           renderStageMeta(run, i, s) +
           renderStageOutput(s.output, s.name) +
+          renderStageLinks(s.links) +
           inlineSummary +
           renderScenarios(run.id, s.scenarios) +
           renderMonitoring(s.monitoring) +
@@ -875,6 +933,7 @@ export function renderShell() {
           (run.approval && run.approval.personalValidation
             ? ' &middot; personal validation: ' + esc(run.approval.personalValidation)
             : "") + '</p>' +
+        renderOriginalPrompt(run) +
         stages +
         trailingSummary +
         renderInsight(run) +

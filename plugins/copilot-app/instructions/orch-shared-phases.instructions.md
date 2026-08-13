@@ -269,8 +269,8 @@ back to the user and waits for them.
 - **Present the code review** of the change set for the user to read.
 - **Present the recorded QA review** from the QA agent (scenarios, pass/fail, monitoring
   findings, and any captured evidence when applicable) when QA Validation ran.
-- **Start the application for the user** when the run produced a code change, so they can
-  review the running result themselves before deciding.
+- **Start the application for the user** when the run produced a code change, using the resolved repo context startup command or the command proven during QA Validation. Do not stop at listing commands unless startup is impossible; if startup fails, block Personal Validation with the actual failure and recovery command.
+- **Publish quick review links in the dashboard** for the running target, such as the primary app URL, Aspire dashboard, health page, or any route that needs review. Pass them to `update_stage` as `links` on the Personal Validation stage so the user can open the review target directly from the dashboard.
 - **Wait for explicit user approval** before any pull request is created, and fold
   requested changes back into the earlier stages when needed.
 - **Record the decision durably** with `set_run_context` (`approval: "approved"` or
@@ -395,7 +395,11 @@ category's resolved model.
 
 Every `orch-*` skill reports progress through the `orch-dashboard` canvas extension
 (`plugins/copilot-app/extensions/orch-dashboard/`). First check the canvas with
-`list_canvas_capabilities`.
+`list_canvas_capabilities`. Start with only `canvasId: "orch-dashboard"`; when the host
+reports multiple matching providers, retry with the exact advertised provider identifier
+for this extension, usually `plugin:copilot-app:orch-dashboard`. Do not use the
+package-level identifier `plugin:copilot-app` as a canvas `extensionId`, because it does
+not identify a registered canvas provider.
 
 - If `orch-dashboard` is not installed or not advertised, skip the canvas calls and
   continue through standard chat interaction.
@@ -405,9 +409,10 @@ Every `orch-*` skill reports progress through the `orch-dashboard` canvas extens
   silently fall back to chat-only tracking; block the orchestration and report the missing
   capability.
 
-- **Open** canvas `orch-dashboard`, then call `start_run` with the skill's `skillId`, the
-  full ordered stage list (its skill-specific stages followed by the shared phase names for
-  its tier), and the `changeKind` when it is already known. `start_run` reattaches to an
+- **Open** canvas `orch-dashboard` with the same resolved provider identifier when one was
+  required, then call `start_run` with the skill's `skillId`, the full ordered stage list
+  (its skill-specific stages followed by the shared phase names for its tier), and the
+  `changeKind` when it is already known. `start_run` reattaches to an
   existing `in_progress` run for the same skill and returns `resumed: true`; continue from
   the first stage that is not `done` instead of restarting the orchestration.
 - **Persist gating state** with `set_run_context`: the `changeKind` as soon as it is
@@ -415,6 +420,7 @@ Every `orch-*` skill reports progress through the `orch-dashboard` canvas extens
 - **Before each stage**, call `update_stage` with `status: "in_progress"`.
 - **After each stage**, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary.
+- **For the Personal Validation phase**, pass `links` for the started app and any dashboard or review target URLs, so the dashboard renders direct buttons next to the stage output instead of making the user copy commands.
 - **For the QA Validation phase**, also pass `scenarios` (one entry per tested scenario
   with `status: "pass"|"fail"|"flaky"`, `notes`, and optional Playwright
   screenshot/recording `evidence` paths) and `monitoring` (the Aspire log/trace summary

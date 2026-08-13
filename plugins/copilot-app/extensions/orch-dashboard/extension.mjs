@@ -12,7 +12,8 @@
 //
 // Model: an orchestration run is a JSON file (see store.mjs) with a list of
 // named stages, each carrying a status (pending/in_progress/done/blocked/
-// skipped/cancelled) and free-form output text. QA/validation stages (driven
+// skipped/cancelled) and free-form output text. Stages can also expose
+// quick-action links, such as Personal Validation review targets. Validation stages (driven
 // by the qa plugin's playwright-validation and aspire-log-monitor skills)
 // may additionally carry `scenarios` (pass/fail/flaky results with evidence
 // file references) and `monitoring` (a runtime log/trace/metric findings
@@ -169,6 +170,31 @@ function normalizeMonitoring(monitoring) {
     };
 }
 
+function normalizeGithubIssue(githubIssue) {
+    if (!githubIssue || typeof githubIssue !== "object") return null;
+    const issue = {};
+    ["owner", "repo", "url", "title"].forEach((key) => {
+        if (typeof githubIssue[key] === "string" && githubIssue[key].trim()) {
+            issue[key] = githubIssue[key].trim();
+        }
+    });
+    const rawNumber = githubIssue.number ?? githubIssue.issueNumber;
+    const number = Number(rawNumber);
+    if (Number.isInteger(number) && number > 0) issue.number = number;
+    return Object.keys(issue).length ? issue : null;
+}
+
+function normalizeLinks(links) {
+    if (!Array.isArray(links)) return undefined;
+    return links
+        .filter((link) => link && typeof link.url === "string" && link.url)
+        .map((link) => ({
+            label: typeof link.label === "string" && link.label ? link.label : link.url,
+            url: link.url,
+            description: typeof link.description === "string" ? link.description : "",
+        }))
+        .filter((link) => /^(https?:\/\/|\/)/i.test(link.url));
+}
 function evidenceContentType(filePath) {
     const ext = path.extname(filePath).toLowerCase();
     return EVIDENCE_CONTENT_TYPES[ext] || "application/octet-stream";
@@ -391,6 +417,14 @@ const session = await joinSession({
                                     required: ["name"],
                                 },
                             },
+                            originalPrompt: {
+                                type: "string",
+                                description: "Original user prompt or request text that started this orchestration run.",
+                            },
+                            githubIssue: {
+                                type: "object",
+                                description: "Originating GitHub issue metadata. When omitted, GitHub Issue Update stages are hidden as not relevant.",
+                            },
                             changeKind: {
                                 type: "string",
                                 enum: VALID_CHANGE_KINDS,
@@ -404,7 +438,7 @@ const session = await joinSession({
                         required: ["skillId", "title", "stages"],
                     },
                     handler: async (ctx) => {
-                        const { skillId, title, stages, changeKind, resume } = ctx.input || {};
+                        const { skillId, title, stages, originalPrompt, githubIssue, changeKind, resume } = ctx.input || {};
                         if (!skillId || !title || !Array.isArray(stages) || stages.length === 0) {
                             throw new CanvasError("canvas_input_invalid", "skillId, title, and a non-empty stages[] are required.");
                         }
@@ -429,6 +463,8 @@ const session = await joinSession({
                             status: "in_progress",
                             changeKind: changeKind || null,
                             approval: { personalValidation: "pending", decidedAt: null, note: "" },
+                            originalPrompt: typeof originalPrompt === "string" && originalPrompt.trim() ? originalPrompt.trim() : "",
+                            githubIssue: normalizeGithubIssue(githubIssue),
                             startedAt: new Date().toISOString(),
                             updatedAt: new Date().toISOString(),
                             stages: stages.map((s) => ({
@@ -500,7 +536,7 @@ const session = await joinSession({
                 {
                     name: "update_stage",
                     description:
-                        "Update one stage of a tracked run: its status and/or captured output. Call this at the start of a stage (status: in_progress) and again when it finishes (status: done/blocked/skipped) with a summary of what was produced. For QA/validation stages (e.g. driven by the qa plugin), also pass scenarios and/or monitoring so the dashboard can show pass/fail results and evidence.",
+                        "Update one stage of a tracked run: its status and/or captured output. Call this at the start of a stage (status: in_progress) and again when it finishes (status: done/blocked/skipped) with a summary of what was produced. For Personal Validation, pass links to local review targets. For QA/validation stages (e.g. driven by the qa plugin), also pass scenarios and/or monitoring so the dashboard can show pass/fail results and evidence.",
                     inputSchema: {
                         type: "object",
                         properties: {
@@ -510,6 +546,19 @@ const session = await joinSession({
                             status: { type: "string", enum: VALID_STATUSES },
                             output: { type: "string", description: "Free-form output/result text to show for this stage; appended to any existing output." },
                             appendOutput: { type: "boolean", description: "If true (default false), append to existing output instead of replacing it." },
+                            links: {
+                                type: "array",
+                                description: "Quick-action links for this stage, such as the running app, Aspire dashboard, or local review URL for Personal Validation. Replaces any links previously recorded for this stage.",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        label: { type: "string", description: "Button label shown in the dashboard." },
+                                        url: { type: "string", description: "HTTP(S) or same-origin URL to open." },
+                                        description: { type: "string", description: "Optional explanatory text shown below the button." },
+                                    },
+                                    required: ["label", "url"],
+                                },
+                            },
                             scenarios: {
                                 type: "array",
                                 description:
@@ -561,7 +610,7 @@ const session = await joinSession({
                         required: ["runId", "status"],
                     },
                     handler: async (ctx) => {
-                        const { runId, stageIndex, stageName, status, output, appendOutput, scenarios, monitoring } = ctx.input || {};
+                        const { runId, stageIndex, stageName, status, output, appendOutput, links, scenarios, monitoring } = ctx.input || {};
                         if (!VALID_STATUSES.includes(status)) {
                             throw new CanvasError("canvas_input_invalid", `status must be one of ${VALID_STATUSES.join(", ")}`);
                         }
@@ -599,6 +648,8 @@ const session = await joinSession({
                             if (typeof output === "string" && output.length > 0) {
                                 stage.output = appendOutput && stage.output ? `${stage.output}\n${output}` : output;
                             }
+                            const normalizedLinks = normalizeLinks(links);
+                            if (normalizedLinks) stage.links = normalizedLinks;
                             const normalizedScenarios = normalizeScenarios(scenarios);
                             if (normalizedScenarios) stage.scenarios = normalizedScenarios;
                             const normalizedMonitoring = normalizeMonitoring(monitoring);
