@@ -41,19 +41,33 @@ behavior described below, note the fallback once, and continue.
 
 ## Depth Selection (Automatic)
 
+Before running a QA mode that depends on an MCP server, verify that the required MCP
+tooling is available. Required tooling includes `playwright` for browser automation,
+screenshots, videos, or any user-requested evidence capture, and any monitoring MCP/tooling
+declared by repo context or needed for the selected runtime validation.
+
+If required MCP tooling is unavailable:
+
+- Mark **QA Validation** `blocked`, not `done` or `skipped`.
+- Prompt the user with the missing MCP server or tool name, why it is required, and the
+  setup or enablement action needed before QA can continue.
+- Stop before Personal Validation, pull request creation, issue updates, or Summary.
+- Do not complete the phase through a degraded/manual fallback that omits required
+  browser automation, evidence capture, or monitoring.
+
 Applies when the repository does not declare a QA depth in `.github/copilot-orch-context.md`.
 
 - **New functionality → QA validation with capture:**
   1. **Run the application locally** via the `qa:qa` agent using the `aspire` /
      `aspire-run` skill.
   2. **Execute the changed/affected scenarios with Playwright** — via the `playwright` MCP
-    server, `qa:qa` drives each scenario, capturing screenshot/video evidence per
-    checkpoint and failure.
+     server, `qa:qa` drives each scenario, capturing screenshot/video evidence per
+     checkpoint and failure.
   3. **Monitor runtime behavior continuously** — `qa:qa-monitor` watches Aspire logs,
-    traces, and metrics. Inside the GitHub Copilot App, run `qa-monitor` in a parallel
-    child session (`create_session` + cross-session messaging) so monitoring runs
-    concurrently with Playwright validation; otherwise use the `qa` plugin's
-    `delegate-to-qa-monitor` skill for a same-session handoff.
+     traces, and metrics. Inside the GitHub Copilot App, run `qa-monitor` in a parallel
+     child session (`create_session` + cross-session messaging) so monitoring runs
+     concurrently with Playwright validation; otherwise use the `qa` plugin's
+     `delegate-to-qa-monitor` skill for a same-session handoff.
   4. **Record the QA result** with pass/fail per scenario and the captured evidence.
 
   Playwright execution itself stays in the orchestrating session (inline or via a
@@ -62,7 +76,9 @@ Applies when the repository does not declare a QA depth in `.github/copilot-orch
   1. **Run the application locally** via the `aspire` / `aspire-run` skill and verify the
      affected scenarios.
   2. **Use Playwright when it helps validate the flow**, but capture screenshot/video
-    evidence only when explicitly requested or when a failure needs supporting evidence.
+     evidence only when explicitly requested or when a failure needs supporting evidence.
+     When the selected verification requires Playwright or requested evidence, missing MCP
+     availability blocks QA instead of falling back to an incomplete manual check.
   3. **Record pass/fail and monitoring findings** for the affected scenarios.
 - **Dependency, package, framework, or SDK update with no functional change → startup-only
   validation:** start the application, confirm the dashboard/health endpoints report
@@ -70,6 +86,16 @@ Applies when the repository does not declare a QA depth in `.github/copilot-orch
   capture are not required unless the update introduces new user-facing behavior.
 - **No functional change and nothing to run → skip:** mark this phase `skipped` and record
   why.
+
+## Revalidation After Requested Changes
+
+When the user requests changes during Personal Validation, or QA finds issues that lead to
+implementation changes, refresh the running app before repeating QA or handing back to the
+user. Prefer updating the same running instance when the repo's startup mode supports hot
+reload/watch and Aspire reports the affected resources remain healthy. Otherwise stop and
+restart the application automatically, wait for healthy/running state again, and refresh
+endpoint URLs when they change. Record whether revalidation used the same updated instance
+or a restart, and do not ask the user to restart the app manually as the normal path.
 
 ## Inputs
 
@@ -82,7 +108,8 @@ Applies when the repository does not declare a QA depth in `.github/copilot-orch
 
 ## Outputs
 
-- QA result: per-scenario pass/fail with optional Playwright evidence paths, or the
+- QA result: per-scenario pass/fail with optional Playwright evidence paths; a `blocked`
+  result naming missing required MCP tooling and the user action needed to continue; or the
   startup/health outcome (startup-only mode), or a skip reason.
 - Monitoring findings (Aspire log/trace/metric anomalies) when monitoring ran.
 - These outputs feed the shared Personal Validation phase (the recorded QA review the user
@@ -94,12 +121,18 @@ Applies when the repository does not declare a QA depth in `.github/copilot-orch
   `instructions/orch-shared-phases.instructions.md`. Also pass `scenarios` (per-scenario
   `status`, `notes`, `evidence`) and `monitoring` (log/trace summary) so the dashboard
   renders QA results with evidence inline.
+- When required MCP tooling is unavailable, report the stage as `blocked` with the missing
+  tooling and user-actionable setup guidance in `output`. Do not report pass scenarios or
+  success wording for checks that could not be completed correctly.
 
 ## Agents
 
 - `qa:qa`, `qa:qa-monitor` (recommended); falls back to `csharp-coding:coding`
-  running validation manually when the `qa` plugin is not installed. Continue without a
-  separate approval prompt before this phase.
+  running validation manually when the `qa` plugin is not installed, but only when manual
+  validation can complete the selected QA depth correctly. Manual validation is not a
+  substitute for required MCP-backed browser automation, evidence capture, or monitoring.
+  Continue without a separate approval prompt before this phase unless required tooling is
+  missing; missing required tooling blocks the phase and prompts the user.
 
 ## Skills Used
 
@@ -107,9 +140,11 @@ Applies when the repository does not declare a QA depth in `.github/copilot-orch
 
 ## MCP Servers
 
-- `playwright` for browser automation and smoke/E2E execution when QA runs browser-facing
-  scenarios; evidence capture is required only for new functionality unless explicitly
-  requested.
+- `playwright` is required for browser automation, smoke/E2E execution of browser-facing
+  scenarios, and screenshot/video evidence capture. Evidence capture is required for new
+  functionality and whenever the user explicitly requests it.
+- Missing required MCP tooling is a blocking prerequisite failure; stop and prompt the user
+  for setup instead of completing QA through degraded fallback.
 
 ## Evidence Location
 

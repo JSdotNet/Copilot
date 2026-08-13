@@ -219,6 +219,11 @@ Applies to code-modifying orchestrations. Runs after Build & Test. Packaged as t
 invokes it and passes the change kind so depth is selected automatically:
 
 - **New functionality** → run automatic QA validation with capture:
+  - **Verify required MCP tooling before running QA.** Browser-facing validation and
+    evidence capture require the `playwright` MCP server. If required MCP tooling is not
+    available, mark **QA Validation** `blocked`, prompt the user with the missing server or
+    tool names and setup action needed, and stop before Personal Validation. Do not mark
+    the phase `done` with a degraded/manual fallback.
   - **Run the application locally** via the `qa:qa` agent using the `aspire` /
     `aspire-run` skill.
   - **Execute the changed/affected scenarios with Playwright** — via the `playwright` MCP
@@ -236,13 +241,26 @@ invokes it and passes the change kind so depth is selected automatically:
     affected scenarios.
   - **Use Playwright when it helps reproduce or verify the flow**, but only capture
     screenshot/video evidence when the user asks for it or when a failure needs evidence.
+    When the selected verification requires Playwright or requested evidence, missing
+    `playwright` MCP availability blocks the phase; prompt the user for setup help instead
+    of completing through a degraded fallback.
   - **Record pass/fail and monitoring findings** for the affected scenarios.
+  - If required monitoring tooling is unavailable, mark **QA Validation** `blocked` and ask
+    the user to enable or configure the missing tooling before continuing.
 - **Dependency, package, framework, or SDK update with no functional change** (for example
   `orch-update-packages`) → reduce QA to a **startup-without-errors validation**: start the
   application, confirm the dashboard/health endpoints report healthy, and confirm the logs
   show no new errors. Full functional Playwright scenarios and capture are not required
   unless the update introduces new user-facing behavior.
 - **No functional change and nothing to run** → mark this phase `skipped` and record why.
+
+**After requested changes:** when the user requests fixes during Personal Validation or QA
+finds issues that require code changes, refresh the app under test before re-running QA or
+returning to the user. Prefer updating the same running instance when the repo's declared
+startup mode supports hot reload/watch and Aspire reports the affected resources remain
+healthy. Otherwise stop and restart the app automatically, wait for healthy/running state
+again, refresh endpoint URLs when they change, and record whether QA used hot reload or a
+restart. Never ask the user to restart the app manually as the normal path.
 
 **Repo Context:** when the consuming repository supplies `.github/copilot-orch-context.md`,
 its startup command, base URLs, healthy-startup signals, and declared QA depth take
@@ -251,9 +269,14 @@ declaring no runnable application makes this phase `skipped`. See
 `orch-repo-context.instructions.md`; the `phase-qa-validation` skill applies it.
 
 **Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to
-`csharp-coding:coding` running validation manually when the `qa` plugin isn't installed.
+`csharp-coding:coding` running validation manually when the `qa` plugin isn't installed,
+but only for validation that can still be completed correctly. Manual validation is not a
+substitute for required MCP-backed browser automation, evidence capture, or monitoring.
 
-**MCP Servers:** `playwright` *(when browser-based validation is needed; capture is required only for new functionality unless explicitly requested)*
+**MCP Servers:** `playwright` *(required when browser-based validation, evidence capture,
+or requested screenshots/videos are part of the selected QA depth)*. If required MCP
+tooling is missing, mark the stage `blocked` with user-actionable setup guidance; never
+report a successful degraded fallback.
 
 **Skills Used:** `aspire`, `aspire-run`
 

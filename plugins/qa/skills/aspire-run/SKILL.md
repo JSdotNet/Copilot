@@ -1,7 +1,7 @@
 ---
 name: aspire-run
 description: 'Start and confirm the health of a .NET Aspire-orchestrated application for QA/testing purposes. Use before any runtime validation, browser testing, or exploratory testing session.'
-compatibility: Works with the Aspire CLI (`aspire run`) and, when available, the Aspire MCP server for resource state checks.
+compatibility: Requires the Aspire CLI (`aspire run`) and Aspire MCP server for QA validation that needs resource state, logs, traces, metrics, or health evidence.
 ---
 
 # Aspire Run — Start the App Under Test
@@ -51,9 +51,10 @@ Wait until every required resource reports a running/healthy state. If a resourc
 stuck starting or in a failed state, check `get_console_logs` for that resource before
 proceeding — do not start Playwright validation against a partially-started app.
 
-Fallback (no MCP server): watch the Aspire dashboard console output for `Running` state
-on each resource, or poll each service's `/health` endpoint if `AddServiceDefaults()` is
-in use.
+Fallback (no MCP server): only allowed for startup-only checks where MCP-backed resource
+state, log, trace, metric, or health evidence is not required. For QA validation that
+requires Aspire monitoring or evidence, missing Aspire MCP blocks the phase; stop and ask
+the user to start/configure Aspire MCP before continuing.
 
 ### 4. Resolve Endpoint URLs
 
@@ -67,6 +68,17 @@ in use.
   invalidates the Aspire log/trace timeline the `aspire-log-monitor` skill depends on.
 - Only stop the app after monitoring and Playwright validation are both complete and
   the report has been produced.
+
+### 6. Refresh After Code Changes
+
+When implementation changes are made after an app has already been started for QA or
+Personal Validation, refresh the running app before continuing validation:
+
+- Prefer the same running instance when the startup command supports hot reload/watch and
+  resource state remains healthy.
+- Otherwise stop and restart the app automatically, then wait for healthy/running state.
+- Re-resolve endpoint URLs after a restart because ports may change.
+- Record whether the refreshed app used hot reload/watch or a full restart.
 
 ## Common Failure Modes
 
