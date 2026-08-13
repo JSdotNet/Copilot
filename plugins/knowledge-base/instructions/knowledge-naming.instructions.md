@@ -1,15 +1,16 @@
 ---
 applyTo: ".arc42/**,.domain/**,.backlog/**,.tech/**,.design/**,**/_meta/**"
-description: File and folder naming conventions inside the knowledge folders, including the underscore prefix that marks tooling assets.
+description: File and folder naming conventions inside knowledge folders, including dot-prefixed specification areas and underscore-prefixed tool-interpreted data.
 ---
 
 # File and folder naming in knowledge folders
 
-## Underscore prefix marks tooling assets
+## Underscore prefix marks tool-interpreted data
 
-Anything that exists **for tooling rather than for reading** carries a leading
-underscore, so a human scanning a folder can tell content from machinery at a
-glance.
+Anything that exists **for tooling rather than for reading directly** carries a
+leading underscore, so a human scanning a folder can tell specification from
+data that must be interpreted by a tool at a glance. Folders with a leading
+underscore are always for data that needs tool interpretation.
 
 - **Tooling folders** are prefixed: `_meta/` (derived artifacts). Files
   *inside* such a folder are not prefixed again — the folder already carries
@@ -23,11 +24,12 @@ to be read as content, even if tooling also parses them — the `.domain`,
 `.arc42`, `.backlog`, `.tech`, and `.design` Markdown files are read by both
 humans and tooling and stay unprefixed.
 
-## Area folders keep their dot prefix
+## Dot prefix marks specification areas
 
 Top-level knowledge areas keep the leading-dot convention and are **not**
 renamed: `.arc42/`, `.domain/`, `.backlog/`, `.tech/`, `.design/`. The dot marks
-a repository-level area; the underscore marks tooling within one.
+a repository-level specification area; the underscore marks tool-interpreted
+data within one. Folders with a leading dot are for specifications.
 
 ## No redundant suffixes
 
