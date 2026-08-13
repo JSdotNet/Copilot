@@ -19,14 +19,15 @@ App, instead of plain chat narration.
   expands an always-visible **stage navigation** beneath it: every relevant
   stage declared in `start_run` is listed with a status dot/badge and jumps to
   that stage in the detail view when clicked. A declared **GitHub Issue Update**
-  stage is hidden when the run has no originating GitHub issue metadata.
+  stage is hidden when the run has no originating GitHub issue metadata. Stages
+  with `links` render those links as quick-open buttons in the stage detail.
 - A run detail view (right panel) with every relevant workflow stage, its status
   (`pending` / `in_progress` / `done` / `blocked` / `skipped` / `cancelled`),
-  the agent(s) assigned, and the captured output text for that stage. When the
-  original user prompt is provided to `start_run`, it is shown near the top of
-  the run detail and included in exported reports. The elapsed time for each
-  stage is shown on its own second line when timing data is available. The
-  `finish_run` **Summary** is rendered as a highlighted block at the end of the
+  the agent(s) assigned, captured output text, and any quick-action links for
+  that stage. When the original user prompt is provided to `start_run`, it is
+  shown near the top of the run detail and included in exported reports. The
+  elapsed time for each stage is shown on its own second line when timing data
+  is available. The `finish_run` **Summary** is rendered as a highlighted block at the end of the
   run, includes the total token cost/usage when telemetry is available, and is
   reachable from the stage navigation.
 - An **Insight** panel showing total tool calls, elapsed time, measured tool
@@ -128,9 +129,9 @@ Canvas id: `orch-dashboard`. Actions:
   `rejected`). Because it lives in the run JSON, it survives compaction and
   session resume — a pull request must never be created while approval is
   `pending`.
-- `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput?, scenarios?, monitoring? })`
+- `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput?, links?, scenarios?, monitoring? })`
   Call at the start of a stage (`status: "in_progress"`) and again when it
-  finishes, with the result captured in `output`. For QA/validation stages,
+  finishes, with the result captured in `output`. For Personal Validation, pass `links` such as the running app URL, Aspire dashboard URL, health page, or focused review route so the dashboard renders direct open buttons. For QA/validation stages,
   also pass:
   - `scenarios: [{ name, status: "pass"|"fail"|"flaky", notes?, evidence?: [{ type?, path, description? }] }]`
     — one entry per tested scenario. `evidence[].path` is resolved against the

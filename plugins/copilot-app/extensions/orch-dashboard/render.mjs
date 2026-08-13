@@ -158,6 +158,22 @@ export function renderShell() {
     margin-top: 2px;
   }
   .show-more:hover { text-decoration: underline; }
+  .stage-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .stage-link {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 1px;
+    max-width: 260px;
+    border: 1px solid var(--border-color-default, #d0d7de);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--true-color-blue, #0969da);
+    background: var(--background-color-muted, rgba(127,127,127,0.05));
+    text-decoration: none;
+  }
+  .stage-link:hover { text-decoration: none; border-color: var(--true-color-blue, #0969da); }
+  .stage-link-label { font-weight: var(--font-weight-semibold, 600); }
+  .stage-link-description { font-size: 12px; color: var(--text-color-muted, #59636e); }
   .qa-block { margin-top: 8px; }
   .qa-block h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-color-muted, #59636e); margin: 8px 0 4px; }
   .qa-scenario {
@@ -582,6 +598,17 @@ export function renderShell() {
       '</div>';
     }
 
+    function renderStageLinks(links) {
+      if (!Array.isArray(links) || !links.length) return "";
+      const items = links.map((link) => (
+        '<a class="stage-link" href="' + esc(link.url) + '" target="_blank" rel="noopener">' +
+          '<span class="stage-link-label">' + esc(link.label || link.url) + '</span>' +
+          (link.description ? '<span class="stage-link-description">' + esc(link.description) + '</span>' : "") +
+        '</a>'
+      )).join("");
+      return '<div class="stage-links">' + items + '</div>';
+    }
+
     function evidenceUrl(runId, filePath) {
       return "/api/runs/" + encodeURIComponent(runId) + "/evidence?path=" + encodeURIComponent(filePath);
     }
@@ -657,6 +684,7 @@ export function renderShell() {
           renderStageElapsed(s) +
           renderStageMeta(run, i, s) +
           renderStageOutput(s.output) +
+          renderStageLinks(s.links) +
           inlineSummary +
           renderScenarios(run.id, s.scenarios) +
           renderMonitoring(s.monitoring) +

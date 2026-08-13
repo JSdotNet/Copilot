@@ -33,6 +33,10 @@ function stageElapsedMs(stage) {
     return Number.isFinite(ended) ? Math.max(0, ended - started) : null;
 }
 
+function safeLinks(links) {
+    if (!Array.isArray(links)) return [];
+    return links.filter((link) => link && typeof link.url === "string" && /^(https?:\/\/|\/)/i.test(link.url));
+}
 function summaryCostLine(context) {
     const totals = context && context.totals;
     if (!totals) return "";
@@ -95,21 +99,27 @@ export function renderReportMarkdown(run) {
     lines.push("");
 
     const visibleStages = visibleStageEntries(run);
-    const stagesWithOutput = visibleStages.filter(({ stage }) => stage.output);
+    const stagesWithOutput = visibleStages.filter(({ stage }) => stage.output || safeLinks(stage.links).length);
     if (stagesWithOutput.length) {
         lines.push("## Stage Output");
         lines.push("");
         visibleStages.forEach(({ stage }, visibleIndex) => {
-            if (!stage.output) return;
+            if (!stage.output && !safeLinks(stage.links).length) return;
             lines.push(`### ${visibleIndex + 1}. ${stage.name}`);
             lines.push("");
-            lines.push("```text");
-            lines.push(stage.output);
-            lines.push("```");
-            lines.push("");
+            if (stage.output) {
+                lines.push("```text");
+                lines.push(stage.output);
+                lines.push("```");
+                lines.push("");
+            }
+            if (safeLinks(stage.links).length) {
+                lines.push("Links:");
+                safeLinks(stage.links).forEach((link) => lines.push(`- [${link.label || link.url}](${link.url})${link.description ? ` - ${link.description}` : ""}`));
+                lines.push("");
+            }
         });
     }
-
     const stagesWithQa = visibleStageEntries(run).map(({ stage }) => stage).filter(
         (stage) => (Array.isArray(stage.scenarios) && stage.scenarios.length) || (stage.monitoring && (stage.monitoring.summary || (stage.monitoring.findings || []).length))
     );
@@ -333,12 +343,14 @@ export function renderReportHtml(run, evidenceDataUris = {}) {
     parts.push("</tbody></table>");
 
     visibleStageEntries(run).forEach(({ stage }, visibleIndex) => {
-        const hasOutput = Boolean(stage.output);
+        const links = safeLinks(stage.links);
+        const hasOutput = Boolean(stage.output) || links.length;
         const hasScenarios = Array.isArray(stage.scenarios) && stage.scenarios.length;
         const hasMonitoring = stage.monitoring && (stage.monitoring.summary || (stage.monitoring.findings || []).length);
         if (!hasOutput && !hasScenarios && !hasMonitoring) return;
         parts.push(`<h3>${visibleIndex + 1}. ${escHtml(stage.name)}</h3>`);
-        if (hasOutput) parts.push(`<pre>${escHtml(stage.output)}</pre>`);
+        if (stage.output) parts.push(`<pre>${escHtml(stage.output)}</pre>`);
+        if (links.length) parts.push(`<div>${links.map((link) => `<a href="${escHtml(link.url)}">${escHtml(link.label || link.url)}</a>${link.description ? ` <span>${escHtml(link.description)}</span>` : ""}`).join("<br />")}</div>`);
         if (hasScenarios) {
             stage.scenarios.forEach((s) => {
                 parts.push('<div class="scenario">');

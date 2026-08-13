@@ -81,7 +81,7 @@ consuming repository's optional runtime context file, whose convention is define
 9. **Enforce the Personal Validation gate.** Personal Validation uses **no agent and no
    model** and is the first required user approval checkpoint: hand control back to the
    user, present the code review and the recorded QA review, start the application for code
-   changes, and wait for explicit user approval.
+   changes, publish dashboard quick links to the running review target, and wait for explicit user approval.
    Never auto-approve. Record the decision with `set_run_context` (`approval`, plus the
    user's wording as `approvalNote`).
 10. **Gate the pull request.** Create a pull request only when the persisted `approval` in
