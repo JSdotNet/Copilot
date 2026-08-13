@@ -21,11 +21,17 @@ App, instead of plain chat narration.
   stage in the detail view when clicked, so no stage is hidden.
 - A run detail view (right panel) with every workflow stage, its status
   (`pending` / `in_progress` / `done` / `blocked` / `skipped` / `cancelled`),
-  the agent(s) assigned, and the captured output text for that stage. The
+  the agent(s) assigned, and the captured output for that stage. Stage output
+  and the `finish_run` **Summary** render as a safe Markdown subset so headings,
+  paragraphs, bullet lists, ordered lists, links, inline code, fenced code, and
+  emphasis appear as readable sections instead of compressed monospace text. Each
+  stage output also includes an **Open rich view** action for a focused rich-text
+  reading panel, and the run header links to an inline **HTML report** with the
+  same rich rendering for sharing or browser review. The
   elapsed time for each stage is shown when timing data is available. The
-  `finish_run` **Summary** is rendered as a highlighted block at the end of the
-  run, includes the total token cost/usage when telemetry is available, and is
-  reachable from the stage navigation.
+  summary is rendered as a highlighted block at the end of the run, includes the
+  total token cost/usage when telemetry is available, and is reachable from the
+  stage navigation.
 - An **Insight** panel showing total tool calls, elapsed time, measured tool
   time, an estimated thinking/reasoning remainder, and a time-by-category
   breakdown (Shell, Edit, Read, `QA (Playwright/Aspire)`, MCP tool, Agent

@@ -224,6 +224,128 @@ function escHtml(value) {
     ));
 }
 
+
+function renderInlineMarkdownHtml(value) {
+    const raw = String(value ?? "");
+    const codeSpans = [];
+    const withPlaceholders = raw.replace(/\`([^\`]+)\`/g, (_m, code) => {
+        const key = "@@ORCH_DASHBOARD_CODE_SPAN_" + codeSpans.length + "@@";
+        codeSpans.push("<code>" + escHtml(code) + "</code>");
+        return key;
+    });
+    let html = escHtml(withPlaceholders);
+    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|#[^\s)]+|\/[^\s)]+)\)/g, (_m, label, href) => {
+        return "<a href=\"" + escHtml(href) + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + label + "</a>";
+    });
+    html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/__([^_]+)__/g, "<strong>$1</strong>");
+    html = html.replace(/(^|[\s(])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    html = html.replace(/(^|[\s(])_([^_\n]+)_/g, "$1<em>$2</em>");
+    codeSpans.forEach((span, i) => {
+        html = html.replace(new RegExp("@@ORCH_DASHBOARD_CODE_SPAN_" + i + "@@", "g"), span);
+    });
+    return html;
+}
+
+function renderMarkdownBlocksHtml(value) {
+    const lines = String(value ?? "").replace(/\r\n?/g, "\n").split("\n");
+    const parts = [];
+    let paragraph = [];
+    let listType = null;
+    let inCode = false;
+    let codeLines = [];
+
+    function closeParagraph() {
+        if (!paragraph.length) return;
+        parts.push("<p>" + renderInlineMarkdownHtml(paragraph.join(" ").trim()) + "</p>");
+        paragraph = [];
+    }
+
+    function closeList() {
+        if (!listType) return;
+        parts.push("</" + listType + ">");
+        listType = null;
+    }
+
+    function openList(type) {
+        if (listType === type) return;
+        closeList();
+        parts.push("<" + type + ">");
+        listType = type;
+    }
+
+    function closeCode() {
+        parts.push("<pre><code>" + escHtml(codeLines.join("\n")) + "</code></pre>");
+        codeLines = [];
+        inCode = false;
+    }
+
+    lines.forEach((line) => {
+        if (/^\s*/.test(line) && line.trim().startsWith(String.fromCharCode(96, 96, 96))) {
+            closeParagraph();
+            closeList();
+            if (inCode) closeCode();
+            else {
+                inCode = true;
+                codeLines = [];
+            }
+            return;
+        }
+
+        if (inCode) {
+            codeLines.push(line);
+            return;
+        }
+
+        if (!line.trim()) {
+            closeParagraph();
+            closeList();
+            return;
+        }
+
+        const heading = line.match(/^(#{1,6})\s+(.+)$/);
+        if (heading) {
+            closeParagraph();
+            closeList();
+            const level = Math.min(6, heading[1].length + 2);
+            parts.push("<h" + level + ">" + renderInlineMarkdownHtml(heading[2].trim()) + "</h" + level + ">");
+            return;
+        }
+
+        const unordered = line.match(/^\s*[-*+]\s+(.+)$/);
+        if (unordered) {
+            closeParagraph();
+            openList("ul");
+            parts.push("<li>" + renderInlineMarkdownHtml(unordered[1].trim()) + "</li>");
+            return;
+        }
+
+        const ordered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+        if (ordered) {
+            closeParagraph();
+            openList("ol");
+            parts.push("<li>" + renderInlineMarkdownHtml(ordered[1].trim()) + "</li>");
+            return;
+        }
+
+        const quote = line.match(/^>\s?(.+)$/);
+        if (quote) {
+            closeParagraph();
+            closeList();
+            parts.push("<blockquote>" + renderInlineMarkdownHtml(quote[1].trim()) + "</blockquote>");
+            return;
+        }
+
+        closeList();
+        paragraph.push(line.trim());
+    });
+
+    if (inCode) closeCode();
+    closeParagraph();
+    closeList();
+    return parts.join("");
+}
+
 const REPORT_HTML_STYLE = `
   :root { color-scheme: light dark; }
   * { box-sizing: border-box; }
@@ -239,6 +361,21 @@ const REPORT_HTML_STYLE = `
   th { background: rgba(127,127,127,0.08); }
   pre { white-space: pre-wrap; background: rgba(127,127,127,0.08); border-radius: 6px;
     padding: 10px 12px; font-size: 12.5px; overflow-x: auto; }
+  .rich-output { background: rgba(127,127,127,0.06); border: 1px solid #d0d7de; border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+  .rich-output :first-child { margin-top: 0; }
+  .rich-output :last-child { margin-bottom: 0; }
+  .rich-output h3, .rich-output h4, .rich-output h5, .rich-output h6 { margin: 12px 0 6px; line-height: 1.25; }
+  .rich-output h3 { font-size: 15px; padding-bottom: 4px; border-bottom: 1px solid #d0d7de; }
+  .rich-output h4 { font-size: 14px; }
+  .rich-output h5, .rich-output h6 { font-size: 13px; color: #59636e; }
+  .rich-output p { margin: 0 0 8px; }
+  .rich-output ul, .rich-output ol { margin: 4px 0 10px; padding-left: 24px; }
+  .rich-output li { margin: 3px 0; }
+  .rich-output code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; background: rgba(127,127,127,0.12); border-radius: 4px; padding: 1px 4px; }
+  .rich-output pre code { display: block; padding: 0; background: transparent; white-space: pre; }
+  .rich-output blockquote { margin: 8px 0 10px; padding-left: 10px; border-left: 3px solid #d0d7de; color: #59636e; }
+  .rich-output a { color: #0969da; text-decoration: none; }
+  .rich-output a:hover { text-decoration: underline; }
   .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px;
     font-weight: 600; text-transform: uppercase; letter-spacing: .02em; }
   .badge.done { background: rgba(31,136,61,.15); color: #1f883d; }
@@ -311,7 +448,7 @@ export function renderReportHtml(run, evidenceDataUris = {}) {
         const hasMonitoring = stage.monitoring && (stage.monitoring.summary || (stage.monitoring.findings || []).length);
         if (!hasOutput && !hasScenarios && !hasMonitoring) return;
         parts.push(`<h3>${i + 1}. ${escHtml(stage.name)}</h3>`);
-        if (hasOutput) parts.push(`<pre>${escHtml(stage.output)}</pre>`);
+        if (hasOutput) parts.push(`<div class="rich-output">${renderMarkdownBlocksHtml(stage.output)}</div>`);
         if (hasScenarios) {
             stage.scenarios.forEach((s) => {
                 parts.push('<div class="scenario">');
@@ -353,7 +490,7 @@ export function renderReportHtml(run, evidenceDataUris = {}) {
         parts.push("<h2>Summary</h2>");
         const costLine = summaryCostLine(context);
         parts.push(
-            `<div class="summary">${escHtml(run.summary)}` +
+            `<div class="summary rich-output">${renderMarkdownBlocksHtml(run.summary)}` +
             (costLine ? `<p><strong>Total cost:</strong> ${escHtml(costLine)}</p>` : "") + `</div>`
         );
     }
