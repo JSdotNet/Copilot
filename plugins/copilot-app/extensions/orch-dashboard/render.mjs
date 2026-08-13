@@ -130,6 +130,7 @@ export function renderShell() {
   .tag.agent { background: rgba(130,80,223,0.15); color: #8250df; }
   .tag.mcp { background: rgba(9,105,218,0.12); color: var(--true-color-blue, #0969da); }
   .tag.model { background: rgba(31,136,61,0.12); color: #1f883d; }
+  .tag.done-count { background: rgba(9,105,218,0.12); color: var(--true-color-blue, #0969da); }
   .stage-output {
     font-size: var(--text-body-medium, 14px);
     line-height: 1.55;
@@ -662,6 +663,17 @@ export function renderShell() {
 
     // Single code path for every stage's meta badge row: purple Agent pills
     // (declared + observed, merged), MCP/Model pills, and the token-delta pill.
+    function stageDoneCount(run, index, stage) {
+      const direct = Number(stage && stage.doneCount);
+      if (Number.isFinite(direct) && direct > 0) return direct;
+      const byName = run && run.phaseDoneCounts && Number(run.phaseDoneCounts[(stage && stage.name) || ""]);
+      return Number.isFinite(byName) && byName > 0 ? byName : 0;
+    }
+
+    function doneCountPill(count) {
+      if (!count) return "";
+      return '<span class="tag done-count" title="Number of times this phase completed with status done">Done ' + count + 'x</span>';
+    }
     function renderStageMeta(run, index, stage) {
       const insight = run.insightSummary && run.insightSummary.perStage && run.insightSummary.perStage[index];
       const declared = (stage && stage.agents) || [];
@@ -669,6 +681,8 @@ export function renderShell() {
       const agents = mergeAgentLabels(declared.concat(observed));
       const pills = [];
       agents.forEach((a) => pills.push('<span class="tag agent">Agent: ' + esc(a) + '</span>'));
+      const donePill = doneCountPill(stageDoneCount(run, index, stage));
+      if (donePill) pills.push(donePill);
       ((insight && insight.mcpServers) || []).forEach((m) => pills.push('<span class="tag mcp">MCP: ' + esc(m) + '</span>'));
       ((insight && insight.models) || []).forEach((m) => pills.push('<span class="tag model">Model: ' + esc(m) + '</span>'));
       const tokenPill = stageTokenPill(run, index);

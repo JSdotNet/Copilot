@@ -60,6 +60,12 @@ function visibleStageEntries(run) {
         .map((stage, index) => ({ stage, index }))
         .filter(({ stage }) => !isGithubIssueUpdateStage(stage) || hasGithubIssue(run));
 }
+function stageDoneCount(run, stage) {
+    const direct = Number(stage && stage.doneCount);
+    if (Number.isFinite(direct) && direct > 0) return direct;
+    const byName = run && run.phaseDoneCounts && Number(run.phaseDoneCounts[(stage && stage.name) || ""]);
+    return Number.isFinite(byName) && byName > 0 ? byName : 0;
+}
 export function renderReportMarkdown(run) {
     const insight = summarizeInsights(run);
     const context = summarizeContext(run);
@@ -88,12 +94,12 @@ export function renderReportMarkdown(run) {
     }
     lines.push("## Stages");
     lines.push("");
-    lines.push("| # | Stage | Status | Elapsed | Agents (planned) | Agents (used) | MCP Servers | Models |");
-    lines.push("| - | ----- | ------ | ------- | ----------------- | -------------- | ----------- | ------ |");
+    lines.push("| # | Stage | Status | Done | Elapsed | Agents (planned) | Agents (used) | MCP Servers | Models |");
+    lines.push("| - | ----- | ------ | ---- | ------- | ----------------- | -------------- | ----------- | ------ |");
     visibleStageEntries(run).forEach(({ stage, index }, visibleIndex) => {
         const observed = insight.perStage[index] || { agents: [], mcpServers: [], models: [] };
         lines.push(
-            `| ${visibleIndex + 1} | ${stage.name} | ${stage.status} | ${fmtDuration(stageElapsedMs(stage))} | ${(stage.agents || []).join(", ") || "-"} | ${observed.agents.join(", ") || "-"} | ${observed.mcpServers.join(", ") || "-"} | ${observed.models.join(", ") || "-"} |`
+            `| ${visibleIndex + 1} | ${stage.name} | ${stage.status} | ${stageDoneCount(run, stage) || "-"} | ${fmtDuration(stageElapsedMs(stage))} | ${(stage.agents || []).join(", ") || "-"} | ${observed.agents.join(", ") || "-"} | ${observed.mcpServers.join(", ") || "-"} | ${observed.models.join(", ") || "-"} |`
         );
     });
     lines.push("");
@@ -464,12 +470,13 @@ export function renderReportHtml(run, evidenceDataUris = {}) {
     }
 
     parts.push("<h2>Stages</h2>");
-    parts.push("<table><thead><tr><th>#</th><th>Stage</th><th>Status</th><th>Elapsed</th><th>Agents (planned)</th><th>Agents (used)</th><th>MCP</th><th>Models</th></tr></thead><tbody>");
+    parts.push("<table><thead><tr><th>#</th><th>Stage</th><th>Status</th><th>Done</th><th>Elapsed</th><th>Agents (planned)</th><th>Agents (used)</th><th>MCP</th><th>Models</th></tr></thead><tbody>");
     visibleStageEntries(run).forEach(({ stage, index }, visibleIndex) => {
         const observed = insight.perStage[index] || { agents: [], mcpServers: [], models: [] };
         parts.push(
             `<tr><td>${visibleIndex + 1}</td><td>${escHtml(stage.name)}</td>` +
             `<td><span class="badge ${escHtml(stage.status)}">${escHtml(stage.status)}</span></td>` +
+            `<td>${escHtml(stageDoneCount(run, stage) || "-")}</td>` +
             `<td>${escHtml(fmtDuration(stageElapsedMs(stage)))}</td>` +
             `<td>${escHtml((stage.agents || []).join(", ") || "-")}</td>` +
             `<td>${escHtml(observed.agents.join(", ") || "-")}</td>` +

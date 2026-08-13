@@ -33,7 +33,9 @@ App, instead of plain chat narration.
   review. When the original user prompt is provided to `start_run`, it is shown
   near the top of the run detail and included in exported reports. The elapsed
   time for each stage is shown on its own second line when timing data is
-  available. The `finish_run` **Summary** is rendered as a highlighted block at
+  available. When a stage completes more than once in the same run, such as after
+  Personal Validation requests changes and implementation validation repeats, the
+  stage shows a `Done Nx` count badge. The `finish_run` **Summary** is rendered as a highlighted block at
   the end of the run, includes the total token cost/usage when telemetry is
   available, and is reachable from the stage navigation.
 - An **Insight** panel showing total tool calls, elapsed time, measured tool
@@ -134,10 +136,16 @@ Canvas id: `orch-dashboard`. Actions:
   depth, and the Personal Validation decision (`pending` / `approved` /
   `rejected`). Because it lives in the run JSON, it survives compaction and
   session resume — a pull request must never be created while approval is
-  `pending`.
+  `pending` or `rejected`. When Personal Validation requests changes, keep the
+  same run, record `approval: "rejected"`, reopen the relevant earlier stage, and
+  reset to `approval: "pending"` before the revised Personal Validation handoff.
 - `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput?, links?, scenarios?, monitoring? })`
   Call at the start of a stage (`status: "in_progress"`) and again when it
-  finishes, with the result captured in `output`. For Personal Validation, pass `links` such as the running app URL, Aspire dashboard URL, health page, or focused review route so the dashboard renders direct open buttons. For QA/validation stages,
+  finishes, with the result captured in `output`. Each transition to `done` increments
+  that stage's completion count, which is shown in the live dashboard and exported
+  reports. For Personal Validation, pass `links` such as the running app URL, Aspire
+  dashboard URL, health page, or focused review route so the dashboard renders direct
+  open buttons. For QA/validation stages,
   also pass:
   - `scenarios: [{ name, status: "pass"|"fail"|"flaky", notes?, evidence?: [{ type?, path, description? }] }]`
     — one entry per tested scenario. `evidence[].path` is resolved against the
