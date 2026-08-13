@@ -131,13 +131,13 @@ export function renderShell() {
   .tag.mcp { background: rgba(9,105,218,0.12); color: var(--true-color-blue, #0969da); }
   .tag.model { background: rgba(31,136,61,0.12); color: #1f883d; }
   .stage-output {
-    white-space: pre-wrap;
-    font-family: var(--font-mono, "SFMono-Regular", Consolas, monospace);
-    font-size: var(--text-code-inline, 12px);
+    font-size: var(--text-body-medium, 14px);
+    line-height: 1.55;
     background: var(--background-color-muted, rgba(127,127,127,0.06));
-    border-radius: 6px;
-    padding: 7px 10px;
-    margin-top: 4px;
+    border: 1px solid var(--border-color-default, rgba(127,127,127,0.18));
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 6px;
   }
   .stage-output-wrap { margin-top: 4px; }
   .stage-output.clamped {
@@ -146,6 +146,31 @@ export function renderShell() {
     -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
   }
+  .stage-output :first-child { margin-top: 0; }
+  .stage-output :last-child { margin-bottom: 0; }
+  .stage-output h3,
+  .stage-output h4,
+  .stage-output h5,
+  .stage-output h6 {
+    margin: 12px 0 6px;
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: 1.25;
+  }
+  .stage-output h3 { font-size: 15px; padding-bottom: 4px; border-bottom: 1px solid var(--border-color-default, rgba(127,127,127,0.18)); }
+  .stage-output h4 { font-size: 14px; }
+  .stage-output h5,
+  .stage-output h6 { font-size: 13px; color: var(--text-color-muted, #59636e); }
+  .stage-output p { margin: 0 0 8px; }
+  .stage-output ul,
+  .stage-output ol { margin: 4px 0 10px; padding-left: 24px; }
+  .stage-output li { margin: 3px 0; }
+  .stage-output code { font-family: var(--font-mono, "SFMono-Regular", Consolas, monospace); font-size: 12px; background: rgba(127,127,127,0.12); border-radius: 4px; padding: 1px 4px; }
+  .stage-output pre { margin: 8px 0 10px; padding: 8px 10px; overflow-x: auto; background: rgba(127,127,127,0.1); border-radius: 6px; }
+  .stage-output pre code { display: block; padding: 0; background: transparent; white-space: pre; }
+  .stage-output blockquote { margin: 8px 0 10px; padding-left: 10px; border-left: 3px solid var(--border-color-default, #d0d7de); color: var(--text-color-muted, #59636e); }
+  .stage-output a { color: var(--true-color-blue, #0969da); text-decoration: none; }
+  .stage-output a:hover { text-decoration: underline; }
+  .stage-output-actions { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
   .show-more {
     background: transparent;
     border: none;
@@ -155,9 +180,57 @@ export function renderShell() {
     font-weight: var(--font-weight-semibold, 600);
     cursor: pointer;
     padding: 2px 0;
-    margin-top: 2px;
   }
-  .show-more:hover { text-decoration: underline; }
+  .rich-viewer-open {
+    background: transparent;
+    border: none;
+    color: var(--true-color-blue, #0969da);
+    font: inherit;
+    font-size: 12px;
+    font-weight: var(--font-weight-semibold, 600);
+    cursor: pointer;
+    padding: 2px 0;
+  }
+  .show-more:hover,
+  .rich-viewer-open:hover { text-decoration: underline; }
+  .rich-viewer[hidden] { display: none; }
+  .rich-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-end;
+    background: rgba(31,35,40,0.45);
+  }
+  .rich-viewer-panel {
+    width: min(820px, 92vw);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--background-color-default, #ffffff);
+    color: var(--text-color-default, #1f2328);
+    box-shadow: -16px 0 36px rgba(31,35,40,0.24);
+  }
+  .rich-viewer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-color-default, #d0d7de);
+  }
+  .rich-viewer-title { margin: 0; font-size: var(--text-body-large, 16px); }
+  .rich-viewer-close {
+    border: 1px solid var(--border-color-default, #d0d7de);
+    border-radius: 6px;
+    background: var(--background-color-default, #ffffff);
+    color: var(--text-color-default, #1f2328);
+    cursor: pointer;
+    padding: 4px 9px;
+  }
+  .rich-viewer-body { overflow: auto; padding: 18px; }
+  .rich-viewer-body .stage-output { max-height: none; margin-top: 0; }
   .stage-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
   .stage-link {
     display: inline-flex;
@@ -233,6 +306,8 @@ export function renderShell() {
   .original-prompt pre { white-space: pre-wrap; margin: 0; font: inherit; color: inherit; }
   .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
   .header-actions { display: flex; align-items: center; gap: 8px; }
+  .report-link { color: var(--true-color-blue, #0969da); font-size: 12px; font-weight: var(--font-weight-semibold, 600); text-decoration: none; }
+  .report-link:hover { text-decoration: underline; }
   .subtitle { color: var(--text-color-muted, #59636e); font-size: 12px; margin: 0 0 16px; }
   .insight { margin-top: 20px; }
   .insight h2 { font-size: var(--text-body-large, 15px); margin: 0 0 8px; }
@@ -259,6 +334,15 @@ export function renderShell() {
 <body>
   <div id="runs"><h1>Orchestrations</h1><div id="run-list"></div></div>
   <div id="detail"><div class="empty">Select a run to see progress and output.</div></div>
+  <div id="rich-viewer" class="rich-viewer" hidden>
+    <section class="rich-viewer-panel" role="dialog" aria-modal="true" aria-labelledby="rich-viewer-title">
+      <header class="rich-viewer-head">
+        <h2 id="rich-viewer-title" class="rich-viewer-title">Rich output</h2>
+        <button class="rich-viewer-close" type="button" data-rich-viewer-close>Close</button>
+      </header>
+      <div class="rich-viewer-body"><div id="rich-viewer-content" class="stage-output"></div></div>
+    </section>
+  </div>
   <script>
     const STATUS_LABEL = ${JSON.stringify(STATUS_LABEL)};
     let runs = [];
@@ -516,7 +600,7 @@ export function renderShell() {
 
     function renderSummaryBlock(run, withHeading) {
       if (!run.summary) return "";
-      return '<div class="summary" id="summary-block">' + (withHeading ? '<h2>Summary</h2>' : "") + esc(run.summary) + renderSummaryCost(run) + '</div>';
+      return '<div class="summary" id="summary-block">' + (withHeading ? '<h2>Summary</h2>' : "") + '<div class="stage-output">' + renderMarkdownBlocks(run.summary) + '</div>' + renderSummaryCost(run) + '</div>';
     }
 
 
@@ -593,20 +677,165 @@ export function renderShell() {
       return '<div class="stage-used">' + pills.join("") + '</div>';
     }
 
+    function renderInlineMarkdown(value) {
+      const raw = String(value ?? "");
+      const codeSpans = [];
+      const withPlaceholders = raw.replace(/\`([^\`]+)\`/g, (_m, code) => {
+        const key = "@@ORCH_DASHBOARD_CODE_SPAN_" + codeSpans.length + "@@";
+        codeSpans.push('<code>' + esc(code) + '</code>');
+        return key;
+      });
+      let html = esc(withPlaceholders);
+      html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|#[^\s)]+|\/[^\s)]+)\)/g, (_m, label, href) => {
+        return '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+      });
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+      html = html.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+      html = html.replace(/(^|[\s(])_([^_\n]+)_/g, '$1<em>$2</em>');
+      codeSpans.forEach((span, i) => {
+        html = html.replace(new RegExp("@@ORCH_DASHBOARD_CODE_SPAN_" + i + "@@", "g"), span);
+      });
+      return html;
+    }
+
+    function renderMarkdownBlocks(value) {
+      const lines = String(value ?? "").replace(/\r\n?/g, "\n").split("\n");
+      const parts = [];
+      let paragraph = [];
+      let listType = null;
+      let inCode = false;
+      let codeLines = [];
+
+      function closeParagraph() {
+        if (!paragraph.length) return;
+        parts.push('<p>' + renderInlineMarkdown(paragraph.join(" ").trim()) + '</p>');
+        paragraph = [];
+      }
+
+      function closeList() {
+        if (!listType) return;
+        parts.push('</' + listType + '>');
+        listType = null;
+      }
+
+      function openList(type) {
+        if (listType === type) return;
+        closeList();
+        parts.push('<' + type + '>');
+        listType = type;
+      }
+
+      function closeCode() {
+        parts.push('<pre><code>' + esc(codeLines.join("\n")) + '</code></pre>');
+        codeLines = [];
+        inCode = false;
+      }
+
+      lines.forEach((line) => {
+        if (/^\s*/.test(line) && line.trim().startsWith(String.fromCharCode(96, 96, 96))) {
+          closeParagraph();
+          closeList();
+          if (inCode) {
+            closeCode();
+          } else {
+            inCode = true;
+            codeLines = [];
+          }
+          return;
+        }
+
+        if (inCode) {
+          codeLines.push(line);
+          return;
+        }
+
+        if (!line.trim()) {
+          closeParagraph();
+          closeList();
+          return;
+        }
+
+        const heading = line.match(/^(#{1,6})\s+(.+)$/);
+        if (heading) {
+          closeParagraph();
+          closeList();
+          const level = Math.min(6, heading[1].length + 2);
+          parts.push('<h' + level + '>' + renderInlineMarkdown(heading[2].trim()) + '</h' + level + '>');
+          return;
+        }
+
+        const unordered = line.match(/^\s*[-*+]\s+(.+)$/);
+        if (unordered) {
+          closeParagraph();
+          openList("ul");
+          parts.push('<li>' + renderInlineMarkdown(unordered[1].trim()) + '</li>');
+          return;
+        }
+
+        const ordered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+        if (ordered) {
+          closeParagraph();
+          openList("ol");
+          parts.push('<li>' + renderInlineMarkdown(ordered[1].trim()) + '</li>');
+          return;
+        }
+
+        const quote = line.match(/^>\s?(.+)$/);
+        if (quote) {
+          closeParagraph();
+          closeList();
+          parts.push('<blockquote>' + renderInlineMarkdown(quote[1].trim()) + '</blockquote>');
+          return;
+        }
+
+        closeList();
+        paragraph.push(line.trim());
+      });
+
+      if (inCode) closeCode();
+      closeParagraph();
+      closeList();
+      return parts.join("");
+    }
+
     // Long stage output is clamped by default with a Show more/less toggle so a
-    // wall of monospace text doesn't dominate the panel; short output renders
-    // in full with no toggle.
-    function renderStageOutput(output) {
+    // wall of detail doesn't dominate the panel; short output renders in full
+    // with no toggle.
+    function renderStageOutput(output, title) {
       if (!output) return "";
       const text = String(output);
-      const long = text.split("\\n").length > 8 || text.length > 600;
+      const long = text.split("\n").length > 8 || text.length > 600;
+      const html = renderMarkdownBlocks(text);
+      const actions = '<div class="stage-output-actions">' +
+        (long ? '<button class="show-more" type="button">Show more</button>' : "") +
+        '<button class="rich-viewer-open" type="button" data-viewer-title="' + esc(title || "Stage output") + '">Open rich view</button>' +
+      '</div>';
       if (!long) {
-        return '<div class="stage-output-wrap"><div class="stage-output">' + esc(text) + '</div></div>';
+        return '<div class="stage-output-wrap"><div class="stage-output">' + html + '</div>' + actions + '</div>';
       }
       return '<div class="stage-output-wrap">' +
-        '<div class="stage-output clamped">' + esc(text) + '</div>' +
-        '<button class="show-more" type="button">Show more</button>' +
+        '<div class="stage-output clamped">' + html + '</div>' +
+        actions +
       '</div>';
+    }
+
+    function openRichViewer(title, html) {
+      const modal = document.getElementById("rich-viewer");
+      const heading = document.getElementById("rich-viewer-title");
+      const content = document.getElementById("rich-viewer-content");
+      if (!modal || !heading || !content) return;
+      heading.textContent = title || "Rich output";
+      content.innerHTML = html || "";
+      modal.hidden = false;
+    }
+
+    function closeRichViewer() {
+      const modal = document.getElementById("rich-viewer");
+      const content = document.getElementById("rich-viewer-content");
+      if (!modal || !content) return;
+      modal.hidden = true;
+      content.innerHTML = "";
     }
 
     function renderStageLinks(links) {
@@ -697,7 +926,7 @@ export function renderShell() {
           '<div class="stage-head"><span class="stage-name">' + esc(s.name) + '</span>' + badge(s.status) + '</div>' +
           renderStageElapsed(s) +
           renderStageMeta(run, i, s) +
-          renderStageOutput(s.output) +
+          renderStageOutput(s.output, s.name) +
           renderStageLinks(s.links) +
           inlineSummary +
           renderScenarios(run.id, s.scenarios) +
@@ -710,7 +939,7 @@ export function renderShell() {
         : "";
       el.innerHTML =
         '<div class="header-row"><h1 style="margin:0;">' + esc(run.title) + '</h1>' +
-          '<div class="header-actions">' + badge(run.status) + '</div>' +
+          '<div class="header-actions"><a class="report-link" href="/api/runs/' + encodeURIComponent(run.id) + '/report.html?inline=1" target="_blank" rel="noopener">Open HTML report</a>' + badge(run.status) + '</div>' +
         '</div>' +
         '<p class="subtitle">' + esc(run.skillId) + ' &middot; started ' + esc(new Date(run.startedAt).toLocaleString()) +
           (run.updatedAt ? ' &middot; updated ' + esc(new Date(run.updatedAt).toLocaleString()) : "") +
@@ -730,7 +959,8 @@ export function renderShell() {
     function wireDetailHandlers() {
       document.querySelectorAll("#detail .show-more").forEach((btn) => {
         btn.addEventListener("click", () => {
-          const out = btn.previousElementSibling;
+          const wrap = btn.closest(".stage-output-wrap");
+          const out = wrap && wrap.querySelector(".stage-output");
           if (!out) return;
           const clamped = out.classList.toggle("clamped");
           btn.textContent = clamped ? "Show more" : "Show less";
@@ -739,6 +969,27 @@ export function renderShell() {
       document.querySelectorAll("#detail .qa-evidence-image-button").forEach((btn) => {
         btn.addEventListener("click", () => openEvidenceLightbox(btn.dataset.fullSrc, btn.dataset.label));
       });
+      document.querySelectorAll("#detail .rich-viewer-open").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const wrap = btn.closest(".stage-output-wrap");
+          const out = wrap && wrap.querySelector(".stage-output");
+          if (!out) return;
+          openRichViewer(btn.dataset.viewerTitle || "Rich output", out.innerHTML);
+        });
+      });
+      const modal = document.getElementById("rich-viewer");
+      if (modal && !modal.dataset.wired) {
+        modal.dataset.wired = "true";
+        modal.querySelectorAll("[data-rich-viewer-close]").forEach((btn) => {
+          btn.addEventListener("click", closeRichViewer);
+        });
+        modal.addEventListener("click", (ev) => {
+          if (ev.target === modal) closeRichViewer();
+        });
+        document.addEventListener("keydown", (ev) => {
+          if (ev.key === "Escape" && !modal.hidden) closeRichViewer();
+        });
+      }
     }
 
     let evidenceLightbox = null;
@@ -783,7 +1034,7 @@ export function renderShell() {
       if (!evidenceLightbox) return;
       evidenceLightbox.hidden = true;
       evidenceLightbox.querySelector("img").removeAttribute("src");
-    }
+    }    }
 
     function evidenceError(img) {
       const ph = document.createElement("span");

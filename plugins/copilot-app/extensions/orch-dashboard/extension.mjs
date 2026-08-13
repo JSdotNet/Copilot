@@ -319,7 +319,9 @@ async function startServer(instanceId, baseDir) {
                 const evidenceDataUris = await collectEvidenceDataUris(session, run);
                 const filename = `${run.skillId}-${run.id}.html`.replace(/[^a-zA-Z0-9._-]/g, "-");
                 res.setHeader("Content-Type", "text/html; charset=utf-8");
-                res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+                if (url.searchParams.get("inline") !== "1") {
+                    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+                }
                 res.end(renderReportHtml(run, evidenceDataUris));
                 return;
             }
