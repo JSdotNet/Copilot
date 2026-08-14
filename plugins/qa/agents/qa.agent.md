@@ -1,6 +1,73 @@
 ---
 description: "QA Agent — runs Aspire-orchestrated apps, validates features end-to-end with Playwright MCP (screenshots/video evidence), and continuously monitors Aspire logs/traces during test execution."
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal']
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'execute/createAndRunTask'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'get_resources'
+  - 'get_resource_logs'
+  - 'get_traces'
+  - 'get_metrics'
+  - 'get_console_logs'
+  - 'aspire_get_resources'
+  - 'aspire_get_resource_logs'
+  - 'aspire_get_traces'
+  - 'aspire_get_metrics'
+  - 'aspire_get_console_logs'
+  - 'browser_click'
+  - 'browser_close'
+  - 'browser_console_messages'
+  - 'browser_drag'
+  - 'browser_drop'
+  - 'browser_evaluate'
+  - 'browser_file_upload'
+  - 'browser_fill_form'
+  - 'browser_find'
+  - 'browser_handle_dialog'
+  - 'browser_hover'
+  - 'browser_navigate'
+  - 'browser_navigate_back'
+  - 'browser_network_request'
+  - 'browser_network_requests'
+  - 'browser_press_key'
+  - 'browser_resize'
+  - 'browser_select_option'
+  - 'browser_snapshot'
+  - 'browser_start_tracing'
+  - 'browser_stop_tracing'
+  - 'browser_tabs'
+  - 'browser_take_screenshot'
+  - 'browser_type'
+  - 'browser_wait_for'
+  - 'playwright-browser_click'
+  - 'playwright-browser_close'
+  - 'playwright-browser_console_messages'
+  - 'playwright-browser_drag'
+  - 'playwright-browser_drop'
+  - 'playwright-browser_evaluate'
+  - 'playwright-browser_file_upload'
+  - 'playwright-browser_fill_form'
+  - 'playwright-browser_find'
+  - 'playwright-browser_handle_dialog'
+  - 'playwright-browser_hover'
+  - 'playwright-browser_navigate'
+  - 'playwright-browser_navigate_back'
+  - 'playwright-browser_network_request'
+  - 'playwright-browser_network_requests'
+  - 'playwright-browser_press_key'
+  - 'playwright-browser_resize'
+  - 'playwright-browser_select_option'
+  - 'playwright-browser_snapshot'
+  - 'playwright-browser_tabs'
+  - 'playwright-browser_take_screenshot'
+  - 'playwright-browser_type'
+  - 'playwright-browser_wait_for'
 ---
 
 # QA Agent
@@ -25,7 +92,10 @@ called-out) Aspire log/trace review.
 
 - **Aspire CLI / Aspire MCP server** — to run the distributed app and to monitor logs, traces, metrics, and resource health during the test.
 - **Playwright MCP server** — to drive the browser, capture accessibility snapshots, take screenshots, and record video.
-- If either MCP server is unavailable, stop and tell the user to configure it first. See [Setup](#setup).
+- If either MCP server is unavailable in the active tool surface, stop and name the missing
+  server and missing tool family. If the server is configured for normal sessions but absent
+  here, report it as a child-agent tool exposure problem instead of asking the user to rerun
+  the same validation. See [Setup](#setup).
 
 ## Scope
 
