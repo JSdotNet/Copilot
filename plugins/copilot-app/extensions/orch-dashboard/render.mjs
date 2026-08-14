@@ -71,7 +71,7 @@ export function renderShell() {
   .stage-nav { margin: 0 0 8px 6px; padding-left: 8px; border-left: 1px solid var(--border-color-default, #d0d7de); }
   .stage-nav-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     width: 100%;
     text-align: left;
@@ -86,7 +86,9 @@ export function renderShell() {
   }
   .stage-nav-item:hover { background: var(--background-color-muted, rgba(127,127,127,0.08)); }
   .stage-nav-item.active { background: var(--background-color-muted, rgba(127,127,127,0.12)); font-weight: var(--font-weight-semibold, 600); }
-  .stage-nav-item .stage-nav-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stage-nav-content { flex: 1; min-width: 0; }
+  .stage-nav-item .stage-nav-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stage-nav-meta { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; line-height: 16px; color: var(--text-color-muted, #59636e); font-weight: var(--font-weight-normal, 400); }
   .stage-nav-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; background: var(--text-color-muted, #59636e); }
   .stage-nav-dot.in_progress { background: var(--true-color-blue, #0969da); }
   .stage-nav-dot.done { background: #1f883d; }
@@ -391,7 +393,10 @@ export function renderShell() {
       const items = visibleStages(run).map(({ stage: s, index: i }) => (
         '<button class="stage-nav-item ' + (activeStage === i ? "active" : "") + '" data-stage="' + i + '">' +
           '<span class="stage-nav-dot ' + esc(s.status) + '"></span>' +
-          '<span class="stage-nav-name">' + esc(s.name) + '</span>' +
+          '<span class="stage-nav-content">' +
+            '<span class="stage-nav-name">' + esc(s.name) + '</span>' +
+            renderStageNavMeta(run, i, s) +
+          '</span>' +
           badge(s.status) +
         '</button>'
       ));
@@ -407,7 +412,19 @@ export function renderShell() {
       }
       return '<div class="stage-nav">' + items.join("") + '</div>';
     }
-
+    function renderStageNavMeta(run, index, stage) {
+      const insight = run.insightSummary && run.insightSummary.perStage && run.insightSummary.perStage[index];
+      const agents = mergeAgentLabels(((stage && stage.agents) || []).concat((insight && insight.agents) || []));
+      const models = ((insight && insight.models) || []).filter(Boolean).sort();
+      const elapsed = stageElapsedMs(stage);
+      const parts = [];
+      if (agents.length) parts.push('Agent: ' + agents.join(', '));
+      if (models.length) parts.push('Model: ' + models.join(', '));
+      if (elapsed !== null) parts.push('Elapsed: ' + fmtDuration(elapsed));
+      if (!parts.length) return "";
+      const label = parts.join(' | ');
+      return '<span class="stage-nav-meta" title="' + esc(label) + '">' + esc(label) + '</span>';
+    }
     function scrollToStage(key) {
       activeStage = key === "summary" ? "summary" : Number(key);
       const id = key === "summary" ? "summary-block" : ("stage-" + key);
