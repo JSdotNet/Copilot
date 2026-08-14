@@ -299,14 +299,19 @@ export function renderShell() {
   .summary { margin-top: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(31,136,61,0.08); border-left: 3px solid #1f883d; }
   .summary h2 { font-size: var(--text-body-large, 15px); margin: 0 0 6px; }
   .summary-cost { margin-top: 8px; margin-bottom: 0; }
-  .original-prompt {
+  .prompt-history {
     margin: 0 0 14px;
     padding: 10px 12px;
     border-radius: 6px;
     background: var(--background-color-muted, rgba(127,127,127,0.06));
   }
-  .original-prompt h2 { font-size: var(--text-body-large, 15px); margin: 0 0 6px; }
-  .original-prompt pre { white-space: pre-wrap; margin: 0; font: inherit; color: inherit; }
+  .prompt-history h2 { font-size: var(--text-body-large, 15px); margin: 0 0 8px; }
+  .prompt-entry { border-top: 1px solid var(--border-color-default, rgba(127,127,127,0.18)); padding-top: 8px; margin-top: 8px; }
+  .prompt-entry:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+  .prompt-entry-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .prompt-entry-title { font-weight: var(--font-weight-semibold, 600); }
+  .prompt-entry-time { color: var(--text-color-muted, #59636e); font-size: 12px; white-space: nowrap; }
+  .prompt-entry pre { white-space: pre-wrap; margin: 0; font: inherit; color: inherit; }
   .header-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
   .header-actions { display: flex; align-items: center; gap: 8px; }
   .report-link { color: var(--true-color-blue, #0969da); font-size: 12px; font-weight: var(--font-weight-semibold, 600); text-decoration: none; }
@@ -622,9 +627,28 @@ export function renderShell() {
     }
 
 
-    function renderOriginalPrompt(run) {
-      if (!run.originalPrompt) return "";
-      return '<section class="original-prompt"><h2>Original prompt</h2><pre>' + esc(run.originalPrompt) + '</pre></section>';
+    function promptHistoryEntries(run) {
+      const prompts = Array.isArray(run && run.promptHistory) ? run.promptHistory.slice() : [];
+      if ((!prompts.length) && run && run.originalPrompt) {
+        prompts.push({ kind: "initial", label: "Initial prompt", prompt: run.originalPrompt, createdAt: run.startedAt });
+      }
+      return prompts.filter((p) => p && p.prompt);
+    }
+
+    function renderPromptHistory(run) {
+      const prompts = promptHistoryEntries(run);
+      if (!prompts.length) return "";
+      const items = prompts.map((p, index) => {
+        const fallback = p.kind === "initial" ? "Initial prompt" : "Follow-up prompt " + (index + 1);
+        const label = p.label || fallback;
+        const time = p.createdAt ? new Date(p.createdAt).toLocaleString() : "";
+        return '<article class="prompt-entry">' +
+          '<div class="prompt-entry-head"><span class="prompt-entry-title">' + esc(label) + '</span>' +
+          (time ? '<span class="prompt-entry-time">' + esc(time) + '</span>' : "") + '</div>' +
+          '<pre>' + esc(p.prompt) + '</pre>' +
+        '</article>';
+      }).join("");
+      return '<section class="prompt-history"><h2>Prompt history</h2>' + items + '</section>';
     }
 
     // Overall Insight-panel usage tags (full, unshortened labels). Kept
@@ -978,7 +1002,7 @@ export function renderShell() {
           (run.approval && run.approval.personalValidation
             ? ' &middot; personal validation: ' + esc(run.approval.personalValidation)
             : "") + '</p>' +
-        renderOriginalPrompt(run) +
+        renderPromptHistory(run) +
         stages +
         trailingSummary +
         renderInsight(run) +
