@@ -52,6 +52,10 @@ partial adoption is fully supported.
    it is self-contained (`build.mjs`, `graph.mjs`, `outline.mjs`, `metadata.mjs`,
    `README.md`) and has no dependencies beyond Node.
 
+   Also copy `tools/knowledge-tech/` into `.github/tools/knowledge-tech/` when
+   the repository adopts `.tech/`. These scripts provide deterministic .NET and
+   frontend package inventories for `knowledge-tech-update`.
+
 4. **Install the CI check.** Copy `assets/workflows/knowledge-meta.yml` from the
    plugin root into `.github/workflows/knowledge-meta.yml`, then trim the `paths`
    filters to the adopted folders and change the branch name if the repository's
