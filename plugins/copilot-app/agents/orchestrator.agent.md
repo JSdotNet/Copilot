@@ -54,18 +54,20 @@ consuming repository's optional runtime context file, whose convention is define
    availability with `list_canvas_capabilities`. Start without `extensionId`; if the host
    reports multiple providers, retry with the exact provider identifier it advertises for
    this extension, usually `plugin:copilot-app:orch-dashboard`. Do not use the package-level
-   identifier `plugin:copilot-app` as a canvas `extensionId`. Open the canvas with
-   `open_canvas` using the same resolved provider identifier when one was required, then
-   call `start_run` with `invoke_canvas_action`, the skill's `skillId`, the full ordered
-   stage list (unique stages + shared phases for its tier), and the `changeKind` when
-   known. `start_run` returns `resumed: true` when an `in_progress` run for the same skill
-   already exists -- in that case continue from the first stage that is not `done` rather
-   than restarting. Follow the shared **Dashboard Reporting Contract** for every stage
-   transition using `update_stage`, `set_run_context`, and `finish_run`. Skip canvas
-   calls gracefully only when the `orch-dashboard` extension is not installed. If the host
-   advertises `orch-dashboard` but any canvas tool or required action is unavailable, mark
-   the run blocked and report a tooling/runtime capability issue instead of falling back to
-   chat-only tracking.
+   identifier `plugin:copilot-app` as a canvas `extensionId`. Use the fixed canvas
+   `instanceId` `orch-dashboard` for every orchestration in the session; re-opening the same
+   instance focuses the existing panel, while a new instance ID creates another dashboard
+   tab. Open the canvas with `open_canvas` using the same resolved provider identifier when
+   one was required, then call `start_run` with `invoke_canvas_action`, the skill's
+   `skillId`, the full ordered stage list (unique stages + shared phases for its tier), and
+   the `changeKind` when known. `start_run` returns `resumed: true` when an `in_progress`
+   run for the same skill already exists -- in that case continue from the first stage that
+   is not `done` rather than restarting. Follow the shared **Dashboard Reporting Contract**
+   for every stage transition using `update_stage`, `set_run_context`, and `finish_run` on
+   the same `orch-dashboard` instance. Skip canvas calls gracefully only when the
+   `orch-dashboard` extension is not installed. If the host advertises `orch-dashboard` but
+   any canvas tool or required action is unavailable, mark the run blocked and report a
+   tooling/runtime capability issue instead of falling back to chat-only tracking.
 5. **Apply the resolved model at every stage transition.** When creating a session, spawning
    a task, or starting a child/background session (for example the parallel `qa:qa-monitor`
    session) for a stage, pass the model resolved for that stage's category. No agent invoked

@@ -444,9 +444,12 @@ not identify a registered canvas provider.
   silently fall back to chat-only tracking; block the orchestration and report the missing
   capability.
 
-- **Open** canvas `orch-dashboard` with the same resolved provider identifier when one was
-  required, then call `start_run` with the skill's `skillId`, the full ordered stage list
-  (its skill-specific stages followed by the shared phase names for its tier), and the
+- **Open** canvas `orch-dashboard` with the fixed `instanceId` `orch-dashboard` and the same
+  resolved provider identifier when one was required. This is the only supported
+  already-open check: re-opening that same instance focuses the existing dashboard panel;
+  choosing a new instance ID opens another tab. Then call `start_run` against the same
+  `orch-dashboard` instance with the skill's `skillId`, the full ordered stage list (its
+  skill-specific stages followed by the shared phase names for its tier), and the
   `changeKind` when it is already known. `start_run` reattaches to an
   existing `in_progress` run for the same skill and returns `resumed: true`; continue from
   the first stage that is not `done` instead of restarting the orchestration.
