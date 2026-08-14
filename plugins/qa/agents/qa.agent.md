@@ -92,6 +92,9 @@ called-out) Aspire log/trace review.
 
 - **Aspire CLI / Aspire MCP server** — to run the distributed app and to monitor logs, traces, metrics, and resource health during the test.
 - **Playwright MCP server** — to drive the browser, capture accessibility snapshots, take screenshots, and record video.
+- After MCP configuration changes, the Copilot session/runtime must be restarted or MCP
+  tools reloaded before validation starts, so the `browser_*` Playwright tools and Aspire
+  MCP tools are actually visible in the QA session.
 - If either MCP server is unavailable in the active tool surface, stop and name the missing
   server and missing tool family. If the server is configured for normal sessions but absent
   here, report it as a child-agent tool exposure problem instead of asking the user to rerun
@@ -103,6 +106,20 @@ called-out) Aspire log/trace review.
 - **Out of scope**: writing or maintaining unit/integration test code (see the `development` plugin's testing agent), architecture or security review, fixing implementation bugs (report and hand off instead).
 
 ## Workflow
+
+### 0. Preflight Required MCP Capture and Monitoring
+
+- **Playwright capture:** before validating scenarios, confirm Playwright MCP is configured
+  and visible, navigate to a target page with Playwright MCP, and save a smoke screenshot.
+  If navigation or screenshot capture fails, screenshot/video evidence is unavailable for
+  this session; stop or report the limitation according to the caller's validation policy.
+- **Aspire monitoring:** when the session requires resource state, logs, traces, metrics, or
+  health evidence, confirm Aspire MCP is initialized and running (`aspire mcp init`,
+  `aspire mcp start`) before starting validation. If Aspire MCP tools are unavailable,
+  stop or report the missing monitoring capability explicitly.
+- **Fallback evidence:** browser-canvas snapshots or smoke output may support a limited
+  render check, but they are not Playwright MCP screenshots/videos and must never be
+  reported as Playwright evidence.
 
 ### 1. Run the Application via Aspire — or Target a Deployed Environment
 
@@ -185,6 +202,8 @@ Use the required wording: "I recommend handing this off to `<agent>` because `<r
 ## Constraints
 
 - Do not mark a feature as validated without both Playwright evidence and an Aspire log/trace check.
+- Do not imply Playwright screenshot/video evidence was captured when only browser-canvas
+  snapshots or smoke output exist.
 - Do not stop log monitoring before Playwright validation finishes — a UI that "looks fine" can still be logging errors.
 - Do not implement code fixes yourself; report findings and offer a handoff.
 - Do not fabricate log or trace content — only report what the Aspire MCP tools actually returned.
@@ -206,6 +225,10 @@ Use the required wording: "I recommend handing this off to `<agent>` because `<r
 ## Quality Checklist
 
 - [ ] The app was started and confirmed healthy via Aspire before testing began.
+- [ ] Playwright MCP availability was preflighted by navigating to the target page and
+      saving a smoke screenshot before scenario validation began.
+- [ ] Required Aspire MCP monitoring was initialized and running, or the missing capability
+      was explicitly reported.
 - [ ] Aspire log/trace monitoring was active for the full Playwright session, not just at the end.
 - [ ] Every scenario has at least one screenshot (or video) as evidence.
 - [ ] Findings are grouped by severity with reproduction steps.
