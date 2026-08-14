@@ -30,8 +30,10 @@ App, instead of plain chat narration.
   compressed monospace text. Each stage output also includes an **Open rich view**
   action for a focused rich-text reading panel, and the run header links to an
   inline **HTML report** with the same rich rendering for sharing or browser
-  review. When the original user prompt is provided to `start_run`, it is shown
-  near the top of the run detail and included in exported reports. The elapsed
+  review. When prompt history is provided to `start_run` or appended through
+  `record_prompt`, the run detail shows a separate **Prompt history** section
+  with the initial prompt and each follow-up prompt; exported reports include
+  the same section. The elapsed
   time for each stage is shown on its own second line when timing data is
   available. When a stage completes more than once in the same run, such as after
   Personal Validation requests changes and implementation validation repeats, the
@@ -117,7 +119,7 @@ App, instead of plain chat narration.
 
 Canvas id: `orch-dashboard`. Actions:
 
-- `start_run({ skillId, title, stages: [{ name, agents? }], originalPrompt?, githubIssue?, changeKind?, resume? })` ->
+- `start_run({ skillId, title, stages: [{ name, agents? }], originalPrompt?, promptHistory?, githubIssue?, changeKind?, resume? })` ->
   `{ runId, resumed }`
   Call once at the start of an orchestration, listing every stage up front —
   including a **Personal Validation** stage, a separate **Create Pull Request**
@@ -131,6 +133,15 @@ Canvas id: `orch-dashboard`. Actions:
   that initiated the run. `githubIssue` stores originating issue metadata (for
   example `{ owner, repo, number, url, title }`); when omitted, a declared
   **GitHub Issue Update** stage is hidden because it is not relevant.
+  `promptHistory` accepts entries shaped as `{ kind?: "initial"|"follow-up",
+  label?, prompt, createdAt? }`; `originalPrompt` is automatically treated as
+  the initial prompt for backward compatibility.
+- `record_prompt({ runId, prompt, kind?, label?, createdAt? })` ->
+  `{ ok, count }`
+  Append a prompt to the run-level **Prompt history** section. Use
+  `kind: "initial"` for a missing initial prompt or omit `kind` for follow-up
+  prompts. `createdAt` defaults to the current time and `label` defaults to
+  **Initial prompt** or **Follow-up prompt**.
 - `set_run_context({ runId, changeKind?, approval?, approvalNote? })`
   Persist the run-level state that gates later phases: the change kind driving QA
   depth, and the Personal Validation decision (`pending` / `approved` /

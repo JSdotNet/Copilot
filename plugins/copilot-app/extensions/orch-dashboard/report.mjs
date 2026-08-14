@@ -55,6 +55,14 @@ function hasGithubIssue(run) {
     return Boolean(issue && (issue.url || issue.number || issue.issueNumber));
 }
 
+function promptHistoryEntries(run) {
+    const prompts = Array.isArray(run && run.promptHistory) ? run.promptHistory.slice() : [];
+    if (!prompts.length && run && run.originalPrompt) {
+        prompts.push({ kind: "initial", label: "Initial prompt", prompt: run.originalPrompt, createdAt: run.startedAt });
+    }
+    return prompts.filter((p) => p && p.prompt);
+}
+
 function visibleStageEntries(run) {
     return (run.stages || [])
         .map((stage, index) => ({ stage, index }))
@@ -84,13 +92,21 @@ export function renderReportMarkdown(run) {
     }
     lines.push("");
 
-    if (run.originalPrompt) {
-        lines.push("## Original Prompt");
+    const promptHistory = promptHistoryEntries(run);
+    if (promptHistory.length) {
+        lines.push("## Prompt History");
         lines.push("");
-        lines.push("```text");
-        lines.push(run.originalPrompt);
-        lines.push("```");
-        lines.push("");
+        promptHistory.forEach((prompt, index) => {
+            const fallback = prompt.kind === "initial" ? "Initial prompt" : `Follow-up prompt ${index + 1}`;
+            const label = prompt.label || fallback;
+            const timestamp = prompt.createdAt ? ` — ${prompt.createdAt}` : "";
+            lines.push(`### ${index + 1}. ${label}${timestamp}`);
+            lines.push("");
+            lines.push("```text");
+            lines.push(prompt.prompt);
+            lines.push("```");
+            lines.push("");
+        });
     }
     lines.push("## Stages");
     lines.push("");
@@ -395,6 +411,7 @@ const REPORT_HTML_STYLE = `
   h2 { font-size: 17px; margin: 28px 0 8px; border-bottom: 1px solid #d0d7de; padding-bottom: 4px; }
   h3 { font-size: 14px; margin: 18px 0 6px; }
   .meta { color: #59636e; font-size: 13px; margin: 0 0 8px; }
+  .prompt-meta { color: #59636e; font-size: 12px; margin: -2px 0 6px; }
   table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 13px; }
   th, td { border: 1px solid #d0d7de; padding: 5px 8px; text-align: left; vertical-align: top; }
   th { background: rgba(127,127,127,0.08); }
@@ -465,8 +482,16 @@ export function renderReportHtml(run, evidenceDataUris = {}) {
     }
     parts.push(`<p class="meta">${metaBits.join(" &middot; ")}</p>`);
 
-    if (run.originalPrompt) {
-        parts.push(`<h2>Original Prompt</h2><pre>${escHtml(run.originalPrompt)}</pre>`);
+    const promptHistory = promptHistoryEntries(run);
+    if (promptHistory.length) {
+        parts.push("<h2>Prompt History</h2>");
+        promptHistory.forEach((prompt, index) => {
+            const fallback = prompt.kind === "initial" ? "Initial prompt" : `Follow-up prompt ${index + 1}`;
+            const label = prompt.label || fallback;
+            parts.push(`<h3>${index + 1}. ${escHtml(label)}</h3>`);
+            if (prompt.createdAt) parts.push(`<p class="prompt-meta">${escHtml(prompt.createdAt)}</p>`);
+            parts.push(`<pre>${escHtml(prompt.prompt)}</pre>`);
+        });
     }
 
     parts.push("<h2>Stages</h2>");

@@ -58,6 +58,7 @@ const VALID_SCENARIO_STATUSES = ["pass", "fail", "flaky"];
 const VALID_FINDING_LEVELS = ["error", "critical", "warning", "info"];
 const VALID_CHANGE_KINDS = ["new-functionality", "bug-fix", "dependency-update", "none"];
 const VALID_APPROVAL_STATES = ["pending", "approved", "rejected"];
+const VALID_PROMPT_KINDS = ["initial", "follow-up"];
 
 const EVIDENCE_CONTENT_TYPES = {
     ".png": "image/png",
@@ -195,6 +196,42 @@ function normalizeLinks(links) {
         }))
         .filter((link) => /^(https?:\/\/|\/)/i.test(link.url));
 }
+
+function normalizePromptEntry(entry, fallbackKind = "follow-up") {
+    if (!entry || typeof entry !== "object") return null;
+    const prompt = typeof entry.prompt === "string" ? entry.prompt.trim() : "";
+    if (!prompt) return null;
+    const kind = VALID_PROMPT_KINDS.includes(entry.kind) ? entry.kind : fallbackKind;
+    const createdAt = typeof entry.createdAt === "string" && entry.createdAt.trim()
+        ? entry.createdAt.trim()
+        : new Date().toISOString();
+    return {
+        kind,
+        label: typeof entry.label === "string" && entry.label.trim()
+            ? entry.label.trim()
+            : kind === "initial" ? "Initial prompt" : "Follow-up prompt",
+        prompt,
+        createdAt,
+    };
+}
+
+function normalizePromptHistory(originalPrompt, promptHistory, initialCreatedAt) {
+    const prompts = [];
+    const initial = typeof originalPrompt === "string" && originalPrompt.trim()
+        ? normalizePromptEntry({ kind: "initial", label: "Initial prompt", prompt: originalPrompt, createdAt: initialCreatedAt }, "initial")
+        : null;
+    if (initial) prompts.push(initial);
+    if (Array.isArray(promptHistory)) {
+        promptHistory.forEach((entry) => {
+            const normalized = normalizePromptEntry(entry);
+            if (!normalized) return;
+            if (normalized.kind === "initial" && prompts.some((p) => p.kind === "initial" && p.prompt === normalized.prompt)) return;
+            prompts.push(normalized);
+        });
+    }
+    return prompts;
+}
+
 function evidenceContentType(filePath) {
     const ext = path.extname(filePath).toLowerCase();
     return EVIDENCE_CONTENT_TYPES[ext] || "application/octet-stream";
@@ -421,6 +458,20 @@ const session = await joinSession({
                                 type: "string",
                                 description: "Original user prompt or request text that started this orchestration run.",
                             },
+                            promptHistory: {
+                                type: "array",
+                                description: "Optional full prompt history, including the initial prompt and any follow-up prompts already known.",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        kind: { type: "string", enum: VALID_PROMPT_KINDS },
+                                        label: { type: "string" },
+                                        prompt: { type: "string" },
+                                        createdAt: { type: "string" },
+                                    },
+                                    required: ["prompt"],
+                                },
+                            },
                             githubIssue: {
                                 type: "object",
                                 description: "Originating GitHub issue metadata. When omitted, GitHub Issue Update stages are hidden as not relevant.",
@@ -438,7 +489,7 @@ const session = await joinSession({
                         required: ["skillId", "title", "stages"],
                     },
                     handler: async (ctx) => {
-                        const { skillId, title, stages, originalPrompt, githubIssue, changeKind, resume } = ctx.input || {};
+                        const { skillId, title, stages, originalPrompt, promptHistory, githubIssue, changeKind, resume } = ctx.input || {};
                         if (!skillId || !title || !Array.isArray(stages) || stages.length === 0) {
                             throw new CanvasError("canvas_input_invalid", "skillId, title, and a non-empty stages[] are required.");
                         }
@@ -456,6 +507,9 @@ const session = await joinSession({
                                 return { runId: existing.id, resumed: true, run: existing };
                             }
                         }
+                        const normalizedOriginalPrompt = typeof originalPrompt === "string" && originalPrompt.trim() ? originalPrompt.trim() : "";
+                        const normalizedPromptHistory = normalizePromptHistory(normalizedOriginalPrompt, promptHistory);
+                        const initialPrompt = normalizedPromptHistory.find((entry) => entry.kind === "initial");
                         const run = {
                             id: newRunId(),
                             skillId,
@@ -463,7 +517,8 @@ const session = await joinSession({
                             status: "in_progress",
                             changeKind: changeKind || null,
                             approval: { personalValidation: "pending", decidedAt: null, note: "" },
-                            originalPrompt: typeof originalPrompt === "string" && originalPrompt.trim() ? originalPrompt.trim() : "",
+                            originalPrompt: normalizedOriginalPrompt || (initialPrompt ? initialPrompt.prompt : ""),
+                            promptHistory: normalizedPromptHistory,
                             phaseDoneCounts: {},
                             githubIssue: normalizeGithubIssue(githubIssue),
                             startedAt: new Date().toISOString(),
@@ -486,6 +541,43 @@ const session = await joinSession({
                         activeRunId = run.id;
                         bus.emit("update");
                         return { runId: run.id, resumed: false };
+                    },
+                },
+                {
+                    name: "record_prompt",
+                    description:
+                        "Append an initial or follow-up user prompt to a tracked run's prompt history so the dashboard and exported reports show the full session prompt sequence.",
+                    inputSchema: {
+                        type: "object",
+                        properties: {
+                            runId: { type: "string" },
+                            prompt: { type: "string", description: "User prompt text to record." },
+                            kind: { type: "string", enum: VALID_PROMPT_KINDS, description: "Prompt kind. Defaults to follow-up." },
+                            label: { type: "string", description: "Optional display label for the prompt." },
+                            createdAt: { type: "string", description: "Optional ISO timestamp. Defaults to now." },
+                        },
+                        required: ["runId", "prompt"],
+                    },
+                    handler: async (ctx) => {
+                        const { runId, prompt, kind, label, createdAt } = ctx.input || {};
+                        const entry = normalizePromptEntry({ prompt, kind, label, createdAt }, kind || "follow-up");
+                        if (!entry) throw new CanvasError("canvas_input_invalid", "prompt is required.");
+                        const baseDir = resolveBaseDir(session);
+                        let count = 0;
+                        await withRunLock(runId, async () => {
+                            const run = await readRun(baseDir, runId);
+                            if (!run) throw new CanvasError("run_not_found", `No run with id ${runId}`);
+                            run.promptHistory = normalizePromptHistory(run.originalPrompt, run.promptHistory, run.startedAt);
+                            const existingInitial = run.promptHistory.find((promptEntry) => promptEntry.kind === "initial");
+                            if (!run.originalPrompt && existingInitial) run.originalPrompt = existingInitial.prompt;
+                            if (entry.kind !== "initial" || !existingInitial) run.promptHistory.push(entry);
+                            if (entry.kind === "initial" && !run.originalPrompt) run.originalPrompt = entry.prompt;
+                            run.updatedAt = new Date().toISOString();
+                            count = run.promptHistory.length;
+                            await writeRun(baseDir, run);
+                        });
+                        bus.emit("update");
+                        return { ok: true, count };
                     },
                 },
                 {
