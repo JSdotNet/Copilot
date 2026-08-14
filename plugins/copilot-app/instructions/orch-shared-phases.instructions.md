@@ -230,6 +230,21 @@ invokes it and passes the change kind so depth is selected automatically:
     available, mark **QA Validation** `blocked`, prompt the user with the missing server or
     tool names and setup action needed, and stop before Personal Validation. Do not mark
     the phase `done` with a degraded/manual fallback.
+  - **Preflight Playwright capture before scenarios.** Ensure the consuming session has a
+    Playwright MCP server configured before QA starts, for example
+    `{"servers":{"playwright":{"command":"npx","args":["-y","@playwright/mcp@latest"]}}}`,
+    then restart/reload the Copilot runtime so the `browser_*` tools are visible. Before
+    validating scenarios, use Playwright MCP to navigate to a target page and take a
+    screenshot. If that smoke check fails, screenshot/video capture is unavailable; block
+    or report the limitation according to this phase's required tooling policy.
+  - **Preflight Aspire monitoring when required.** For Aspire apps whose validation
+    requires resource state, logs, traces, metrics, or health evidence, run
+    `aspire mcp init` and `aspire mcp start` before validation or clearly block/report the
+    missing monitoring capability.
+  - **Label fallback evidence accurately.** Browser-canvas snapshots and smoke output may
+    show that an app rendered, but they are not Playwright MCP screenshots, videos, or
+    traces. Do not imply Playwright evidence was captured when only browser-canvas
+    evidence exists.
   - **Run the application locally** via the `qa:qa` agent using the `aspire` /
     `aspire-run` skill.
   - **Execute the changed/affected scenarios with Playwright** — via the `playwright` MCP
@@ -282,7 +297,11 @@ substitute for required MCP-backed browser automation, evidence capture, or moni
 **MCP Servers:** `playwright` *(required when browser-based validation, evidence capture,
 or requested screenshots/videos are part of the selected QA depth)*. If required MCP
 tooling is missing, mark the stage `blocked` with user-actionable setup guidance; never
-report a successful degraded fallback.
+report a successful degraded fallback. For required capture, Playwright MCP availability
+means the tools are configured, visible after a runtime restart/reload, and proven by a
+pre-scenario navigate-plus-screenshot smoke check. For required Aspire monitoring,
+initialize/start Aspire MCP before validation; browser-canvas snapshots or smoke output do
+not satisfy Playwright or Aspire MCP evidence requirements.
 
 **Skills Used:** `aspire`, `aspire-run`
 

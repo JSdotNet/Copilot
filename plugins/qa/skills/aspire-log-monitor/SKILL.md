@@ -15,11 +15,18 @@ interaction begins, and keep it running until every scenario is finished.
 
 ## Prerequisites
 
-The Aspire CLI MCP server must be running:
+The Aspire CLI MCP server must be initialized and running before validation that depends on
+resource state, logs, traces, metrics, or health evidence:
 
 ```bash
+aspire mcp init
 aspire mcp start
 ```
+
+If the Aspire MCP tools are not visible in the Copilot session after startup, restart the
+Copilot session/runtime or reload MCP tools before QA begins. If monitoring remains
+unavailable, report the missing capability explicitly and do not claim Aspire log/trace or
+resource-state evidence was captured.
 
 ## Available MCP Tools (CLI 13.1+)
 

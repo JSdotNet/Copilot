@@ -15,6 +15,21 @@ rely on static code reading to claim a feature works — prove it by running it.
 - The app under test is already running and healthy (see the `aspire-run` skill).
 - Aspire log/trace monitoring is already active (see the `aspire-log-monitor` skill) —
   start it before this skill, not after.
+- The Playwright MCP server is configured before QA starts, for example:
+
+  ```json
+  {
+    "servers": {
+      "playwright": {
+        "command": "npx",
+        "args": ["-y", "@playwright/mcp@latest"]
+      }
+    }
+  }
+  ```
+
+- The Copilot session/runtime has been restarted or MCP tools have been reloaded after
+  configuration, so the `browser_*` tools are visible in the validation session.
 
 ## Available Playwright MCP Tools (typical set)
 
@@ -33,6 +48,18 @@ Exact tool names depend on the installed Playwright MCP version — use `browser
 first on an unfamiliar page to confirm available element references before interacting.
 
 ## Workflow
+
+### 0. Preflight Capture
+
+Before scenario validation, prove capture works in this session:
+
+1. `browser_navigate` to the target page or a lightweight health/render page.
+2. `browser_take_screenshot` and save the smoke screenshot under the scenario evidence
+   folder.
+
+If navigation or screenshot capture fails, screenshot/video capture is unavailable. Stop or
+mark the limitation according to the caller's validation policy, and do not claim
+Playwright screenshot/video evidence was captured.
 
 ### 1. Define the Scenario
 
@@ -80,6 +107,8 @@ first on an unfamiliar page to confirm available element references before inter
   `browser_console_messages` and `browser_network_requests` output at that moment.
 - Evidence file paths must be included in the final QA report — do not describe a
   screenshot without a path the user can open.
+- Browser-canvas snapshots and smoke output can be cited only as browser-canvas fallback
+  evidence; they are not Playwright MCP screenshots, videos, or traces.
 
 ## Common Pitfalls
 

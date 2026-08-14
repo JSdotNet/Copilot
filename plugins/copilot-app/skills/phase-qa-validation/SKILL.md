@@ -46,6 +46,37 @@ tooling is available. Required tooling includes `playwright` for browser automat
 screenshots, videos, or any user-requested evidence capture, and any monitoring MCP/tooling
 declared by repo context or needed for the selected runtime validation.
 
+For Playwright-backed validation, the preflight is:
+
+1. Confirm the consuming repo/session has the Playwright MCP server configured before QA
+   starts, for example:
+
+   ```json
+   {
+     "servers": {
+       "playwright": {
+         "command": "npx",
+         "args": ["-y", "@playwright/mcp@latest"]
+       }
+     }
+   }
+   ```
+
+2. Confirm the Copilot session/runtime was restarted or MCP tools were reloaded after
+   configuration, so the `browser_*` Playwright tools are visible to the QA/orchestration
+   agent that will run validation.
+3. Run a live capture smoke check before scenarios: use Playwright MCP to navigate to the
+   target page and take a screenshot. If navigation or screenshot capture fails, screenshot
+   and video capture are unavailable for this run.
+
+For Aspire-backed monitoring, confirm Aspire MCP is initialized and running before
+validation when logs, traces, metrics, resources, or health evidence are required:
+
+```bash
+aspire mcp init
+aspire mcp start
+```
+
 If required MCP tooling is unavailable:
 
 - Mark **QA Validation** `blocked`, not `done` or `skipped`.
@@ -54,6 +85,10 @@ If required MCP tooling is unavailable:
 - Stop before Personal Validation, pull request creation, issue updates, or Summary.
 - Do not complete the phase through a degraded/manual fallback that omits required
   browser automation, evidence capture, or monitoring.
+- Do not describe browser-canvas snapshots or smoke output as Playwright MCP screenshots,
+  videos, or traces. They can be noted as fallback render evidence only when the selected
+  validation policy allows a degraded result; they do not satisfy required Playwright
+  evidence capture.
 
 Applies when the repository does not declare a QA depth in `.github/copilot-orch-context.md`.
 
@@ -143,6 +178,13 @@ or a restart, and do not ask the user to restart the app manually as the normal 
 - `playwright` is required for browser automation, smoke/E2E execution of browser-facing
   scenarios, and screenshot/video evidence capture. Evidence capture is required for new
   functionality and whenever the user explicitly requests it.
+- A quick Playwright MCP preflight must navigate to a target page and save a screenshot
+  before scenario validation begins. If that fails, screenshot/video evidence capture is
+  unavailable and the phase must report the limitation or block according to the selected
+  QA depth.
+- Aspire MCP is required when validation depends on Aspire resource state, logs, traces,
+  metrics, or health evidence. Initialize/start it with `aspire mcp init` and
+  `aspire mcp start` before validation, or block with a clear missing-monitoring report.
 - Missing required MCP tooling is a blocking prerequisite failure; stop and prompt the user
   for setup instead of completing QA through degraded fallback.
 
