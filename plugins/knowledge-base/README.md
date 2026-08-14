@@ -51,6 +51,16 @@ malformed `meta` blocks, inconsistent reading order, stale committed indexes.
 **Trigger keywords:** `knowledge-meta failed`, `broken reference`, `stale _meta`,
 `validate knowledge folders`, `knowledge base check`, `build.mjs --check`
 
+### Skill: `knowledge-tech-update`
+
+Refreshes a repository's `.tech/` technology graph from deterministic package
+inventories for .NET and frontend dependencies, then analyzes the repository for
+non-package technologies such as runtimes, services, platforms, protocols, and
+tooling before delegating graph authoring through `orch-tech`.
+
+**Trigger keywords:** `update technology graph`, `refresh .tech`,
+`technology inventory`, `.NET packages`, `frontend packages`, `package graph`
+
 ### Skill: `orch-arc42-content`
 
 Orchestrates direct content edits to `.arc42/` chapters — refreshing a chapter,
@@ -132,6 +142,17 @@ Output is deterministic — no timestamps — so a clean `git diff` proves the
 committed indexes are current. See `tools/knowledge-meta/README.md` for the
 output shape.
 
+### Tooling: `knowledge-tech`
+
+```bash
+node .github/tools/knowledge-tech/dotnet-packages.mjs --root .
+node .github/tools/knowledge-tech/frontend-packages.mjs --root .
+```
+
+The inventory scripts emit deterministic JSON from repository manifests. Use them
+as the source of truth for package-derived `.tech` facts; use repository analysis
+for technologies that do not appear in package manifests.
+
 ### Assets
 
 | File | Purpose |
@@ -169,6 +190,7 @@ After running `knowledge-base-init`, a repository that adopted everything has:
 _meta/{graph.json,index.json}          # repository-wide rollup
 .github/
 ├── tools/knowledge-meta/              # the generator
+├── tools/knowledge-tech/              # deterministic package inventory scripts
 └── workflows/knowledge-meta.yml       # the CI check
 ```
 
