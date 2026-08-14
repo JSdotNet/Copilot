@@ -680,11 +680,11 @@ export function renderShell() {
       const observed = (insight && insight.agents) || [];
       const agents = mergeAgentLabels(declared.concat(observed));
       const pills = [];
+      ((insight && insight.models) || []).forEach((m) => pills.push('<span class="tag model">Model: ' + esc(m) + '</span>'));
       agents.forEach((a) => pills.push('<span class="tag agent">Agent: ' + esc(a) + '</span>'));
       const donePill = doneCountPill(stageDoneCount(run, index, stage));
       if (donePill) pills.push(donePill);
       ((insight && insight.mcpServers) || []).forEach((m) => pills.push('<span class="tag mcp">MCP: ' + esc(m) + '</span>'));
-      ((insight && insight.models) || []).forEach((m) => pills.push('<span class="tag model">Model: ' + esc(m) + '</span>'));
       const tokenPill = stageTokenPill(run, index);
       if (tokenPill) pills.push(tokenPill);
       if (!pills.length) return "";
