@@ -17,8 +17,9 @@ App, instead of plain chat narration.
 - A run list (left panel) with one entry per orchestration in the current
   session, each labeled with its skill and overall status. Selecting a run
   expands an always-visible **stage navigation** beneath it: every relevant
-  stage declared in `start_run` is listed with a status dot/badge and jumps to
-  that stage in the detail view when clicked. A declared **GitHub Issue Update**
+  stage declared in `start_run` is listed with a status dot/badge plus compact
+  agent, model, and elapsed-time hints when available, and jumps to that stage
+  in the detail view when clicked. A declared **GitHub Issue Update**
   stage is hidden when the run has no originating GitHub issue metadata. Stages
   with `links` render those links as quick-open buttons in the stage detail.
 - A run detail view (right panel) with every relevant workflow stage, its status
