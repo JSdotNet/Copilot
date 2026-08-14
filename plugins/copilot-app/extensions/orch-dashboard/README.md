@@ -115,7 +115,10 @@ App, instead of plain chat narration.
 
 ## Canvas Contract
 
-Canvas id: `orch-dashboard`. Actions:
+Canvas id: `orch-dashboard`. Use a single panel per session by opening it with the fixed
+canvas `instanceId` `orch-dashboard`; calling `open_canvas` again with that same instance
+focuses the existing dashboard, while a different instance ID opens another dashboard tab.
+Actions:
 
 - `start_run({ skillId, title, stages: [{ name, agents? }], originalPrompt?, githubIssue?, changeKind?, resume? })` ->
   `{ runId, resumed }`
