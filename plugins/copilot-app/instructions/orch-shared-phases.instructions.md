@@ -318,6 +318,15 @@ Applies to every orchestration.
 
 - **Create the pull request only after explicit user approval** in Personal Validation —
   never before, and only when the persisted `approval` in the run state is `approved`.
+- **Shut down validation runtime before creating the pull request.** If QA Validation or
+  Personal Validation started Aspire or another local application runtime, stop it and
+  confirm it is no longer running before invoking any PR creation command. Prefer the
+  repository's proven shutdown command or `aspire stop` for Aspire-backed runs, and block
+  this phase with the actual shutdown error if the runtime cannot be stopped safely.
+- **Close orchestration-owned browser windows before creating the pull request.** Close only
+  browser windows or tabs opened for QA, Playwright evidence capture, or Personal
+  Validation review. Do not close the `orch-dashboard` window, any Copilot App canvas, or
+  unrelated user browser sessions.
 - **Write the PR description** from the change set, code review outcome, and validation
   evidence.
 - **Apply any PR-time improvements** (final polish, labels, changelog) as part of this
@@ -471,8 +480,11 @@ not identify a registered canvas provider.
 - **Keep Personal Validation and Create Pull Request as separate stages**: gate Create
   Pull Request on explicit user approval recorded in Personal Validation (mark it
   `skipped` when there is no change set to submit), and record all PR-time changes under
-  the Create Pull Request stage output — never create the pull request before personal
-  validation.
+  the Create Pull Request stage output. Before invoking any PR creation command, the Create
+  Pull Request stage must stop the orchestration-started runtime, close only
+  orchestration-owned QA/review browser windows, keep `orch-dashboard` and other Copilot App
+  canvases open, and record that cleanup in the stage output — never create the pull request
+  before personal validation or cleanup.
 - **For the Documentation Update phase** (code-modifying tier only), run it after Create
   Pull Request: mark it `in_progress`, then `done` with an `output` naming the governed docs
   updated and the new commit pushed onto the existing PR branch, or `done` describing what was
