@@ -51,14 +51,16 @@ consuming repository's optional runtime context file, whose convention is define
    covers. Both files are optional: a missing or malformed file falls back to existing
    behavior and never blocks the run.
 4. **Open the dashboard once and reattach if a run exists.** Check `orch-dashboard`
-   availability with `list_canvas_capabilities`. Start without `extensionId`; if the host
-   reports multiple providers, retry with the exact provider identifier it advertises for
-   this extension, usually `plugin:copilot-app:orch-dashboard`. Do not use the package-level
-   identifier `plugin:copilot-app` as a canvas `extensionId`. Use the fixed canvas
-   `instanceId` `orch-dashboard` for every orchestration in the session; re-opening the same
-   instance focuses the existing panel, while a new instance ID creates another dashboard
-   tab. Open the canvas with `open_canvas` using the same resolved provider identifier when
-   one was required, then call `start_run` with `invoke_canvas_action`, the skill's
+   availability with `list_canvas_capabilities` using the exact plugin canvas provider
+   identifier `plugin:copilot-app:orch-dashboard`. If that provider is unavailable, retry
+   without `extensionId` only to discover whether one unambiguous fallback provider exists.
+   When the host reports multiple providers, keep using the full advertised provider
+   identifier for this extension, normally `plugin:copilot-app:orch-dashboard`. Do not use
+   shortened identifiers such as `plugin:copilot-app` or `user` as a canvas `extensionId`.
+   Use the fixed canvas `instanceId` `orch-dashboard` for every orchestration in the
+   session; re-opening the same instance focuses the existing panel, while a new instance ID
+   creates another dashboard tab. Open the canvas with `open_canvas` using the same resolved
+   provider identifier, then call `start_run` with `invoke_canvas_action`, the skill's
    `skillId`, the full ordered stage list (unique stages + shared phases for its tier), and
    the `changeKind` when known. `start_run` returns `resumed: true` when an `in_progress`
    run for the same skill already exists -- in that case continue from the first stage that

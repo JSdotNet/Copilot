@@ -430,11 +430,15 @@ category's resolved model.
 
 Every `orch-*` skill reports progress through the `orch-dashboard` canvas extension
 (`plugins/copilot-app/extensions/orch-dashboard/`). First check the canvas with
-`list_canvas_capabilities`. Start with only `canvasId: "orch-dashboard"`; when the host
-reports multiple matching providers, retry with the exact advertised provider identifier
-for this extension, usually `plugin:copilot-app:orch-dashboard`. Do not use the
-package-level identifier `plugin:copilot-app` as a canvas `extensionId`, because it does
-not identify a registered canvas provider.
+`list_canvas_capabilities` using `extensionId: "plugin:copilot-app:orch-dashboard"` and
+`canvasId: "orch-dashboard"`. That full provider ID is the canonical provider for the
+dashboard shipped by this plugin and avoids ambiguity when a stale user-scope copy is also
+installed. If the plugin provider is unavailable, retry without `extensionId` only to
+discover whether one unambiguous fallback provider exists. When the host reports multiple
+matching providers, use the exact advertised provider identifier for the intended
+dashboard, normally `plugin:copilot-app:orch-dashboard`. Do not use shortened identifiers
+such as `plugin:copilot-app` or `user` as a canvas `extensionId`, because they do not
+identify a registered canvas provider.
 
 - If `orch-dashboard` is not installed or not advertised, skip the canvas calls and
   continue through standard chat interaction.
@@ -443,14 +447,16 @@ not identify a registered canvas provider.
   `finish_run`) is unavailable, treat it as a tooling/runtime capability issue. Do not
   silently fall back to chat-only tracking; block the orchestration and report the missing
   capability.
+- When changing dashboard instructions, guard against regressions by searching for
+  ambiguous provider wording such as "Open canvas `orch-dashboard`" and shortened
+  provider IDs such as `extensionId: "plugin:copilot-app"` or `extensionId: "user"`.
 
 - **Open** canvas `orch-dashboard` with the fixed `instanceId` `orch-dashboard` and the same
-  resolved provider identifier when one was required. This is the only supported
-  already-open check: re-opening that same instance focuses the existing dashboard panel;
-  choosing a new instance ID opens another tab. Then call `start_run` against the same
-  `orch-dashboard` instance with the skill's `skillId`, the full ordered stage list (its
-  skill-specific stages followed by the shared phase names for its tier), and the
-  `changeKind` when it is already known. `start_run` reattaches to an
+  resolved provider identifier. This is the only supported already-open check: re-opening
+  that same instance focuses the existing dashboard panel; choosing a new instance ID opens
+  another tab. Then call `start_run` against the same `orch-dashboard` instance with the
+  skill's `skillId`, the full ordered stage list (its skill-specific stages followed by the
+  shared phase names for its tier), and the `changeKind` when it is already known. `start_run` reattaches to an
   existing `in_progress` run for the same skill and returns `resumed: true`; continue from
   the first stage that is not `done` instead of restarting the orchestration.
 - **Persist gating state** with `set_run_context`: the `changeKind` as soon as it is

@@ -135,9 +135,12 @@ Invoke: orch-design
 
 This skill reports progress through the `orch-dashboard` canvas extension shipped
 by the `copilot-app` plugin. If the extension is not installed, skip the canvas
-calls below and continue through standard chat interaction.
+calls below and continue through standard chat interaction. Follow the provider-safe
+dashboard contract in `plugins/copilot-app/instructions/orch-shared-phases.instructions.md`;
+prefer `extensionId: "plugin:copilot-app:orch-dashboard"` when opening or inspecting the
+canvas.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
+- Open the dashboard per the shared contract, then call `start_run` with
   `skillId: "orch-design"` and these stages: Context Loading, Authoritative
   Grounding, Design Authoring, Metadata & Cross-Reference Enforcement,
   Consistency Review.

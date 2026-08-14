@@ -205,6 +205,12 @@ committed to a repo, available for you across projects, or scoped to one
 session. See `.github/instructions/customization-structure.instructions.md`
 for repository-wide customization conventions.
 
+Copilot App orchestration agents should inspect and open this dashboard with the
+full plugin provider ID `plugin:copilot-app:orch-dashboard`. Do not use shortened
+provider IDs such as `plugin:copilot-app` or `user`. If the host reports duplicate
+`orch-dashboard` providers, remove stale user-scope copies from
+`%USERPROFILE%\.copilot\extensions` after confirming they are not needed.
+
 ## Reference
 
 Source: `plugins/copilot-app/extensions/orch-dashboard/`

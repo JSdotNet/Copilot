@@ -120,6 +120,10 @@ See `plugins/copilot-app/extensions/diagram-canvas/README.md` and
 `plugins/copilot-app/extensions/markdown-canvas/README.md` for details.
 `orch-dashboard` is installed with the app extension installer from
 `https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard`.
+Copilot App orchestration skills should address the plugin dashboard with the full
+provider ID `plugin:copilot-app:orch-dashboard`; if duplicate `orch-dashboard` providers
+are reported, remove stale user-scope copies from `%USERPROFILE%\.copilot\extensions`
+after confirming they are not needed.
 
 The `knowledge-base` plugin additionally bundles a `knowledge-canvas` extension that renders
 the repository's knowledge-folder reference graph. It has no standalone manifest and installs

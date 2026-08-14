@@ -92,9 +92,12 @@ Copilot session branch, keeping all in-progress work in sync with the trunk.
 This skill reports progress through the `orch-dashboard` canvas extension
 (`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
 installed, skip the canvas calls below and continue through standard chat
-interaction.
+interaction. Follow the shared **Dashboard Reporting Contract** in
+`instructions/orch-shared-phases.instructions.md` to resolve the dashboard provider;
+prefer `extensionId: "plugin:copilot-app:orch-dashboard"` when opening or inspecting the
+canvas.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
+- Open the dashboard per the shared contract, then call `start_run` with
   `skillId: "update-open-sessions"` and these stages: Discover Open Sessions,
   Update Each Session, Summary.
 - Before each phase, call `update_stage` with `status: "in_progress"`.
