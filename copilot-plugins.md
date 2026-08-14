@@ -80,6 +80,9 @@ repo.
   - Source path: `plugins/copilot-app/extensions/orch-dashboard`
   - Install: `install_extension` tool with `https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard` (not `copilot plugin install` — this extension has no standalone `.github/plugin/plugin.json`).
   - Canvas: live progress/output dashboard for `copilot-app`'s `orch-*` orchestration and automation skills.
+  - Provider: orchestration agents should use the full plugin provider ID
+    `plugin:copilot-app:orch-dashboard`; remove stale user-scope copies from
+    `%USERPROFILE%\.copilot\extensions` if duplicate dashboard providers are reported.
   - Used by: `copilot-app` plugin only.
 - `knowledge-canvas` (`1`)
   - Source path: `plugins/knowledge-base/extensions/knowledge-canvas`
