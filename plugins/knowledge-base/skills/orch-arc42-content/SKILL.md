@@ -111,9 +111,12 @@ Invoke: orch-arc42-content
 
 This skill reports progress through the `orch-dashboard` canvas extension shipped
 by the `copilot-app` plugin. If the extension is not installed, skip the canvas
-calls below and continue through standard chat interaction.
+calls below and continue through standard chat interaction. Follow the provider-safe
+dashboard contract in `plugins/copilot-app/instructions/orch-shared-phases.instructions.md`;
+prefer `extensionId: "plugin:copilot-app:orch-dashboard"` when opening or inspecting the
+canvas.
 
-- Open canvas `orch-dashboard`, then call `start_run` with
+- Open the dashboard per the shared contract, then call `start_run` with
   `skillId: "orch-arc42-content"` and these stages: Context Loading, Content
   Drafting, Metadata Enforcement, Consistency Review.
 - Before each stage, call `update_stage` with `status: "in_progress"`.
