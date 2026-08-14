@@ -17,6 +17,24 @@
     "validation",
     "observability"
   ],
+  "mcpServers": {
+    "aspire": {
+      "type": "stdio",
+      "command": "aspire",
+      "args": [
+        "agent",
+        "mcp"
+      ]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
+    }
+  },
   "agents": "agents/",
   "skills": "skills/"
 }

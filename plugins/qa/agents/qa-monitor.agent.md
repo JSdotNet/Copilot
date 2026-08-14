@@ -1,6 +1,22 @@
 ---
 description: "QA Monitor Agent — continuously watches Aspire logs, traces, and metrics for a running app under test and reports anomalies. Focused, single-purpose persona invoked by the qa agent."
-tools: ['read/readFile', 'search/codebase', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'terminal/runInTerminal']
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'terminal/runInTerminal'
+  - 'get_resources'
+  - 'get_resource_logs'
+  - 'get_traces'
+  - 'get_metrics'
+  - 'get_console_logs'
+  - 'aspire_get_resources'
+  - 'aspire_get_resource_logs'
+  - 'aspire_get_traces'
+  - 'aspire_get_metrics'
+  - 'aspire_get_console_logs'
 ---
 
 # QA Monitor Agent
@@ -25,7 +41,9 @@ checkpoints to be communicated to it (see [Coordination](#coordination)).
 ## Required Access
 
 - **Aspire MCP server** — this agent is unusable without it. If unavailable, stop and
-  tell the user to configure it first (`aspire mcp start`).
+  name the missing Aspire MCP tool family. If Aspire MCP is configured for normal sessions
+  but absent here, report it as a child-agent tool exposure problem instead of asking the
+  user to rerun the same validation.
 
 ## Scope
 

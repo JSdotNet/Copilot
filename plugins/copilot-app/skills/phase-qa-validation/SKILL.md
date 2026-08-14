@@ -77,6 +77,14 @@ aspire mcp init
 aspire mcp start
 ```
 
+When QA is delegated to `qa:qa` or `qa:qa-monitor`, verify availability in the target
+agent/session tool surface, not only in the parent orchestration session. The QA plugin
+declares the required `aspire` and `playwright` MCP servers and allowlists their expected
+tool families (`get_resources` / `aspire_get_*` resource, log, trace, and metric tools
+and `browser_*` / `playwright-browser_*`). If those tools are present in normal sessions
+but absent only in the delegated child agent, report the problem as a child-agent MCP/tool
+allowlist exposure failure and include the missing tool family in the blocked output.
+
 If required MCP tooling is unavailable:
 
 - Mark **QA Validation** `blocked`, not `done` or `skipped`.

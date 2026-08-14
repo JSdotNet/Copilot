@@ -115,7 +115,10 @@ App, instead of plain chat narration.
 
 ## Canvas Contract
 
-Canvas id: `orch-dashboard`. Actions:
+Canvas id: `orch-dashboard`. Use a single panel per session by opening it with the fixed
+canvas `instanceId` `orch-dashboard`; calling `open_canvas` again with that same instance
+focuses the existing dashboard, while a different instance ID opens another dashboard tab.
+Actions:
 
 - `start_run({ skillId, title, stages: [{ name, agents? }], originalPrompt?, githubIssue?, changeKind?, resume? })` ->
   `{ runId, resumed }`
@@ -201,6 +204,12 @@ Choose `project`, `user`, or `session` scope depending on whether you want it
 committed to a repo, available for you across projects, or scoped to one
 session. See `.github/instructions/customization-structure.instructions.md`
 for repository-wide customization conventions.
+
+Copilot App orchestration agents should inspect and open this dashboard with the
+full plugin provider ID `plugin:copilot-app:orch-dashboard`. Do not use shortened
+provider IDs such as `plugin:copilot-app` or `user`. If the host reports duplicate
+`orch-dashboard` providers, remove stale user-scope copies from
+`%USERPROFILE%\.copilot\extensions` after confirming they are not needed.
 
 ## Reference
 
