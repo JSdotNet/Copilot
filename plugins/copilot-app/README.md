@@ -153,7 +153,10 @@ mechanism itself, and each has its own install method):
   a repo folder URL such as
   `https://github.com/<owner>/<repo>/tree/<ref>/plugins/copilot-app/extensions/orch-dashboard`,
   choosing `project`, `user`, or `session` scope. See
-  `extensions/orch-dashboard/README.md` for details.
+  `extensions/orch-dashboard/README.md` for details. Copilot App orchestration
+  agents should use the full provider ID `plugin:copilot-app:orch-dashboard`;
+  if duplicate `orch-dashboard` providers are reported, remove stale user-scope
+  copies from `%USERPROFILE%\.copilot\extensions` after confirming they are not needed.
 - `diagram-canvas` and `markdown-canvas`: each has its own `.github/plugin/plugin.json`, so
   install them the same way as any plugin, independently of each other:
   `copilot plugin install <owner>/<repo>:plugins/copilot-app/extensions/diagram-canvas`
