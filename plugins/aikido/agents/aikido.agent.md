@@ -1,6 +1,30 @@
 ---
-description: "Application security specialist — scan code, triage Aikido findings, and fix SAST, secrets, and IaC issues."
-tools: ['read/readFile', 'search/codebase', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+name: aikido
+description: Application security specialist — scan code, triage Aikido findings, and fix SAST, secrets, and IaC issues.
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'execute/createAndRunTask'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'list_projects'
+  - 'create_session'
+  - 'send_session_message'
+  - 'list_sessions_and_chats'
+  - 'get_session'
+  - 'respond_to_session_plan'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'Write'
+  - 'Edit'
+  - 'Bash'
+  - 'Agent'
+  - 'SendMessage'
+  - 'Skill'
 ---
 
 # Aikido Security Agent

@@ -1,0 +1,22 @@
+{
+  "name": "ux-design",
+  "version": "0.2.0",
+  "description": "Copilot plugin for UX design workflows — wireframes, design guidelines, user flows, and design reviews.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "ux",
+    "design",
+    "wireframe",
+    "user-flow",
+    "design-review"
+  ],
+  "agents": [
+    "./agents/ux-designer.agent.md"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

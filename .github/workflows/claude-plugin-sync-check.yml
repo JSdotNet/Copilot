@@ -1,0 +1,37 @@
+name: Claude Plugin Sync Check
+
+# The Claude Code adapter layer (.claude-plugin/, agents-claude/, hooks/) is generated from
+# the Copilot sources. This check fails when the two drift - for example when an agent gains
+# a tool, a hook is reworded, or a plugin manifest version changes without a regenerate.
+
+on:
+  pull_request:
+    paths:
+      - "plugins/**"
+      - "scripts/Sync-ClaudePlugins.ps1"
+      - "scripts/claude-sync/**"
+      - ".claude-plugin/**"
+      - ".github/workflows/claude-plugin-sync-check.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "plugins/**"
+      - "scripts/Sync-ClaudePlugins.ps1"
+      - "scripts/claude-sync/**"
+      - ".claude-plugin/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Claude plugin assets are in sync
+        shell: pwsh
+        run: ./scripts/Sync-ClaudePlugins.ps1 -Check

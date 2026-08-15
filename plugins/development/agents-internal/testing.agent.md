@@ -1,10 +1,35 @@
 ---
+name: testing
 description: Testing specialist for writing and maintaining unit and integration tests from approved plans.
-model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'execute/createAndRunTask'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Edit'
+  - 'Bash'
+  - 'Agent'
+  - 'Skill'
 ---
 
 # Testing Agent
+
+## Model
+
+No model is pinned, so each host applies its own default.
+Prefer a strong, tool-heavy coding model.
 
 ## Purpose
 

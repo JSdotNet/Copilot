@@ -1,0 +1,18 @@
+{
+  "name": "wip-convention",
+  "version": "0.1.0",
+  "description": "Encapsulates the .wip folder convention for storing work-in-progress artifacts. Provides skills and instructions to align agents with the .wip workflow.",
+  "license": "MIT",
+  "keywords": [
+    "wip",
+    "work-in-progress",
+    "planning",
+    "artifacts",
+    "stories",
+    "epics",
+    "bugs",
+    "ideas",
+    "proposals"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

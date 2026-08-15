@@ -1,10 +1,32 @@
 ---
+name: security
 description: Security review specialist for identifying vulnerabilities and security risks in implementation changes.
-model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'agent', 'terminal/runInTerminal']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Agent'
+  - 'Bash'
+  - 'Skill'
 ---
 
 # Security Agent
+
+## Model
+
+No model is pinned, so each host applies its own default.
+Prefer a strong, tool-heavy reasoning model.
 
 ## Purpose
 

@@ -1,0 +1,93 @@
+{
+  "$comment": [
+    "Translation table used by scripts/Sync-ClaudePlugins.ps1 to convert Copilot agent",
+    "frontmatter into Claude Code subagent frontmatter.",
+    "",
+    "'tools' maps a Copilot/VS Code tool id to zero or more Claude Code tool names.",
+    "An empty array means the capability has no Claude equivalent and is dropped;",
+    "the reason is recorded in 'dropReasons' and emitted as a comment in the generated agent.",
+    "",
+    "'mcpPrefixes' matches tool ids by prefix and maps them to a Claude MCP server-level",
+    "pattern (mcp__<server>), which grants every tool from that server.",
+    "",
+    "This file is hand-maintained. When a new Copilot tool id appears in an agent, the",
+    "generator fails with 'unmapped tool id' rather than guessing - add the mapping here."
+  ],
+
+  "alwaysInclude": ["Skill"],
+  "$alwaysIncludeComment": "Copilot exposes plugin skills to agents implicitly; Claude requires the Skill tool to be listed.",
+
+  "tools": {
+    "read/readFile": ["Read"],
+    "vscode/openFile": ["Read"],
+
+    "search": ["Grep", "Glob"],
+    "search/codebase": ["Grep", "Glob"],
+    "search/textSearch": ["Grep"],
+    "search/searchResults": ["Grep"],
+    "search/usages": ["Grep"],
+    "search/fileSearch": ["Glob"],
+    "search/findTestFiles": ["Glob"],
+    "search/listDirectory": ["Glob"],
+    "search/changes": ["Bash"],
+
+    "edit/createFile": ["Write"],
+    "edit/editFiles": ["Edit"],
+
+    "terminal/runInTerminal": ["Bash"],
+    "execute/createAndRunTask": ["Bash"],
+
+    "web/fetch": ["WebFetch", "WebSearch"],
+
+    "agent": ["Agent"],
+    "vscode/askQuestions": ["AskUserQuestion"],
+
+    "vscode/memory": [],
+    "extensions_manage": [],
+    "extensions_reload": [],
+    "list_canvas_capabilities": [],
+    "open_canvas": [],
+    "invoke_canvas_action": [],
+
+    "list_projects": ["Agent"],
+    "create_session": ["Agent"],
+    "send_session_message": ["SendMessage"],
+    "list_sessions_and_chats": ["Agent"],
+    "get_session": ["SendMessage"],
+    "respond_to_session_plan": ["SendMessage"]
+  },
+
+  "mcpPrefixes": {
+    "aspire_": "mcp__aspire",
+    "get_resources": "mcp__aspire",
+    "get_resource_logs": "mcp__aspire",
+    "get_traces": "mcp__aspire",
+    "get_metrics": "mcp__aspire",
+    "get_console_logs": "mcp__aspire",
+    "browser_": "mcp__playwright",
+    "playwright-browser_": "mcp__playwright"
+  },
+
+  "dropReasons": {
+    "vscode/memory": "VS Code workspace memory has no Claude Code equivalent; Claude uses CLAUDE.md and the memory directory instead.",
+    "extensions_manage": "Copilot CLI extension management API; no Claude Code equivalent.",
+    "extensions_reload": "Copilot CLI extension management API; no Claude Code equivalent.",
+    "list_canvas_capabilities": "Copilot canvas extension API; no Claude Code equivalent (nearest analogue is Artifact).",
+    "open_canvas": "Copilot canvas extension API; no Claude Code equivalent (nearest analogue is Artifact).",
+    "invoke_canvas_action": "Copilot canvas extension API; no Claude Code equivalent (nearest analogue is Artifact)."
+  },
+
+  "models": {
+    "GPT-5.3-Codex": "opus",
+    "claude-haiku-4.5": "haiku",
+    "claude-sonnet-4.5": "sonnet",
+    "claude-opus-4.5": "opus"
+  },
+
+  "$modelsComment": [
+    "Copilot pins concrete model names; Claude Code takes an alias (opus/sonnet/haiku/fable),",
+    "a full model id, or 'inherit'. GPT-5.3-Codex was chosen in the Copilot agents as the",
+    "strong coding model, so it maps to 'opus'. Agents with no model pin get no model field,",
+    "which defaults to 'inherit'."
+  ]
+}

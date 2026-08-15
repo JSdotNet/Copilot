@@ -1,6 +1,34 @@
 ---
+name: developer
 description: Developer orchestration agent that executes approved plans through specialist sub-agents with explicit approval gates.
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'execute/createAndRunTask'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'list_projects'
+  - 'create_session'
+  - 'send_session_message'
+  - 'list_sessions_and_chats'
+  - 'get_session'
+  - 'respond_to_session_plan'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Edit'
+  - 'Bash'
+  - 'Agent'
+  - 'SendMessage'
+  - 'Skill'
 handoffs:
   - label: TDD - Red Phase (domain)
     agent: testing

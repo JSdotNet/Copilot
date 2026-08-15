@@ -1,0 +1,17 @@
+{
+  "name": "jira",
+  "version": "0.1.0",
+  "description": "Copilot plugin for Jira issue synchronization workflows. Creates and updates Jira issues from approved Markdown backlog artifacts.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "jira",
+    "backlog",
+    "story",
+    "epic",
+    "bug"
+  ]
+}

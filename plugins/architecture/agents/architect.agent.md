@@ -1,6 +1,34 @@
 ---
+name: architect
 description: Unified architecture lead mode for arc42, blueprints, ADRs, and TDRs.
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'search/findTestFiles', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'search/findTestFiles'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'list_projects'
+  - 'create_session'
+  - 'send_session_message'
+  - 'list_sessions_and_chats'
+  - 'get_session'
+  - 'respond_to_session_plan'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Edit'
+  - 'Agent'
+  - 'Bash'
+  - 'SendMessage'
+  - 'Skill'
 ---
 
 # Architect Agent

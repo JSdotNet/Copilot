@@ -1,0 +1,26 @@
+{
+  "name": "architecture",
+  "version": "0.4.0",
+  "description": "Copilot plugin for architecture documentation, blueprints, ADRs, technical debt records, and architecture diagrams (C4, sequence, state machine, deployment).",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "architecture",
+    "arc42",
+    "adr",
+    "tdr",
+    "c4",
+    "c4-model",
+    "diagram",
+    "sequence-diagram",
+    "state-diagram",
+    "deployment-diagram"
+  ],
+  "agents": [
+    "./agents/architect.agent.md"
+  ]
+}

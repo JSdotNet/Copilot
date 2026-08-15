@@ -1,0 +1,43 @@
+{
+  "name": "qa",
+  "version": "0.1.0",
+  "description": "Copilot plugin for runtime QA validation — run Aspire-orchestrated apps, drive Playwright browser checks with recorded evidence, and monitor Aspire logs/traces during the test session.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "qa",
+    "testing",
+    "aspire",
+    "playwright",
+    "e2e",
+    "validation",
+    "observability"
+  ],
+  "agents": [
+    "./agents/qa-monitor.agent.md",
+    "./agents/qa.agent.md"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": {
+    "aspire": {
+      "type": "stdio",
+      "command": "aspire",
+      "args": [
+        "agent",
+        "mcp"
+      ]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}

@@ -1,7 +1,26 @@
 ---
+name: development-plan
 description: Interactive development planning agent that researches, aligns, and produces approved implementation plans for execution handoff.
-model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'agent', 'vscode/askQuestions', 'terminal/runInTerminal']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'agent'
+  - 'vscode/askQuestions'
+  - 'terminal/runInTerminal'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'AskUserQuestion'
+  - 'Bash'
+  - 'Skill'
+  - 'Agent(Explore)'
 agents: ['Explore']
 handoffs:
   - label: Architecture Review
@@ -34,6 +53,11 @@ handoffs:
 ---
 
 # Development Plan Agent
+
+## Model
+
+No model is pinned, so each host applies its own default.
+Prefer a strong, tool-heavy reasoning model.
 
 ## Purpose
 Create complete, implementation-ready development plans in Markdown through an

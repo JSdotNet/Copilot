@@ -1,0 +1,11 @@
+{
+  "name": "documentation",
+  "version": "0.3.0",
+  "description": "Write and maintain documentation artifacts, infographics, and profile content using GitHub Copilot.",
+  "license": "MIT",
+  "agents": [
+    "./agents/documentation.agent.md",
+    "./agents/profile.agent.md"
+  ],
+  "hooks": "./hooks/hooks.json"
+}
