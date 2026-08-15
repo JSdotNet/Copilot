@@ -42,6 +42,9 @@ JSdotNet-Copilot
 |- plugins/
 |  |- aikido/
 |  |- architecture/
+|  |- claude-desktop/
+|  |  \- mcp/
+|  |     \- orch-dashboard/
 |  |- copilot-app/
 |  |  \- extensions/
 |  |     |- diagram-canvas/
@@ -128,6 +131,21 @@ The `knowledge-base` plugin additionally bundles a `knowledge-canvas` extension 
 the repository's knowledge-folder reference graph. It has no standalone manifest and installs
 with its parent: `copilot plugin install JSdotNet/Copilot:plugins/knowledge-base`.
 
+### Claude Desktop Extension
+
+The `claude-desktop` plugin is the Claude-side sibling of `copilot-app`. Its `orch-dashboard`
+MCP server replaces all three canvas extensions above, and in Claude Desktop it renders
+**inline in the conversation** as an MCP App rather than in a separate window. Build the
+installable bundle with:
+
+```bash
+pwsh ./scripts/Build-DesktopExtension.ps1
+```
+
+That writes `dist/orch-dashboard-<version>.mcpb`, which installs into Claude Desktop with one
+click. See [`plugins/claude-desktop/README.md`](plugins/claude-desktop/README.md) for both
+install paths and for which features work in which host.
+
 ## Project Structure
 
 Repository organization centers on reusable Copilot plugin bundles:
@@ -144,6 +162,7 @@ Repository organization centers on reusable Copilot plugin bundles:
     - `csharp-coding`
     - `aikido`
     - `copilot-app`
+    - `claude-desktop`
     - `domain-design`
     - `fincent`
     - `github`

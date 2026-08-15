@@ -1,0 +1,80 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Route these task categories through the matching orch-* skill: architecture, ADR, arc42, blueprint, TDR -> orch-architecture, orch-adr, orch-arc42, orch-blueprint, orch-tdr; feature work -> orch-feature; bug fixes -> orch-bug; existing repository structure or layout refactors, folder moves, project/solution organization fixes, or test/harness placement changes -> orch-structure; new module or service -> orch-create-module, orch-create-service; dependency or package updates -> orch-update-packages; Aspire upgrades -> orch-aspire-update; MVP creation -> orch-create-mvp; repository or project scaffolding -> orch-repo, orch-project. This list is the plugin-provided baseline, not an exhaustive catalog: a repository may provide additional repo-native orch-* skills under .claude/skills/, and those take precedence for the task categories they cover. When a skill is unavailable, fall back to the closest specialist agent: architecture:architect, csharp-coding:coding, product-owner:product-owner, qa:qa. If you decide not to use an orchestration skill for one of these categories, say so explicitly and give the reason before continuing. Every orchestration reports progress through the orch-dashboard MCP server (mcp__orch-dashboard__*): open it once with open_dashboard and give the user the URL. A user may override model choice outside the repo via CLAUDE_ORCH_MODEL_SELECTION_PATH or the default global model-selection file; a repo may override shared behavior via .claude/model-selection.md (team model choice) and .claude/orch-context.md (app startup and QA context). The repo's own .mcp.json and instructions remain the source of truth for MCP servers."
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/mcp/orch-dashboard/telemetry-hook.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/mcp/orch-dashboard/telemetry-hook.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/mcp/orch-dashboard/telemetry-hook.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/mcp/orch-dashboard/telemetry-hook.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/mcp/orch-dashboard/telemetry-hook.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/mcp/orch-dashboard/telemetry-hook.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

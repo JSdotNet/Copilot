@@ -9,6 +9,9 @@ resolve, so a single agent file can carry the vocabulary of both.
 
 Only the manifest location and the hook shape genuinely differ, and those are generated.
 
+The single exception is the `copilot-app` / `claude-desktop` pair, where the host difference is
+not frontmatter but a UI surface Claude Code does not have. See **Claude-native plugins**.
+
 ## Layout
 
 | Path | Authored by | Read by |
@@ -23,7 +26,8 @@ Only the manifest location and the hook shape genuinely differ, and those are ge
 | `.claude-plugin/marketplace.json` (repo root) | **generated** | Claude |
 
 Never edit anything under `.claude-plugin/` or `hooks/`. Change the Copilot source and
-regenerate.
+regenerate. The one exception is a Claude-native plugin (`claude-desktop`), which has no Copilot
+source to generate from and is hand-authored throughout — see **Claude-native plugins**.
 
 ## Regenerating
 
@@ -124,6 +128,42 @@ nesting and the event casing change:
   ]}}                                     ]}}
 ```
 
+## Claude-native plugins
+
+One plugin is authored for Claude only: **`claude-desktop`**, the sibling of `copilot-app`.
+Its manifest and hooks are hand-written, nothing under it is generated, and the sync script
+lists it in `$ClaudeNativePlugins` so it still appears in `marketplace.json`. That listing is
+the only thing the generator does for it.
+
+It ships twice from one implementation: as a Claude Code plugin, and as a **Claude Desktop
+extension** (`.mcpb`) built by `scripts/Build-DesktopExtension.ps1`. On the Desktop side the
+dashboard renders inline in the conversation as an
+[MCP App](https://modelcontextprotocol.io/extensions/apps/overview) — `ui://` resources under
+the `io.modelcontextprotocol/ui` extension — which is the real replacement for the Copilot
+canvas panel. Claude Code is not on the MCP Apps
+[client matrix](https://modelcontextprotocol.io/extensions/client-matrix), so there the same
+three pages are served over local HTTP instead. Extension support is negotiated, so neither
+host needs to know about the other's surface.
+
+It exists because a canvas cannot be translated — it has to be rebuilt on a different
+transport:
+
+| `copilot-app` | `claude-desktop` |
+| --- | --- |
+| `orch-dashboard` canvas panel | MCP App panel inline in Claude Desktop; a page on `127.0.0.1` elsewhere |
+| canvas actions (`invoke_canvas_action`) | MCP tools (`mcp__orch-dashboard__*`), same names and arguments |
+| `diagram-canvas`, `markdown-canvas` extensions | `/mermaid` and `/markdown` routes on the same server, driven by `render_diagram` / `render_markdown` |
+| host session telemetry events | `PreToolUse`/`PostToolUse`/`SubagentStop`/`PreCompact`/`Stop` hooks plus the session transcript |
+| `.github/copilot-orch-context.md`, `.github/copilot-model-selection.md` | `.claude/orch-context.md`, `.claude/model-selection.md` |
+| Copilot model families in the selection table | `opus` / `sonnet` / `haiku` aliases |
+| child sessions for concurrent work | background sub-agents, `isolation: "worktree"` when a separate checkout is needed |
+
+What is genuinely shared is the interesting part: `render.mjs` and `report.mjs` are
+byte-identical in both plugins, and `store.mjs`/`insight.mjs` differ only in comments and in
+the tool names the category table matches — none of them ever touched the Copilot SDK. Keep
+the two plugins' skills, stage names, and dashboard contract in step; a change to shared
+behavior usually belongs in both.
+
 ## Installing in Claude Code
 
 ```bash
@@ -141,10 +181,11 @@ and the intent recorded in a `## Model` section in each body. Each host now appl
 default. The generator rejects any pin that is not a Claude-valid value, so this cannot
 regress silently.
 
-**`copilot-app` is Copilot-only and excluded.** It is built around the Copilot CLI canvas
-extension API (`diagram-canvas`, `markdown-canvas`, `orch-dashboard`), which has no Claude
-counterpart. Porting it means rewriting the extensions — as Artifacts for rendered output
-and an MCP server for the dashboard — not translating them.
+**`copilot-app` is Copilot-only; `claude-desktop` is its Claude sibling.** `copilot-app` is built
+around the Copilot CLI canvas extension API (`diagram-canvas`, `markdown-canvas`,
+`orch-dashboard`), which has no Claude counterpart, so it stays excluded from generation.
+The port could not be a translation — it needed a different transport — so it lives as a
+separate, hand-authored plugin. See **Claude-native plugins** below.
 
 **`applyTo` instructions are not auto-applied.** Claude has no glob-scoped instruction
 injection. This matters less than it looks: 75 skill and agent files already reference these
