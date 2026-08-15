@@ -1,0 +1,19 @@
+{
+  "name": "orch-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "mcp-server.mjs",
+  "description": "MCP server for Claude Code: live orchestration run dashboard, Mermaid diagram viewer, and Markdown document viewer for the claude-desktop plugin's orch-* skills.",
+  "keywords": [
+    "mcp",
+    "claude-code",
+    "orchestration",
+    "dashboard",
+    "mermaid",
+    "markdown"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

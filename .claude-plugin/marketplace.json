@@ -18,6 +18,12 @@
       "version": "0.4.0"
     },
     {
+      "name": "claude-desktop",
+      "source": "./plugins/claude-desktop",
+      "description": "Claude Code plugin for orchestration workflows and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
+      "version": "0.1.0"
+    },
+    {
       "name": "csharp-coding",
       "source": "./plugins/csharp-coding",
       "description": "Copilot plugin for C# .NET coding expertise — write, review, optimize, and test C# code.",

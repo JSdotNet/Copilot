@@ -56,7 +56,15 @@ $PluginsRoot  = Join-Path $RepoRoot 'plugins'
 # Plugins that stay Copilot-only. copilot-app is built around the Copilot CLI canvas
 # extension API (diagram-canvas, markdown-canvas, orch-dashboard), which has no Claude
 # Code counterpart, so generating a Claude manifest for it would advertise a broken plugin.
+# Its Claude sibling is the hand-authored claude-desktop plugin below.
 $ExcludedPlugins = @('copilot-app')
+
+# Claude-native plugins: authored for Claude Code only, with a hand-written
+# .claude-plugin/plugin.json and hooks/hooks.json. They have no Copilot manifest to generate
+# from, so nothing under them is rewritten - they are only listed in the marketplace. Keeping
+# them here (rather than relying on the "has a Copilot manifest" filter) makes the omission
+# deliberate and visible.
+$ClaudeNativePlugins = @('claude-desktop')
 
 # Claude Code refuses to load an agent whose model it does not recognise, so a Copilot-only
 # model id would take the agent down on one host. Pins must use a value both hosts accept,
@@ -476,6 +484,28 @@ foreach ($dir in $pluginDirs) {
         version     = $source.version
     }
 }
+
+# Claude-native plugins contribute their marketplace entry from their own hand-authored
+# manifest, so the marketplace stays the single list of everything installable from this
+# repository without the generator touching plugins it does not own.
+foreach ($pluginName in $ClaudeNativePlugins) {
+    $manifestPath = Join-Path $PluginsRoot "$pluginName/.claude-plugin/plugin.json"
+    if (-not (Test-Path -LiteralPath $manifestPath)) {
+        $script:Errors.Add("$pluginName is listed as Claude-native but has no .claude-plugin/plugin.json")
+        continue
+    }
+    $source = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $marketplaceEntries += [ordered]@{
+        name        = $source.name
+        source      = "./plugins/$pluginName"
+        description = $source.description
+        version     = $source.version
+    }
+}
+
+# Sort by the 'name' key explicitly: Sort-Object -Property on an ordered dictionary sorts by
+# something other than the key's value.
+$marketplaceEntries = @($marketplaceEntries | Sort-Object -Property { $_['name'] })
 
 $marketplace = [ordered]@{
     name    = 'jsdotnet-copilot'
