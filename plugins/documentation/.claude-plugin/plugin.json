@@ -6,6 +6,5 @@
   "agents": [
     "./agents/documentation.agent.md",
     "./agents/profile.agent.md"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }

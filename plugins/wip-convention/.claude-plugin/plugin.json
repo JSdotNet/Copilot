@@ -13,6 +13,5 @@
     "bugs",
     "ideas",
     "proposals"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }

@@ -22,6 +22,5 @@
     "./agents-internal/naming.agent.md",
     "./agents-internal/security.agent.md",
     "./agents-internal/testing.agent.md"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }

@@ -17,6 +17,5 @@
     "stories",
     "pull-request",
     "pr-remarks"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }

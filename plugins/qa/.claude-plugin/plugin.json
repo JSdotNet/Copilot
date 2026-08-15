@@ -21,7 +21,6 @@
     "./agents/qa-monitor.agent.md",
     "./agents/qa.agent.md"
   ],
-  "hooks": "./hooks/hooks.json",
   "mcpServers": {
     "aspire": {
       "type": "stdio",

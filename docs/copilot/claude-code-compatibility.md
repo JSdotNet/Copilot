@@ -107,6 +107,10 @@ avoids depending on how Claude globs a folder of `*.agent.md`.
 
 `mcpServers` is copied through unchanged; the two hosts use compatible syntax.
 
+`hooks` is omitted for the same reason as `skills` — Claude Code loads `hooks/hooks.json`
+automatically. Naming it in the manifest too makes the plugin fail to load with
+`Duplicate hooks file detected`; the field is only for hook files beyond that standard one.
+
 ### Hooks
 
 Semantics survive intact, because Claude Code also supports `type: "prompt"` hooks. Only the
