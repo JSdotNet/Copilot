@@ -1,0 +1,20 @@
+{
+  "name": "product-owner",
+  "version": "0.2.0",
+  "description": "Copilot plugin for product backlog authoring — epics, stories, and bugs as Markdown artifacts.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "product-owner",
+    "backlog",
+    "story",
+    "epic",
+    "bug"
+  ],
+  "agents": [
+    "./agents/product-owner.agent.md"
+  ]
+}

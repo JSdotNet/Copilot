@@ -24,7 +24,7 @@ Before generating any output, detect the repository context from existing files:
 2. No runtime dependency manifests were found in this repository root structure (for example `package.json`, `.csproj`, `pom.xml`, `requirements.txt`).
 3. Plugin manifest versions follow Semantic Versioning style (`0.1.0`, `1.0.0`) in files such as:
    - `plugins/development/.github/plugin/plugin.json`
-   - `plugins/copilot-spec-builder/.github/plugin/plugin.json`
+   - `plugins/spec-builder/.github/plugin/plugin.json`
    - `plugins/documentation/.github/plugin/plugin.json`
 
 Never assume runtime framework versions when they are not explicitly present in the repository.
@@ -40,11 +40,11 @@ In case of conflict, follow the Priority Guidelines over Context File Priority.
 3. `.github/instructions/agent-language-and-tone.instructions.md`
 4. `.github/instructions/agent-handoff.instructions.md` (when editing agent files)
 5. Existing plugin-local authoring instructions, for example:
-   - `plugins/copilot-spec-builder/instructions/authoring/create-agent.instructions.md`
-   - `plugins/copilot-spec-builder/instructions/authoring/create-instruction.instructions.md`
-   - `plugins/copilot-spec-builder/instructions/authoring/create-plugin.instructions.md`
-   - `plugins/copilot-spec-builder/instructions/authoring/create-skill.instructions.md`
-   - `plugins/copilot-spec-builder/instructions/authoring/create-canvas.instructions.md`
+   - `plugins/spec-builder/instructions/authoring/create-agent.instructions.md`
+   - `plugins/spec-builder/instructions/authoring/create-instruction.instructions.md`
+   - `plugins/spec-builder/instructions/authoring/create-plugin.instructions.md`
+   - `plugins/spec-builder/instructions/authoring/create-skill.instructions.md`
+   - `plugins/spec-builder/instructions/authoring/create-canvas.instructions.md`
 
 When rules overlap, keep the highest-priority rule and remove duplicates from lower-priority assets.
 
@@ -66,8 +66,7 @@ Each plugin must be installable and usable on its own.
 
 Concrete examples:
 
-- `plugins/copilot-spec-builder/`
-- `plugins/copilot-plugin-manager/`
+- `plugins/spec-builder/`
 - `plugins/architecture/`
 - `plugins/development/`
 - `plugins/wip-convention/`
@@ -110,7 +109,7 @@ When creating or updating `.instructions.md` files:
 - Avoid duplication when guidance already exists in another instruction file.
 - Keep instruction content in English.
 
-Source: `plugins/copilot-spec-builder/instructions/authoring/create-instruction.instructions.md`.
+Source: `plugins/spec-builder/instructions/authoring/create-instruction.instructions.md`.
 
 ## Agent Authoring Standards
 
@@ -136,7 +135,7 @@ When authoring skills and plugins:
 
 Examples:
 
-- `plugins/copilot-spec-builder/skills/create-instruction/SKILL.md`
+- `plugins/spec-builder/skills/create-instruction/SKILL.md`
 - `plugins/development/.github/plugin/plugin.json`
 
 ## Codebase Scanning Instructions

@@ -1,5 +1,7 @@
 ---
-description: "QA Agent — runs Aspire-orchestrated apps, validates features end-to-end with Playwright MCP (screenshots/video evidence), and continuously monitors Aspire logs/traces during test execution."
+name: qa
+description: QA Agent — runs Aspire-orchestrated apps, validates features end-to-end with Playwright MCP (screenshots/video evidence), and continuously monitors Aspire logs/traces during test execution.
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
 tools:
   - 'read/readFile'
   - 'search/codebase'
@@ -68,6 +70,18 @@ tools:
   - 'playwright-browser_take_screenshot'
   - 'playwright-browser_type'
   - 'playwright-browser_wait_for'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Edit'
+  - 'Bash'
+  - 'Agent'
+  - 'mcp__aspire'
+  - 'mcp__playwright'
+  - 'Skill'
 ---
 
 # QA Agent

@@ -1,0 +1,111 @@
+{
+  "name": "jsdotnet-copilot",
+  "owner": {
+    "name": "Job Schepers",
+    "url": "https://github.com/JSdotNet"
+  },
+  "plugins": [
+    {
+      "name": "aikido",
+      "source": "./plugins/aikido",
+      "description": "Copilot plugin for Aikido Security — scan code for vulnerabilities and secrets, triage findings, fix security issues, and sync to GitHub Issues using the Aikido MCP server.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "architecture",
+      "source": "./plugins/architecture",
+      "description": "Copilot plugin for architecture documentation, blueprints, ADRs, technical debt records, and architecture diagrams (C4, sequence, state machine, deployment).",
+      "version": "0.4.0"
+    },
+    {
+      "name": "csharp-coding",
+      "source": "./plugins/csharp-coding",
+      "description": "Copilot plugin for C# .NET coding expertise — write, review, optimize, and test C# code.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "development",
+      "source": "./plugins/development",
+      "description": "Copilot plugin for development planning and implementation workflows.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "documentation",
+      "source": "./plugins/documentation",
+      "description": "Write and maintain documentation artifacts, infographics, and profile content using GitHub Copilot.",
+      "version": "0.3.0"
+    },
+    {
+      "name": "domain-design",
+      "source": "./plugins/domain-design",
+      "description": "Copilot plugin for Domain-Driven Design — bounded context discovery, ubiquitous language, domain model design, and context mapping.",
+      "version": "0.2.0"
+    },
+    {
+      "name": "fincent",
+      "source": "./plugins/fincent",
+      "description": "Copilot plugin for Fincent project story review, dev, domain alignment, story point estimation, PR review, sprint reporting, and demo presentation workflows.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "github",
+      "source": "./plugins/github",
+      "description": "Copilot plugin for GitHub platform workflows — issue sync, pull requests, GitHub Actions CI/CD, and Dependabot configuration.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "jira",
+      "source": "./plugins/jira",
+      "description": "Copilot plugin for Jira issue synchronization workflows. Creates and updates Jira issues from approved Markdown backlog artifacts.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "knowledge-base",
+      "source": "./plugins/knowledge-base",
+      "description": "Repository knowledge-folder convention for .arc42, .domain, .tech, .design, and .backlog: parseable chapter metadata, derived _meta indexes, a reference-graph canvas, per-folder orchestration skills, and enforcement tooling.",
+      "version": "0.3.0"
+    },
+    {
+      "name": "product-owner",
+      "source": "./plugins/product-owner",
+      "description": "Copilot plugin for product backlog authoring — epics, stories, and bugs as Markdown artifacts.",
+      "version": "0.2.0"
+    },
+    {
+      "name": "qa",
+      "source": "./plugins/qa",
+      "description": "Copilot plugin for runtime QA validation — run Aspire-orchestrated apps, drive Playwright browser checks with recorded evidence, and monitor Aspire logs/traces during the test session.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "review",
+      "source": "./plugins/review",
+      "description": "Copilot plugin providing reusable review skills for any agent — supports TODO-driven, question-driven, and improvement-driven reviews of code, stories, documentation, architecture, and more.",
+      "version": "0.3.0"
+    },
+    {
+      "name": "spec-builder",
+      "source": "./plugins/spec-builder",
+      "description": "Copilot plugin focused on GitHub customization asset authoring workflows.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "ux-design",
+      "source": "./plugins/ux-design",
+      "description": "Copilot plugin for UX design workflows — wireframes, design guidelines, user flows, and design reviews.",
+      "version": "0.2.0"
+    },
+    {
+      "name": "wip-convention",
+      "source": "./plugins/wip-convention",
+      "description": "Encapsulates the .wip folder convention for storing work-in-progress artifacts. Provides skills and instructions to align agents with the .wip workflow.",
+      "version": "0.1.0"
+    },
+    {
+      "name": "worktree-parallel",
+      "source": "./plugins/worktree-parallel",
+      "description": "Copilot plugin for dividing work across isolated git worktrees with per-worktree agent continuity.",
+      "version": "0.1.0"
+    }
+  ]
+}

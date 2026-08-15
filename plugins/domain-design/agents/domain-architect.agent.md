@@ -1,6 +1,33 @@
 ---
+name: domain-architect
 description: Domain-Driven Design expert for bounded context discovery, ubiquitous language, and domain model design.
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'list_projects'
+  - 'create_session'
+  - 'send_session_message'
+  - 'list_sessions_and_chats'
+  - 'get_session'
+  - 'respond_to_session_plan'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Edit'
+  - 'Agent'
+  - 'Bash'
+  - 'SendMessage'
+  - 'Skill'
 ---
 
 # Domain Architect Agent

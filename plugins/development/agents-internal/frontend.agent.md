@@ -1,10 +1,35 @@
 ---
+name: frontend
 description: Frontend implementation specialist for UI delivery aligned with approved plans and API contracts.
-model: GPT-5.3-Codex
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'execute/createAndRunTask', 'agent', 'terminal/runInTerminal']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'execute/createAndRunTask'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Edit'
+  - 'Bash'
+  - 'Agent'
+  - 'Skill'
 ---
 
 # Frontend Agent
+
+## Model
+
+No model is pinned, so each host applies its own default.
+Prefer a strong, tool-heavy coding model.
 
 ## Purpose
 

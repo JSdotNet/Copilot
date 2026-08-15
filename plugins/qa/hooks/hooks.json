@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "For every QA validation, always run the target through Aspire, keep Aspire MCP log/trace monitoring active for the full duration, and attach concrete evidence (Playwright screenshot or video path) to every pass/fail finding. Never report a feature as validated without evidence and without checking for errors surfaced through Aspire logs during the run."
+          }
+        ]
+      }
+    ]
+  }
+}

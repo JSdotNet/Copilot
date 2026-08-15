@@ -1,6 +1,6 @@
 # JSdotNet-Copilot
 
-Repository for building and curating GitHub Copilot customization assets as installable local plugins. The project focuses on agent workflows, instruction packs, and reusable skills for architecture, development, documentation, review, and plugin lifecycle management.
+Repository for building and curating GitHub Copilot customization assets as installable local plugins. The project focuses on agent workflows, instruction packs, and reusable skills for architecture, development, documentation, review, and spec-driven asset authoring.
 
 ## Technology Stack
 
@@ -47,8 +47,6 @@ JSdotNet-Copilot
 |  |     |- diagram-canvas/
 |  |     |- markdown-canvas/
 |  |     \- orch-dashboard/
-|  |- copilot-plugin-manager/
-|  |- copilot-spec-builder/
 |  |- csharp-coding/
 |  |- development/
 |  |- documentation/
@@ -59,6 +57,7 @@ JSdotNet-Copilot
 |  |- product-owner/
 |  |- qa/
 |  |- review/
+|  |- spec-builder/
 |  |- ux-design/
 |  |- wip-convention/
 |  |- knowledge-base/
@@ -141,8 +140,7 @@ Repository organization centers on reusable Copilot plugin bundles:
     - `development`
     - `documentation`
     - `review`
-    - `copilot-spec-builder`
-    - `copilot-plugin-manager`
+    - `spec-builder`
     - `csharp-coding`
     - `aikido`
     - `copilot-app`
@@ -164,8 +162,7 @@ Repository organization centers on reusable Copilot plugin bundles:
 - Plugin-based Copilot customization model for modular adoption.
 - Domain-focused agents for architecture, development, documentation, and review workflows.
 - Skill catalogs that encapsulate repeatable guidance and authoring processes.
-- Spec-driven asset authoring with `copilot-spec-builder`.
-- Plugin lifecycle management via `copilot-plugin-manager`.
+- Spec-driven asset authoring with `spec-builder`.
 - GitHub, Jira, QA, UX, domain design, and security-focused workflow plugins.
 - Work-in-progress artifact conventions via `wip-convention`.
 - Parallel task decomposition patterns via `worktree-parallel`.

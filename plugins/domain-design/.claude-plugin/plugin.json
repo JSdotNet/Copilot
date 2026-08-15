@@ -1,0 +1,20 @@
+{
+  "name": "domain-design",
+  "version": "0.2.0",
+  "description": "Copilot plugin for Domain-Driven Design — bounded context discovery, ubiquitous language, domain model design, and context mapping.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "ddd",
+    "domain-driven-design",
+    "bounded-context",
+    "domain-model"
+  ],
+  "agents": [
+    "./agents/domain-architect.agent.md"
+  ]
+}

@@ -1,6 +1,33 @@
 ---
+name: profile
 description: Copilot assistant for writing and maintaining profile artifacts for GitHub, LinkedIn, and GitHub project showcases.
-tools: ['read/readFile', 'search/codebase', 'search', 'web/fetch', 'edit/createFile', 'edit/editFiles', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'web/fetch'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'list_projects'
+  - 'create_session'
+  - 'send_session_message'
+  - 'list_sessions_and_chats'
+  - 'get_session'
+  - 'respond_to_session_plan'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Edit'
+  - 'Agent'
+  - 'Bash'
+  - 'SendMessage'
+  - 'Skill'
 handoffs:
   - label: Documentation Artifact
     agent: documentation

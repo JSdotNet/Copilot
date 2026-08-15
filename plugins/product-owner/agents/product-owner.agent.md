@@ -1,6 +1,38 @@
 ---
+name: product-owner
 description: Product Owner specialist for Agile/Scrum epics, user stories, and bugs.
-tools: ['read/readFile', 'edit/createFile', 'edit/editFiles', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/searchResults', 'search/textSearch', 'search/usages', 'web/fetch', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'edit/createFile'
+  - 'edit/editFiles'
+  - 'search/changes'
+  - 'search/codebase'
+  - 'search/fileSearch'
+  - 'search/listDirectory'
+  - 'search/searchResults'
+  - 'search/textSearch'
+  - 'search/usages'
+  - 'web/fetch'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'list_projects'
+  - 'create_session'
+  - 'send_session_message'
+  - 'list_sessions_and_chats'
+  - 'get_session'
+  - 'respond_to_session_plan'
+  - 'Read'
+  - 'Write'
+  - 'Edit'
+  - 'Bash'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Agent'
+  - 'SendMessage'
+  - 'Skill'
 handoffs:
   - label: Sync To Jira
     agent: jira

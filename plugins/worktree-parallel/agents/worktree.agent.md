@@ -1,6 +1,25 @@
 ---
-description: "Worktree Parallel: Orchestrate parallel work across isolated git worktrees using the active agent."
-tools: ['read/readFile', 'vscode/askQuestions', 'vscode/openFile', 'agent', 'terminal/runInTerminal', 'list_projects', 'create_session', 'send_session_message', 'list_sessions_and_chats', 'get_session', 'respond_to_session_plan']
+name: worktree
+description: 'Worktree Parallel: Orchestrate parallel work across isolated git worktrees using the active agent.'
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'vscode/askQuestions'
+  - 'vscode/openFile'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'list_projects'
+  - 'create_session'
+  - 'send_session_message'
+  - 'list_sessions_and_chats'
+  - 'get_session'
+  - 'respond_to_session_plan'
+  - 'Read'
+  - 'AskUserQuestion'
+  - 'Agent'
+  - 'Bash'
+  - 'SendMessage'
+  - 'Skill'
 ---
 
 # Worktree Parallel Agent

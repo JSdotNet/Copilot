@@ -1,5 +1,7 @@
 ---
-description: "QA Monitor Agent — continuously watches Aspire logs, traces, and metrics for a running app under test and reports anomalies. Focused, single-purpose persona invoked by the qa agent."
+name: qa-monitor
+description: QA Monitor Agent — continuously watches Aspire logs, traces, and metrics for a running app under test and reports anomalies. Focused, single-purpose persona invoked by the qa agent.
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
 tools:
   - 'read/readFile'
   - 'search/codebase'
@@ -17,6 +19,16 @@ tools:
   - 'aspire_get_traces'
   - 'aspire_get_metrics'
   - 'aspire_get_console_logs'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'WebFetch'
+  - 'WebSearch'
+  - 'Write'
+  - 'Edit'
+  - 'Bash'
+  - 'mcp__aspire'
+  - 'Skill'
 ---
 
 # QA Monitor Agent

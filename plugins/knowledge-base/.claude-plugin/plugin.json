@@ -1,0 +1,25 @@
+{
+  "name": "knowledge-base",
+  "version": "0.3.0",
+  "description": "Repository knowledge-folder convention for .arc42, .domain, .tech, .design, and .backlog: parseable chapter metadata, derived _meta indexes, a reference-graph canvas, per-folder orchestration skills, and enforcement tooling.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "knowledge",
+    "documentation",
+    "arc42",
+    "domain",
+    "ddd",
+    "architecture",
+    "backlog",
+    "design",
+    "technology-graph",
+    "metadata",
+    "convention",
+    "orchestration"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

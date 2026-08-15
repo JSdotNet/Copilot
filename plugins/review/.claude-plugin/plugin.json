@@ -1,0 +1,22 @@
+{
+  "name": "review",
+  "version": "0.3.0",
+  "description": "Copilot plugin providing reusable review skills for any agent — supports TODO-driven, question-driven, and improvement-driven reviews of code, stories, documentation, architecture, and more.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "review",
+    "todo",
+    "questions",
+    "improvement",
+    "code",
+    "documentation",
+    "stories",
+    "pull-request",
+    "pr-remarks"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

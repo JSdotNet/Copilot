@@ -19,6 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Bump changed plugin versions
+        id: bump-plugin-versions
         shell: pwsh
         run: |
           Set-StrictMode -Version Latest
@@ -82,6 +83,13 @@ jobs:
           Write-Host "Updated manifests:"
           $updatedManifests | ForEach-Object { Write-Host "- $_" }
           "updated=true" >> $env:GITHUB_OUTPUT
+
+      # The Claude manifests mirror the Copilot version field, so they drift the moment a
+      # bump lands. Regenerate before opening the PR rather than leaving CI red afterwards.
+      - name: Sync Claude plugin assets
+        if: steps.bump-plugin-versions.outputs.updated == 'true'
+        shell: pwsh
+        run: ./scripts/Sync-ClaudePlugins.ps1
 
       - name: Create pull request
         if: steps.bump-plugin-versions.outputs.updated == 'true'

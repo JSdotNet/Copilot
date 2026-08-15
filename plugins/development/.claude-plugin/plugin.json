@@ -1,0 +1,27 @@
+{
+  "name": "development",
+  "version": "0.1.0",
+  "description": "Copilot plugin for development planning and implementation workflows.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "development",
+    "planning",
+    "implementation",
+    "execution"
+  ],
+  "agents": [
+    "./agents/developer.agent.md",
+    "./agents-internal/backend.agent.md",
+    "./agents-internal/development-plan.agent.md",
+    "./agents-internal/frontend.agent.md",
+    "./agents-internal/naming.agent.md",
+    "./agents-internal/security.agent.md",
+    "./agents-internal/testing.agent.md"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

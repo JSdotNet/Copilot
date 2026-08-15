@@ -1,10 +1,27 @@
 ---
+name: naming
 description: Naming specialist for consistent domain, API, and code identifier naming decisions.
-model: claude-haiku-4.5
-tools: ['read/readFile', 'search/codebase', 'search', 'agent', 'terminal/runInTerminal']
+# Copilot tool ids and their Claude equivalents. Each host keeps the entries it knows.
+tools:
+  - 'read/readFile'
+  - 'search/codebase'
+  - 'search'
+  - 'agent'
+  - 'terminal/runInTerminal'
+  - 'Read'
+  - 'Grep'
+  - 'Glob'
+  - 'Agent'
+  - 'Bash'
+  - 'Skill'
 ---
 
 # Naming Agent
+
+## Model
+
+No model is pinned, so each host applies its own default.
+Prefer a fast, inexpensive model: this is a narrow, low-context review.
 
 ## Purpose
 

@@ -1,0 +1,24 @@
+{
+  "name": "spec-builder",
+  "version": "0.1.0",
+  "description": "Copilot plugin focused on GitHub customization asset authoring workflows.",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "github",
+    "agent",
+    "instruction",
+    "plugin",
+    "skill",
+    "markdown",
+    "workflow",
+    "github-actions"
+  ],
+  "agents": [
+    "./agents/spec-builder.agent.md"
+  ],
+  "hooks": "./hooks/hooks.json"
+}
