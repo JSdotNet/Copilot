@@ -454,10 +454,10 @@ foreach ($dir in $pluginDirs) {
         })
     }
 
+    # 'hooks' is omitted deliberately: Claude Code loads hooks/hooks.json automatically, and
+    # naming it in the manifest as well makes the plugin fail to load with "Duplicate hooks
+    # file detected". The field is only for hook files beyond that standard one.
     $hooksPath = Join-Path $dir.FullName 'hooks.json'
-    if (Test-Path -LiteralPath $hooksPath) {
-        $manifest['hooks'] = './hooks/hooks.json'
-    }
 
     if ($source.PSObject.Properties['mcpServers']) {
         $manifest['mcpServers'] = $source.mcpServers

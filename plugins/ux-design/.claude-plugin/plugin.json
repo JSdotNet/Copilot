@@ -17,6 +17,5 @@
   ],
   "agents": [
     "./agents/ux-designer.agent.md"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }

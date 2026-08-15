@@ -19,6 +19,5 @@
   ],
   "agents": [
     "./agents/spec-builder.agent.md"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }
