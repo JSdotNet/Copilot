@@ -12,7 +12,12 @@ const STATUS_LABEL = {
 };
 
 export function renderShell() {
-    return `<!doctype html>
+    // String.raw, not a plain template literal: the page below is one long JS string
+    // holding the dashboard's own script, and that script's regex escapes and string
+    // escapes have to reach the browser intact. A plain template literal consumes them
+    // one level early - a regex character class loses its escapes and stops parsing -
+    // which kills the whole page script. Interpolation still works exactly as before.
+    return String.raw`<!doctype html>
 <html>
 <head>
 <meta charset="utf-8" />
@@ -1089,7 +1094,7 @@ export function renderShell() {
       if (!evidenceLightbox) return;
       evidenceLightbox.hidden = true;
       evidenceLightbox.querySelector("img").removeAttribute("src");
-    }    }
+    }
 
     function evidenceError(img) {
       const ph = document.createElement("span");
