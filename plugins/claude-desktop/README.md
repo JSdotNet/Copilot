@@ -111,11 +111,34 @@ Practical consequences:
 - `skills/phase-build-test/`, `skills/phase-qa-validation/` — the two heavy shared phases,
   packaged so their procedure is maintained once
 
+#### Pull Request Skills
+
+Everything after the Personal Validation gate the `orch-*` orchestrations stop at.
+
+- `skills/create-pull-request/` — open a PR for the current branch, body grounded in the diff
+- `skills/update-pr-branch/` — integrate the base branch and resolve conflicts
+- `skills/fix-pr-checks/` — read failing job logs, reproduce, fix, push until green
+- `skills/pr-merge-ready/` — sweep your open sessions' PRs and clear their blockers; built
+  for `/loop`
+
+| Question | Skill |
+| --- | --- |
+| The branch is done — open a PR | `create-pull-request` |
+| GitHub says the branch has conflicts or is out of date | `update-pr-branch` |
+| Checks are red | `fix-pr-checks` |
+| Which of my open sessions need what, on a timer | `pr-merge-ready` |
+| Reviewers left comments | `pr-remarks-review` (plugin: `review`) |
+
+`pr-merge-ready` is scoped to the open worktree sessions on this machine — it matches each
+session branch to its pull request and works inside that session's existing worktree. It never
+runs `gh pr checkout`, so it cannot fight the worktree that already holds the branch. Sessions
+with no PR yet are reported, not remediated; raising the PR stays a deliberate call via
+`create-pull-request`.
+
 #### Automation Skills
 
 - `skills/azure-sre-to-github-issue/` — create GitHub issues from active Azure SRE alerts
 - `skills/start-session-from-issue/` — start one worktree-isolated agent per matching issue
-- `skills/update-open-sessions/` — rebase or merge open worktree branches onto the trunk
 - `skills/automation-bug-fix/` — start one `orch-bug` run per confirmed open `bug` issue
 - `skills/automation-package-update/` — update outdated NuGet packages and open a PR
 - `skills/automation-performance-review/` — find, implement, and PR a performance improvement
