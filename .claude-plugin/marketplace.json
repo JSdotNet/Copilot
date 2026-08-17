@@ -20,8 +20,8 @@
     {
       "name": "claude-desktop",
       "source": "./plugins/claude-desktop",
-      "description": "Claude Code plugin for orchestration workflows and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
-      "version": "0.1.0"
+      "description": "Claude Code plugin for orchestration workflows, pull request delivery, and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
+      "version": "0.2.0"
     },
     {
       "name": "csharp-coding",
