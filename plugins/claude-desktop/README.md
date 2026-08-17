@@ -108,6 +108,7 @@ Practical consequences:
 - `skills/orch-structure/` — repository structure/layout refactors
 - `skills/orch-create-module/` — create and validate a new module
 - `skills/orch-create-service/` — create and wire a new service
+- `skills/orch-fallback/` — generic entrypoint for task categories no other `orch-*` skill covers
 - `skills/phase-build-test/`, `skills/phase-qa-validation/` — the two heavy shared phases,
   packaged so their procedure is maintained once
 

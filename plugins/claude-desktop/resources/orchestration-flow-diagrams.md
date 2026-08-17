@@ -442,3 +442,40 @@ flowchart TD
 | Create Pull Request | *(default)* | — |
 | GitHub Issue Update | *(default)* | — |
 | Summary | `orchestrator` agent | — |
+
+## orch-fallback
+
+```mermaid
+flowchart TD
+    A["Routing Check"] --> Z{Dedicated orch-* skill matches?}
+    Z -->|Yes| Y["Stop - invoke that skill instead"]
+    Z -->|No| B["Plan"]
+    B --> C["Execute"]
+    C --> D["Review & Recommend"]
+    D --> K{Change kind?}
+    K -->|Code-modifying| E["Build & Test"]
+    E --> F["QA Validation"]
+    F --> G["Personal Validation"]
+    K -->|Documentation/config| G
+    G --> H{User approves?}
+    H -->|Yes| I["Create Pull Request or Skip"]
+    H -->|No| J["Return to the relevant earlier stage"]
+    J --> B
+    I --> V["Documentation Update or Skip (code-modifying tier only)"]
+    V --> U["GitHub Issue Update or Skip"]
+    U --> S["Summary"]
+```
+
+| Phase | Agents | MCP servers |
+|-------|--------|-------------|
+| Routing Check | `orchestrator` agent | — |
+| Plan | The closest specialist agent for the task category | `jsdotnet-guidelines-mcpserver` *(when the task touches governed assets)* |
+| Execute | The closest specialist agent for the task category | `microsoft-learn` *(targeted lookups only)* |
+| Review & Recommend | The closest specialist agent for the task category | — |
+| Build & Test | `csharp-coding:coding` *(code-modifying change kind only)* | `microsoft-learn` *(targeted remediation only)* |
+| QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` *(code-modifying change kind only)* | `playwright` *(targeted validation when a runnable surface exists)* |
+| Personal Validation | — | — |
+| Create Pull Request | *(default)* | — |
+| Documentation Update | `documentation:documentation` *(code-modifying change kind only)* | `jsdotnet-guidelines-mcpserver` *(optional, governed docs only)* |
+| GitHub Issue Update | *(default)* | — |
+| Summary | `orchestrator` agent | — |

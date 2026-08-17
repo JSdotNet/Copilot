@@ -196,6 +196,9 @@ When a child session is used (`create_session` + cross-session messaging):
   `orch-blueprint`, `orch-architecture`, `orch-repo` — run: **Personal Validation →
   Create Pull Request → GitHub Issue Update → Summary** (no Build & Test or QA Validation, because they
   produce no runnable code change).
+- **`orch-fallback`** has no fixed tier: it runs the code-modifying tier when its Routing
+  Check determines a code-modifying change kind, and the documentation/config tier
+  otherwise. It reports the resolved tier's phase names in `start_run`.
 
 ## Phase: Build & Test
 

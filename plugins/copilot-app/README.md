@@ -49,6 +49,7 @@ review rather than restarting broad discovery.
 - `skills/orch-structure/SKILL.md` - Existing repository structure/layout refactors, folder moves, project/solution organization fixes, and test/harness placement changes (canvas)
 - `skills/orch-create-module/SKILL.md` - Create and validate a new module in an existing project (canvas)
 - `skills/orch-create-service/SKILL.md` - Create and wire a new service in an existing project (canvas)
+- `skills/orch-fallback/SKILL.md` - Generic entrypoint for task categories no other `orch-*` skill covers (canvas)
 
 #### Automation Skills
 
@@ -169,7 +170,7 @@ mechanism itself, and each has its own install method):
 
 After installation, the plugin skills should appear in GitHub Copilot App:
 
-- In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-structure`, `orch-create-module`, `orch-create-service`
+- In the command palette: `orch-repo`, `orch-project`, `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, `orch-tdr`, `orch-feature`, `orch-bug`, `orch-structure`, `orch-create-module`, `orch-create-service`, `orch-fallback`
 - In skill suggestions when relevant
 - Canvas panels open for each orchestration skill
 - Integration buttons to switch to `csharp-coding:coding` agent
@@ -424,6 +425,7 @@ live in one central document: [`resources/orchestration-flow-diagrams.md`](resou
 | `orch-structure` | [`resources/orchestration-flow-diagrams.md#orch-structure`](resources/orchestration-flow-diagrams.md#orch-structure) |
 | `orch-create-module` | [`resources/orchestration-flow-diagrams.md#orch-create-module`](resources/orchestration-flow-diagrams.md#orch-create-module) |
 | `orch-create-service` | [`resources/orchestration-flow-diagrams.md#orch-create-service`](resources/orchestration-flow-diagrams.md#orch-create-service) |
+| `orch-fallback` | [`resources/orchestration-flow-diagrams.md#orch-fallback`](resources/orchestration-flow-diagrams.md#orch-fallback) |
 
 ## Skills Can Use Other Skills
 
@@ -444,6 +446,9 @@ The orchestration skills are designed to coordinate with other plugin skills:
 - `orch-bug` uses TDD approach with `csharp-coding:coding` agent
 - `orch-structure` handles existing repository structure/layout refactors and keeps
   `orch-project` focused on initial project scaffolding
+- `orch-fallback` is the last resort: it covers task categories no other `orch-*` skill owns
+  (tooling, CI, scripting, housekeeping) and recommends a dedicated skill when the category
+  recurs. Unmet preconditions on a matching skill are never a reason to use it
 - `orch-create-service` can use `aspire` for AppHost wiring
 - `orch-feature`, `orch-bug`, `orch-update-packages`, `orch-structure`, `orch-create-module`,
   `orch-create-service`, `orch-create-mvp`, `orch-project`, and `orch-aspire-update`
