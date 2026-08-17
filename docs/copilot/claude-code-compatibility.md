@@ -151,7 +151,7 @@ transport:
 | `copilot-app` | `claude-desktop` |
 | --- | --- |
 | `orch-dashboard` canvas panel | MCP App panel inline in Claude Desktop; a page on `127.0.0.1` elsewhere |
-| canvas actions (`invoke_canvas_action`) | MCP tools (`mcp__orch-dashboard__*`), same names and arguments |
+| canvas actions (`invoke_canvas_action`) | MCP tools (`mcp__plugin_claude-desktop_orch-dashboard__*`), same names and arguments |
 | `diagram-canvas`, `markdown-canvas` extensions | `/mermaid` and `/markdown` routes on the same server, driven by `render_diagram` / `render_markdown` |
 | host session telemetry events | `PreToolUse`/`PostToolUse`/`SubagentStop`/`PreCompact`/`Stop` hooks plus the session transcript |
 | `.github/copilot-orch-context.md`, `.github/copilot-model-selection.md` | `.claude/orch-context.md`, `.claude/model-selection.md` |

@@ -25,7 +25,7 @@ them in step when changing either copy.
 | Copilot CLI | Claude Code |
 | --- | --- |
 | canvas panel embedded in the host | browser page served on `127.0.0.1` |
-| canvas actions (`invoke_canvas_action`) | MCP tools (`mcp__orch-dashboard__*`) |
+| canvas actions (`invoke_canvas_action`) | MCP tools (`mcp__plugin_claude-desktop_orch-dashboard__*`) |
 | `diagram-canvas` extension | `/mermaid` route + `render_diagram` |
 | `markdown-canvas` extension | `/markdown` route + `render_markdown` |
 | session telemetry events | Claude Code hooks + session transcript |
@@ -81,8 +81,12 @@ them in step when changing either copy.
 
 ## Tools
 
-Registered under the MCP server name `orch-dashboard`, so Claude Code exposes them as
-`mcp__orch-dashboard__<tool>`.
+Registered under the MCP server name `orch-dashboard`. The prefix Claude Code exposes them
+under depends on how the server is registered: installed as part of this plugin they are
+namespaced with the plugin, as `mcp__plugin_claude-desktop_orch-dashboard__<tool>`;
+registered directly in a repository's `.mcp.json` they are `mcp__orch-dashboard__<tool>`.
+Tool names and arguments are identical either way — resolve the prefix from the available
+tool list rather than hardcoding one.
 
 - `open_dashboard()` -> `{ dashboardUrl, diagramUrl, documentUrl, stateDir }`
   Starts the local HTTP server if it is not already running and returns the URLs. Call once
