@@ -2,7 +2,7 @@
 name: orchestrator
 description: 'Orchestration runner for claude-desktop orch-* skills. Sequences the shared delivery phases, drives the orch-dashboard MCP server, and enforces the agentless Personal Validation gate before any pull request.'
 model: opus
-tools: ['Read', 'Grep', 'Glob', 'Write', 'Edit', 'Bash', 'Agent', 'SendMessage', 'Skill', 'AskUserQuestion', 'mcp__orch-dashboard__open_dashboard', 'mcp__orch-dashboard__start_run', 'mcp__orch-dashboard__record_prompt', 'mcp__orch-dashboard__set_run_context', 'mcp__orch-dashboard__update_stage', 'mcp__orch-dashboard__finish_run', 'mcp__orch-dashboard__list_runs', 'mcp__orch-dashboard__get_run', 'mcp__orch-dashboard__render_diagram', 'mcp__orch-dashboard__render_markdown', 'mcp__orch-dashboard__export_report']
+tools: ['Read', 'Grep', 'Glob', 'Write', 'Edit', 'Bash', 'Agent', 'SendMessage', 'Skill', 'AskUserQuestion', 'mcp__plugin_claude-desktop_orch-dashboard__open_dashboard', 'mcp__plugin_claude-desktop_orch-dashboard__start_run', 'mcp__plugin_claude-desktop_orch-dashboard__record_prompt', 'mcp__plugin_claude-desktop_orch-dashboard__set_run_context', 'mcp__plugin_claude-desktop_orch-dashboard__update_stage', 'mcp__plugin_claude-desktop_orch-dashboard__finish_run', 'mcp__plugin_claude-desktop_orch-dashboard__list_runs', 'mcp__plugin_claude-desktop_orch-dashboard__get_run', 'mcp__plugin_claude-desktop_orch-dashboard__render_diagram', 'mcp__plugin_claude-desktop_orch-dashboard__render_markdown', 'mcp__plugin_claude-desktop_orch-dashboard__export_report', 'mcp__orch-dashboard__open_dashboard', 'mcp__orch-dashboard__start_run', 'mcp__orch-dashboard__record_prompt', 'mcp__orch-dashboard__set_run_context', 'mcp__orch-dashboard__update_stage', 'mcp__orch-dashboard__finish_run', 'mcp__orch-dashboard__list_runs', 'mcp__orch-dashboard__get_run', 'mcp__orch-dashboard__render_diagram', 'mcp__orch-dashboard__render_markdown', 'mcp__orch-dashboard__export_report']
 ---
 
 # Orchestrator Agent
@@ -52,7 +52,8 @@ consuming repository's optional runtime context file, whose convention is define
    covers. Both files are optional: a missing or malformed file falls back to existing
    behavior and never blocks the run.
 4. **Open the dashboard once and reattach if a run exists.** Call
-   `mcp__orch-dashboard__open_dashboard` once per session and give the user the returned
+   `open_dashboard` (`mcp__plugin_claude-desktop_orch-dashboard__open_dashboard` when this
+   plugin is installed as a plugin) once per session and give the user the returned
    `dashboardUrl` to open in a browser; the page then updates itself live. Then call
    `start_run` with the skill's `skillId`, the full ordered stage list (unique stages +
    shared phases for its tier), and the `changeKind` when known. `start_run` returns

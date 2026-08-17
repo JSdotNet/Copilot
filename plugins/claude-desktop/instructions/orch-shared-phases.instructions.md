@@ -463,10 +463,18 @@ category's resolved model.
 
 Every `orch-*` skill reports progress through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`), which this plugin registers. Its tools appear
-as `mcp__orch-dashboard__<tool>` — `open_dashboard`, `start_run`, `record_prompt`,
-`set_run_context`, `update_stage`, `finish_run`, `list_runs`, `get_run`, `render_diagram`,
-`render_markdown`, and `export_report`. There is no provider ambiguity to resolve: an MCP
-server is addressed by name, and a second copy would surface under a different name.
+under the names `open_dashboard`, `start_run`, `record_prompt`, `set_run_context`,
+`update_stage`, `finish_run`, `list_runs`, `get_run`, `render_diagram`, `render_markdown`,
+and `export_report`.
+
+**The tool prefix depends on how the server is registered, so resolve it from the available
+tool list rather than assuming it.** A plugin-provided MCP server is namespaced with the
+plugin that provides it, so installing this plugin surfaces the tools as
+`mcp__plugin_claude-desktop_orch-dashboard__<tool>`. The same server registered directly in a
+repository's `.mcp.json` surfaces as `mcp__orch-dashboard__<tool>`. The tool names and
+arguments are identical either way; only the prefix differs. An agent that hardcodes one
+spelling — in an `mcp__` tool allowlist especially, which matches exact runtime names — loses
+every dashboard tool under the other.
 
 - If the `orch-dashboard` tools are not available at all — the plugin is installed without
   its MCP server, or the server failed to start — skip the dashboard calls and continue

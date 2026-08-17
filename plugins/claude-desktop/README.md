@@ -230,7 +230,8 @@ hands you its URL.
 
 - In Claude Desktop: asking for the dashboard renders a panel inline in the conversation
 - In Claude Code: `orch-*` skills appear in the skill list and are suggested for the governed
-  categories, and `mcp__orch-dashboard__open_dashboard` returns a `http://127.0.0.1:<port>/`
+  categories, and `mcp__plugin_claude-desktop_orch-dashboard__open_dashboard` returns a
+  `http://127.0.0.1:<port>/`
   URL whose page shows the run list and updates without a refresh
 
 ## Dependencies
