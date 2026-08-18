@@ -7,8 +7,15 @@
     "An empty array means the capability has no Claude equivalent and is dropped;",
     "the reason is recorded in 'dropReasons' and emitted as a comment in the generated agent.",
     "",
-    "'mcpPrefixes' matches tool ids by prefix and maps them to a Claude MCP server-level",
-    "pattern (mcp__<server>), which grants every tool from that server.",
+    "'mcpPrefixes' matches tool ids by prefix and maps them to the MCP server that provides",
+    "them. The server must be declared in the plugin's own manifest. The generator turns it",
+    "into Claude MCP server-level patterns, which grant every tool from that server:",
+    "  mcp__plugin_<plugin>_<server>   the plugin-provided server, namespaced by its plugin",
+    "  mcp__<server>                   the same server registered directly in a .mcp.json",
+    "Both are emitted because the prefix depends on how the server was registered, and a",
+    "'tools' allowlist is matched against the exact runtime names. Granting the server rather",
+    "than a list of tool names also keeps the allowlist working when the server renames its",
+    "tools - which is not hypothetical: the Aspire MCP server's get_* tools became list_*.",
     "",
     "This file is hand-maintained. When a new Copilot tool id appears in an agent, the",
     "generator fails with 'unmapped tool id' rather than guessing - add the mapping here."
@@ -58,15 +65,31 @@
   },
 
   "mcpPrefixes": {
-    "aspire_": "mcp__aspire",
-    "get_resources": "mcp__aspire",
-    "get_resource_logs": "mcp__aspire",
-    "get_traces": "mcp__aspire",
-    "get_metrics": "mcp__aspire",
-    "get_console_logs": "mcp__aspire",
-    "browser_": "mcp__playwright",
-    "playwright-browser_": "mcp__playwright"
+    "aspire_": "aspire",
+    "doctor": "aspire",
+    "list_apphosts": "aspire",
+    "select_apphost": "aspire",
+    "list_resources": "aspire",
+    "list_console_logs": "aspire",
+    "list_structured_logs": "aspire",
+    "list_traces": "aspire",
+    "list_trace_structured_logs": "aspire",
+    "execute_resource_command": "aspire",
+    "get_resources": "aspire",
+    "get_resource_logs": "aspire",
+    "get_traces": "aspire",
+    "get_metrics": "aspire",
+    "get_console_logs": "aspire",
+    "browser_": "playwright",
+    "playwright-browser_": "playwright"
   },
+
+  "$mcpPrefixesComment": [
+    "The Aspire MCP server renamed its query tools from get_* to list_* (and dropped metrics",
+    "entirely). Both spellings are mapped: the current list_* names, and the get_* names that",
+    "an older Aspire CLI still exposes. Neither host errors on an id it cannot resolve, so an",
+    "agent may declare both and keep working across CLI versions."
+  ],
 
   "dropReasons": {
     "vscode/memory": "VS Code workspace memory has no Claude Code equivalent; Claude uses CLAUDE.md and the memory directory instead.",

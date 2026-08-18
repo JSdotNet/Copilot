@@ -114,9 +114,9 @@ Store runbooks under `.wip/runbooks/<service-name>/<alert-name>.md`.
 
 ## Diagnostic Steps
 
-1. Check `get_resources` in Aspire MCP — is the service running?
-2. `get_resource_logs` for <service> — look for error patterns.
-3. `get_traces` — identify failing request paths.
+1. Check `list_resources` in Aspire MCP — is the service running?
+2. `list_structured_logs` for <service> — look for error patterns.
+3. `list_traces` — identify failing request paths, then `list_trace_structured_logs` for one.
 4. Check downstream dependencies (database, queues, external APIs).
 
 ## Mitigation
@@ -136,10 +136,11 @@ When investigating an incident, gather:
 1. **When** — first occurrence timestamp, duration.
 2. **What** — error messages, affected endpoints, impacted users.
 3. **Where** — which service, which dependency, which region.
-4. **Why** — trace ID and root cause from `get_traces` / `get_resource_logs`.
+4. **Why** — trace ID and root cause from `list_traces` / `list_structured_logs`.
 5. **How to fix** — immediate mitigation and long-term remediation.
 
-Use the `aspire-logging` skill to retrieve logs and traces from running services.
+Use the `aspire-logging` skill to retrieve logs and traces from running services — it also
+records the current tool names and how to resolve their `mcp__` prefix.
 
 ## Error Budget Burn Tracking
 

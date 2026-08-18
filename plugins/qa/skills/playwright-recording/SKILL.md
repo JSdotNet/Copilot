@@ -1,15 +1,55 @@
 ---
 name: playwright-recording
-description: 'Record video or trace of a multi-step Playwright MCP flow as continuous evidence. Use for scenarios where the sequence of interactions matters, not just the end state — e.g. multi-page checkout, wizard flows, drag-and-drop.'
-compatibility: Requires the Playwright MCP server (`@playwright/mcp`) with tracing/recording support.
+description: 'Capture continuous step-by-step evidence of a multi-step Playwright MCP flow. Use for scenarios where the sequence of interactions matters, not just the end state — e.g. multi-page checkout, wizard flows, drag-and-drop.'
+compatibility: Requires the Playwright MCP server (`@playwright/mcp`). Video/trace recording only if the installed version exposes tracing tools — 0.0.79 does not.
 ---
 
 # Playwright Recording — Continuous Flow Evidence
 
-Record a continuous video or trace of a multi-step interaction sequence, so the QA
-report can show *how* a flow behaved, not just its final state. Use this alongside
-`playwright-screenshot` — recordings capture the sequence, screenshots pin specific
-checkpoints for quick review.
+Capture a continuous record of a multi-step interaction sequence, so the QA report can show
+*how* a flow behaved, not just its final state. Use this alongside `playwright-screenshot` —
+this skill covers the whole sequence, that one pins a single checkpoint for quick review.
+
+## First: Check What Your Server Can Record
+
+**Read your tool list before choosing a form of evidence.** `@playwright/mcp` 0.0.79 — the
+version this plugin installs via `@playwright/mcp@latest` — exposes **no** tracing or video
+tools (`browser_start_tracing` / `browser_stop_tracing` do not exist) and **no** `--save-trace`
+or `--save-video` server option. Only `--save-session` (a session log of tool calls under
+`--output-dir`) and screenshots are available.
+
+So there are two paths, and the report must name which one was used:
+
+| Your tool list shows | Evidence form | Follow |
+|---|---|---|
+| No tracing tools (current default) | **Numbered screenshot sequence**, one per step | [Screenshot sequence](#screenshot-sequence-default) |
+| `browser_start_tracing` / `browser_stop_tracing` | Video or Playwright trace file | [Tracing tools](#tracing-tools-if-exposed) |
+
+Never call a screenshot sequence a video or a trace in a QA report.
+
+## Screenshot Sequence (default)
+
+1. Take a `browser_take_screenshot` immediately after the app is confirmed healthy (see
+   `aspire-run`) and before the first interaction, so the sequence covers the entry state.
+2. Take one after **every** state-changing step, in order, without skipping steps that
+   "looked fine" — the point is the sequence, not the endpoint.
+3. Save them zero-padded and in order so the sequence reads as a flow:
+
+   ```
+   .wip/qa/<feature-name>/sequence/<scenario-name>/01-<step>.png
+   ```
+
+4. In the report, cite the folder plus the step each frame corresponds to, and state that
+   the evidence is a screenshot sequence because the server exposes no recording tool.
+5. If the server was started with `--save-session`, also cite the session file under its
+   `--output-dir` — it records every tool call and is the closest thing to a replayable
+   trace this server offers.
+
+Timing-sensitive behavior (animation, drag-and-drop) is the known weakness of this form:
+add a `browser_wait_for` before each screenshot so each frame captures a settled state, and
+say plainly in the report what a still sequence could not prove.
+
+## Tracing Tools (if exposed)
 
 ## When to Use
 
@@ -28,10 +68,10 @@ checkpoints for quick review.
 Tool: browser_start_tracing
 ```
 
-(Tool name depends on the installed Playwright MCP version — some versions expose
-video recording via a `browser_navigate`/session option instead of a dedicated
-start/stop tool pair; check the `browser_snapshot` tool listing if `browser_start_tracing`
-is not available.)
+(Only if your tool list actually shows it — see
+[First: Check What Your Server Can Record](#first-check-what-your-server-can-record). Tool
+names here are bare; prepend the prefix your tool list shows, normally
+`mcp__plugin_qa_playwright__`.)
 
 - Start tracing immediately after the app is confirmed healthy (see `aspire-run`) and
   before the first `browser_navigate` of the scenario, so the recording covers the

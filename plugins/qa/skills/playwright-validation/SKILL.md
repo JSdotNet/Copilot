@@ -28,8 +28,13 @@ rely on static code reading to claim a feature works — prove it by running it.
   }
   ```
 
-- The Copilot session/runtime has been restarted or MCP tools have been reloaded after
+- The session/runtime has been restarted or MCP tools have been reloaded after
   configuration, so the `browser_*` tools are visible in the validation session.
+- The prefix is resolved from the tool list you actually have. The Playwright server ships
+  with this plugin, so its tools normally surface as `mcp__plugin_qa_playwright__<tool>`; the
+  same server registered directly in a repository's own MCP configuration surfaces as
+  `mcp__playwright__<tool>`. This skill names tools bare (`browser_navigate`) — prepend
+  whichever prefix your tool list shows rather than assuming one.
 
 ## Available Playwright MCP Tools (typical set)
 
@@ -39,13 +44,19 @@ rely on static code reading to claim a feature works — prove it by running it.
 | `browser_snapshot` | Get an accessibility-tree snapshot of the current page (preferred for locating elements) |
 | `browser_click` / `browser_type` / `browser_select_option` | Interact with elements |
 | `browser_take_screenshot` | Capture a screenshot of the current page or element |
-| `browser_start_tracing` / `browser_stop_tracing` | Record a trace/video of a multi-step flow |
+| `browser_find` | Find elements by description without a full snapshot |
+| `browser_evaluate` | Read computed state (e.g. a CSS value) the snapshot does not expose |
 | `browser_console_messages` | Read browser console output (client-side errors) |
 | `browser_network_requests` | Inspect network requests/responses made by the page |
 | `browser_wait_for` | Wait for text, element state, or a time interval |
 
 Exact tool names depend on the installed Playwright MCP version — use `browser_snapshot`
 first on an unfamiliar page to confirm available element references before interacting.
+
+**There are no tracing/recording tools in the current server** (checked against
+`@playwright/mcp` 0.0.79): no `browser_start_tracing` / `browser_stop_tracing`. Continuous
+evidence therefore means a screenshot sequence, not a video — see `playwright-recording`, and
+never describe a screenshot sequence as video in a report.
 
 ## Workflow
 

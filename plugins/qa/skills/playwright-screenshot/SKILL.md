@@ -32,6 +32,11 @@ checkpoint, assertion, or failure during Playwright MCP validation.
 Tool: browser_take_screenshot
 ```
 
+(Tool names here are bare. The Playwright server ships with this plugin, so its tools
+normally surface as `mcp__plugin_qa_playwright__<tool>` — `mcp__playwright__<tool>` when the
+server is registered directly in a repository's own MCP configuration. Take the prefix from
+your tool list.)
+
 - Full-page screenshot by default; scope to a specific element reference (from a prior
   `browser_snapshot`) when only one component's state matters (e.g. a single form field
   error, a toast, a modal).
