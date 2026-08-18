@@ -9,6 +9,10 @@ const STATUS_LABEL = {
     blocked: "Blocked",
     skipped: "Skipped",
     cancelled: "Cancelled",
+    // Derived run state (see idle.mjs), never a stored status: an `in_progress` run whose
+    // session ended or that nothing has advanced for hours — typically one left waiting at
+    // the Personal Validation gate.
+    idle: "Idle",
 };
 
 export function renderShell() {
@@ -113,6 +117,7 @@ export function renderShell() {
   .badge.done { background: rgba(31,136,61,0.15); color: #1f883d; }
   .badge.blocked, .badge.cancelled { background: rgba(207,34,46,0.15); color: var(--true-color-red, #cf222e); }
   .badge.skipped { background: rgba(127,127,127,0.1); color: var(--text-color-muted, #59636e); }
+  .badge.idle { background: rgba(154,103,0,0.15); color: var(--true-color-yellow, #9a6700); }
   .stage {
     border-left: 3px solid var(--border-color-default, #d0d7de);
     padding: 6px 0 6px 14px;
@@ -372,6 +377,12 @@ export function renderShell() {
       return '<span class="badge ' + esc(s) + '">' + esc(STATUS_LABEL[s] || s) + '</span>';
     }
 
+    // Runs carry a derived idle flag from the API; stages never do, so they keep using
+    // badge() directly on their stored status.
+    function runBadge(run) {
+      return badge(run && run.idle ? "idle" : run && run.status);
+    }
+
     // A run has a declared trailing Summary stage when its last stage is named
     // "Summary" (orch-feature and friends declare one). finish_run also sets
     // run.summary; without this check the nav/detail would render Summary twice
@@ -452,7 +463,7 @@ export function renderShell() {
       el.innerHTML = runs.map((r) => (
         '<button class="run-item ' + (r.id === selectedId ? "selected" : "") + '" data-id="' + esc(r.id) + '">' +
           '<span class="title">' + esc(r.title) + '</span>' +
-          '<span class="meta">' + esc(r.skillId) + ' &middot; ' + badge(r.status) + '</span>' +
+          '<span class="meta">' + esc(r.skillId) + ' &middot; ' + runBadge(r) + '</span>' +
         '</button>' +
         (r.id === selectedId && selectedRun ? renderStageNav(selectedRun) : "")
       )).join("");
@@ -999,7 +1010,7 @@ export function renderShell() {
         : "";
       el.innerHTML =
         '<div class="header-row"><h1 style="margin:0;">' + esc(run.title) + '</h1>' +
-          '<div class="header-actions"><a class="report-link" href="/api/runs/' + encodeURIComponent(run.id) + '/report.html?inline=1" target="_blank" rel="noopener">Open HTML report</a>' + badge(run.status) + '</div>' +
+          '<div class="header-actions"><a class="report-link" href="/api/runs/' + encodeURIComponent(run.id) + '/report.html?inline=1" target="_blank" rel="noopener">Open HTML report</a>' + runBadge(run) + '</div>' +
         '</div>' +
         '<p class="subtitle">' + esc(run.skillId) + ' &middot; started ' + esc(new Date(run.startedAt).toLocaleString()) +
           (run.updatedAt ? ' &middot; updated ' + esc(new Date(run.updatedAt).toLocaleString()) : "") +

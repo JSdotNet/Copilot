@@ -37,6 +37,7 @@ import { renderShell } from "./render.mjs";
 import { summarizeInsights, summarizeContext } from "./insight.mjs";
 import { renderReportMarkdown, renderReportHtml } from "./report.mjs";
 import { runsDir, stateDir, worktreeRoot, readActive, writeActive } from "./state.mjs";
+import { isIdle, clearIdle } from "./idle.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -125,6 +126,10 @@ function summarize(run) {
         updatedAt: run.updatedAt,
         changeKind: run.changeKind || null,
         approval: run.approval || null,
+        // Derived, not stored: an `in_progress` run nothing has advanced. Surfaced so the
+        // dashboard and a resuming agent can tell a live run from one abandoned at a gate.
+        idle: isIdle(run),
+        idleSince: run.idleSince || null,
     };
 }
 
@@ -466,7 +471,14 @@ async function handleRequest(req, res) {
             return;
         }
         res.setHeader("Content-Type", "application/json; charset=utf-8");
-        res.end(JSON.stringify({ ...run, insightSummary: summarizeInsights(run), contextSummary: summarizeContext(run) }));
+        res.end(
+            JSON.stringify({
+                ...run,
+                idle: isIdle(run),
+                insightSummary: summarizeInsights(run),
+                contextSummary: summarizeContext(run),
+            })
+        );
         return;
     }
 
@@ -563,7 +575,7 @@ const tools = [
     {
         name: "open_dashboard",
         description:
-            "Show the orchestration dashboard. In a host that supports MCP Apps it renders inline; otherwise it starts the local dashboard server and returns URLs for the run dashboard and the diagram/document viewers to open in a browser. Call once per session before start_run.",
+            "Show the orchestration dashboard. In a host that supports MCP Apps it renders inline; otherwise it starts the local dashboard server and returns URLs for the run dashboard and the diagram/document viewers. Call once per session before start_run. When the host has an in-app browser, open the returned dashboardUrl there (in Claude Code: preview_start) so the dashboard sits beside the conversation instead of only appearing as a link.",
         inputSchema: { type: "object", properties: {}, additionalProperties: false },
         _meta: { ui: { resourceUri: "ui://orch-dashboard/dashboard.html" } },
         handler: async () => {
@@ -638,7 +650,10 @@ const tools = [
             }
             const dashboardUrl = await ensureHttpServer();
             if (resume !== false) {
-                const existing = (await listRuns(baseDir)).find((r) => r.skillId === skillId && r.status === "in_progress");
+                // An idle run is deliberately not resumable here: a run abandoned at the
+                // Personal Validation gate stays `in_progress`, and adopting it would
+                // silently continue dead work under a stale title and stage list.
+                const existing = (await listRuns(baseDir)).find((r) => r.skillId === skillId && r.status === "in_progress" && !isIdle(r));
                 if (existing) {
                     await writeActive({ runId: existing.id, stage: null, updatedAt: new Date().toISOString() });
                     bus.emit("update");
@@ -710,6 +725,7 @@ const tools = [
                 if (entry.kind !== "initial" || !existingInitial) run.promptHistory.push(entry);
                 if (entry.kind === "initial" && !run.originalPrompt) run.originalPrompt = entry.prompt;
                 run.updatedAt = new Date().toISOString();
+                clearIdle(run);
                 count = run.promptHistory.length;
                 await writeRun(baseDir, run);
             });
@@ -755,6 +771,7 @@ const tools = [
                     };
                 }
                 run.updatedAt = new Date().toISOString();
+                clearIdle(run);
                 await writeRun(baseDir, run);
                 result = { changeKind: run.changeKind || null, approval: run.approval || null };
             });
@@ -887,6 +904,7 @@ const tools = [
                 if (normalizedMonitoring) stage.monitoring = normalizedMonitoring;
                 stage.updatedAt = nowIso;
                 run.updatedAt = nowIso;
+                clearIdle(run);
                 await writeRun(baseDir, run);
             });
             // Written outside the run lock: the telemetry hook reads this pointer to
@@ -915,6 +933,7 @@ const tools = [
                 run.status = status;
                 if (typeof summary === "string") run.summary = summary;
                 run.updatedAt = new Date().toISOString();
+                clearIdle(run);
                 await writeRun(baseDir, run);
             });
             const active = await readActive();
@@ -925,7 +944,8 @@ const tools = [
     },
     {
         name: "list_runs",
-        description: "List all tracked runs (summaries only). Useful to recover the current runId after a resume or compaction.",
+        description:
+            "List all tracked runs (summaries only). Useful to recover the current runId after a resume or compaction. A run with idle:true is still in_progress but has been abandoned (its session ended, or nothing advanced it for hours) — close it with finish_run rather than continuing it.",
         inputSchema: { type: "object", properties: {}, additionalProperties: false },
         handler: async () => (await listRuns(baseDir)).map(summarize),
     },

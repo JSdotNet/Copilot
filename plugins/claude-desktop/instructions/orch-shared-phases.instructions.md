@@ -140,6 +140,12 @@ Defines *where* an orchestration runs and *how* its progress is tracked. Applies
    practice, `qa:qa-monitor` tailing Aspire logs while Playwright drives scenarios. Launch
    it with the `Agent` tool's `run_in_background`, steer it with `SendMessage`, and do not
    background work merely to save context.
+4. **Stop every background sub-agent you started, in the same phase that started it.**
+   `qa-monitor` is built to poll until told otherwise — its own instructions say not to stop
+   monitoring — so nothing ends it on its own. Ask it for its final summary with
+   `SendMessage`, then end it with `TaskStop`. A monitor left running keeps polling Aspire
+   after the run has moved on, and a phase must never complete with a background agent it
+   started still alive.
 
 Whichever form is used, pass the model resolved for that stage's category per
 `instructions/orch-model-selection.instructions.md` in the `Agent` call's `model`.
@@ -197,6 +203,13 @@ mechanism; background sub-agents remain reserved for concurrent monitoring.
   run for the same `skillId` by default and returns `resumed: true` with the stored run.
   Continue from the first stage that is not `done`; pass `resume: false` only to
   deliberately start a second run of the same skill.
+- **An idle run is abandoned work, not resumable work.** A run only leaves `in_progress`
+  through `finish_run`, so one left waiting at an unanswered Personal Validation gate stays
+  `in_progress` indefinitely. The dashboard derives an `idle` flag for those (session ended,
+  or nothing advanced the run for hours) and `start_run` will not reattach to one. When
+  `list_runs` shows an idle run, do not silently continue it: either close it with
+  `finish_run` (`cancelled`, with a summary saying where it stopped) or confirm with the
+  user that it should be picked up, then advance a stage so it counts as live again.
 - **Persist the decisions that gate later phases** with `set_run_context`:
   - `changeKind` (`new-functionality` / `bug-fix` / `dependency-update` / `none`) as soon
     as it is known, so a resumed run selects the same QA depth.
@@ -283,6 +296,9 @@ invokes it and passes the change kind so depth is selected automatically:
     (the `Agent` tool with `run_in_background`, steered with `SendMessage`) so monitoring
     runs concurrently with Playwright validation; otherwise use the `qa` plugin's
     `delegate-to-qa-monitor` skill for a same-session handoff.
+  - **Collect the monitoring summary and stop the monitor** once the last scenario has run:
+    request the summary with `SendMessage`, then end the background agent with `TaskStop`.
+    Do not mark this phase `done` while a monitor you started is still polling.
   - **Record the QA result** with pass/fail per scenario and the captured evidence.
 - **Bug fix or change to existing functionality** → run targeted QA validation without
   required capture:
@@ -358,6 +374,15 @@ back to the user and waits for them.
 - **Record every Personal Validation decision durably** with `set_run_context`
   (`approval: "pending"`, `"approved"`, or `"rejected"`, plus the user's wording as
   `approvalNote`) so the gate survives a session resume.
+- **Do not leave a runtime running behind an unanswered gate.** This phase starts the
+  application for the user, and it must stay up while they review — but the orchestration
+  still owns it. If the user defers the decision, ends the session, or otherwise steps
+  away without approving or rejecting, shut down the runtime and any
+  orchestration-owned browser windows under the same rules as **Create Pull Request**,
+  leave `approval: "pending"`, and record in the stage output that the gate is still open
+  and the app was stopped. A resumed run restarts the app before asking again. Waiting on a
+  human is expected; leaving Aspire and a browser running for hours while nothing happens is
+  not.
 
 ## Phase: Create Pull Request
 
@@ -365,7 +390,9 @@ Applies to every orchestration.
 
 - **Create the pull request only after explicit user approval** in Personal Validation —
   never before, and only when the persisted `approval` in the run state is `approved`.
-- **Shut down validation runtime before creating the pull request.** If QA Validation or
+- **Shut down validation runtime before creating the pull request** — and, more generally,
+  before the run leaves your hands by any exit: a pull request, a `blocked` or `cancelled`
+  `finish_run`, or a gate the user has stepped away from. If QA Validation or
   Personal Validation started Aspire or another local application runtime, stop it and
   confirm it is no longer running before invoking any PR creation command. Prefer the
   repository's proven shutdown command or `aspire stop` for Aspire-backed runs, and block
@@ -510,8 +537,8 @@ every dashboard tool under the other.
   survive a session restart and never appear in `git status`. `stateDir` in the
   `open_dashboard` result names that directory.
 
-- **Open** the dashboard once per session with `open_dashboard`, and give the user the
-  returned `dashboardUrl` to open in a browser — the page updates live over server-sent
+- **Open** the dashboard once per session with `open_dashboard` and surface it per
+  **Surfacing the Dashboard** below — the page updates live over server-sent
   events, so it is opened once and left open. Then call `start_run` with the skill's
   `skillId`, the full ordered stage list (its skill-specific stages followed by the shared
   phase names for its tier), and the `changeKind` when it is already known. `start_run`
@@ -559,6 +586,30 @@ every dashboard tool under the other.
 - **Mark the Summary stage** `in_progress` then `done`, and call `finish_run` with the final
   status and summary once the pull request and any applicable GitHub issue update are complete
   (or the run concludes without one).
+
+### Surfacing the Dashboard
+
+A run the user cannot see is a run they cannot steer. Show the dashboard where the host can
+display it, and only fall back to a bare link when it cannot.
+
+1. **Inline panel.** In a host that supports MCP Apps, `open_dashboard` renders the
+   dashboard inline on its own. Nothing further is needed — do not also open a browser tab.
+2. **Inline browser pane.** Otherwise, if the host exposes an in-app browser, open
+   `dashboardUrl` there so the dashboard sits beside the conversation instead of in a
+   separate window. In Claude Code that is `preview_start` with `{ url: dashboardUrl }`
+   (`mcp__Claude_Browser__preview_start`); resolve the exact name from the available tool
+   list, since a host may namespace or omit it.
+3. **Plain link.** With neither available, give the user `dashboardUrl` to open themselves.
+
+- **Open it once.** The page updates live over server-sent events, so re-opening the pane on
+  later stages just steals focus. If the tab was closed, reopening is fine; routine stage
+  transitions are not a reason to.
+- **Do not block on it.** Failing to open the pane is a presentation problem, never a run
+  problem: report that the pane could not be opened, give the URL, and continue the
+  orchestration.
+- **The viewers follow the same rule.** `render_diagram` and `render_markdown` serve
+  `<dashboardUrl>mermaid` and `<dashboardUrl>markdown`; open those in the inline browser too
+  when a stage renders content, and leave them open alongside the dashboard tab.
 
 See `plugins/claude-desktop/mcp/orch-dashboard/README.md` for the full dashboard tool
 contract, and `instructions/dashboard-usage.instructions.md` for when to also open the

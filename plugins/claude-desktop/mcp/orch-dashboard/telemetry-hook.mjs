@@ -17,6 +17,7 @@
 //   assistant.usage            transcript JSONL      (per-message `usage`, incl. sidechains)
 //   session.usage_info         transcript JSONL      (last root message's prompt size)
 //   session.compaction_start   PreCompact hook       (trigger: manual | auto)
+//   (no Copilot equivalent)    SessionEnd hook       (stamps the run idle — see idle.mjs)
 //
 // Usage: `node telemetry-hook.mjs` with the hook payload on stdin.
 //
@@ -24,8 +25,9 @@
 // any error, and unparseable transcript lines are skipped rather than fatal.
 
 import { open, stat } from "node:fs/promises";
-import { readActive, readTelemetry, writeTelemetry, runsDir } from "./state.mjs";
+import { readActive, writeActive, readTelemetry, writeTelemetry, runsDir } from "./state.mjs";
 import { readRun, writeRun } from "./store.mjs";
+import { isIdle, markIdle } from "./idle.mjs";
 import {
     categorizeTool,
     appendToolCall,
@@ -144,6 +146,18 @@ async function syncTranscript(run, telemetry, transcriptPath) {
     };
 }
 
+// Used when telemetry has nowhere to land: move the cursor to the end of the transcript
+// so a run that becomes active later does not absorb the conversation that came before it.
+async function skipToTranscriptEnd(sessionId, telemetry, transcriptPath) {
+    if (!transcriptPath) return;
+    try {
+        const size = (await stat(transcriptPath)).size;
+        await writeTelemetry(sessionId, { ...telemetry, transcriptPath, transcriptOffset: size });
+    } catch {
+        /* transcript not readable yet */
+    }
+}
+
 async function main() {
     const raw = await readStdin();
     let payload;
@@ -173,20 +187,34 @@ async function main() {
     if (!active.runId) {
         // Nothing to attribute telemetry to. Still advance the transcript cursor so a run
         // started later does not absorb the whole earlier conversation as its first stage.
-        if (payload.transcript_path) {
-            try {
-                const size = (await stat(payload.transcript_path)).size;
-                await writeTelemetry(sessionId, { ...telemetry, transcriptPath: payload.transcript_path, transcriptOffset: size });
-            } catch {
-                /* transcript not readable yet */
-            }
-        }
+        await skipToTranscriptEnd(sessionId, telemetry, payload.transcript_path);
         return;
     }
 
     const baseDir = runsDir();
     const run = await readRun(baseDir, active.runId);
     if (!run) return;
+
+    // The session that owned this run has ended, so nothing more will happen in it on its
+    // own. Stamping the run idle stops its elapsed clock and keeps `start_run` from
+    // adopting it; releasing the active pointer keeps a later session's tool calls from
+    // landing on work that already stopped.
+    if (event === "SessionEnd") {
+        markIdle(run);
+        await writeRun(baseDir, run);
+        await writeActive({ runId: null, stage: null, updatedAt: new Date().toISOString() });
+        return;
+    }
+
+    // Backstop for a session left open at the Personal Validation gate: telemetry is
+    // session-wide, so unrelated later work in that session would otherwise be attributed
+    // to a run nothing has touched for hours. A resumed orchestration clears the stamp
+    // through `update_stage` and attribution picks up again on its own.
+    if (isIdle(run)) {
+        await skipToTranscriptEnd(sessionId, telemetry, payload.transcript_path);
+        return;
+    }
+
     const stage = active.stage || null;
     let updated = telemetry;
 

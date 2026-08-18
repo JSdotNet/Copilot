@@ -38,6 +38,8 @@
 //
 // The same session-wide caveat below applies to these numbers too.
 
+import { effectiveEndedAtMs } from "./idle.mjs";
+
 const MAX_TOOL_CALLS_PER_RUN = 1000;
 // Compaction/truncation events are rare compared to tool calls, but the
 // arrays are still capped so a very long-running run can't grow the run
@@ -327,7 +329,9 @@ export function summarizeInsights(run) {
         totalToolMs += ms;
     }
     const startedAt = run.startedAt ? new Date(run.startedAt).getTime() : null;
-    const endedAt = run.status === "in_progress" ? Date.now() : run.updatedAt ? new Date(run.updatedAt).getTime() : null;
+    // Not `Date.now()` for an in_progress run: one abandoned at the Personal Validation
+    // gate would otherwise report every idle hour since as elapsed orchestration time.
+    const endedAt = effectiveEndedAtMs(run);
     const elapsedMs = startedAt !== null && endedAt !== null ? Math.max(0, endedAt - startedAt) : null;
     const thinkingMs = elapsedMs !== null ? Math.max(0, elapsedMs - totalToolMs) : null;
 

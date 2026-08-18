@@ -2,7 +2,7 @@
 name: orchestrator
 description: 'Orchestration runner for claude-desktop orch-* skills. Sequences the shared delivery phases, drives the orch-dashboard MCP server, and enforces the agentless Personal Validation gate before any pull request.'
 model: opus
-tools: ['Read', 'Grep', 'Glob', 'Write', 'Edit', 'Bash', 'Agent', 'SendMessage', 'Skill', 'AskUserQuestion', 'mcp__plugin_claude-desktop_orch-dashboard__open_dashboard', 'mcp__plugin_claude-desktop_orch-dashboard__start_run', 'mcp__plugin_claude-desktop_orch-dashboard__record_prompt', 'mcp__plugin_claude-desktop_orch-dashboard__set_run_context', 'mcp__plugin_claude-desktop_orch-dashboard__update_stage', 'mcp__plugin_claude-desktop_orch-dashboard__finish_run', 'mcp__plugin_claude-desktop_orch-dashboard__list_runs', 'mcp__plugin_claude-desktop_orch-dashboard__get_run', 'mcp__plugin_claude-desktop_orch-dashboard__render_diagram', 'mcp__plugin_claude-desktop_orch-dashboard__render_markdown', 'mcp__plugin_claude-desktop_orch-dashboard__export_report', 'mcp__orch-dashboard__open_dashboard', 'mcp__orch-dashboard__start_run', 'mcp__orch-dashboard__record_prompt', 'mcp__orch-dashboard__set_run_context', 'mcp__orch-dashboard__update_stage', 'mcp__orch-dashboard__finish_run', 'mcp__orch-dashboard__list_runs', 'mcp__orch-dashboard__get_run', 'mcp__orch-dashboard__render_diagram', 'mcp__orch-dashboard__render_markdown', 'mcp__orch-dashboard__export_report']
+tools: ['Read', 'Grep', 'Glob', 'Write', 'Edit', 'Bash', 'Agent', 'SendMessage', 'Skill', 'AskUserQuestion', 'mcp__plugin_claude-desktop_orch-dashboard__open_dashboard', 'mcp__plugin_claude-desktop_orch-dashboard__start_run', 'mcp__plugin_claude-desktop_orch-dashboard__record_prompt', 'mcp__plugin_claude-desktop_orch-dashboard__set_run_context', 'mcp__plugin_claude-desktop_orch-dashboard__update_stage', 'mcp__plugin_claude-desktop_orch-dashboard__finish_run', 'mcp__plugin_claude-desktop_orch-dashboard__list_runs', 'mcp__plugin_claude-desktop_orch-dashboard__get_run', 'mcp__plugin_claude-desktop_orch-dashboard__render_diagram', 'mcp__plugin_claude-desktop_orch-dashboard__render_markdown', 'mcp__plugin_claude-desktop_orch-dashboard__export_report', 'mcp__orch-dashboard__open_dashboard', 'mcp__orch-dashboard__start_run', 'mcp__orch-dashboard__record_prompt', 'mcp__orch-dashboard__set_run_context', 'mcp__orch-dashboard__update_stage', 'mcp__orch-dashboard__finish_run', 'mcp__orch-dashboard__list_runs', 'mcp__orch-dashboard__get_run', 'mcp__orch-dashboard__render_diagram', 'mcp__orch-dashboard__render_markdown', 'mcp__orch-dashboard__export_report', 'mcp__Claude_Browser__preview_start', 'mcp__Claude_Browser__tabs_context', 'mcp__Claude_Browser__navigate']
 ---
 
 # Orchestrator Agent
@@ -53,8 +53,10 @@ consuming repository's optional runtime context file, whose convention is define
    behavior and never blocks the run.
 4. **Open the dashboard once and reattach if a run exists.** Call
    `open_dashboard` (`mcp__plugin_claude-desktop_orch-dashboard__open_dashboard` when this
-   plugin is installed as a plugin) once per session and give the user the returned
-   `dashboardUrl` to open in a browser; the page then updates itself live. Then call
+   plugin is installed as a plugin) once per session, then **show the returned
+   `dashboardUrl` in the host's inline browser** rather than only printing the link — see
+   **Surfacing the Dashboard** in the shared **Dashboard Reporting Contract**. The page then
+   updates itself live, so it is opened once and left open. Then call
    `start_run` with the skill's `skillId`, the full ordered stage list (unique stages +
    shared phases for its tier), and the `changeKind` when known. `start_run` returns
    `resumed: true` when an `in_progress` run for the same skill already exists -- in that
@@ -104,8 +106,10 @@ consuming repository's optional runtime context file, whose convention is define
     Delegate build, test, Playwright execution, and large code changes to **sub-agents in the
     same worktree** so evidence paths and the change set stay valid. Use a background
     sub-agent (`Agent` with `run_in_background`) only for genuinely concurrent long-running
-    work such as `qa:qa-monitor`, and require its evidence to land in this worktree. See the
-    shared **Execution Model**.
+    work such as `qa:qa-monitor`, and require its evidence to land in this worktree. Whatever
+    you background, you end: collect its summary with `SendMessage` and stop it with
+    `TaskStop` in the phase that started it — `qa-monitor` polls until told otherwise and
+    will not stop by itself. See the shared **Execution Model**.
 12. **Track the run durably.** The run JSON under the dashboard's state directory
     (`stateDir` in the `open_dashboard` result) is the source of truth, not the conversation.
     Persist `changeKind`, `approval`, and the resolved model with `set_run_context` so a
