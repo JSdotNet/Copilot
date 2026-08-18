@@ -48,13 +48,18 @@ const MAX_CONTEXT_EVENTS_PER_RUN = 100;
 // vocabularies are listed: the rules stay valid whichever host produced the run file.
 // Ordering matters — QA is checked before the generic MCP rule so browser/Aspire
 // activity gets its own bucket in the breakdown.
+// Aspire MCP tool names, current (list_*) and legacy (get_*): the server renamed these
+// and a run file may hold either spelling. Plugin-provided servers arrive prefixed
+// (mcp__plugin_qa_aspire__*), which the 'aspire' alternative already covers.
+const ASPIRE_TOOLS = "^list_resources$|^list_structured_logs$|^list_console_logs$|^list_traces$|^list_trace_structured_logs$|^execute_resource_command$|^get_resources$|^get_resource_logs$|^get_traces$|^get_metrics$|^get_console_logs$";
+
 const CATEGORY_RULES = [
     { category: "Shell", test: /powershell|bash|shell/i },
     { category: "Edit", test: /^edit$|^create$|^write$|^notebookedit$|^multiedit$/i },
     { category: "Read", test: /^view$|^read$|^glob$|^grep$|^webfetch$|^websearch$/i },
     {
         category: "QA (Playwright/Aspire)",
-        test: /^browser_|playwright|aspire|^get_resources$|^get_resource_logs$|^get_traces$|^get_metrics$|^get_console_logs$/i,
+        test: new RegExp(`^browser_|playwright|aspire|${ASPIRE_TOOLS}`, "i"),
     },
     { category: "MCP tool", test: /mcpserver|mcp[_-]/i },
     { category: "Agent tasks", test: /^task$|^agent$|^skill$|^workflow$/i },

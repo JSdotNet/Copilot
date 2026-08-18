@@ -44,12 +44,18 @@ while it keeps running.
 Prefer the Aspire MCP server when available:
 
 ```
-Tool: get_resources
+Tool: list_resources
 ```
 
 Wait until every required resource reports a running/healthy state. If a resource is
-stuck starting or in a failed state, check `get_console_logs` for that resource before
+stuck starting or in a failed state, check `list_console_logs` for that resource before
 proceeding — do not start Playwright validation against a partially-started app.
+
+Tool names here are bare. The Aspire server ships with this plugin, so its tools normally
+surface as `mcp__plugin_qa_aspire__<tool>` (`mcp__aspire__<tool>` when the server is
+registered directly in a repository's own MCP configuration) — take the prefix from your
+tool list. If `list_resources` is missing, an older Aspire CLI may still expose the earlier
+`get_resources` name; `doctor` diagnoses the environment even with no AppHost running.
 
 Fallback (no MCP server): only allowed for startup-only checks where MCP-backed resource
 state, log, trace, metric, or health evidence is not required. For QA validation that
@@ -84,9 +90,9 @@ Personal Validation, refresh the running app before continuing validation:
 
 | Symptom | Likely Cause | Check |
 |---|---|---|
-| Resource stuck in "Starting" | Missing dependency (DB/cache container not pulled) | `get_console_logs` for that resource |
+| Resource stuck in "Starting" | Missing dependency (DB/cache container not pulled) | `list_console_logs` for that resource |
 | Frontend loads but API calls fail | Service discovery misconfiguration | `ConnectionStrings__*` / `services__*__http__0` env vars |
-| App exits immediately | Config/secret missing | Console output at startup, `get_console_logs` |
+| App exits immediately | Config/secret missing | Console output at startup, `list_console_logs` |
 
 ## Reference
 

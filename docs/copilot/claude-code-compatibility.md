@@ -94,12 +94,31 @@ tool id rather than guessing, so a new Copilot tool surfaces as a build error.
 | `vscode/askQuestions` | `AskUserQuestion` |
 | `list_projects`, `create_session`, `list_sessions_and_chats` | `Agent` |
 | `send_session_message`, `get_session`, `respond_to_session_plan` | `SendMessage` |
-| `aspire_*`, `get_resources`, `get_traces`, … | `mcp__aspire` |
-| `browser_*`, `playwright-browser_*` | `mcp__playwright` |
+| `aspire_*`, `list_resources`, `list_traces`, `doctor`, … | `mcp__plugin_qa_aspire`, `mcp__aspire` |
+| `browser_*`, `playwright-browser_*` | `mcp__plugin_qa_playwright`, `mcp__playwright` |
 | `vscode/memory`, `extensions_*`, `*_canvas*` | *no equivalent; Copilot-only* |
 
 Every agent additionally gets `Skill`: Copilot exposes a plugin's skills to its agents
 implicitly, Claude requires the tool to be listed.
+
+MCP tool ids translate to **server-level** patterns rather than a list of tool names, and to
+both spellings of the server:
+
+- `mcp__plugin_<plugin>_<server>` — how Claude names a server a plugin provides, because it
+  namespaces it with the providing plugin (`plugin:qa:aspire` normalizes to
+  `plugin_qa_aspire`).
+- `mcp__<server>` — the same server registered directly in a repository's `.mcp.json`.
+
+`tools` is an allowlist matched against exact runtime names, so naming only one form costs
+every tool of that server, silently: the agent launches with its built-ins and reports itself
+blocked. Granting the server also survives the server renaming its tools, which is not
+hypothetical — Aspire's `get_*` query tools became `list_*` and its metrics tool disappeared.
+
+The cost is granularity: Claude cannot allow a subset of one server's tools this way, so an
+agent meant to use a server read-only (`qa-monitor`) carries that intent in its prose
+constraints instead of in the allowlist. The generator fails if an agent declares an MCP tool
+id whose server the plugin's own manifest does not declare, since the emitted pattern would
+name a server that never surfaces.
 
 ### Manifest
 

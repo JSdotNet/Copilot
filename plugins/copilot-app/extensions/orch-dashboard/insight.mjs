@@ -47,15 +47,19 @@ const MAX_TOOL_CALLS_PER_RUN = 1000;
 // file without bound (mirrors MAX_TOOL_CALLS_PER_RUN for run.insights).
 const MAX_CONTEXT_EVENTS_PER_RUN = 100;
 
+// Aspire MCP tool names, current (list_*) and legacy (get_*): the server renamed these
+// and a run file may hold either spelling. Plugin-provided servers arrive prefixed
+// (mcp__plugin_qa_aspire__*), which the 'aspire' alternative already covers.
+const ASPIRE_TOOLS = "^list_resources$|^list_structured_logs$|^list_console_logs$|^list_traces$|^list_trace_structured_logs$|^execute_resource_command$|^get_resources$|^get_resource_logs$|^get_traces$|^get_metrics$|^get_console_logs$";
+
 const CATEGORY_RULES = [
     { category: "Shell", test: /powershell|bash|shell/i },
     { category: "Edit", test: /^edit$|^create$/i },
     { category: "Read", test: /^view$|^glob$|^grep$/i },
-    // Playwright MCP (browser_*) and Aspire CLI MCP (get_resources/get_resource_logs/
-    // get_traces/get_metrics/get_console_logs) tool calls, used by the qa plugin's
+    // Playwright MCP (browser_*) and Aspire CLI MCP tool calls, used by the qa plugin's
     // playwright-validation and aspire-log-monitor skills. Checked before the generic
     // "MCP tool" rule so QA activity gets its own bucket in the insight breakdown.
-    { category: "QA (Playwright/Aspire)", test: /^browser_|^get_resources$|^get_resource_logs$|^get_traces$|^get_metrics$|^get_console_logs$/i },
+    { category: "QA (Playwright/Aspire)", test: new RegExp(`^browser_|playwright|aspire|${ASPIRE_TOOLS}`, "i") },
     { category: "MCP tool", test: /mcpserver|mcp[_-]/i },
     { category: "Agent tasks", test: /^task$/i },
 ];

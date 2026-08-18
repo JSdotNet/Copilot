@@ -79,11 +79,27 @@ aspire mcp start
 
 When QA is delegated to `qa:qa` or `qa:qa-monitor`, verify availability in the target
 agent/session tool surface, not only in the parent orchestration session. The QA plugin
-declares the required `aspire` and `playwright` MCP servers and allowlists their expected
-tool families (`get_resources` / `aspire_get_*` resource, log, trace, and metric tools
-and `browser_*` / `playwright-browser_*`). If those tools are present in normal sessions
-but absent only in the delegated child agent, report the problem as a child-agent MCP/tool
-allowlist exposure failure and include the missing tool family in the blocked output.
+declares the required `aspire` and `playwright` MCP servers and allowlists them at server
+granularity, so the child agent gets every tool of each server (Aspire's `list_resources`,
+`list_structured_logs`, `list_console_logs`, `list_traces`, `list_trace_structured_logs`, and
+Playwright's `browser_*`).
+
+Two failure modes are worth naming separately, because they look identical from the outside
+and only one is a real outage:
+
+- **Stale tool name.** A tool called by a remembered name the server no longer exposes fails
+  per call — Aspire renamed its query tools from `get_*` to `list_*` and dropped metrics
+  entirely. Resolve the current name from the tool list; this is not a missing server.
+- **Wrong prefix in an allowlist.** A plugin-provided MCP server is namespaced with its
+  plugin, so the QA servers surface as `mcp__plugin_qa_aspire__*` and
+  `mcp__plugin_qa_playwright__*`, and only as `mcp__aspire__*` / `mcp__playwright__*` when
+  registered directly in a repository's MCP configuration. An allowlist naming the wrong form
+  matches nothing, and the child agent loses every tool of that server while the parent
+  session still has them.
+
+If the tools are present in normal sessions but absent only in the delegated child agent,
+report it as a child-agent MCP/tool allowlist exposure failure, name the missing server, and
+say which of the two forms the agent's allowlist used.
 
 If required MCP tooling is unavailable:
 

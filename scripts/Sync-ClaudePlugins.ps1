@@ -231,12 +231,30 @@ function Format-YamlScalar {
 
 $toolMap = Get-Content -LiteralPath $ToolMapPath -Raw -Encoding UTF8 | ConvertFrom-Json
 
+function Get-McpServerPatterns {
+    <#
+        Claude entries that grant every tool of one MCP server. A plugin-provided server is
+        namespaced with the plugin that provides it, so its tools surface as
+        mcp__plugin_<plugin>_<server>__*; the same server registered directly in a repository's
+        .mcp.json surfaces as mcp__<server>__*. 'tools' is an allowlist matched against exact
+        runtime names, so guessing one form costs every tool of that server - both are emitted.
+    #>
+    param([Parameter(Mandatory)][string]$PluginName, [Parameter(Mandatory)][string]$Server)
+
+    return @("mcp__plugin_${PluginName}_${Server}", "mcp__$Server")
+}
+
 function Get-ClaudeTools {
     <#
         Translates Copilot tool ids into the Claude tools they correspond to. The result is
         appended to - never substituted for - the Copilot ids, so one list serves both hosts.
     #>
-    param([string[]]$Ids, [Parameter(Mandatory)][string]$Source)
+    param(
+        [string[]]$Ids,
+        [Parameter(Mandatory)][string]$Source,
+        [Parameter(Mandatory)][string]$PluginName,
+        [string[]]$DeclaredMcpServers
+    )
 
     $resolved = [System.Collections.Generic.List[string]]::new()
     $unmapped = [System.Collections.Generic.List[string]]::new()
@@ -256,7 +274,14 @@ function Get-ClaudeTools {
         $matched = $false
         foreach ($prefix in $toolMap.mcpPrefixes.PSObject.Properties) {
             if ($id -eq $prefix.Name -or $id.StartsWith($prefix.Name)) {
-                $resolved.Add($prefix.Value); $matched = $true; break
+                $server = [string]$prefix.Value
+                if ($DeclaredMcpServers -notcontains $server) {
+                    $script:Errors.Add("$Source declares '$id', which tool-map.json routes to the MCP server '$server', but $PluginName's manifest declares no such server. The generated allowlist would name a server that never surfaces, and Claude filters out every tool it cannot match.")
+                }
+                foreach ($pattern in (Get-McpServerPatterns -PluginName $PluginName -Server $server)) {
+                    $resolved.Add($pattern)
+                }
+                $matched = $true; break
             }
         }
         if (-not $matched) { $unmapped.Add($id) }
@@ -275,7 +300,11 @@ function Update-AgentFile {
         Rewrites only the 'name' and 'tools' frontmatter lines of an authored agent file so
         it loads on both hosts, and lints the parts a script must not invent.
     #>
-    param([Parameter(Mandatory)][System.IO.FileInfo]$File)
+    param(
+        [Parameter(Mandatory)][System.IO.FileInfo]$File,
+        [Parameter(Mandatory)][string]$PluginName,
+        [string[]]$DeclaredMcpServers
+    )
 
     $agentName = $File.Name -replace '\.agent\.md$', ''
     $relSource = Get-RelativePath $File.FullName
@@ -300,7 +329,7 @@ function Update-AgentFile {
     $copilotIds = @()
     if ($fm.Contains('tools')) { $copilotIds = @($fm['tools']) }
 
-    $claudeTools = Get-ClaudeTools -Ids $copilotIds -Source $relSource
+    $claudeTools = Get-ClaudeTools -Ids $copilotIds -Source $relSource -PluginName $PluginName -DeclaredMcpServers $DeclaredMcpServers
 
     # Copilot's 'agents' key whitelists delegation targets; Claude scopes the Agent tool.
     if ($fm.Contains('agents')) {
@@ -451,7 +480,17 @@ foreach ($dir in $pluginDirs) {
         }
     }
 
-    foreach ($file in $agentFiles) { Update-AgentFile -File $file }
+    # The MCP servers this plugin provides. An agent's MCP tool ids must resolve to one of
+    # them, because the Claude allowlist names the server and Claude namespaces a
+    # plugin-provided server with its plugin.
+    $declaredMcpServers = @()
+    if ($source.PSObject.Properties['mcpServers']) {
+        $declaredMcpServers = @($source.mcpServers.PSObject.Properties.Name)
+    }
+
+    foreach ($file in $agentFiles) {
+        Update-AgentFile -File $file -PluginName $pluginName -DeclaredMcpServers $declaredMcpServers
+    }
 
     # 'skills' is omitted deliberately: Claude Code already scans skills/ by default and the
     # field adds to that default rather than replacing it. 'agents' lists the shared files

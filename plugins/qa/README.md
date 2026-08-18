@@ -4,7 +4,7 @@ Installable GitHub Copilot CLI plugin for runtime QA validation.
 
 Runs a project through **.NET Aspire**, validates features end-to-end with the
 **Playwright MCP server** (recording screenshots or video as evidence), and
-continuously monitors **Aspire MCP** logs/traces/metrics for the whole test session —
+continuously monitors **Aspire MCP** logs/traces for the whole test session —
 so runtime errors are never missed just because the UI looked correct.
 
 Two agent personas are included: `qa` drives the browser and produces the report,
@@ -14,13 +14,13 @@ Two agent personas are included: `qa` drives the browser and produces the report
 
 - Agents:
   - `agents/qa.agent.md` — drives Aspire startup, Playwright validation, and reporting
-  - `agents/qa-monitor.agent.md` — dedicated Aspire log/trace/metric monitoring persona
+  - `agents/qa-monitor.agent.md` — dedicated Aspire log/trace monitoring persona
 - Skills:
   - `skills/aspire-run/SKILL.md` — start and confirm health of the app under test via Aspire
   - `skills/playwright-validation/SKILL.md` — drive browser validation via Playwright MCP with recorded evidence
   - `skills/playwright-screenshot/SKILL.md` — point-in-time screenshot evidence for a checkpoint or failure
   - `skills/playwright-recording/SKILL.md` — continuous video/trace evidence for a multi-step flow
-  - `skills/aspire-log-monitor/SKILL.md` — continuously monitor Aspire logs/traces/metrics during testing
+  - `skills/aspire-log-monitor/SKILL.md` — continuously monitor Aspire logs/traces during testing
   - `skills/delegate-to-qa-monitor/SKILL.md` — hand off monitoring to the `qa-monitor` agent persona
   - `skills/feature-test-from-issue/SKILL.md` — derive test scenarios from a GitHub issue or Jira ticket (delegates fetching/updating to a GitHub or Jira skill; no GitHub/Jira-specific content here)
   - `skills/deployed-environment-validation/SKILL.md` — validate against a specific already-deployed test environment (staging/QA/UAT) instead of a local Aspire run
@@ -32,7 +32,7 @@ Two agent personas are included: `qa` drives the browser and produces the report
 
 | MCP Server | Purpose |
 |---|---|
-| Aspire MCP (`aspire mcp start`) | Run the distributed app; query resource state, logs, traces, and metrics |
+| Aspire MCP (`aspire mcp start`) | Run the distributed app; query resource state, logs, and traces (no metrics tool) |
 | Playwright MCP (`@playwright/mcp`) | Drive a real browser: navigate, interact, snapshot, screenshot, record video |
 
 If either server is unavailable, the agent stops and asks the user to configure it —
@@ -44,7 +44,7 @@ see the [Setup](./agents/qa.agent.md#setup) section in the agent file.
 - **Run the app under test** — start an Aspire-orchestrated solution and confirm every resource is healthy before testing begins, or use `deployed-environment-validation` to target a specific already-deployed staging/QA/UAT environment instead.
 - **Validate features end-to-end** — use Playwright MCP to navigate, interact, and assert against the real running UI, not just source code.
 - **Record evidence** — capture screenshots per checkpoint/failure, or video/trace recordings for multi-step flows.
-- **Monitor logs continuously** — keep Aspire log/trace/metric monitoring active for the entire session, catching backend errors a passing UI might hide, either directly or via the `qa-monitor` persona.
+- **Monitor logs continuously** — keep Aspire log/trace monitoring active for the entire session, catching backend errors a passing UI might hide, either directly or via the `qa-monitor` persona.
 - **Codify durable regression tests** — turn a scenario validated interactively into a committed, re-runnable Playwright test via `playwright-e2e-authoring`.
 - **Report findings** — structured Pass/Fail/Flaky results with severity, evidence paths, and correlated Aspire log/trace findings.
 
