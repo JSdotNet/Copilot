@@ -127,7 +127,10 @@ Applies when the repository does not declare a QA depth in `.claude/orch-context
      (the `Agent` tool with `run_in_background`) so monitoring runs
      concurrently with Playwright validation; otherwise use the `qa` plugin's
      `delegate-to-qa-monitor` skill for a same-session handoff.
-  4. **Record the QA result** with pass/fail per scenario and the captured evidence.
+  4. **Stop the monitor when the scenarios are done** — request its summary with
+     `SendMessage`, then end the background agent with `TaskStop`. `qa-monitor` polls until
+     told otherwise, so this phase must not be marked `done` while one is still running.
+  5. **Record the QA result** with pass/fail per scenario and the captured evidence.
 
   Playwright execution itself stays in the orchestrating session (inline or via a
   sub-agent in the **same worktree**) so it exercises the actual change set.

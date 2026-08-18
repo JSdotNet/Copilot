@@ -131,7 +131,10 @@ Produce a summary containing:
 - Do not fabricate log or trace content — report only what the Aspire MCP tools
   actually returned.
 - Do not stop monitoring just because the UI under test looked correct — that
-  correlation is exactly what this agent exists to check independently.
+  correlation is exactly what this agent exists to check independently. This is about not
+  concluding early, not about running forever: when run as a background agent, the session
+  that started you asks for the final summary and then ends you once the scenarios are
+  finished. Keep polling until then.
 - Do not attempt to fix issues found — report them; fixes are the `csharp-coding:coding`
   agent's responsibility after a handoff.
 - Do not run resource commands (`start`, `stop`, `restart` via `execute_resource_command`).

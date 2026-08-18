@@ -72,6 +72,10 @@ Render the same Markdown content the agent wrote to its file artifact.
   summaries). The viewers render the **content** a stage produced. Use them together: the
   dashboard tab for the run timeline, the viewer tabs for that run's diagrams and
   documents.
+- **Open viewer URLs the same way the dashboard is opened** — in the host's inline browser
+  pane where it has one, falling back to a plain link otherwise. See **Surfacing the
+  Dashboard** in `instructions/orch-shared-phases.instructions.md`. A rendered view the user
+  never sees is no better than no view at all.
 - For a finished run, `export_report` writes the whole run — stages, output, QA evidence —
   to a self-contained Markdown or HTML file. Use it when the user wants something to keep
   or share rather than a live view; it is also the natural source for publishing the run as

@@ -173,6 +173,7 @@ transport:
 | canvas actions (`invoke_canvas_action`) | MCP tools (`mcp__plugin_claude-desktop_orch-dashboard__*`), same names and arguments |
 | `diagram-canvas`, `markdown-canvas` extensions | `/mermaid` and `/markdown` routes on the same server, driven by `render_diagram` / `render_markdown` |
 | host session telemetry events | `PreToolUse`/`PostToolUse`/`SubagentStop`/`PreCompact`/`Stop` hooks plus the session transcript |
+| (no equivalent) | `SessionEnd` hook, which stamps an unfinished run idle so an abandoned gate stops accruing elapsed time |
 | `.github/copilot-orch-context.md`, `.github/copilot-model-selection.md` | `.claude/orch-context.md`, `.claude/model-selection.md` |
 | Copilot model families in the selection table | `opus` / `sonnet` / `haiku` aliases |
 | child sessions for concurrent work | background sub-agents, `isolation: "worktree"` when a separate checkout is needed |

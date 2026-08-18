@@ -9,12 +9,19 @@ It has **two surfaces from one implementation**:
 | Surface | How it renders | Where |
 | --- | --- | --- |
 | **MCP App** (`ui://` resources, [SEP-1865](https://modelcontextprotocol.io/extensions/apps/overview)) | inline in the conversation, in a sandboxed iframe | Claude Desktop, Claude web, and any host implementing `io.modelcontextprotocol/ui` |
-| **HTTP** (`127.0.0.1`, ephemeral port) | a browser tab the user opens | everywhere else, including Claude Code |
+| **HTTP** (`127.0.0.1`, ephemeral port) | a browser tab — the Claude Code in-app browser pane where the host has one, otherwise one the user opens | everywhere else, including Claude Code |
 
 The App surface is what actually replaces the GitHub Copilot canvas: the panel is back, in
 the conversation, rather than in a separate browser window. Extension support is negotiated,
 so a host that does not implement MCP Apps never reads the `ui://` resources and simply gets
 the URL instead.
+
+An MCP server cannot open that URL itself — driving a browser is the host's job — so the
+orchestration instructions tell the agent to hand `dashboardUrl` to the host's in-app
+browser (`preview_start` in Claude Code) rather than only printing it. See **Surfacing the
+Dashboard** in `instructions/orch-shared-phases.instructions.md`. That keeps the dashboard
+beside the conversation on hosts without MCP Apps, which is as close to the App surface as
+the HTTP one gets.
 
 This is the Claude Code counterpart of the GitHub Copilot `orch-dashboard` canvas extension
 in `plugins/copilot-app/extensions/orch-dashboard/`. The run model is identical:
@@ -255,7 +262,7 @@ node plugins/claude-desktop/mcp/orch-dashboard/mcp-server.mjs
 
 | | Claude Desktop | Claude Code |
 | --- | --- | --- |
-| Dashboard, viewers, reports | inline as an MCP App | browser tab on `127.0.0.1` |
+| Dashboard, viewers, reports | inline as an MCP App | `127.0.0.1` in the in-app browser pane |
 | Run/stage/QA tracking | yes | yes |
 | Insight and Context panels | **no** — they are fed by hooks, which Desktop does not have | yes |
 | `orch-*` workflows that build, test and commit | **no** — no repository access | yes |
