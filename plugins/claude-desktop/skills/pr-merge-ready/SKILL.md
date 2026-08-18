@@ -315,8 +315,8 @@ contract.
 
 - `create-pull-request` — raise the PR for a session this skill reports as "no PR yet".
 - `update-pr-branch`, `fix-pr-checks` — the per-PR remediations, usable standalone.
-- `start-session-from-issue`, `automation-bug-fix` — create the worktree sessions this skill
-  later sweeps.
+- `start-session-from-issue`, `automation-bug-fix` — prepare the handoffs whose sessions this
+  skill later sweeps.
 
 ## Notes
 

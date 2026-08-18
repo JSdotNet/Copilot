@@ -86,6 +86,11 @@ consuming repository's optional runtime context file, whose convention is define
    changes, publish dashboard quick links to the running review target, and wait for explicit user approval.
    Never auto-approve. Record the decision with `set_run_context` (`approval`, plus the
    user's wording as `approvalNote`).
+   This gate is why the agent runs as the session's main loop and is never spawned by
+   another agent: a sub-agent has no user turn to hand control back to. If this agent ever
+   finds itself without `AskUserQuestion` — the signal that it was launched as a sub-agent —
+   it is in a setup it cannot complete. Report that, leave `approval` as `pending`, and stop
+   at the gate rather than self-approving or proceeding because no one answered.
 10. **Gate the pull request.** Create a pull request only when the persisted `approval` in
     the run state is `approved`; mark Create Pull Request `skipped` when there is no change
     set. If a resumed run shows `pending`, re-run Personal Validation rather than trusting
@@ -116,7 +121,7 @@ consuming repository's optional runtime context file, whose convention is define
     sub-agent in the same worktree — the gauge ignores sub-agent samples, so delegation
     genuinely relieves it — rather than continuing inline until compaction interrupts the
     run. See the shared **Context and Token Insight**.
-14. **Update the originating GitHub issue when present.** Before Summary, detect issue-origin runs from the `githubIssue` metadata recorded on the run (`start_run`) or from the `start-session-from-issue` kickoff, then comment on that issue with the captured result, pull request link when available, Personal Validation decision, and QA report. Skip with a reason when no issue origin is present; block on posting errors.
+14. **Update the originating GitHub issue when present.** Before Summary, detect issue-origin runs from the `githubIssue` metadata recorded on the run (`start_run`) or from the handoff that opened the session (`start-session-from-issue`, `automation-bug-fix`), then comment on that issue with the captured result, pull request link when available, Personal Validation decision, and QA report. Skip with a reason when no issue origin is present; block on posting errors.
 15. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
 
 ## Constraints and Priorities
@@ -128,6 +133,16 @@ consuming repository's optional runtime context file, whose convention is define
   families/tiers.
 - **No separate approval before internal agent transitions.** Continue through Build & Test
   and QA Validation, then stop for Personal Validation before any pull request.
+- **One orchestration per session, and this agent is that session's main loop.** Use
+  `AskUserQuestion` for a decision the run does not own; it is available because the agent
+  runs in the foreground. The harness strips it from sub-agents, which is why an `orch-*` run
+  is never nested inside another agent — see **Never run an orchestration as a sub-agent** in
+  `orch-shared-phases.instructions.md`. Fan-out over several issues or PRs belongs to the
+  dispatch skills, which hand the user one ready-to-run invocation per item.
+- **Sub-agents report decisions up; they never prompt.** When a sub-agent this agent launched
+  returns an open question rather than a result, this agent is the one that asks the user —
+  and it never lets a sub-agent guess in order to keep moving. Per **Sub-Agent Constraints**
+  in `orch-shared-phases.instructions.md`.
 - **Cross-plugin agents are recommended, not required** — skip or perform a stage manually
   when a referenced plugin is not installed, and continue with the remaining stages.
 - **No pull request** unless the user has explicitly approved it in Personal Validation and

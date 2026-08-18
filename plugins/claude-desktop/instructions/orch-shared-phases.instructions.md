@@ -164,6 +164,29 @@ mechanism; background sub-agents remain reserved for concurrent monitoring.
   to write evidence under the owner worktree root, or copy it back before the owner reports
   it. The dashboard serves evidence only from that root and rejects paths outside it.
 - The owner session reports a sub-agent's findings; a sub-agent never calls dashboard tools.
+- **A sub-agent never prompts the user.** `AskUserQuestion` is foreground-only — the harness
+  strips it from sub-agents, so a sub-agent that reaches for it errors out mid-stage, and
+  "wait for the user to approve" has no user turn to wait for. When a sub-agent hits a
+  decision it does not own, it **stops and returns the decision to its caller** as
+  structured findings: the question, the options it sees, its recommendation, and the
+  default it would take if told to proceed. The owner session is the only one that asks the
+  user and the only one that records the answer. Never invent an answer and continue, and
+  never end a sub-agent's turn waiting for input that cannot arrive.
+- **The Personal Validation gate belongs to the owner session, always.** A sub-agent —
+  including a backgrounded or worktree-isolated one — cannot hold it: it cannot hand control
+  back to the user and cannot persist `approval`. A sub-agent runs up to the gate, returns
+  its change set, evidence, and code review, and stops. The session that launched it takes
+  the gate.
+- **Never run an orchestration as a sub-agent.** An `orch-*` run needs all three of the
+  capabilities a sub-agent lacks: the user turn behind Personal Validation, `AskUserQuestion`
+  for a decision it does not own, and ownership of the dashboard run (which the two rules
+  above reserve for the owner session, and whose telemetry is session-wide). So the
+  `orchestrator` agent is always a session's main loop, never something another agent spawns.
+  Parallelism across items comes from **more sessions**, not from nesting orchestrations: a
+  skill that fans out over issues or PRs prepares one ready-to-run invocation per item and
+  hands them back for the user to launch, as `automation-bug-fix` and
+  `start-session-from-issue` do. Delegation *within* a run — build, test, QA, large edits —
+  stays sub-agent work as described under **Delegation Order**.
 
 ### Run State and Resume
 
@@ -418,9 +441,9 @@ Applies to every orchestration. Runs after the pull request and any documentatio
 work, and before Summary.
 
 - **Detect whether the session was started from a GitHub issue** by checking the session's
-  issue linkage metadata when available, then the kickoff prompt metadata produced by
-  `start-session-from-issue` (`GitHub issue origin`, `Repository`, `Issue Number`, and
-  `Issue URL`).
+  issue linkage metadata when available, then the handoff metadata produced by
+  `start-session-from-issue` and `automation-bug-fix` (`GitHub issue origin`, `Repository`,
+  `Issue Number`, and `Issue URL`), which arrives as the session's first message.
 - **Skip this phase** (mark it `skipped`) when no GitHub issue origin is present, when the
   issue number or repository cannot be determined, or when GitHub issue tooling is not
   available. Include the reason in the stage `output`.

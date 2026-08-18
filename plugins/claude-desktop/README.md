@@ -139,8 +139,10 @@ with no PR yet are reported, not remediated; raising the PR stays a deliberate c
 #### Automation Skills
 
 - `skills/azure-sre-to-github-issue/` — create GitHub issues from active Azure SRE alerts
-- `skills/start-session-from-issue/` — start one worktree-isolated agent per matching issue
-- `skills/automation-bug-fix/` — start one `orch-bug` run per confirmed open `bug` issue
+- `skills/start-session-from-issue/` — prepare one ready-to-run, plan-first session handoff
+  per matching issue
+- `skills/automation-bug-fix/` — claim each confirmed open `bug` issue and prepare one
+  ready-to-run `orch-bug` handoff for it
 - `skills/automation-package-update/` — update outdated NuGet packages and open a PR
 - `skills/automation-performance-review/` — find, implement, and PR a performance improvement
 - `skills/automation-review/` — full review cycle with optional issue creation
