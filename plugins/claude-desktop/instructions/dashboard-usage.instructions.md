@@ -74,7 +74,7 @@ Render the same Markdown content the agent wrote to its file artifact.
   documents.
 - **Open viewer URLs the same way the dashboard is opened** — in the host's inline browser
   pane where it has one, falling back to a plain link otherwise. See **Surfacing the
-  Dashboard** in `instructions/orch-shared-phases.instructions.md`. A rendered view the user
+  Dashboard** in `instructions/orch-dashboard-contract.instructions.md`. A rendered view the user
   never sees is no better than no view at all.
 - For a finished run, `export_report` writes the whole run — stages, output, QA evidence —
   to a self-contained Markdown or HTML file. Use it when the user wants something to keep

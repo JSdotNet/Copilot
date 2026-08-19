@@ -21,7 +21,7 @@ for approval before implementing, and any `orch-*` skill the session goes on to 
 hold the Personal Validation gate and write its own dashboard state. None of that works in a
 sub-agent — `AskUserQuestion` is foreground-only and there is no user turn to wait for. See
 **Session Ownership** and **Sub-Agent Constraints** in
-`instructions/orch-shared-phases.instructions.md`. Launched as its own session, a handoff is
+`instructions/orch-execution-model.instructions.md`. Launched as its own session, a handoff is
 plan-first for real.
 
 ## Inputs
@@ -112,7 +112,7 @@ Do not start coding until the plan is approved.
 This skill reports progress through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`). If the server is not configured, skip the
 dashboard calls below and continue through standard chat interaction. Follow the shared
-**Dashboard Reporting Contract** in `instructions/orch-shared-phases.instructions.md`
+**Dashboard Reporting Contract** in `instructions/orch-dashboard-contract.instructions.md`
 for the tool cadence.
 
 - Open the dashboard per the shared contract, then call `start_run` with

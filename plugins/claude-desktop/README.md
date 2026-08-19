@@ -275,9 +275,23 @@ Each orchestration follows a staged workflow tailored to its scenario:
 7. **GitHub Issue Update stage** — comments the result and QA report on the originating issue
 8. **Summary stage** — emitted once the PR and any issue update are complete
 
-The shared phases are defined once in
-[`instructions/orch-shared-phases.instructions.md`](instructions/orch-shared-phases.instructions.md);
-the workflow diagrams live in
+A run is not tied to the session that started it. The telemetry hook watches the context
+gauge and warns as it fills — delegate at 60%, prepare at 75%, hand off at 85% — and a handoff
+persists the run's gating decisions plus a resume note, so the next session's `start_run`
+reattaches and continues from the same stage instead of starting over or being compacted
+mid-run. See **Session Handoff** in
+[`instructions/orch-execution-model.instructions.md`](instructions/orch-execution-model.instructions.md).
+
+The shared phases are defined once, indexed by
+[`instructions/orch-shared-phases.instructions.md`](instructions/orch-shared-phases.instructions.md)
+and split across
+[`orch-execution-model`](instructions/orch-execution-model.instructions.md) (where a run
+executes and how it delegates, including session handoff),
+[`orch-delivery-phases`](instructions/orch-delivery-phases.instructions.md) (Personal
+Validation onwards), and
+[`orch-dashboard-contract`](instructions/orch-dashboard-contract.instructions.md) (stage
+reporting and context insight) — so a run reads the part it is in rather than all of it.
+The workflow diagrams live in
 [`resources/orchestration-flow-diagrams.md`](resources/orchestration-flow-diagrams.md).
 
 ## Relationship to `copilot-app`

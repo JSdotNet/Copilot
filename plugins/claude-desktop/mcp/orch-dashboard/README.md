@@ -19,7 +19,7 @@ the URL instead.
 An MCP server cannot open that URL itself — driving a browser is the host's job — so the
 orchestration instructions tell the agent to hand `dashboardUrl` to the host's in-app
 browser (`preview_start` in Claude Code) rather than only printing it. See **Surfacing the
-Dashboard** in `instructions/orch-shared-phases.instructions.md`. That keeps the dashboard
+Dashboard** in `instructions/orch-dashboard-contract.instructions.md`. That keeps the dashboard
 beside the conversation on hosts without MCP Apps, which is as close to the App surface as
 the HTTP one gets.
 
@@ -171,6 +171,22 @@ categories, sub-agent invocations, per-stage token usage, the context gauge, and
 events into the active run. It is best-effort by design: it exits 0 on any error and never
 blocks a tool call.
 
+The hook also runs one way **outward**. When a `PostToolUse` sample pushes the run-level
+context gauge past a threshold, it answers with a warning rather than staying silent — a
+`systemMessage` for the user and `additionalContext` for the orchestrator:
+
+| Gauge | Signal | What the orchestrator is told to do |
+| --- | --- | --- |
+| 60% | `delegate` | Push the next heavy step to a sub-agent in the same worktree. |
+| 75% | `prepare-handoff` | Persist gating decisions, finish the stage in flight, start nothing heavy inline. |
+| 85% | `hand-off` | Mark the handoff and end the session so the run continues in a fresh context. |
+
+Each threshold fires once per crossing, latched in `context.pressureNotified`. The latch
+clears when the gauge falls back below a threshold, so the same run warns again after a
+compaction or a handoff has reset its context. Without this the gauge was merely *observable*:
+nothing read it on the agent's behalf, and the escalation stayed advice in a file. The
+thresholds and their wording live in `CONTEXT_PRESSURE_THRESHOLDS` in `insight.mjs`.
+
 Two accuracy caveats worth knowing:
 
 - Tool durations pair `PreToolUse` with `PostToolUse` by tool name, so several concurrent
@@ -186,8 +202,16 @@ sub-agents in the **same worktree** so the change set and evidence paths stay va
 `isolation: "worktree"` agents for genuinely concurrent work such as `qa:qa-monitor`; their
 evidence must be written into — or copied back to — the owner's worktree root, because the
 evidence endpoint refuses any path outside it. See
-`plugins/claude-desktop/instructions/orch-shared-phases.instructions.md` for the full Execution
+`plugins/claude-desktop/instructions/orch-execution-model.instructions.md` for the full Execution
 Model.
+
+A run outlives its session. When the owner session ends at a context threshold, it calls
+`set_run_context` with `handoff: true` and a `handoffNote`, and the next session's
+`start_run` for the same `skillId` reattaches instead of opening a duplicate. The marker
+matters because a handed-off run and one abandoned at the Personal Validation gate look
+identical to `isIdle` — session ended, nothing advancing — and `start_run` refuses the
+second. `list_runs` reports `handoffPending`, the dashboard badges it **Handed off** rather
+than **Idle**, and reattaching clears the marker while keeping the note.
 
 ## The App surface
 
@@ -229,6 +253,16 @@ node plugins/claude-desktop/mcp/orch-dashboard/dev/test-host.mjs --tool open_das
 
 Add `--inspect` to drop the iframe's opaque origin so devtools can read the app's DOM. It is
 excluded from the packed bundle.
+
+`dev/handoff-test.mjs` drives the server over stdio the way Claude Code does and asserts the
+session-handoff round trip end to end — mark, `SessionEnd`, reattach, and the abandoned-run
+case that must still be refused:
+
+```bash
+node plugins/claude-desktop/mcp/orch-dashboard/dev/handoff-test.mjs
+```
+
+It uses a throwaway state directory and exits non-zero on the first failed check.
 
 ## Install
 

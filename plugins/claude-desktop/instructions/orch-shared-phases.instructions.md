@@ -1,6 +1,6 @@
 ---
 applyTo: 'skills/orch-*/SKILL.md'
-description: Defines the reusable delivery and validation phases shared by all orch-* orchestration skills (Build & Test, QA Validation, Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary) and the orch-dashboard reporting contract, so the shared content is maintained in one place.
+description: Index of the shared orch-* orchestration contract — which phases each tier runs, how skills reference them, and which file owns each part (execution model, delivery phases, dashboard contract, and the two phase skills).
 ---
 
 # Shared Orchestration Phases (Orchestration-Owned)
@@ -8,28 +8,50 @@ description: Defines the reusable delivery and validation phases shared by all o
 ## Purpose
 
 - Define the phases that every `orch-*` skill shares **once**, so a maintainer edits
-  them here instead of in ~14 `SKILL.md` files.
+  them in one place instead of in ~14 `SKILL.md` files.
 - Each `orch-*/SKILL.md` keeps only its skill-specific stages inline and references the
-  matching phases below by their exact names.
-- To change a shared phase for every orchestration, edit this file; do not re-copy the
-  prose into individual skills.
+  matching phases by their exact names.
+- To change a shared phase for every orchestration, edit the file that owns it — see
+  **Where Each Part Lives**; do not re-copy the prose into individual skills.
+
+## Where Each Part Lives
+
+This file is the index: which phases a tier runs, how skills reference them, and the
+transition rule. The definitions live in three companion files, so a run reads the part it
+is actually in. They were previously one 47 KB file, which meant every run carried the
+phases it had not reached yet and the ones its tier would never run — on every turn, until
+the run ended.
+
+| File | Holds | When a run reads it |
+| --- | --- | --- |
+| `orch-execution-model.instructions.md` | Code-modifying context and escalation, MCP server strategy, session ownership, delegation order, sub-agent constraints, run state and resume, **Session Handoff** | Once, at the start of the run |
+| `orch-delivery-phases.instructions.md` | Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary | When the run reaches Personal Validation |
+| `orch-dashboard-contract.instructions.md` | The dashboard reporting contract, surfacing the dashboard, context and token insight | Once, before the first `update_stage` |
+| `skills/phase-build-test/SKILL.md` and `skills/phase-qa-validation/SKILL.md` | Build & Test and QA Validation, in full | When the orchestrator invokes them |
+
+Build & Test and QA Validation are **not** defined in this file or in its companions. They
+are invokable skills and their procedure lives only there; the instruction files name them,
+their position in the tier, and their model category, and stop.
+
+Read what the run needs, not the whole set — reading all four files up front costs what the
+single file cost and defeats the split.
 
 ## How Skills Reference These Phases
 
-- A skill lists its shared phases under a `### Final Phases (Shared)` heading and links
-  to this file. The linked file is the source of truth; the skill only names which
+- A skill lists its shared phases under a `### Final Phases (Shared)` heading and links to
+  the file that defines them. Those files are the source of truth; the skill only names which
   phases it runs and adds skill-specific notes (for example the QA scope).
-- Claude Code does not auto-inline this file into a running skill, so the
-  reference in each skill must name the phases explicitly and point here for their
-  definitions.
+- Claude Code does not auto-inline any of these files into a running skill, so the reference
+  in each skill must name the phases explicitly and point at the file that defines them.
 - The `orchestrator` agent (`agents/orchestrator.agent.md`) runs these phases in order,
   drives the dashboard, and enforces the Personal Validation gate. The two heavy
   code-modifying phases are packaged as invokable skills so their procedure is maintained
   once:
   - **Build & Test** → `skills/phase-build-test/SKILL.md`.
   - **QA Validation** → `skills/phase-qa-validation/SKILL.md`.
-- Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, and Summary stay defined in
-  this file (short, linear phases where a separate skill would only add indirection).
+- Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, and
+  Summary stay defined as prose in `orch-delivery-phases.instructions.md` rather than as
+  skills — short, linear phases where a separate skill would only add indirection.
 - Model choice for every phase (and every skill-specific stage) is resolved once, centrally,
   from `instructions/orch-model-selection.instructions.md` — do not describe model choice
   here or in individual skills.
@@ -45,185 +67,6 @@ description: Defines the reusable delivery and validation phases shared by all o
 - The required user approval gate is **Personal Validation**. Stop there before creating a
   pull request, updating issues, or marking the orchestration complete.
 
-## Code-Modifying Orchestration Context
-
-- `orch-feature`, `orch-bug`, `orch-structure`, `orch-create-module`, `orch-create-service`,
-  `orch-create-mvp`, `orch-update-packages`, `orch-aspire-update`, and
-  `orch-project` are **implementation-focused** orchestrations.
-- Each of these skills **owns establishing its own implementation context** in its first
-  stage — scope, acceptance or verification criteria, impacted code paths, and the
-  governing instructions and guidelines for the affected area.
-- When a specification, acceptance criteria, architecture decision, or equivalent
-  implementation note already exists, that first stage is a short intake: read it, align
-  to it, and continue. Documentation and specification orchestrations —
-  `orch-architecture`, `orch-arc42`, `orch-blueprint`, `orch-adr`, and `orch-tdr` — remain
-  the preferred upstream source of that context when they have already run.
-- When it does not exist, the first stage **derives it from the request and the codebase**
-  and records the derived assumptions before continuing. Missing context is a reason to run
-  that stage — never a reason to stop, hand the request back, or skip the orchestration and
-  implement inline.
-- Ad-hoc, incremental, and one-line requests are in scope for these skills. They enter
-  through the same first stage as fully specified work.
-
-### Escalation (the only stop conditions)
-
-Stop and route the work when the request needs a decision the orchestration does not own.
-Name the successor and invoke it after user approval; do not end the turn by asking the
-user to run something themselves.
-
-| Situation | Route to |
-|---|---|
-| The change requires a new architectural decision | `orch-adr` |
-| The change requires a new bounded context or service boundary | `orch-create-service`, or `orch-architecture` for the boundary decision |
-| The change requires a cross-cutting redesign | `orch-blueprint`, or `orch-arc42` for structured architecture documentation |
-| Accepting known debt instead of fixing it | `orch-tdr` |
-
-Everything else — an unwritten specification, absent acceptance criteria, a bug with no
-reproduction, a request that arrived as one sentence — is derived in the skill's first
-stage, not escalated.
-
-### Exception: `orch-feature` and `orch-bug`
-
-- `orch-feature` and `orch-bug` handle the most common ad-hoc requests, so they own a
-  **Stage 0: Scope Discovery** that derives missing scope, acceptance or verification
-  criteria, and impacted code paths from the request and codebase.
-- For those two skills, missing context is a reason to run Stage 0 — not a reason to stop,
-  and never a reason to skip the orchestration and implement inline.
-- Stopping still applies when the change requires a new architectural decision, a new
-  bounded context, or a cross-cutting redesign. In that case route to `orch-adr`,
-  `orch-architecture`, or `orch-blueprint` only after the user approves that escalation.
-- The other code-modifying orchestrations use the same Personal Validation gate and only
-  stop early for the escalation cases above.
-
-## MCP Server Strategy (Shared)
-
-- Use `jsdotnet-guidelines-mcpserver` for repository standards, governed asset
-  constraints, template conventions, and repository instruction guidance.
-- Use `jsdotnet-design-mcpserver` only for UX-specific design work such as wireframes,
-  user flows, and design artifacts. Do not use it for the architecture, ADR, TDR, or
-  general implementation phases documented in the current `orch-*` skills unless a flow
-  explicitly adds UX design work.
-- Use `microsoft-learn` during implementation-focused phases when official
-  Microsoft/.NET/Azure/Aspire documentation or code samples are needed. Prefer targeted
-  lookups tied to the stack being changed; do not turn implementation phases back into
-  broad research passes.
-- Use `playwright` in QA Validation when browser-based scenarios or visual evidence are
-  required. Skip it when the validation mode is startup-only or the change has no browser
-  surface.
-- Prefer the narrowest server that matches the phase. Do not query all four servers by
-  default.
-
-## Execution Model (Shared)
-
-Defines *where* an orchestration runs and *how* its progress is tracked. Applies to every
-`orch-*` skill.
-
-### Session Ownership
-
-- **One owner session.** The `orchestrator` agent runs the orchestration in the session it
-  was invoked from and stays the sole owner of the run: it alone calls `start_run`,
-  `update_stage`, `set_run_context`, and `finish_run`, and it alone holds the Personal
-  Validation gate. Never delegate dashboard writes or the approval decision.
-- **Never start a second orchestration in the same session** while a run is
-  `in_progress`; the dashboard's tool-activity insight is session-wide and would
-  mis-attribute the work.
-
-### Delegation Order
-
-1. **Do it inline** for short, decision-heavy steps that need the run's context.
-2. **Delegate to a sub-agent (default for heavy work).** Use a sub-agent for build, test,
-   Playwright execution, and large code changes. A sub-agent gets its own context but the
-   **same worktree**, so evidence paths, the change set, and the running application all
-   stay valid for the owner session. This keeps verbose output out of the orchestrator's
-   context without breaking the dashboard.
-3. **Run a background sub-agent only for genuinely concurrent long-running work** — in
-   practice, `qa:qa-monitor` tailing Aspire logs while Playwright drives scenarios. Launch
-   it with the `Agent` tool's `run_in_background`, steer it with `SendMessage`, and do not
-   background work merely to save context.
-4. **Stop every background sub-agent you started, in the same phase that started it.**
-   `qa-monitor` is built to poll until told otherwise — its own instructions say not to stop
-   monitoring — so nothing ends it on its own. Ask it for its final summary with
-   `SendMessage`, then end it with `TaskStop`. A monitor left running keeps polling Aspire
-   after the run has moved on, and a phase must never complete with a background agent it
-   started still alive.
-
-Whichever form is used, pass the model resolved for that stage's category per
-`instructions/orch-model-selection.instructions.md` in the `Agent` call's `model`.
-
-**Escalate to sub-agent delegation when the run-level context gauge approaches its limit.**
-The gauge described in **Context and Token Insight** below is the signal: when the owner
-session's context is filling up, move the next heavy step — broad exploration, large
-refactors, verbose build/test output — to a sub-agent so its cost lands in a separate
-context window, instead of continuing inline until compaction interrupts the run
-mid-orchestration. The gauge ignores sub-agent samples, so this genuinely relieves the owner
-session's context. This is the existing delegation order applied earlier, not a new
-mechanism; background sub-agents remain reserved for concurrent monitoring.
-
-### Sub-Agent Constraints
-
-- **Keep sub-agents in the owner's worktree.** A plain `Agent` call shares the worktree, so
-  the change set, the running application, and evidence paths all stay valid. Only pass
-  `isolation: "worktree"` when parallel agents would otherwise write the same files — an
-  isolated agent cannot see the owner's uncommitted change set and must not be asked to
-  build, test, or validate it.
-- **Evidence must land in the owner's worktree.** Instruct any isolated or background agent
-  to write evidence under the owner worktree root, or copy it back before the owner reports
-  it. The dashboard serves evidence only from that root and rejects paths outside it.
-- The owner session reports a sub-agent's findings; a sub-agent never calls dashboard tools.
-- **A sub-agent never prompts the user.** `AskUserQuestion` is foreground-only — the harness
-  strips it from sub-agents, so a sub-agent that reaches for it errors out mid-stage, and
-  "wait for the user to approve" has no user turn to wait for. When a sub-agent hits a
-  decision it does not own, it **stops and returns the decision to its caller** as
-  structured findings: the question, the options it sees, its recommendation, and the
-  default it would take if told to proceed. The owner session is the only one that asks the
-  user and the only one that records the answer. Never invent an answer and continue, and
-  never end a sub-agent's turn waiting for input that cannot arrive.
-- **The Personal Validation gate belongs to the owner session, always.** A sub-agent —
-  including a backgrounded or worktree-isolated one — cannot hold it: it cannot hand control
-  back to the user and cannot persist `approval`. A sub-agent runs up to the gate, returns
-  its change set, evidence, and code review, and stops. The session that launched it takes
-  the gate.
-- **Never run an orchestration as a sub-agent.** An `orch-*` run needs all three of the
-  capabilities a sub-agent lacks: the user turn behind Personal Validation, `AskUserQuestion`
-  for a decision it does not own, and ownership of the dashboard run (which the two rules
-  above reserve for the owner session, and whose telemetry is session-wide). So the
-  `orchestrator` agent is always a session's main loop, never something another agent spawns.
-  Parallelism across items comes from **more sessions**, not from nesting orchestrations: a
-  skill that fans out over issues or PRs prepares one ready-to-run invocation per item and
-  hands them back for the user to launch, as `automation-bug-fix` and
-  `start-session-from-issue` do. Delegation *within* a run — build, test, QA, large edits —
-  stays sub-agent work as described under **Delegation Order**.
-
-### Run State and Resume
-
-- **The run JSON is the source of truth**, not the conversation. It lives at
-  `<state dir>/runs/<runId>.json` (the `stateDir` returned by `open_dashboard`) and survives
-  compaction, restart, and session resume.
-- **On start, reattach before creating.** `start_run` resumes an existing `in_progress`
-  run for the same `skillId` by default and returns `resumed: true` with the stored run.
-  Continue from the first stage that is not `done`; pass `resume: false` only to
-  deliberately start a second run of the same skill.
-- **An idle run is abandoned work, not resumable work.** A run only leaves `in_progress`
-  through `finish_run`, so one left waiting at an unanswered Personal Validation gate stays
-  `in_progress` indefinitely. The dashboard derives an `idle` flag for those (session ended,
-  or nothing advanced the run for hours) and `start_run` will not reattach to one. When
-  `list_runs` shows an idle run, do not silently continue it: either close it with
-  `finish_run` (`cancelled`, with a summary saying where it stopped) or confirm with the
-  user that it should be picked up, then advance a stage so it counts as live again.
-- **Persist the decisions that gate later phases** with `set_run_context`:
-  - `changeKind` (`new-functionality` / `bug-fix` / `dependency-update` / `none`) as soon
-    as it is known, so a resumed run selects the same QA depth.
-  - `approval` (`pending` / `approved` / `rejected`) at every Personal Validation decision.
-- **Never create a pull request unless the persisted `approval` is `approved`.** If the
-  run state says `pending` after a resume, re-run Personal Validation — do not rely on
-  conversation memory of an approval.
-- **When Personal Validation rejects or requests changes**, set `approval: "rejected"` with
-  the user's wording, return to the appropriate implementation/specification stage, mark that
-  stage `in_progress`, apply the requested changes, and then repeat Build & Test, QA
-  Validation, and Personal Validation. Before the repeated Personal Validation handoff, reset
-  `approval: "pending"` so Create Pull Request remains locked until the user approves the
-  revised change set.
-
 ## Phase Tiers
 
 - **Code-modifying orchestrations** — `orch-feature`, `orch-bug`, `orch-structure`, `orch-create-module`,
@@ -237,437 +80,10 @@ mechanism; background sub-agents remain reserved for concurrent monitoring.
 - **`orch-fallback`** has no fixed tier: it runs the code-modifying tier when its Routing
   Check determines a code-modifying change kind, and the documentation/config tier
   otherwise. It reports the resolved tier's phase names in `start_run`.
-
-## Phase: Build & Test
-
-Applies to code-modifying orchestrations. Runs first, before QA Validation and Personal
-Validation, and is identical for every code-modifying skill. Packaged as the
-`phase-build-test` skill (`skills/phase-build-test/SKILL.md`); the orchestrator invokes it
-rather than re-describing the steps.
-
-- **Build all projects** and fail fast on any build error.
-- **Run the unit test suite** and require it to pass.
-- **Run the automated end-to-end (E2E) test suite** and require it to pass.
-- **Stop and fix** before continuing when build, unit, or E2E tests fail — do not proceed
-  to QA Validation or Personal Validation on a red build. When build and tests are green,
-  continue directly to QA Validation and then Personal Validation.
-
-**Agents:** `csharp-coding:coding` (recommended); performed manually when that plugin is not
-installed.
-
-**MCP Servers:** `microsoft-learn` *(optional, targeted official lookup only)*
-
-**Model Category:** Implementation & Coding (see `orch-model-selection.instructions.md`).
-
-## Phase: QA Validation
-
-Applies to code-modifying orchestrations. Runs after Build & Test. Packaged as the
-`phase-qa-validation` skill (`skills/phase-qa-validation/SKILL.md`); the orchestrator
-invokes it and passes the change kind so depth is selected automatically:
-
-- **New functionality** → run automatic QA validation with capture:
-  - **Verify required MCP tooling before running QA.** Browser-facing validation and
-    evidence capture require the `playwright` MCP server. If required MCP tooling is not
-    available, mark **QA Validation** `blocked`, prompt the user with the missing server or
-    tool names and setup action needed, and stop before Personal Validation. Do not mark
-    the phase `done` with a degraded/manual fallback.
-  - **Preflight Playwright capture before scenarios.** Ensure the consuming session has a
-    Playwright MCP server configured before QA starts, for example
-    `{"servers":{"playwright":{"command":"npx","args":["-y","@playwright/mcp@latest"]}}}`,
-    then restart Claude Code so the `browser_*` tools are visible. Before
-    validating scenarios, use Playwright MCP to navigate to a target page and take a
-    screenshot. If that smoke check fails, screenshot/video capture is unavailable; block
-    or report the limitation according to this phase's required tooling policy.
-  - **Preflight Aspire monitoring when required.** For Aspire apps whose validation
-    requires resource state, logs, traces, metrics, or health evidence, run
-    `aspire mcp init` and `aspire mcp start` before validation or clearly block/report the
-    missing monitoring capability.
-  - **Label fallback evidence accurately.** Browser snapshots and smoke output may
-    show that an app rendered, but they are not Playwright MCP screenshots, videos, or
-    traces. Do not imply Playwright evidence was captured when only browser
-    snapshot evidence exists.
-  - **Run the application locally** via the `qa:qa` agent using the `aspire` /
-    `aspire-run` skill.
-  - **Execute the changed/affected scenarios with Playwright** — via the `playwright` MCP
-    server, `qa:qa` drives each scenario, capturing screenshot/video evidence per
-    checkpoint and failure.
-  - **Monitor runtime behavior continuously** — `qa:qa-monitor` watches Aspire logs,
-    traces, and metrics. Run `qa-monitor` as a background sub-agent
-    (the `Agent` tool with `run_in_background`, steered with `SendMessage`) so monitoring
-    runs concurrently with Playwright validation; otherwise use the `qa` plugin's
-    `delegate-to-qa-monitor` skill for a same-session handoff.
-  - **Collect the monitoring summary and stop the monitor** once the last scenario has run:
-    request the summary with `SendMessage`, then end the background agent with `TaskStop`.
-    Do not mark this phase `done` while a monitor you started is still polling.
-  - **Record the QA result** with pass/fail per scenario and the captured evidence.
-- **Bug fix or change to existing functionality** → run targeted QA validation without
-  required capture:
-  - **Run the application locally** via the `aspire` / `aspire-run` skill and exercise the
-    affected scenarios.
-  - **Use Playwright when it helps reproduce or verify the flow**, but only capture
-    screenshot/video evidence when the user asks for it or when a failure needs evidence.
-    When the selected verification requires Playwright or requested evidence, missing
-    `playwright` MCP availability blocks the phase; prompt the user for setup help instead
-    of completing through a degraded fallback.
-  - **Record pass/fail and monitoring findings** for the affected scenarios.
-  - If required monitoring tooling is unavailable, mark **QA Validation** `blocked` and ask
-    the user to enable or configure the missing tooling before continuing.
-- **Dependency, package, framework, or SDK update with no functional change** (for example
-  `orch-update-packages`) → reduce QA to a **startup-without-errors validation**: start the
-  application, confirm the dashboard/health endpoints report healthy, and confirm the logs
-  show no new errors. Full functional Playwright scenarios and capture are not required
-  unless the update introduces new user-facing behavior.
-- **No functional change and nothing to run** → mark this phase `skipped` and record why.
-
-**After requested changes:** when the user requests fixes during Personal Validation or QA
-finds issues that require code changes, refresh the app under test before re-running QA or
-returning to the user. Prefer updating the same running instance when the repo's declared
-startup mode supports hot reload/watch and Aspire reports the affected resources remain
-healthy. Otherwise stop and restart the app automatically, wait for healthy/running state
-again, refresh endpoint URLs when they change, and record whether QA used hot reload or a
-restart. Never ask the user to restart the app manually as the normal path.
-
-**Repo Context:** when the consuming repository supplies `.claude/orch-context.md`,
-its startup command, base URLs, healthy-startup signals, and declared QA depth take
-precedence over discovery and over the automatic depth selection above, and a repository
-declaring no runnable application makes this phase `skipped`. See
-`orch-repo-context.instructions.md`; the `phase-qa-validation` skill applies it.
-
-**Agents:** `qa:qa`, `qa:qa-monitor` (recommended); falls back to
-`csharp-coding:coding` running validation manually when the `qa` plugin isn't installed,
-but only for validation that can still be completed correctly. Manual validation is not a
-substitute for required MCP-backed browser automation, evidence capture, or monitoring.
-
-**MCP Servers:** `playwright` *(required when browser-based validation, evidence capture,
-or requested screenshots/videos are part of the selected QA depth)*. If required MCP
-tooling is missing, mark the stage `blocked` with user-actionable setup guidance; never
-report a successful degraded fallback. For required capture, Playwright MCP availability
-means the tools are configured, visible after a runtime restart/reload, and proven by a
-pre-scenario navigate-plus-screenshot smoke check. For required Aspire monitoring,
-initialize/start Aspire MCP before validation; browser snapshots or smoke output do
-not satisfy Playwright or Aspire MCP evidence requirements.
-
-**Skills Used:** `aspire`, `aspire-run`
-
-**Model Category:** Testing, QA & Monitoring (see `orch-model-selection.instructions.md`).
-
-## Phase: Personal Validation
-
-Applies to every orchestration. This phase does **not** use an agent — it hands control
-back to the user and waits for them.
-
-- **Do not delegate to an agent and do not auto-approve.** Pause and wait for the user's
-  explicit decision.
-- **Present the code review** of the change set for the user to read.
-- **Present the recorded QA review** from the QA agent (scenarios, pass/fail, monitoring
-  findings, and any captured evidence when applicable) when QA Validation ran.
-- **Start the application for the user** when the run produced a code change, using the resolved repo context startup command or the command proven during QA Validation. Do not stop at listing commands unless startup is impossible; if startup fails, block Personal Validation with the actual failure and recovery command.
-- **Publish quick review links in the dashboard** for the running target, such as the primary app URL, Aspire dashboard, health page, or any route that needs review. Pass them to `update_stage` as `links` on the Personal Validation stage so the user can open the review target directly from the dashboard.
-- **Wait for explicit user approval** before any pull request is created.
-- **When the user requests changes**, record `approval: "rejected"` with the user's wording,
-  reopen the appropriate implementation or specification stage in the same run, apply the
-  requested changes, and then repeat Build & Test, QA Validation, and Personal Validation.
-  The run must not advance to Create Pull Request while the rejected decision is persisted.
-- **When returning to Personal Validation after requested changes**, record
-  `approval: "pending"` before the handoff so the revised change set still requires
-  explicit approval.
-- **Record every Personal Validation decision durably** with `set_run_context`
-  (`approval: "pending"`, `"approved"`, or `"rejected"`, plus the user's wording as
-  `approvalNote`) so the gate survives a session resume.
-- **Do not leave a runtime running behind an unanswered gate.** This phase starts the
-  application for the user, and it must stay up while they review — but the orchestration
-  still owns it. If the user defers the decision, ends the session, or otherwise steps
-  away without approving or rejecting, shut down the runtime and any
-  orchestration-owned browser windows under the same rules as **Create Pull Request**,
-  leave `approval: "pending"`, and record in the stage output that the gate is still open
-  and the app was stopped. A resumed run restarts the app before asking again. Waiting on a
-  human is expected; leaving Aspire and a browser running for hours while nothing happens is
-  not.
-
-## Phase: Create Pull Request
-
-Applies to every orchestration.
-
-- **Create the pull request only after explicit user approval** in Personal Validation —
-  never before, and only when the persisted `approval` in the run state is `approved`.
-- **Shut down validation runtime before creating the pull request** — and, more generally,
-  before the run leaves your hands by any exit: a pull request, a `blocked` or `cancelled`
-  `finish_run`, or a gate the user has stepped away from. If QA Validation or
-  Personal Validation started Aspire or another local application runtime, stop it and
-  confirm it is no longer running before invoking any PR creation command. Prefer the
-  repository's proven shutdown command or `aspire stop` for Aspire-backed runs, and block
-  this phase with the actual shutdown error if the runtime cannot be stopped safely.
-- **Close orchestration-owned browser windows before creating the pull request.** Close only
-  browser windows or tabs opened for QA, Playwright evidence capture, or Personal
-  Validation review. Do not close the `orch-dashboard` tab, the diagram/document viewer tabs, or
-  unrelated user browser sessions.
-- **Write the PR description** from the change set, code review outcome, and validation
-  evidence.
-- **Apply any PR-time improvements** (final polish, labels, changelog) as part of this
-  phase.
-- **Skip this phase** (mark it `skipped`) when the run produces no change set to submit.
-
-**Agents:** *(default)*
-
-**Model Category:** Review (see `orch-model-selection.instructions.md`). No dedicated agent
-runs this phase by default, so the orchestrator performs it directly under the category's
-resolved model.
-
-## Phase: Documentation Update
-
-Applies to code-modifying orchestrations. Runs **after** Create Pull Request and before Summary.
-Its job is to stop a change from shipping while the repository's own governed documentation drifts
-out of date. It is **conditional**: it is a clean no-op when nothing is stale, and never forces a
-pointless commit.
-
-- **Skip this phase** (mark it `skipped`) when Create Pull Request was skipped — there is no change
-  set and no PR branch to update.
-- **Discover the repository's documentation surface.** Read the target repo's own conventions —
-  `CLAUDE.md`, any repo `*.instructions.md`, and the checked-in
-  knowledge/doc folders it governs (for example `.arc42/`, `.domain/`, `.tech/`, `.design/`,
-  `.backlog/`, `docs/`, and `README.md`) together with their per-chapter metadata format.
-- **Decide whether documentation is now stale.** Compare the landed change set against that surface:
-  did architecture, technology, deployment, a public API/contract, configuration, dependencies, or
-  user-facing behavior change in a way the governed docs should record?
-- **When updates are needed**, make them following the repo's own conventions (metadata blocks,
-  per-chapter format), then **commit and push onto the existing pull request branch** so the open
-  PR is updated in place — a doc change that stays uncommitted is a bug. Record what changed in the
-  stage `output`, and reflect it in the PR body when it helps the reviewer.
-- **Never rewrite the PR branch history.** Add a **new commit** only. By the time this phase runs
-  the pull request is open and a reviewer may already be reading it, so this phase must never
-  amend, rebase, squash, or force-push the branch — doing so silently detaches existing review
-  comments and changes code under someone mid-review.
-- **Fail loudly if the commit or push is rejected.** A rejected push is expected in practice when
-  the branch has moved (a reviewer pushed a suggestion or a maintainer updated the branch). On a
-  failed commit or push, **mark this stage `blocked` (never `done`) with the actual error surfaced
-  in the `output`** — marking it `done` would let the user believe the documentation shipped when
-  it did not, the exact silent drift this phase exists to prevent. Recovery: pull/rebase the
-  **local** work onto the updated remote branch and retry the push once (this rebases your own
-  unpushed doc commit, not the PR branch's published history); if it still fails, stop and report.
-- **When nothing is stale**, mark this phase `done` with an `output` naming what was checked and why
-  no change was needed. **Do not create a commit.**
-
-Because this phase runs after the user-approved Create Pull Request and touches **documentation
-only, never code**, it does not re-open the Personal Validation gate; the documentation commit is
-surfaced in the pull request for the reviewer. If a documentation change turns out to require code
-edits, treat that as new implementation work and route it back through the earlier phases rather
-than committing code here.
-
-**Agents:** `documentation:documentation` (recommended), run as a sub-agent in the **same worktree**
-so its commit lands on the pull request branch; falls back to `csharp-coding:coding` or the
-orchestrator performing it directly when that plugin is not installed.
-
-**MCP Servers:** `jsdotnet-guidelines-mcpserver` *(optional, for governed-asset documentation
-conventions)*
-
-**Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
-
-## Phase: GitHub Issue Update
-
-Applies to every orchestration. Runs after the pull request and any documentation update
-work, and before Summary.
-
-- **Detect whether the session was started from a GitHub issue** by checking the session's
-  issue linkage metadata when available, then the handoff metadata produced by
-  `start-session-from-issue` and `automation-bug-fix` (`GitHub issue origin`, `Repository`,
-  `Issue Number`, and `Issue URL`), which arrives as the session's first message.
-- **Skip this phase** (mark it `skipped`) when no GitHub issue origin is present, when the
-  issue number or repository cannot be determined, or when GitHub issue tooling is not
-  available. Include the reason in the stage `output`.
-- **Add a new issue comment instead of rewriting the issue body.** The comment must include
-  the captured orchestration result, pull request link when one exists, Personal Validation
-  decision, and the recorded QA report.
-- **Include the QA report from the QA Validation stage** for code-modifying orchestrations:
-  scenario pass/fail/flaky status, monitoring findings, and captured evidence or dashboard
-  report links when available. If QA Validation was skipped or does not apply, state that
-  explicitly in the comment rather than inventing a result.
-- **Use configured GitHub issue tooling first**, such as an installed GitHub plugin skill or
-  MCP integration; fall back to `gh issue comment --repo <owner/repo> <number> --body-file
-  <file>` when available. Do not create a new issue.
-- **Fail loudly on update errors.** If posting the comment fails, mark this stage `blocked`
-  with the actual error in `output`; do not mark it `done` or silently continue to Summary.
-
-**Agents:** *(default)*
-
-**Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
-No dedicated agent runs this phase by default, so the orchestrator performs it directly under
-the category's resolved model.
-
-## Phase: Summary
-
-Applies to every orchestration.
-
-- **Summarize the delivered outcome**, the created pull request (if any), and the
-  GitHub issue update outcome when applicable.
-- **Emit the run summary** once the pull request and any applicable GitHub issue update are
-  complete, or the run concludes without
-  one.
-
-**Agents:** `orchestrator` agent
-
-**Model Category:** Documentation & Low-Complexity (see `orch-model-selection.instructions.md`).
-No dedicated agent runs this phase; the orchestrator summarizes directly under the
-category's resolved model.
-
-## Dashboard Reporting Contract (Shared)
-
-Every `orch-*` skill reports progress through the `orch-dashboard` MCP server
-(`plugins/claude-desktop/mcp/orch-dashboard/`), which this plugin registers. Its tools appear
-under the names `open_dashboard`, `start_run`, `record_prompt`, `set_run_context`,
-`update_stage`, `finish_run`, `list_runs`, `get_run`, `render_diagram`, `render_markdown`,
-and `export_report`.
-
-**The tool prefix depends on how the server is registered, so resolve it from the available
-tool list rather than assuming it.** A plugin-provided MCP server is namespaced with the
-plugin that provides it, so installing this plugin surfaces the tools as
-`mcp__plugin_claude-desktop_orch-dashboard__<tool>`. The same server registered directly in a
-repository's `.mcp.json` surfaces as `mcp__orch-dashboard__<tool>`. The tool names and
-arguments are identical either way; only the prefix differs. An agent that hardcodes one
-spelling — in an `mcp__` tool allowlist especially, which matches exact runtime names — loses
-every dashboard tool under the other.
-
-- If the `orch-dashboard` tools are not available at all — the plugin is installed without
-  its MCP server, or the server failed to start — skip the dashboard calls and continue
-  through standard chat interaction.
-- If some tools resolve but a required one (`start_run`, `update_stage`,
-  `set_run_context`, `finish_run`) errors, treat it as a tooling/runtime capability issue.
-  Do not silently fall back to chat-only tracking; block the orchestration and report the
-  missing capability, including the tool's error text.
-- The server writes run state to a per-project directory outside the repository, so runs
-  survive a session restart and never appear in `git status`. `stateDir` in the
-  `open_dashboard` result names that directory.
-
-- **Open** the dashboard once per session with `open_dashboard` and surface it per
-  **Surfacing the Dashboard** below — the page updates live over server-sent
-  events, so it is opened once and left open. Then call `start_run` with the skill's
-  `skillId`, the full ordered stage list (its skill-specific stages followed by the shared
-  phase names for its tier), and the `changeKind` when it is already known. `start_run`
-  reattaches to an existing `in_progress` run for the same skill and returns
-  `resumed: true`; continue from the first stage that is not `done` instead of restarting
-  the orchestration.
-- **Persist gating state** with `set_run_context`: the `changeKind` as soon as it is
-  determined, and the `approval` decision recorded in Personal Validation.
-- **Before each stage**, call `update_stage` with `status: "in_progress"`.
-- **After each stage**, call `update_stage` again with `status: "done"` (or
-  `"blocked"`/`"skipped"`) and an `output` summary. The dashboard increments the stage's
-  completion count every time it transitions to `done`, so repeated Build & Test, QA
-  Validation, or Personal Validation passes after requested changes remain visible.
-- **For the Personal Validation phase**, pass `links` for the started app and any dashboard or review target URLs, so the dashboard renders direct buttons next to the stage output instead of making the user copy commands.
-- **When Personal Validation requests changes**, record the rejected decision, move the
-  relevant earlier stage back to `in_progress`, and continue the same run through the repeated
-  phases instead of starting a new run. Before handing back for the revised Personal
-  Validation pass, record `approval: "pending"`; only `approval: "approved"` unlocks Create
-  Pull Request.
-- **For the QA Validation phase**, also pass `scenarios` (one entry per tested scenario
-  with `status: "pass"|"fail"|"flaky"`, `notes`, and optional Playwright
-  screenshot/recording `evidence` paths) and `monitoring` (the Aspire log/trace summary
-  and any Error/Critical/Warning findings) so the dashboard renders QA results with
-  evidence inline when it exists.
-- **Keep Personal Validation and Create Pull Request as separate stages**: gate Create
-  Pull Request on explicit user approval recorded in Personal Validation (mark it
-  `skipped` when there is no change set to submit), and record all PR-time changes under
-  the Create Pull Request stage output. Before invoking any PR creation command, the Create
-  Pull Request stage must stop the orchestration-started runtime, close only
-  orchestration-owned QA/review browser windows, keep the `orch-dashboard` and viewer tabs
-  open, and record that cleanup in the stage output — never create the pull request
-  before personal validation or cleanup.
-- **For the Documentation Update phase** (code-modifying tier only), run it after Create
-  Pull Request: mark it `in_progress`, then `done` with an `output` naming the governed docs
-  updated and the new commit pushed onto the existing PR branch, or `done` describing what was
-  checked when no update was needed, or `skipped` when Create Pull Request was skipped. It
-  adds a new commit only — never amend, rebase, squash, or force-push the PR branch — and it
-  never creates a commit when no documentation is stale. If the commit or push is rejected,
-  mark the stage `blocked` with the actual error in the `output`, never `done`.
-- **For the GitHub Issue Update phase**, run it after Documentation Update for code-modifying
-  orchestrations and after Create Pull Request for documentation/config orchestrations. Mark
-  it `done` after adding the result and QA report comment to the originating issue, `skipped`
-  when the session was not started from a GitHub issue, or `blocked` with the actual error
-  when the comment cannot be posted.
-- **Mark the Summary stage** `in_progress` then `done`, and call `finish_run` with the final
-  status and summary once the pull request and any applicable GitHub issue update are complete
-  (or the run concludes without one).
-
-### Surfacing the Dashboard
-
-A run the user cannot see is a run they cannot steer. Show the dashboard where the host can
-display it, and only fall back to a bare link when it cannot.
-
-1. **Inline panel.** In a host that supports MCP Apps, `open_dashboard` renders the
-   dashboard inline on its own. Nothing further is needed — do not also open a browser tab.
-2. **Inline browser pane.** Otherwise, if the host exposes an in-app browser, open
-   `dashboardUrl` there so the dashboard sits beside the conversation instead of in a
-   separate window. In Claude Code that is `preview_start` with `{ url: dashboardUrl }`
-   (`mcp__Claude_Browser__preview_start`); resolve the exact name from the available tool
-   list, since a host may namespace or omit it.
-3. **Plain link.** With neither available, give the user `dashboardUrl` to open themselves.
-
-- **Open it once.** The page updates live over server-sent events, so re-opening the pane on
-  later stages just steals focus. If the tab was closed, reopening is fine; routine stage
-  transitions are not a reason to.
-- **Do not block on it.** Failing to open the pane is a presentation problem, never a run
-  problem: report that the pane could not be opened, give the URL, and continue the
-  orchestration.
-- **The viewers follow the same rule.** `render_diagram` and `render_markdown` serve
-  `<dashboardUrl>mermaid` and `<dashboardUrl>markdown`; open those in the inline browser too
-  when a stage renders content, and leave them open alongside the dashboard tab.
-
-See `plugins/claude-desktop/mcp/orch-dashboard/README.md` for the full dashboard tool
-contract, and `instructions/dashboard-usage.instructions.md` for when to also open the
-`render_markdown`/`render_diagram` content viewers.
-
-## Context and Token Insight (Shared)
-
-The dashboard's **Context** panel reports context-window and token consumption alongside
-the tool-activity Insight panel. Both are captured automatically by the plugin’s
-telemetry hooks from the session’s own tool calls and transcript; the orchestrating agent
-does not report them.
-
-- **Per-stage token delta** (the `Token delta:` badge on each stage) — the tokens of every model
-  call that completed while that stage was `in_progress`, with reasoning and prompt cache
-  read/write tracked separately, plus a subtotal for sub-agent usage so delegated cost stays
-  visible. It is a delta rather than an absolute reading at the stage boundary, because
-  compaction can reset the absolute mid-stage. Two figures are shown:
-  - **Input + output** — the headline total. `inputTokens` counts the *whole* prompt, most
-    of which is normally served from the prompt cache on later turns, so this figure can
-    legitimately run to several times the model's context window. It measures throughput,
-    **not** context occupancy.
-  - **Uncached** (`input − cache reads + output`) — the fresh tokens the stage actually
-    pushed through the model. This is the figure that approximates real context pressure.
-- **Run-level context gauge** — the latest `currentTokens` against `tokenLimit` as a
-  percentage, the component breakdown (system, conversation, tool definitions), the peak
-  observed during the run, and the count and reasons of compaction and truncation events.
-  The gauge deliberately **ignores sub-agent samples**, because a sub-agent runs in its own
-  context window.
-
-How to use these:
-
-- **Never invent, estimate, or hand-write token numbers** into `update_stage` output,
-  `set_run_context`, or the run summary. The extension owns these values; a written-in
-  figure would conflict with the captured one. Keep stage `output` focused on what the
-  stage did and produced.
-- **Never read the headline input + output figure as context consumption.** A stage showing
-  a multi-million-token total against a 200k window is normal cache behavior, not an
-  emergency. Compare stages on the **uncached** figure, and read occupancy off the run-level
-  gauge.
-- **Read the uncached per-stage figure as the signal for which phase is expensive.** A stage
-  whose uncached delta dwarfs the rest — especially one with a large sub-agent subtotal — is
-  evidence that the stage should be split into smaller stages or delegated, and is worth
-  naming in the Summary phase as a qualitative observation.
-- **Act on the run-level gauge before it forces compaction.** As it approaches the limit,
-  apply the escalation in **Execution Model → Delegation Order**: push the next heavy step
-  to a sub-agent in the same worktree. Because the gauge ignores sub-agent samples,
-  delegating genuinely relieves the owner session's context rather than just relabelling the
-  cost. Compaction and truncation counts rising during a run mean the mitigation came too
-  late.
-- **Runs that predate this capture simply omit the panel and its fields** — treat their
-  absence as "not recorded", not as zero.
-
-**Caveat — attribution is session-wide.** Token telemetry, like the existing tool-activity
-insight, is captured per session, not per run. Any model call made while a run is
-`in_progress` is attributed to that run and to its current stage, including unrelated work
-done in the same session. This is the reason for the **one orchestration per session** rule
-in the Execution Model; interpret the numbers as an upper bound when other work happened
-alongside the run.
+- **Session Handoff belongs to no tier.** It is an interrupt rather than a step: it fires
+  whenever the run-level context gauge reaches the handoff threshold, at whatever stage the
+  run has reached, and the run then resumes on that same stage in a fresh session. See
+  **Session Handoff** in `orch-execution-model.instructions.md`.
 
 ## Reference Convention
 
@@ -676,8 +92,9 @@ alongside the run.
 
 ## Quality Checks
 
-- [ ] Shared phase prose is edited here, not copied into individual skills.
-- [ ] Each skill names its shared phases and links to this file.
+- [ ] Shared phase prose is edited in the file that owns it (see **Where Each Part
+      Lives**), not copied into individual skills and not duplicated across those files.
+- [ ] Each skill names its shared phases and links to this index.
 - [ ] Build & Test runs before QA Validation and Personal Validation for code-modifying
       skills.
 - [ ] Code-modifying orchestrations continue through Build & Test and QA Validation without
@@ -703,3 +120,10 @@ alongside the run.
       total is never read as context occupancy.
 - [ ] Heavy work is escalated to a sub-agent as the run-level context gauge approaches its
       limit, rather than continuing inline until compaction hits.
+- [ ] Build & Test and QA Validation procedure lives only in `phase-build-test` and
+      `phase-qa-validation`; the instruction files name them without restating them.
+- [ ] A run hands off to a fresh session when the context gauge reaches the handoff
+      threshold, instead of running on until compaction interrupts it — with the gating
+      decisions and the handoff note persisted on the run before the session ends.
+- [ ] A resumed session reads the handoff note off the run before re-deriving context it
+      was already handed.

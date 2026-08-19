@@ -53,7 +53,7 @@ Execute a TDR workflow with the Claude Code orchestration dashboard with MCP-gui
 ### Final Phases (Shared)
 
 After Risk & Follow-Up Review, this skill runs the shared closing phases defined once in
-`instructions/orch-shared-phases.instructions.md` (documentation/config tier), in order:
+`instructions/orch-delivery-phases.instructions.md` (documentation/config tier), in order:
 
 1. **Personal Validation** — hand back to the user (no agent); present the drafted
    artifacts and any review for the user to approve.
@@ -63,7 +63,7 @@ After Risk & Follow-Up Review, this skill runs the shared closing phases defined
    comment to that issue with the captured result and QA report; otherwise skip.
 4. **Summary** — emit the run summary.
 
-See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+See `instructions/orch-delivery-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
 
 ## Usage Pattern
@@ -88,7 +88,7 @@ Invoke: orch-tdr
 
 This skill reports progress through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`). Follow the shared **Dashboard Reporting
-Contract** in `instructions/orch-shared-phases.instructions.md` for the
+Contract** in `instructions/orch-dashboard-contract.instructions.md` for the
 `start_run`/`update_stage`/`finish_run` cadence and the Personal Validation → Create
 Pull Request gating. If the server is not configured, skip the dashboard calls and
 continue through standard chat interaction.

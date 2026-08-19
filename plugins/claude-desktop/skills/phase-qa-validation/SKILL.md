@@ -180,7 +180,7 @@ or a restart, and do not ask the user to restart the app manually as the normal 
 ## Dashboard Reporting
 
 - Report as the `QA Validation` stage via the shared **Dashboard Reporting Contract** in
-  `instructions/orch-shared-phases.instructions.md`. Also pass `scenarios` (per-scenario
+  `instructions/orch-dashboard-contract.instructions.md`. Also pass `scenarios` (per-scenario
   `status`, `notes`, `evidence`) and `monitoring` (log/trace summary) so the dashboard
   renders QA results with evidence inline.
 - When required MCP tooling is unavailable, report the stage as `blocked` with the missing
@@ -228,5 +228,5 @@ or a restart, and do not ask the user to restart the app manually as the normal 
 ## Reference
 
 Source skill location: `plugins/claude-desktop/skills/phase-qa-validation/SKILL.md`.
-Phase definition: `plugins/claude-desktop/instructions/orch-shared-phases.instructions.md`.
+Phase definition: `plugins/claude-desktop/instructions/orch-delivery-phases.instructions.md`.
 Repo context convention: `plugins/claude-desktop/instructions/orch-repo-context.instructions.md`.

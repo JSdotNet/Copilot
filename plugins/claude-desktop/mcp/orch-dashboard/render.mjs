@@ -13,6 +13,9 @@ const STATUS_LABEL = {
     // session ended or that nothing has advanced for hours — typically one left waiting at
     // the Personal Validation gate.
     idle: "Idle",
+    // Also idle by those signals, but deliberately so: the session ended at a context
+    // threshold and the run is waiting for another session to continue it.
+    handoff: "Handed off",
 };
 
 export function renderShell() {
@@ -118,6 +121,7 @@ export function renderShell() {
   .badge.blocked, .badge.cancelled { background: rgba(207,34,46,0.15); color: var(--true-color-red, #cf222e); }
   .badge.skipped { background: rgba(127,127,127,0.1); color: var(--text-color-muted, #59636e); }
   .badge.idle { background: rgba(154,103,0,0.15); color: var(--true-color-yellow, #9a6700); }
+  .badge.handoff { background: rgba(84,111,255,0.15); color: var(--true-color-blue, #546fff); }
   .stage {
     border-left: 3px solid var(--border-color-default, #d0d7de);
     padding: 6px 0 6px 14px;
@@ -380,7 +384,9 @@ export function renderShell() {
     // Runs carry a derived idle flag from the API; stages never do, so they keep using
     // badge() directly on their stored status.
     function runBadge(run) {
-      return badge(run && run.idle ? "idle" : run && run.status);
+      // handoffPending is checked before idle: a handed-off run satisfies both, and
+      // labelling deliberate suspension "Idle" reads as abandoned work.
+      return badge(run && run.handoffPending ? "handoff" : run && run.idle ? "idle" : run && run.status);
     }
 
     // A run has a declared trailing Summary stage when its last stage is named

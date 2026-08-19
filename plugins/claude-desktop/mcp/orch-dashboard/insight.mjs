@@ -231,6 +231,89 @@ export function recordTruncation(run, entry) {
     run.context = ctx;
 }
 
+// Run-level context pressure thresholds.
+//
+// `recordContextSample` keeps a live gauge of how full the owner session's context window
+// is, and **Execution Model -> Delegation Order** tells the orchestrator to escalate as that
+// gauge fills. Prose alone leaves the noticing to the agent, which is exactly what gets
+// missed in a long run; these thresholds let the telemetry hook say it out loud on the tool
+// call that crosses one.
+//
+// Each threshold fires once per crossing, latched in `context.pressureNotified`. The latch
+// clears when the gauge falls back below a threshold — with a hysteresis band so a sample
+// oscillating on a boundary cannot re-announce — which is what lets the same run warn again
+// after a compaction or a session handoff has reset its context.
+const PRESSURE_HYSTERESIS_PCT = 5;
+
+export const CONTEXT_PRESSURE_THRESHOLDS = [
+    {
+        pct: 60,
+        level: "delegate",
+        action:
+            "Delegate the next heavy step -- broad exploration, a large refactor, verbose build or test output -- " +
+            "to a sub-agent in the same worktree. The gauge ignores sub-agent samples, so this genuinely relieves " +
+            "this session's context rather than relabelling the cost.",
+    },
+    {
+        pct: 75,
+        level: "prepare-handoff",
+        action:
+            "Prepare a session handoff: persist every decision that gates a later phase with set_run_context, " +
+            "finish the stage in flight, and start no further heavy stage inline. " +
+            "See Execution Model -> Session Handoff.",
+    },
+    {
+        pct: 85,
+        level: "hand-off",
+        action:
+            "Hand off now: set_run_context with handoff true and a handoffNote holding the resume invocation, " +
+            "leave the stage in flight in_progress, hand the invocation to the user, and end this session so the " +
+            "run continues in a fresh context instead of being compacted mid-orchestration. " +
+            "See Execution Model -> Session Handoff.",
+    },
+];
+
+// Returns the threshold this sample just crossed, or null when the gauge is unreadable or
+// nothing new was crossed. Mutates `run.context.pressureNotified`, so the caller must
+// persist the run for the latch to hold.
+export function evaluateContextPressure(run) {
+    const ctx = run && run.context && typeof run.context === "object" ? run.context : null;
+    if (!ctx) return null;
+    const currentTokens = Number(ctx.currentTokens);
+    const tokenLimit = Number(ctx.tokenLimit);
+    if (!Number.isFinite(currentTokens) || !Number.isFinite(tokenLimit) || tokenLimit <= 0) return null;
+    const pct = (currentTokens / tokenLimit) * 100;
+
+    // Drop latches that now sit well above the gauge: the context shrank (compaction, or a
+    // handoff into a fresh session continuing the same run) and those thresholds are live again.
+    const notified = new Set(
+        (Array.isArray(ctx.pressureNotified) ? ctx.pressureNotified : [])
+            .map(Number)
+            .filter((value) => Number.isFinite(value) && value <= pct + PRESSURE_HYSTERESIS_PCT),
+    );
+
+    // A sample can jump past more than one threshold at once. Announce the most urgent one
+    // and latch every threshold it passed, so the milder ones do not fire afterwards.
+    let crossed = null;
+    for (const threshold of CONTEXT_PRESSURE_THRESHOLDS) {
+        if (pct < threshold.pct) continue;
+        if (!notified.has(threshold.pct)) crossed = threshold;
+        notified.add(threshold.pct);
+    }
+
+    ctx.pressureNotified = [...notified].sort((a, b) => a - b);
+    run.context = ctx;
+    if (!crossed) return null;
+    return {
+        level: crossed.level,
+        thresholdPct: crossed.pct,
+        pct: Math.round(pct),
+        currentTokens,
+        tokenLimit,
+        action: crossed.action,
+    };
+}
+
 // Aggregates the context/token state recorded above into a shape the
 // dashboard and report can render directly. Runs created before context
 // tracking existed simply have no `context`/`tokenUsage` fields; this returns

@@ -19,7 +19,7 @@ This skill **dispatches; it does not orchestrate.** It deliberately does not spa
 per issue. `orch-bug` runs through the `orchestrator` agent, which must own its own session
 to hold the Personal Validation gate, write dashboard state, and ask the user a question — a
 backgrounded orchestrator can do none of the three. See **Session Ownership** and
-**Sub-Agent Constraints** in `instructions/orch-shared-phases.instructions.md`. The user
+**Sub-Agent Constraints** in `instructions/orch-execution-model.instructions.md`. The user
 launches each handoff as its own session, where `orch-bug` behaves exactly as designed.
 
 ## Inputs
@@ -170,7 +170,7 @@ This skill orchestrates the following installed skills:
 This skill reports progress through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`). If the server is not configured, skip the
 dashboard calls below and continue through standard chat interaction. Follow the shared
-**Dashboard Reporting Contract** in `instructions/orch-shared-phases.instructions.md`
+**Dashboard Reporting Contract** in `instructions/orch-dashboard-contract.instructions.md`
 for the tool cadence.
 
 - Open the dashboard per the shared contract, then call `start_run` with
