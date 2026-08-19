@@ -50,7 +50,7 @@
     {
       "name": "fincent",
       "source": "./plugins/fincent",
-      "description": "Copilot plugin for Fincent project story review, dev, domain alignment, story point estimation, PR review, sprint reporting, and demo presentation workflows.",
+      "description": "Copilot plugin for Fincent project story review, dev, domain alignment, story point estimation, PR review, PR remark resolution, sprint reporting, and demo presentation workflows.",
       "version": "0.1.0"
     },
     {
