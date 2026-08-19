@@ -26,16 +26,19 @@ flowchart TD
 ```
 
 PR reviews run independently, parallel to the pipeline. `pr-review-story` verifies delivery
-against the story; `pr-review-domain` and `pr-review-architecture` verify code quality:
+against the story; `pr-review-domain` and `pr-review-architecture` verify code quality.
+`pr-remarks-resolve` closes the loop: it answers the remarks those reviews produce.
 
 ```mermaid
 flowchart LR
     PR([Pull Request]) --> PD[pr-review-domain\nDomain Review]
     PR --> PA[pr-review-architecture\nArchitecture Review]
     PR --> PS[pr-review-story\nStory Coverage]
-    PD --> MERGE([Merge decision])
-    PA --> MERGE
-    PS --> MERGE
+    PD --> RR[pr-remarks-resolve\nPropose, Approve, Push, Reply]
+    PA --> RR
+    PS --> RR
+    RR -->|Fix items pushed and replied| MERGE([Merge decision])
+    RR -->|Discuss / Defer open| WAIT([Waiting on reviewer])
 ```
 
 ## Skills
@@ -56,6 +59,7 @@ flowchart LR
 | `pr-review-architecture` | Layer boundaries, ADR compliance, NFRs, security |
 | `pr-review-domain` | Domain layer purity, event naming, aggregate design |
 | `pr-review-story` | Verify PR delivers all story acceptance criteria; flag out-of-scope changes |
+| `pr-remarks-resolve` | Propose a solution per open review remark, get batch approval, push the changes, reply to every thread, resolve the fixed ones |
 
 ### Automation Skills (batch-by-Jira-status)
 
