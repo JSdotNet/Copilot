@@ -116,6 +116,7 @@ Practical consequences:
 
 Everything after the Personal Validation gate the `orch-*` orchestrations stop at.
 
+- `skills/push-branch/` — push the current branch to its remote and stop there, no PR
 - `skills/create-pull-request/` — open a PR for the current branch, body grounded in the diff
 - `skills/update-pr-branch/` — integrate the base branch and resolve conflicts
 - `skills/fix-pr-checks/` — read failing job logs, reproduce, fix, push until green
@@ -124,6 +125,7 @@ Everything after the Personal Validation gate the `orch-*` orchestrations stop a
 
 | Question | Skill |
 | --- | --- |
+| The commits just need to reach the remote | `push-branch` |
 | The branch is done — open a PR | `create-pull-request` |
 | GitHub says the branch has conflicts or is out of date | `update-pr-branch` |
 | Checks are red | `fix-pr-checks` |
