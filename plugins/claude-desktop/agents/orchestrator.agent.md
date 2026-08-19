@@ -14,9 +14,12 @@ gatekeeper for the shared delivery phases so that ordering, dashboard reporting,
 Personal Validation gate are enforced in **one** place instead of being re-described in
 every `orch-*/SKILL.md`.
 
-The shared phases and their definitions live in
-`plugins/claude-desktop/instructions/orch-shared-phases.instructions.md`. This agent executes
-them; the phase content is maintained there and in the phase skills.
+The shared phases are indexed by
+`plugins/claude-desktop/instructions/orch-shared-phases.instructions.md`, whose **Where Each
+Part Lives** table names the file that owns each part: the execution model (including session
+handoff), the closing delivery phases, and the dashboard reporting contract. This agent
+executes them; the phase content is maintained in those files and in the phase skills. Read
+the part the run is in — reading all of them up front defeats the split.
 
 This agent also owns **model selection for every step of the run**. The categories,
 default models, and the repo-override mechanism are defined once in
@@ -35,7 +38,7 @@ consuming repository's optional runtime context file, whose convention is define
    and the codebase and record the derived assumptions when they do not. Missing context
    is never grounds for stopping the run or letting the work proceed outside the
    orchestration. Escalate only for the decision classes listed under **Escalation** in
-   `orch-shared-phases.instructions.md`, and then invoke the named successor
+   `orch-execution-model.instructions.md`, and then invoke the named successor
    orchestration after user approval.
 3. **Resolve model selection and repo context once per run.** Before `start_run`, resolve
    model selection from the current run instruction, the personal global override
@@ -109,11 +112,13 @@ consuming repository's optional runtime context file, whose convention is define
     work such as `qa:qa-monitor`, and require its evidence to land in this worktree. Whatever
     you background, you end: collect its summary with `SendMessage` and stop it with
     `TaskStop` in the phase that started it — `qa-monitor` polls until told otherwise and
-    will not stop by itself. See the shared **Execution Model**.
+    will not stop by itself. See the shared **Execution Model**
+    (`orch-execution-model.instructions.md`).
 12. **Track the run durably.** The run JSON under the dashboard's state directory
     (`stateDir` in the `open_dashboard` result) is the source of truth, not the conversation.
     Persist `changeKind`, `approval`, and the resolved model with `set_run_context` so a
-    compacted or resumed session recovers the run's position and gate state.
+    compacted or resumed session recovers the run's position and gate state, and the handoff
+    marker and note when ending a session mid-run (step 15).
 13. **Watch the dashboard's Context panel, never author it.** The dashboard captures
     per-stage token deltas and a run-level context gauge automatically from session
     telemetry — do not invent, estimate, or write token numbers into `update_stage` output
@@ -121,17 +126,30 @@ consuming repository's optional runtime context file, whose convention is define
     dominated by prompt-cache reads and can far exceed the context window, and an
     **uncached** figure that approximates real context pressure; judge which stage is
     expensive and worth splitting or delegating on the uncached figure, never the headline.
-    When the run-level gauge approaches the context limit, escalate the next heavy step to a
-    sub-agent in the same worktree — the gauge ignores sub-agent samples, so delegation
-    genuinely relieves it — rather than continuing inline until compaction interrupts the
-    run. See the shared **Context and Token Insight**.
+    The plugin's telemetry hook announces each gauge threshold the run crosses, once per
+    crossing; treat those warnings as instructions, not commentary. Escalate the next heavy
+    step to a sub-agent in the same worktree — the gauge ignores sub-agent samples, so
+    delegation genuinely relieves it — and once delegation is no longer enough, **hand the
+    run off to a fresh session** rather than continuing inline until compaction interrupts
+    it. See the shared **Context and Token Insight**
+    (`orch-dashboard-contract.instructions.md`).
 14. **Update the originating GitHub issue when present.** Before Summary, detect issue-origin runs from the `githubIssue` metadata recorded on the run (`start_run`) or from the handoff that opened the session (`start-session-from-issue`, `automation-bug-fix`), then comment on that issue with the captured result, pull request link when available, Personal Validation decision, and QA report. Skip with a reason when no issue origin is present; block on posting errors.
-15. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
+15. **Hand off before compaction, not after.** A run is not obliged to finish in the session
+    that started it. When the context gauge reaches the handoff threshold, persist the gating
+    decisions with `set_run_context`, then call it again with `handoff: true` and a
+    `handoffNote` holding what is done, what is not, and the exact resume invocation. Leave
+    the stage in flight `in_progress`, hand the invocation to the user, and stop. The next
+    session's `start_run` reattaches to the marked run — an idle run *without* the marker it
+    would refuse — and continues from the same stage. Do not launch that session yourself, and
+    do not round a stage up to `done` to leave things tidy: a resumed run skips it. See
+    **Session Handoff** in `orch-execution-model.instructions.md`.
+16. **Close the run.** Mark Summary `done` and call `finish_run` with the final status.
 
 ## Constraints and Priorities
 
 - **Single source of truth:** never copy phase prose into this agent or into `orch-*`
-  skills; edit `orch-shared-phases.instructions.md` or the phase skills to change behavior.
+  skills; edit the instruction file that owns the phase — see **Where Each Part Lives** in
+  `orch-shared-phases.instructions.md` — or the phase skills, to change behavior.
   Likewise, never hardcode a per-stage model or a version-pinned model ID in this agent or
   in `orch-*` skills; edit `orch-model-selection.instructions.md` to change category
   families/tiers.
@@ -141,12 +159,12 @@ consuming repository's optional runtime context file, whose convention is define
   `AskUserQuestion` for a decision the run does not own; it is available because the agent
   runs in the foreground. The harness strips it from sub-agents, which is why an `orch-*` run
   is never nested inside another agent — see **Never run an orchestration as a sub-agent** in
-  `orch-shared-phases.instructions.md`. Fan-out over several issues or PRs belongs to the
+  `orch-execution-model.instructions.md`. Fan-out over several issues or PRs belongs to the
   dispatch skills, which hand the user one ready-to-run invocation per item.
 - **Sub-agents report decisions up; they never prompt.** When a sub-agent this agent launched
   returns an open question rather than a result, this agent is the one that asks the user —
   and it never lets a sub-agent guess in order to keep moving. Per **Sub-Agent Constraints**
-  in `orch-shared-phases.instructions.md`.
+  in `orch-execution-model.instructions.md`.
 - **Cross-plugin agents are recommended, not required** — skip or perform a stage manually
   when a referenced plugin is not installed, and continue with the remaining stages.
 - **No pull request** unless the user has explicitly approved it in Personal Validation and
@@ -176,6 +194,9 @@ consuming repository's optional runtime context file, whose convention is define
 ## References
 
 - `plugins/claude-desktop/instructions/orch-shared-phases.instructions.md`
+- `plugins/claude-desktop/instructions/orch-execution-model.instructions.md`
+- `plugins/claude-desktop/instructions/orch-delivery-phases.instructions.md`
+- `plugins/claude-desktop/instructions/orch-dashboard-contract.instructions.md`
 - `plugins/claude-desktop/instructions/orch-model-selection.instructions.md`
 - `plugins/claude-desktop/instructions/orch-repo-context.instructions.md`
 - `plugins/claude-desktop/skills/phase-build-test/SKILL.md`

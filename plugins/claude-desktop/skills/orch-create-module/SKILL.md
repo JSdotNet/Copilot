@@ -110,7 +110,7 @@ After Module Implementation, this skill runs the shared delivery phases defined 
    comment to that issue with the captured result and QA report; otherwise skip.
 7. **Summary** — emit the run summary.
 
-See `instructions/orch-shared-phases.instructions.md` for the full phase definitions;
+See `instructions/orch-delivery-phases.instructions.md` for the full phase definitions;
 update that file to change these phases for every orchestration.
 
 ## Usage Pattern
@@ -147,7 +147,7 @@ Orchestrate module creation for:
 
 This skill reports progress through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`). Follow the shared **Dashboard Reporting
-Contract** in `instructions/orch-shared-phases.instructions.md` for the
+Contract** in `instructions/orch-dashboard-contract.instructions.md` for the
 `start_run`/`update_stage`/`finish_run` cadence, the QA Validation
 `scenarios`/`monitoring` passthrough, and the Personal Validation → Create Pull Request
 gating. If the server is not configured, skip the dashboard calls and continue through

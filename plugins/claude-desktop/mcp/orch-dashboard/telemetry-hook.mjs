@@ -19,6 +19,12 @@
 //   session.compaction_start   PreCompact hook       (trigger: manual | auto)
 //   (no Copilot equivalent)    SessionEnd hook       (stamps the run idle — see idle.mjs)
 //
+// The adapter also runs one way outward: when a PostToolUse sample pushes the run-level
+// context gauge past a threshold, the hook answers with a warning instead of staying silent
+// (see `emitContextPressure`). That is the difference between the gauge being observable and
+// the escalation in **Execution Model -> Delegation Order** actually firing — nothing here
+// reads the gauge on the agent's behalf unless it is put in front of the agent.
+//
 // Usage: `node telemetry-hook.mjs` with the hook payload on stdin.
 //
 // Everything here is best-effort and must never fail a tool call: the script exits 0 on
@@ -35,6 +41,7 @@ import {
     recordTokenUsage,
     recordContextSample,
     recordCompaction,
+    evaluateContextPressure,
 } from "./insight.mjs";
 
 // Claude Code's context window. Every current model exposes 200k; the 1M-context beta is
@@ -158,6 +165,24 @@ async function skipToTranscriptEnd(sessionId, telemetry, transcriptPath) {
     }
 }
 
+// Announces a gauge threshold crossing on the tool call that crossed it. `systemMessage`
+// surfaces it to the user; `additionalContext` puts it in front of the orchestrator, which is
+// the half that changes behavior. Written to stdout only when a threshold was actually
+// crossed — every other invocation stays silent, as a hook on a "*" matcher must.
+function emitContextPressure(pressure) {
+    const limitK = Math.round(pressure.tokenLimit / 1000);
+    const headline = `context ${pressure.pct}% of ${limitK}k (crossed ${pressure.thresholdPct}%)`;
+    process.stdout.write(
+        JSON.stringify({
+            systemMessage: `orch-dashboard: ${headline}. ${pressure.action}`,
+            hookSpecificOutput: {
+                hookEventName: "PostToolUse",
+                additionalContext: `Orchestration ${headline}. ${pressure.action}`,
+            },
+        }),
+    );
+}
+
 async function main() {
     const raw = await readStdin();
     let payload;
@@ -217,6 +242,7 @@ async function main() {
 
     const stage = active.stage || null;
     let updated = telemetry;
+    let pressure = null;
 
     if (event === "PostToolUse") {
         const name = payload.tool_name || "unknown";
@@ -251,6 +277,9 @@ async function main() {
             });
         }
         updated = await syncTranscript(run, telemetry, payload.transcript_path);
+        // Ordered after the sync deliberately: the gauge is only as fresh as the usage
+        // records that sync just folded in.
+        pressure = evaluateContextPressure(run);
     } else if (event === "PreCompact") {
         recordCompaction(run, {
             reason: payload.trigger === "manual" ? "manual" : "threshold",
@@ -268,8 +297,11 @@ async function main() {
         return;
     }
 
+    // The run is persisted before the warning is emitted: the latch that keeps a threshold
+    // from re-announcing on every later tool call lives in the run file.
     await writeRun(baseDir, run);
     await writeTelemetry(sessionId, updated);
+    if (pressure) emitContextPressure(pressure);
 }
 
 main().catch((err) => {

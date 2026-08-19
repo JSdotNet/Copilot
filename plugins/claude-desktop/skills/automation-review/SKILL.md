@@ -108,7 +108,7 @@ This skill orchestrates the following installed skills:
 This skill reports progress through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`). If the server is not configured, skip the
 dashboard calls below and continue through standard chat interaction. Follow the shared
-**Dashboard Reporting Contract** in `instructions/orch-shared-phases.instructions.md`
+**Dashboard Reporting Contract** in `instructions/orch-dashboard-contract.instructions.md`
 for the tool cadence.
 
 - Open the dashboard per the shared contract, then call `start_run` with

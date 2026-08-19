@@ -16,7 +16,7 @@ belongs to.
 > category but its stated preconditions do not hold — no approved specification, no
 > acceptance criteria, no prior architecture sign-off — invoke that skill anyway and derive
 > the missing inputs inside it (see the `orch-feature`/`orch-bug` exception in
-> `instructions/orch-shared-phases.instructions.md`). Reach for this fallback only when no
+> `instructions/orch-execution-model.instructions.md`). Reach for this fallback only when no
 > skill covers the category, or when the matched skill targets a fundamentally different
 > kind of work.
 
@@ -85,7 +85,7 @@ belongs to.
 ### Final Phases (Shared)
 
 After Review & Recommend, this skill runs the shared closing phases defined once in
-`instructions/orch-shared-phases.instructions.md`, on the tier matching the change kind
+`instructions/orch-delivery-phases.instructions.md`, on the tier matching the change kind
 determined in Stage 1:
 
 - **Code-modifying change kind** — Build & Test → QA Validation → Personal Validation →
@@ -96,7 +96,7 @@ determined in Stage 1:
 Personal Validation always hands back to the user (no agent), Create Pull Request happens
 only after explicit user approval (mark skipped when there is no change set), the GitHub
 Issue Update phase comments on the originating issue when the session started from one, and
-Summary emits the run summary. See `instructions/orch-shared-phases.instructions.md` for
+Summary emits the run summary. See `instructions/orch-delivery-phases.instructions.md` for
 the full phase definitions; update that file to change these phases for every
 orchestration.
 
@@ -122,7 +122,7 @@ Invoke: orch-fallback
 
 This skill reports progress through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`). Follow the shared **Dashboard Reporting
-Contract** in `instructions/orch-shared-phases.instructions.md` for the
+Contract** in `instructions/orch-dashboard-contract.instructions.md` for the
 `start_run`/`update_stage`/`finish_run` cadence and the Personal Validation → Create
 Pull Request gating. If the server is not configured, skip the dashboard calls and
 continue through standard chat interaction.

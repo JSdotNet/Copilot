@@ -63,3 +63,36 @@ export function markIdle(run, at = new Date().toISOString()) {
     if (run && run.status === "in_progress" && !run.idleSince) run.idleSince = at;
     return run;
 }
+
+// A **handoff** is the deliberate counterpart to idleness: the owner session ended on
+// purpose, at a context threshold, with the intent that another session pick the run up
+// from where it stopped (see **Session Handoff** in
+// `instructions/orch-execution-model.instructions.md`).
+//
+// Both look identical to `isIdle` — session ended, nothing advancing — so the marker is
+// what separates "waiting to be continued" from "abandoned at a gate". Without it,
+// `start_run` would refuse the reattach and the next session would open a duplicate run,
+// which is the one outcome a handoff exists to avoid.
+export function isHandoffPending(run) {
+    return Boolean(run && run.status === "in_progress" && run.handoff && run.handoff.pending);
+}
+
+export function markHandoff(run, { note, stage, at = new Date().toISOString() } = {}) {
+    if (!run) return run;
+    run.handoff = {
+        pending: true,
+        note: typeof note === "string" && note ? note : (run.handoff && run.handoff.note) || "",
+        stage: stage || (run.handoff && run.handoff.stage) || null,
+        at,
+    };
+    return run;
+}
+
+// Called on reattach, not on resume-in-place: the note is kept so the run file still shows
+// where the previous session stopped, but the run is live again.
+export function clearHandoff(run) {
+    if (run && run.handoff && run.handoff.pending) {
+        run.handoff = { ...run.handoff, pending: false, resumedAt: new Date().toISOString() };
+    }
+    return run;
+}

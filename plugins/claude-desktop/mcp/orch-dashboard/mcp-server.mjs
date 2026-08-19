@@ -37,7 +37,7 @@ import { renderShell } from "./render.mjs";
 import { summarizeInsights, summarizeContext } from "./insight.mjs";
 import { renderReportMarkdown, renderReportHtml } from "./report.mjs";
 import { runsDir, stateDir, worktreeRoot, readActive, writeActive } from "./state.mjs";
-import { isIdle, clearIdle } from "./idle.mjs";
+import { isIdle, clearIdle, isHandoffPending, markHandoff, clearHandoff } from "./idle.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -130,6 +130,10 @@ function summarize(run) {
         // dashboard and a resuming agent can tell a live run from one abandoned at a gate.
         idle: isIdle(run),
         idleSince: run.idleSince || null,
+        // A run whose session ended deliberately, at a context threshold, waiting to be
+        // continued elsewhere. It satisfies `idle` too, so consumers check this first.
+        handoff: run.handoff || null,
+        handoffPending: isHandoffPending(run),
     };
 }
 
@@ -653,8 +657,24 @@ const tools = [
                 // An idle run is deliberately not resumable here: a run abandoned at the
                 // Personal Validation gate stays `in_progress`, and adopting it would
                 // silently continue dead work under a stale title and stage list.
-                const existing = (await listRuns(baseDir)).find((r) => r.skillId === skillId && r.status === "in_progress" && !isIdle(r));
+                //
+                // A **handed-off** run is the exception, and the reason the marker exists: its
+                // session ended on purpose at a context threshold so that a fresh session
+                // could continue it, and it is idle by exactly the same signals. Refusing it
+                // here would open a duplicate run for work already in flight.
+                const existing = (await listRuns(baseDir)).find(
+                    (r) => r.skillId === skillId && r.status === "in_progress" && (!isIdle(r) || isHandoffPending(r))
+                );
                 if (existing) {
+                    // Clear both stamps before the new session does anything: while
+                    // `idleSince` is set, the telemetry hook drops this session's tool calls
+                    // rather than attributing them to the run.
+                    if (existing.idleSince || isHandoffPending(existing)) {
+                        clearHandoff(existing);
+                        clearIdle(existing);
+                        existing.updatedAt = new Date().toISOString();
+                        await writeRun(baseDir, existing);
+                    }
                     await writeActive({ runId: existing.id, stage: null, updatedAt: new Date().toISOString() });
                     bus.emit("update");
                     return { runId: existing.id, resumed: true, run: existing, dashboardUrl };
@@ -736,7 +756,7 @@ const tools = [
     {
         name: "set_run_context",
         description:
-            "Persist run-level context that must survive a session resume or compaction: the change kind driving QA depth, and the Personal Validation approval decision that gates the pull request. Call with approval 'approved' only after the user explicitly approves.",
+            "Persist run-level context that must survive a session resume or compaction: the change kind driving QA depth, the Personal Validation approval decision that gates the pull request, and the session-handoff marker. Call with approval 'approved' only after the user explicitly approves.",
         inputSchema: {
             type: "object",
             properties: {
@@ -748,10 +768,19 @@ const tools = [
                     description: "Personal Validation decision. 'approved' is the only value that unlocks the Create Pull Request stage.",
                 },
                 approvalNote: { type: "string", description: "What the user said when approving or rejecting." },
+                handoff: {
+                    type: "boolean",
+                    description:
+                        "Set true when ending this session at a context threshold so another session continues the run: start_run will reattach to it instead of opening a duplicate, and the dashboard shows it as handed off rather than abandoned. Leave the stage in flight in_progress. Not needed on resume — start_run clears the marker.",
+                },
+                handoffNote: {
+                    type: "string",
+                    description: "What the next session needs: what is finished, what is not, the paths it needs, and the exact invocation to resume with.",
+                },
             },
             required: ["runId"],
         },
-        handler: async ({ runId, changeKind, approval, approvalNote }) => {
+        handler: async ({ runId, changeKind, approval, approvalNote, handoff, handoffNote }) => {
             if (changeKind && !VALID_CHANGE_KINDS.includes(changeKind)) {
                 throw new ToolError(`changeKind must be one of ${VALID_CHANGE_KINDS.join(", ")}`);
             }
@@ -770,10 +799,20 @@ const tools = [
                         note: typeof approvalNote === "string" ? approvalNote : (run.approval && run.approval.note) || "",
                     };
                 }
+                if (handoff === true) {
+                    const inFlight = run.stages.find((s) => s.status === "in_progress");
+                    markHandoff(run, { note: handoffNote, stage: inFlight ? inFlight.name : null });
+                } else if (handoff === false) {
+                    clearHandoff(run);
+                } else if (typeof handoffNote === "string" && handoffNote && run.handoff) {
+                    run.handoff = { ...run.handoff, note: handoffNote };
+                }
                 run.updatedAt = new Date().toISOString();
-                clearIdle(run);
+                // A handoff is the one context update that must not mark the run live again:
+                // clearing the stamp here would make it look advanced and defeat the marker.
+                if (handoff !== true) clearIdle(run);
                 await writeRun(baseDir, run);
-                result = { changeKind: run.changeKind || null, approval: run.approval || null };
+                result = { changeKind: run.changeKind || null, approval: run.approval || null, handoff: run.handoff || null };
             });
             bus.emit("update");
             return result || { ok: true };
@@ -945,7 +984,7 @@ const tools = [
     {
         name: "list_runs",
         description:
-            "List all tracked runs (summaries only). Useful to recover the current runId after a resume or compaction. A run with idle:true is still in_progress but has been abandoned (its session ended, or nothing advanced it for hours) — close it with finish_run rather than continuing it.",
+            "List all tracked runs (summaries only). Useful to recover the current runId after a resume or compaction. A run with idle:true is still in_progress but has been abandoned (its session ended, or nothing advanced it for hours) — close it with finish_run rather than continuing it. A run with handoffPending:true is idle too but was handed off deliberately at a context threshold: continue it with start_run for the same skillId, which reattaches, and read handoff.note for where the previous session stopped.",
         inputSchema: { type: "object", properties: {}, additionalProperties: false },
         handler: async () => (await listRuns(baseDir)).map(summarize),
     },

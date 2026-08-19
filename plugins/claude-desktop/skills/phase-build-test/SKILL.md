@@ -39,7 +39,7 @@ Validation — so build and test behavior lives in one place instead of in each 
 ## Dashboard Reporting
 
 - Report as the `Build & Test` stage via the shared **Dashboard Reporting Contract** in
-  `instructions/orch-shared-phases.instructions.md` (`update_stage` `in_progress` → `done`
+  `instructions/orch-dashboard-contract.instructions.md` (`update_stage` `in_progress` → `done`
   or `blocked`).
 
 ## Agents
@@ -55,4 +55,4 @@ Validation — so build and test behavior lives in one place instead of in each 
 ## Reference
 
 Source skill location: `plugins/claude-desktop/skills/phase-build-test/SKILL.md`.
-Phase definition: `plugins/claude-desktop/instructions/orch-shared-phases.instructions.md`.
+Phase definition: `plugins/claude-desktop/instructions/orch-delivery-phases.instructions.md`.
