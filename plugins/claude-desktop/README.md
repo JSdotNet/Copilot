@@ -136,6 +136,13 @@ runs `gh pr checkout`, so it cannot fight the worktree that already holds the br
 with no PR yet are reported, not remediated; raising the PR stays a deliberate call via
 `create-pull-request`.
 
+#### Developer Skills
+
+- `skills/start/` — start the app from the repository's own startup instruction, then open
+  it. Reads `.claude/start.md` (template:
+  [`resources/claude-start-template.md`](resources/claude-start-template.md)), falling back
+  to `.claude/orch-context.md`, the repository's getting-started docs, and then inference.
+
 #### Automation Skills
 
 - `skills/azure-sre-to-github-issue/` — create GitHub issues from active Azure SRE alerts
@@ -192,6 +199,12 @@ in `instructions/orch-repo-context.instructions.md`, with a starting point at
 A repository with nothing to start declares `**Runnable application:** none`, and QA
 Validation is then marked `skipped` cleanly. The file must never contain secrets and never
 pins a model.
+
+### 5. Per-Repo Interactive Startup — `.claude/start.md`
+
+A repository may declare the developer-facing start: the command and the URL to open, plus
+optional sign-in, area map, and troubleshooting notes. Read only by the `start` skill, which
+falls back to `.claude/orch-context.md` for anything it omits. Never contains a secret.
 
 MCP servers stay repository-specific: this plugin routes work to them but does not own or
 configure them.

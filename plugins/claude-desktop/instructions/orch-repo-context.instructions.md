@@ -16,6 +16,9 @@ description: Defines the optional .claude/orch-context.md convention a consuming
   `.claude/model-selection.md` (see
   `orch-model-selection.instructions.md`), and MCP server configuration stays in the
   repository's own `.mcp.json` and instruction files.
+- Interactive developer startup — the URL to open, and optionally sign-in and an area map —
+  belongs in `.claude/start.md`, read by the `start` skill (`skills/start/SKILL.md`). That
+  file falls back to this one, so neither states the same thing twice.
 
 ## The File
 
