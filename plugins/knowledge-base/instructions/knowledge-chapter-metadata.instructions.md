@@ -83,8 +83,9 @@ Prose or the first chapter starts here.
 The file-level block uses the same fields as a chapter block (`status`
 required; `related` and `issue` optional) and the same omit-when-empty rule.
 Folder-specific fields defined for chapters (`depends-on`, `implements`,
-`aliases`, `kind`, `version`, `alternatives`) are chapter-scoped and are not used at file level —
-a file's overall relationships are expressed through `related` only.
+`aliases`, `feature-flag`, `kind`, `version`, `alternatives`) are
+chapter-scoped and are not used at file level — a file's overall
+relationships are expressed through `related` only.
 
 In `.arc42`, the file's top-level chapter heading (e.g. `# 01. Introduction
 and Goals`) already carries a chapter metadata block as described above; for
@@ -98,8 +99,9 @@ which extra fields apply and what they mean. Most such fields use the same
 reference format described below, but not every folder-specific field is a
 reference field: in `.domain`, `aliases` (defined in
 `knowledge-domain.instructions.md`) is a list of
-plain-string surface names, not `<path>#<heading-slug>` references, and in
-`.tech`, `alternatives` (defined in
+plain-string surface names and `feature-flag` (same file) is a list of
+application feature keys, neither of them `<path>#<heading-slug>` references,
+and in `.tech`, `alternatives` (defined in
 `knowledge-tech.instructions.md`) is likewise a
 plain-string list.
 
@@ -149,8 +151,8 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
   "[Declaring reading order](#declaring-reading-order)" below.
 
 Folder-specific fields (e.g. `depends-on` on features/backlog/tech chapters,
-`implements` on backlog chapters, `kind`/`version`/`alternatives` on tech
-chapters) are documented in that folder's
+`feature-flag` on domain feature chapters, `implements` on backlog chapters,
+`kind`/`version`/`alternatives` on tech chapters) are documented in that folder's
 own instructions file, not here — this file only defines the fields common
 to every folder.
 

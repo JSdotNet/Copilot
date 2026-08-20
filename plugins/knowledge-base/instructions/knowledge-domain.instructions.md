@@ -133,6 +133,26 @@ instructions.
   Value Objects/Enums) do not use `depends-on` — they describe standing
   structure, and their relationships belong in `model.md`/`dependencies.md` or
   the `related` field instead.
+- `features.md` Feature/Sub-feature chapters may carry an additional
+  `feature-flag` field: the key (or keys) of the application feature flag that
+  delivers this chapter in the running product, e.g. `feature-flag: inbox-pane`
+  or, when several flags together deliver one chapter,
+  `feature-flag: [inbox-pane, inbox-filters]`. One flag may equally appear on
+  several chapters. Unlike `related`/`depends-on`, entries are plain
+  application identifiers, not `<path>#<heading-slug>` references — the flag
+  lives in the application's own catalog, not in this repository, so the field
+  produces no graph edge and the key itself is never validated here. Omit the
+  field when the chapter has no flag. `domain.md` and `naming.md` chapters do
+  not use `feature-flag`: a flag delivers a capability, not a structural
+  element or a term.
+
+  This link is an **identity** link only — it says "this chapter and that flag
+  are the same capability". It is deliberately **not** a status mapping. The
+  `status` values above describe how settled the written model is; a feature
+  flag's own maturity describes whether the running behaviour can be relied on.
+  Those answer different questions, so do not translate one vocabulary into the
+  other, and do not infer a chapter's `status` from its flag's maturity or the
+  reverse.
 - In `dependencies.md`, use explicit DDD relationship terminology for each
   cross-context row when applicable (for example: `ACL`,
   `Customer/Supplier`, `Partnership`, `OHS + Published Language`) and identify
@@ -275,6 +295,7 @@ status: draft
 
 \`\`\`meta
 status: draft
+feature-flag: <application-feature-key>
 \`\`\`
 
 Short description of the capability and the business value it delivers.
