@@ -33,7 +33,7 @@ handoffs:
   - label: TDD - Red Phase (domain)
     agent: testing
     prompt: >-
-      Write failing domain tests from the approved implementation plan under
+      Backend lane. Write failing domain tests from the approved implementation plan under
       .wip/implementation-plans/. No production code changes yet. Return failing
       test summary.
     send: false
@@ -53,8 +53,8 @@ handoffs:
   - label: Run Test Suite
     agent: testing
     prompt: >-
-      Add or update tests for implemented changes, run dotnet test, and report
-      pass/fail plus coverage notes.
+      Add or update tests for implemented changes and run them. State which lane applies
+      (backend, frontend, or both) and report pass/fail plus coverage notes per lane.
     send: false
   - label: Security Review
     agent: security
@@ -65,9 +65,10 @@ handoffs:
   - label: Frontend Implementation
     agent: frontend
     prompt: >-
-      Backend is approved for frontend integration. Implement UI updates from
-      plan and API contract under .wip/implementation-plans/. Run relevant tests
-      and report outcomes.
+      Backend is approved for frontend integration. Detect the frontend stack from the
+      repository first, then implement UI updates from the plan and API contract under
+      .wip/implementation-plans/. Run the typecheck, lint, test, and build gate with the
+      detected commands and report the detected stack plus each gate result.
     send: false
 ---
 
@@ -99,6 +100,8 @@ proceeding.
 2. Verify the plan includes scope, implementation steps, validation gates, and API contract.
 3. If no approved plan exists, stop execution and direct the user to `development-plan.agent.md`.
 4. Create an execution checklist mapped to plan steps and phases.
+5. If the plan touches the UI, capture the frontend stack report once and reuse it for the
+   rest of the run instead of letting each phase re-detect it.
 
 ## Phase Workflow
 
@@ -115,8 +118,10 @@ proceeding.
    - Ask for explicit user approval before frontend work.
 3. Phase 3 - Frontend
   - Propose handoff: `Frontend Implementation` to `frontend`.
-  - Propose handoff: `Run Test Suite` to `testing`.
-   - Require clean frontend-related test results.
+  - Propose handoff: `Run Test Suite` to `testing`, frontend lane.
+   - Require the full frontend gate green: typecheck, lint, test, and production build,
+     each run with the commands detected for this repository.
+   - Require the detected stack and the four gate results in the phase report.
    - Ask for explicit user approval before final validation.
 4. Phase 4 - Final Validation
    - Run full validation gates from the approved plan.
@@ -126,18 +131,26 @@ proceeding.
 ## Validation Requirements
 - Execute all plan-defined validation gates.
 - At minimum for .NET changes, run dotnet build or dotnet test (prefer dotnet test when available).
+- At minimum for frontend changes, run the detected typecheck, lint, test, and build commands.
+- Never substitute a command from a different package manager for the detected one.
+- When the repository has no script for a required gate, report the gap explicitly instead of
+  treating the gate as passed.
 - Resolve new warnings/errors introduced by the change before finalizing.
 
 ## Approval Gates
 - Gate 1: Domain complete -> tests clean -> user approval required.
 - Gate 2: Backend complete -> tests clean + security reviewed -> user approval required.
-- Gate 3: Frontend complete -> tests clean -> user approval required.
+- Gate 3: Frontend complete -> typecheck, lint, test, and build clean -> user approval required.
 - Gate 4: Final validation complete -> security reviewed -> completion confirmation.
 
 ## Execution-Focused Skills
 - csharp-xunit
 - nuget-manager
 - refactor
+- frontend-stack-detect
+- api-client-contract
+- react-component
+- react-testing
 
 ## Blocker Protocol
 If the plan is ambiguous or conflicting:
@@ -149,6 +162,7 @@ If the plan is ambiguous or conflicting:
 - Every approved plan item is implemented or explicitly deferred with reason.
 - Tests are added/updated where required.
 - Validation commands were run and results reported.
+- Frontend phases report the detected stack alongside the four gate results.
 - Final summary includes risks, follow-ups, and any assumptions used.
 - All phase transitions included explicit user approval.
 - Security review findings are documented and dispositioned.

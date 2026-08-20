@@ -1,7 +1,7 @@
 {
   "name": "development",
-  "description": "Copilot plugin for development planning and implementation workflows.",
-  "version": "0.1.0",
+  "description": "Copilot plugin for development planning and implementation workflows across a .NET backend and a React frontend, with repository-detected frontend tooling.",
+  "version": "0.2.0",
   "author": {
     "name": "Job Schepers"
   },
@@ -12,7 +12,12 @@
     "development",
     "planning",
     "implementation",
-    "execution"
+    "execution",
+    "dotnet",
+    "react",
+    "typescript",
+    "frontend",
+    "backend"
   ],
   "agents": "agents/",
   "skills": "skills/",
