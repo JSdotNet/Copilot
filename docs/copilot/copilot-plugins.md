@@ -53,7 +53,7 @@ Track GitHub Copilot plugins used by this repository so team members can install
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/copilot-app`
   - Notes: Orchestration (`orch-*`) and automation skills, the `orchestrator` agent, and a plugin-global `sessionStart` routing hook. See [Orchestration Configuration Layers](#orchestration-configuration-layers).
 
-- `knowledge-base` (`0.2.0`)
+- `knowledge-base` (`0.5.0`)
   - Source path: `plugins/knowledge-base`
   - Install: `copilot plugin install JSdotNet/Copilot:plugins/knowledge-base`
   - Notes: Repository knowledge-folder convention for `.arc42`, `.domain`, `.tech`, `.design`, and `.backlog` — parseable chapter metadata, derived `_meta/` indexes, a reference-graph canvas, and enforcement tooling. Scaffold with `knowledge-base-init`, repair with `knowledge-base-validate`, and route per-folder edits through `orch-arc42-content`, `orch-domain`, `orch-tech`, `orch-design`, and `orch-backlog`. Requires Node 18+ for the generator.

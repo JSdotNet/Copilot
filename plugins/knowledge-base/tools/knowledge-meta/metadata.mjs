@@ -39,7 +39,10 @@ const TECH_KINDS = [
 // Fields every folder's chapter/file block may carry, plus folder-specific
 // extras layered in below. `order` is file-level only (see validateDocument):
 // it declares the reading order of a directory's entries.
-const COMMON_OPTIONAL_FIELDS = ["related", "issue"];
+const COMMON_OPTIONAL_FIELDS = ["related", "issue", "effort", "roadmap"];
+
+// `roadmap` entries are lowercase kebab-case tag slugs, not chapter references.
+const ROADMAP_TAG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const FILE_ONLY_FIELDS = ["order"];
 const FOLDER_EXTRA_FIELDS = {
     domain: ["depends-on", "aliases", "feature-flag"],
@@ -259,6 +262,34 @@ export function validateDocument(relPath, markdown) {
                     issues.push({
                         severity: "error",
                         message: `${label} has \`feature-flag\` entry "${key}" — feature flag keys are application identifiers, not \`<path>#<slug>\` chapter references.`,
+                    });
+                }
+            }
+        }
+
+        // `effort` is a story-point estimate, so it is a single non-negative
+        // integer. A list, a fraction, a negative number, or a word such as
+        // "large" is not an estimate this schema can total or compare.
+        if (chapter.meta.effort != null) {
+            const raw = chapter.meta.effort;
+            const isInteger = typeof raw === "string" && /^\d+$/.test(raw);
+            if (!isInteger) {
+                issues.push({
+                    severity: "error",
+                    message: `${label} has \`effort\` "${Array.isArray(raw) ? raw.join(", ") : raw}" — effort is a story-point estimate and must be a single non-negative integer.`,
+                });
+            }
+        }
+
+        // Roadmap entries are tag slugs an application groups work by, not
+        // `<path>#<slug>` chapter references, so the tag vocabulary lives in the
+        // consuming repository and only the slug shape is checked here.
+        if (chapter.meta.roadmap != null) {
+            for (const tag of toList(chapter.meta.roadmap)) {
+                if (!ROADMAP_TAG_PATTERN.test(tag)) {
+                    issues.push({
+                        severity: "warning",
+                        message: `${label} has \`roadmap\` entry "${tag}" — roadmap tags are lowercase kebab-case slugs, not chapter references or free text.`,
                     });
                 }
             }

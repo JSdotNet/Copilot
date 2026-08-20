@@ -64,8 +64,8 @@ Stage 1 from the request and the existing `.backlog/` contents, and continue.
 
 - Add or update the chapter metadata block on every new/edited Item and
   Sub-item: `status` required (`draft`, `ready`, `in-progress`, `done`,
-  `blocked`); `depends-on`, `implements`, `related`, `issue` optional and
-  omitted when empty.
+  `blocked`); `depends-on`, `implements`, `related`, `issue`, `effort`,
+  `roadmap` optional and omitted when empty.
 - Add or update the file-level metadata block directly under the concern
   file's `# <Concern Name>` heading.
 - Use `depends-on` only for sequencing against other backlog items/sub-items;

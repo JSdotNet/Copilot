@@ -64,8 +64,8 @@ from the request and the repository contents, and continue.
 ### Stage 3: Metadata Enforcement
 
 - Add or update the chapter metadata block (`status` required; `related`,
-  `issue` optional) on the file's top-level chapter heading and on any
-  independently trackable `##` section inside it.
+  `issue`, `effort`, `roadmap` optional) on the file's top-level chapter
+  heading and on any independently trackable `##` section inside it.
 - Because an `.arc42` file is always exactly one top-level chapter, that
   chapter's metadata block also serves as the file-level block — do not add
   a duplicate.
