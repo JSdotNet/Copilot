@@ -92,7 +92,8 @@ context to be understood, not a design document.
 
 `.tech` uses the common fields from
 `knowledge-chapter-metadata.instructions.md` (`status` required;
-`related` and `issue` optional) plus the folder-specific fields below.
+`related`, `issue`, `effort`, and `roadmap` optional) plus the folder-specific
+fields below.
 
 ### status
 

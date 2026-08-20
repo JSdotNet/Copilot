@@ -20,7 +20,7 @@ export const GENERATOR = ".github/tools/knowledge-meta/build.mjs";
 
 // Metadata fields that hold `<path>` / `<path>#<slug>` references, and the edge
 // type each one produces. Non-reference list fields (`aliases`, `alternatives`,
-// `feature-flag`) are deliberately absent — they stay node attributes.
+// `feature-flag`, `roadmap`) are deliberately absent — they stay node attributes.
 const REFERENCE_FIELDS = {
     "depends-on": "depends-on",
     related: "related",
@@ -32,7 +32,13 @@ const ATTRIBUTE_FIELDS = ["kind", "version", "issue", "aliases", "alternatives"]
 // Non-reference fields whose authored form may be a scalar or a bracket list,
 // and which are always emitted as a list so a consumer reading graph.json never
 // has to branch on shape. `aliases`/`alternatives` above stay verbatim.
-const LIST_ATTRIBUTE_FIELDS = ["feature-flag"];
+const LIST_ATTRIBUTE_FIELDS = ["feature-flag", "roadmap"];
+
+// Fields authored as an integer scalar. The parser hands back the raw string,
+// so they are coerced here and a viewer can sum or threshold them directly.
+// A value that is not a non-negative integer is left off the node — the lint in
+// metadata.mjs is what reports it, and the graph never carries a bad number.
+const NUMERIC_ATTRIBUTE_FIELDS = ["effort"];
 
 /** Recursively collect Markdown files under a folder, as repo-relative posix paths. */
 async function collectMarkdown(repoRoot, relFolder) {
@@ -68,6 +74,10 @@ function applyMeta(node, meta) {
     for (const field of LIST_ATTRIBUTE_FIELDS) {
         const values = asList(meta[field]);
         if (values.length) node[field] = values;
+    }
+    for (const field of NUMERIC_ATTRIBUTE_FIELDS) {
+        const raw = meta[field];
+        if (typeof raw === "string" && /^\d+$/.test(raw)) node[field] = Number(raw);
     }
     for (const field of Object.keys(REFERENCE_FIELDS)) {
         const refs = asList(meta[field]);

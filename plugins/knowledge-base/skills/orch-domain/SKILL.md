@@ -61,8 +61,9 @@ the existing `.domain/` contents, and continue.
 ### Stage 3: Metadata & Cross-Reference Enforcement
 
 - Add or update the chapter metadata block (`status` required; `related`,
-  `issue` optional) on every new/edited Aggregate, Domain Service, Domain
-  Event, Shared Value Objects/Enums, Feature/Sub-feature, or `Term` chapter.
+  `issue`, `effort`, `roadmap` optional) on every new/edited Aggregate, Domain
+  Service, Domain Event, Shared Value Objects/Enums, Feature/Sub-feature, or
+  `Term` chapter.
 - Add or update the file-level metadata block on every touched file,
   including `context-map.md`, `model.md`, `flow.md`, and `dependencies.md`
   (which carry a file-level block only, no per-chapter blocks).

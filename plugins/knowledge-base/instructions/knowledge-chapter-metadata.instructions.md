@@ -50,9 +50,10 @@ Prose for this chapter starts here.
 ```
 
 Only `status` is required, so a chapter with no relations and no issue carries
-just that one field. Optional fields (`related`, `issue`, and folder-specific
-fields such as `depends-on`) are included only when they have a value; empty
-collections and null values are omitted rather than written out.
+just that one field. Optional fields (`related`, `issue`, `effort`, `roadmap`,
+and folder-specific fields such as `depends-on`) are included only when they
+have a value; empty collections and null values are omitted rather than written
+out.
 
 ## File-level metadata block
 
@@ -81,11 +82,11 @@ Prose or the first chapter starts here.
 ```
 
 The file-level block uses the same fields as a chapter block (`status`
-required; `related` and `issue` optional) and the same omit-when-empty rule.
-Folder-specific fields defined for chapters (`depends-on`, `implements`,
-`aliases`, `feature-flag`, `kind`, `version`, `alternatives`) are
-chapter-scoped and are not used at file level — a file's overall
-relationships are expressed through `related` only.
+required; `related`, `issue`, `effort`, and `roadmap` optional) and the same
+omit-when-empty rule. Folder-specific fields defined for chapters
+(`depends-on`, `implements`, `aliases`, `feature-flag`, `kind`, `version`,
+`alternatives`) are chapter-scoped and are not used at file level — a file's
+overall relationships are expressed through `related` only.
 
 In `.arc42`, the file's top-level chapter heading (e.g. `# 01. Introduction
 and Goals`) already carries a chapter metadata block as described above; for
@@ -103,7 +104,7 @@ plain-string surface names and `feature-flag` (same file) is a list of
 application feature keys, neither of them `<path>#<heading-slug>` references,
 and in `.tech`, `alternatives` (defined in
 `knowledge-tech.instructions.md`) is likewise a
-plain-string list.
+plain-string list. The universal `roadmap` field below behaves the same way.
 
 ### Chapter and file references
 
@@ -146,6 +147,27 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
   shorthand) of the GitHub issue tracking this chapter or file, if one
   exists. Keep this in sync when a chapter is published to, or synced from, an
   issue tracker. Omit the field entirely when no issue exists.
+- **effort** (optional) — estimate of the work this chapter or file
+  represents, in **story points**: a single non-negative integer. `effort: 0`
+  is a deliberate "no work left" statement and is different from omitting the
+  field, which means "not estimated". An effort is an estimate of size, not a
+  measurement of time spent, and it is a legitimate outcome for an AI agent to
+  derive it from the chapter's content rather than for a person to write it by
+  hand — either way it stays an estimate and is revised as understanding
+  changes. A file-level `effort` covers the document as a whole and is set
+  independently of its chapters' values; it is not required to equal their sum.
+  Available in every folder. Omit the field entirely when the chapter has not
+  been estimated.
+- **roadmap** (optional) — list of roadmap item tags this chapter or file
+  contributes to, e.g. `roadmap: [sync-service, mobile-mvp]`. This lets a
+  roadmap item gather its knowledge by tag instead of having to reference every
+  contributing chapter explicitly. Entries are **plain lowercase kebab-case
+  slugs, not `<path>#<heading-slug>` references** — like `.domain`'s `aliases`
+  and `.tech`'s `alternatives`, they stay node attributes and produce no graph
+  edges. The tag vocabulary belongs to the consuming repository's roadmap, so
+  it is not validated here beyond the slug shape. A chapter may contribute to
+  several roadmap items. Available in every folder. Omit the field entirely
+  when the chapter belongs to no roadmap item.
 - **order** (optional, **file-level blocks only**) — declares the reading
   order of the directory this document sits in. See
   "[Declaring reading order](#declaring-reading-order)" below.
@@ -155,6 +177,19 @@ Folder-specific fields (e.g. `depends-on` on features/backlog/tech chapters,
 `kind`/`version`/`alternatives` on tech chapters) are documented in that folder's
 own instructions file, not here — this file only defines the fields common
 to every folder.
+
+A chapter that is estimated and carried by a roadmap item therefore reads:
+
+```markdown
+## Item: Offline Sync Queue
+
+\`\`\`meta
+status: ready
+effort: 8
+roadmap: [sync-service, mobile-mvp]
+related: [.domain/sync/features.md#feature-offline-sync]
+\`\`\`
+```
 
 ## Authoring guidance
 
@@ -166,14 +201,22 @@ to every folder.
 - Every new or edited file must have its file-level metadata block; every new
   or edited chapter must have its chapter metadata block. Do not add one
   without the other when creating a new file.
+- Re-estimate `effort` when a chapter's scope changes, and drop the field again
+  if the chapter stops being something worth estimating. Never raise or lower it
+  to make a total come out at a wanted number — the estimate describes the
+  chapter, not the report.
+- Keep `roadmap` tags spelled exactly as the consuming repository's roadmap
+  spells them; a mistyped tag silently drops the chapter out of that roadmap
+  item's view rather than failing loudly.
 - Do not invent additional top-level fields without updating either this
   file (for a universal field) or the relevant folder's instructions file
   (for a folder-specific field) first — the derived index tooling depends on a
   fixed schema.
 - Optional fields are included only when they carry a value. Empty list-valued
-  fields (`related: []`, `depends-on: []`) and null values (`issue: null`) are
-  omitted rather than written out, so a chapter or file with no relations and
-  no issue shows only `status`.
+  fields (`related: []`, `depends-on: []`, `roadmap: []`) and null values
+  (`issue: null`, `effort: null`) are omitted rather than written out, so a
+  chapter or file with no relations, no estimate, and no issue shows only
+  `status`.
 
 ## Declaring reading order
 
