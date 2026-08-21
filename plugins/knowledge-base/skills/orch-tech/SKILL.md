@@ -60,7 +60,7 @@ the existing `.tech/` contents, and continue.
 - Draft or update chapters using the technology chapter template in
   `knowledge-tech.instructions.md`; keep each chapter short.
 - Add or update the chapter metadata block on every touched technology chapter:
-  `status` and `kind` required; `version`, `depends-on`, `alternatives`,
+  `status` and `type` required; `version`, `depends-on`, `alternatives`,
   `related`, `issue`, `effort`, `roadmap` optional and omitted when empty.
 - Set `status` from this folder's ladder: `candidate`, `trial`, `adopted`,
   `hold`, `retired`.

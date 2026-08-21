@@ -40,7 +40,9 @@ or malformed `meta` blocks, and stale committed `_meta/` indexes.
    | Missing `meta` block | A chapter was added without one | Add a block per `knowledge-chapter-metadata.instructions.md` |
    | Malformed `meta` block | Wrong field name, wrong value shape, or bad fencing | Correct it against `knowledge-chapter-metadata.instructions.md` |
    | Inconsistent reading order | Duplicate or missing `order` values within a folder | Renumber the affected folder so `order` is unique and gapless |
-   | Unknown status or kind | A value outside the allowed ladder | Use one of the values listed in the folder's own instruction file |
+   | Unknown status or type | A value outside the allowed ladder or value set | Use one of the values listed in the folder's own instruction file |
+   | Missing `type` | A `.domain` or `.tech` block with no `type`, or a heading still carrying a kind prefix | Add `type` from the folder's value set and strip the prefix from the heading |
+   | Literal escape sequence in body text | A `` `r`n `` or `\n` was written instead of a line break, usually by a tool writing the file through a shell | Replace it with a real line break. Check whether a heading was glued onto the previous line and silently stopped being a heading |
 
    Fix the **source Markdown**, never the generated JSON. Anything under `_meta/`
    is derived; see `knowledge-derived-artifacts.instructions.md`.

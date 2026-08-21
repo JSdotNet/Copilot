@@ -16,10 +16,10 @@ A "chapter" here means any heading that these folders' own instructions
 already treat as an addressable unit:
 
 - `.domain/<context>/domain.md` — each Aggregate, Domain Service, Domain Event,
-  and each Shared Value Objects / Shared Enums chapter. Entity/Value
-  Object/Enum sub-chapters inside an Aggregate use the metadata block too if
-  they need independent status/dependencies/cross-references; otherwise they
-  can be covered by their parent Aggregate's block.
+  and each Shared Value Objects / Shared Enums chapter, plus every Entity, Value
+  Object, and Enum sub-chapter inside an Aggregate. Those sub-chapters each
+  carry their own metadata block; they are not covered by their parent
+  Aggregate's block.
 - `.domain/<context>/features.md` — each Feature and Sub-feature.
 - `.domain/<context>/naming.md` — each `Term` chapter.
 - `.arc42/<nn>-<name>.md` — the file's top-level chapter, and any ## section
@@ -44,16 +44,44 @@ Place the block immediately after the heading, before any prose:
 
 \`\`\`meta
 status: active
+type: aggregate
 \`\`\`
 
 Prose for this chapter starts here.
 ```
 
-Only `status` is required, so a chapter with no relations and no issue carries
-just that one field. Optional fields (`related`, `issue`, `effort`, `roadmap`,
+`status` is always required, and `type` is required wherever the folder defines
+a value set for it. A chapter with no relations and no issue therefore carries
+just those fields. Optional fields (`related`, `issue`, `effort`, `roadmap`,
 and folder-specific fields such as `depends-on`) are included only when they
 have a value; empty collections and null values are omitted rather than written
 out.
+
+## Headings carry the name, `type` carries the kind
+
+Heading text is the **name of the thing only**. What kind of thing it is lives
+in the `type` field, never in the heading:
+
+```markdown
+## Order
+
+\`\`\`meta
+status: active
+type: aggregate
+\`\`\`
+```
+
+not `## Aggregate: Order`. The kind is a classification that changes as
+understanding sharpens, and encoding it in the heading makes every such change
+churn the heading's anchor and every reference pointing at it. Keeping it in
+`type` means a reclassification is a one-line metadata edit.
+
+Anchors are therefore slugs of the bare name —
+`.domain/order-management/domain.md#order`, not `#aggregate-order`.
+
+Headings that name a **grouping** rather than a thing keep their descriptive
+text, because that text *is* the group's name: `## Shared Value Objects` is
+correct, with `type: shared-value-objects`.
 
 ## File-level metadata block
 
@@ -74,6 +102,7 @@ any blockquote summary, prose, or first chapter:
 
 \`\`\`meta
 status: active
+type: domain
 \`\`\`
 
 > Optional blockquote summary, if the file has one.
@@ -82,9 +111,10 @@ Prose or the first chapter starts here.
 ```
 
 The file-level block uses the same fields as a chapter block (`status`
-required; `related`, `issue`, `effort`, and `roadmap` optional) and the same
+required; `type` required where the folder defines a file-level value set;
+`related`, `issue`, `effort`, and `roadmap` optional) and the same
 omit-when-empty rule. Folder-specific fields defined for chapters
-(`depends-on`, `implements`, `aliases`, `feature-flag`, `kind`, `version`,
+(`depends-on`, `implements`, `aliases`, `feature-flag`, `version`,
 `alternatives`) are chapter-scoped and are not used at file level — a file's
 overall relationships are expressed through `related` only.
 
@@ -111,7 +141,7 @@ plain-string list. The universal `roadmap` field below behaves the same way.
 Chapters are not given a separate stored id. A chapter is addressed by its
 file path (relative to the repository root) plus a GitHub-style anchor slug
 of its heading text: `<path>#<heading-slug>`, e.g.
-`.domain/order-management/domain.md#aggregate-order`. This is exactly what
+`.domain/order-management/domain.md#order`. This is exactly what
 renders as the heading's link target, so it stays correct automatically when
 read in any Markdown viewer and never needs to be kept in sync by hand.
 
@@ -137,6 +167,30 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
   the document as a whole and is set independently of its chapters' own
   `status` values (e.g. a file can be `active` overall while one chapter
   inside it is still `draft`).
+- **type** (required where the folder defines a value set) — what kind of thing
+  this chapter or file *is*: the classification that used to be written as a
+  heading prefix. Like `status`, the allowed values are folder-specific and are
+  defined in that folder's own instructions file. It applies to chapter blocks
+  and file-level blocks alike, with a separate value set for each level where
+  the folder distinguishes them.
+
+  Only two folders define a value set:
+
+  | Folder | Chapter values | File values |
+  |---|---|---|
+  | `.domain` | `aggregate`, `entity`, `value-object`, `enum`, `shared-value-objects`, `shared-enums`, `domain-service`, `domain-event`, `feature`, `sub-feature`, `term` | `context-map`, `domain`, `features`, `model`, `flow`, `dependencies`, `naming` |
+  | `.tech` | `language`, `runtime`, `framework`, `library`, `package`, `tool`, `service`, `platform`, `protocol`, `format` | none |
+
+  `.arc42`, `.backlog`, and `.design` deliberately define **no** value set. Their
+  only kind distinction — chapter vs section, item vs sub-item — is already
+  carried by heading level, so a `type` field there would restate the document
+  structure rather than add anything. Omit it in those folders, per the same
+  omit-when-empty discipline that governs the optional fields; setting it is
+  reported as a warning.
+
+  In `.tech` this field was previously spelled `kind`. The old name still parses
+  so an existing repository is not broken by a generator sync, but it reports a
+  warning — rename it to `type`.
 - **related** (optional) — list of `<path>#<heading-slug>` or `<path>`
   references this chapter or file points to for context, without a hard
   dependency (e.g. a backlog item linking to the domain aggregate it
@@ -174,25 +228,28 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
 
 Folder-specific fields (e.g. `depends-on` on features/backlog/tech chapters,
 `feature-flag` on domain feature chapters, `implements` on backlog chapters,
-`kind`/`version`/`alternatives` on tech chapters) are documented in that folder's
+`version`/`alternatives` on tech chapters) are documented in that folder's
 own instructions file, not here — this file only defines the fields common
 to every folder.
 
 A chapter that is estimated and carried by a roadmap item therefore reads:
 
 ```markdown
-## Item: Offline Sync Queue
+## Offline Sync Queue
 
 \`\`\`meta
 status: ready
 effort: 8
 roadmap: [sync-service, mobile-mvp]
-related: [.domain/sync/features.md#feature-offline-sync]
+related: [.domain/sync/features.md#offline-sync]
 \`\`\`
 ```
 
 ## Authoring guidance
 
+- Heading text is the name of the thing only. Record what kind of thing it is
+  in `type`, never as a heading prefix — a reclassification is then a one-line
+  metadata edit instead of an anchor rename that breaks every reference.
 - If a chapter heading is renamed, update every relation field entry
   elsewhere (`related` or any folder-specific field) that references its
   old `<path>#<heading-slug>` in the same change.
@@ -216,7 +273,7 @@ related: [.domain/sync/features.md#feature-offline-sync]
   fields (`related: []`, `depends-on: []`, `roadmap: []`) and null values
   (`issue: null`, `effort: null`) are omitted rather than written out, so a
   chapter or file with no relations, no estimate, and no issue shows only
-  `status`.
+  `status` and, where the folder defines one, `type`.
 
 ## Declaring reading order
 

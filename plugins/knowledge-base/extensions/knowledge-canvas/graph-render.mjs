@@ -56,6 +56,7 @@ export function renderGraphPage({ scopes = ["."], scope = "." } = {}) {
     <input id="search" type="search" placeholder="Search nodes…" />
     <select id="scope" title="Graph scope">${scopeOptions}</select>
     <select id="folder"><option value="">All folders</option></select>
+    <select id="kind" title="Filter by what kind of thing a node is"><option value="">All kinds</option></select>
     <label class="toggle"><input id="show-contains" type="checkbox" /> containment edges</label>
     <label class="toggle"><input id="show-headings" type="checkbox" /> plain headings</label>
     <button id="relayout">Re-layout</button>
@@ -164,6 +165,7 @@ async function load() {
   });
 
   populateFolders();
+  populateKinds();
   renderLegend();
   renderStats();
   renderProblems();
@@ -187,6 +189,7 @@ function runLayout() {
 
 function applyFilters() {
   const folder = document.getElementById("folder").value;
+  const kind = document.getElementById("kind").value;
   const showContains = document.getElementById("show-contains").checked;
   const showHeadings = document.getElementById("show-headings").checked;
   const term = document.getElementById("search").value.trim().toLowerCase();
@@ -196,6 +199,7 @@ function applyFilters() {
       const d = n.data();
       let visible = true;
       if (folder && d.folder !== folder) visible = false;
+      if (kind && d.kind !== kind) visible = false;
       if (!showHeadings && d.type === "heading") visible = false;
       n.style("display", visible ? "element" : "none");
     });
@@ -277,6 +281,23 @@ function populateFolders() {
   }
 }
 
+// "kind" is the authored type field — what kind of thing a node is
+// (aggregate, feature, framework…), as opposed to "type", which is the
+// structural role (file, chapter, heading, external).
+function populateKinds() {
+  const select = document.getElementById("kind");
+  const previous = select.value;
+  select.innerHTML = '<option value="">All kinds</option>';
+  const kinds = [...new Set(cy.nodes().map((n) => n.data("kind")).filter(Boolean))].sort();
+  for (const kind of kinds) {
+    const option = document.createElement("option");
+    option.value = kind;
+    option.textContent = kind;
+    select.appendChild(option);
+  }
+  if (kinds.includes(previous)) select.value = previous;
+}
+
 function renderLegend() {
   const rows = Object.entries(FOLDER_COLORS).map(
     ([name, color]) => '<div class="legend-row"><span class="swatch" style="background:' + color + '"></span>' + name + "</div>"
@@ -314,7 +335,7 @@ function renderProblems() {
   el.innerHTML = graph.problems.map((p) => "<div>[" + escapeHtml(p.severity) + "] " + escapeHtml(p.message) + "</div>").join("");
 }
 
-for (const id of ["folder", "show-contains", "show-headings"]) {
+for (const id of ["folder", "kind", "show-contains", "show-headings"]) {
   document.getElementById(id).addEventListener("change", applyFilters);
 }
 document.getElementById("scope").addEventListener("change", load);

@@ -62,7 +62,7 @@ chapters and generated `_meta/*.json` indexes.
 3. **Analyze non-package graph parts.** Inspect the repository for technologies that package
    manifests do not fully describe:
 
-   | Area | Evidence to inspect | Typical `.tech` kind |
+   | Area | Evidence to inspect | Typical `.tech` type |
    | --- | --- | --- |
    | Runtime and SDK | `global.json`, `Dockerfile`, `*.csproj`, `.config/dotnet-tools.json` | `runtime`, `tool` |
    | Frontend toolchain | `vite.config.*`, `next.config.*`, `angular.json`, `tsconfig*.json` | `framework`, `tool` |
@@ -76,8 +76,8 @@ chapters and generated `_meta/*.json` indexes.
 
 4. **Map findings to `.tech`.** For each technology, choose exactly one owning layer. Shared
    technologies used by multiple layers belong in `shared.md`; layer-specific technologies
-   depend on the shared node. Package nodes normally use `kind: package`, while frameworks,
-   runtimes, tools, services, platforms, protocols, and formats use the closest specific kind
+   depend on the shared node. Package nodes normally use `type: package`, while frameworks,
+   runtimes, tools, services, platforms, protocols, and formats use the closest specific type
    from `knowledge-tech.instructions.md`.
 
 5. **Author through `orch-tech`.** Route the actual `.tech/` edits through `orch-tech` unless

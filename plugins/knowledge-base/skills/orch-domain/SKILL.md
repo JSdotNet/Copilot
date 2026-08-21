@@ -60,15 +60,19 @@ the existing `.domain/` contents, and continue.
 
 ### Stage 3: Metadata & Cross-Reference Enforcement
 
-- Add or update the chapter metadata block (`status` required; `related`,
-  `issue`, `effort`, `roadmap` optional) on every new/edited Aggregate, Domain
-  Service, Domain Event, Shared Value Objects/Enums, Feature/Sub-feature, or
-  `Term` chapter.
+- Add or update the chapter metadata block (`status` and `type` required;
+  `related`, `issue`, `effort`, `roadmap` optional) on every new/edited
+  Aggregate, Entity, Value Object, Enum, Domain Service, Domain Event, Shared
+  Value Objects/Enums, Feature/Sub-feature, or Term chapter.
 - Add or update the file-level metadata block on every touched file,
   including `context-map.md`, `model.md`, `flow.md`, and `dependencies.md`
   (which carry a file-level block only, no per-chapter blocks).
 - Set `status` from this folder's allowed values: `draft`, `proposed`,
   `active`, `deprecated` (no `done`).
+- Set `type` from this folder's value sets in
+  `knowledge-domain.instructions.md`, and confirm the heading carries the name
+  only — no `Aggregate:`, `Feature:`, `Sub-feature:`, or `Term:` prefix, and no
+  `Domain:`/`Features:`/`Naming:` prefix on a file title.
 - Update `depends-on` on `features.md` chapters and `aliases`/`related` on
   `naming.md` terms as needed; omit empty optional fields per the
   omit-when-empty rule.
