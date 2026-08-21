@@ -180,8 +180,11 @@ but `build.mjs --check` reports errors until it is migrated. Re-sync
    `# Naming: Order Management` all become `# Order Management`.
    `## Shared Value Objects` and `## Shared Enums` keep their headings: those
    name a grouping, not a single thing. `.domain/context-map.md` has no context
-   name to fall back to, so title it after the system the map covers
-   (`# Backlog`); its `type: context-map` carries the kind.
+   name to fall back to, so prefer titling it after the system the map covers
+   (`# Backlog`), with `type: context-map` carrying the kind; a plain
+   `# Context Map` is also accepted. If it already has a sensible title, leave
+   it — this step is about stripping *kind prefixes*, and that file never had
+   one.
 2. **Add `type` to every `meta` block.** Values come from the folder's own
    instructions file — `knowledge-domain.instructions.md` for `.domain`,
    `knowledge-tech.instructions.md` for `.tech`. File-level blocks take a
