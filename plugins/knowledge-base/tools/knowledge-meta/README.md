@@ -187,8 +187,24 @@ non-negative integer is left off the node and reported as a lint error instead.
 | A `type` value outside its folder's value set | error |
 | A reference pointing outside the knowledge folders | warning |
 | A `type` set in a folder that defines no value set | warning |
+| A literal `` `r`n `` / `\r\n` / `\n` escape sequence in body text | warning |
 | `.tech` still using the old `kind` field name | warning |
 | An `order` entry that is missing, duplicated, or names a non-sibling | error |
+
+### Literal escape sequences
+
+A tool writing Markdown through a shell can emit an escape sequence instead of
+the newline it stands for. The result is silent and out of proportion: a
+`## Heading` glued onto the end of the previous line stops being a heading, so
+the chapter vanishes from the outline, the graph, and every check that reasons
+about headings — including all of the `type` validation above. Nothing else here
+can see it, because by then the heading is prose.
+
+So the generator scans body text for a literal `` `r`n ``, `\r\n`, or `\n` and
+reports a warning. Fenced code blocks are skipped, as are backticked spans, so
+documentation that discusses escape sequences does not trip it. `\t` is
+deliberately not matched: it breaks no structure and collides with unformatted
+Windows paths. `node escape-lint.test.mjs` covers the cases.
 
 ## Output shape: `index.json`
 

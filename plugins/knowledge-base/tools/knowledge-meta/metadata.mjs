@@ -265,6 +265,74 @@ export function typeIssues(folder, blockLevel, meta) {
 }
 
 /**
+ * Flag literal escape sequences sitting in Markdown body text.
+ *
+ * An agent writing a file through a shell can emit the escape itself rather
+ * than the newline it stands for — a PowerShell here-string that was single-
+ * quoted when it needed interpolation, say. The failure is silent and
+ * disproportionate: a `## Heading` glued onto the end of the previous line
+ * stops being a heading, so the chapter disappears from the outline, from the
+ * graph, and from every check that reasons about headings. Nothing else here
+ * can catch it, because by the time those checks run the heading is prose.
+ *
+ * Warning rather than error: a document legitimately discussing escape
+ * sequences would otherwise have no way to say so. Only newline escapes are
+ * matched — `\t` was deliberately left out, because it breaks no structure and
+ * collides with unformatted Windows paths. A bare `C:\temp\new` written
+ * outside backticks is still a known false positive; formatting paths as code
+ * avoids it.
+ */
+export function escapeSequenceIssues(markdown) {
+    const issues = [];
+    let inFence = false;
+    let fenceChar = null;
+
+    markdown.split(/\r?\n/).forEach((line, index) => {
+        const fence = line.match(/^\s*(`{3,}|~{3,})/);
+        if (fence) {
+            if (!inFence) {
+                inFence = true;
+                fenceChar = fence[1][0];
+            } else if (fence[1][0] === fenceChar) {
+                inFence = false;
+                fenceChar = null;
+            }
+            return;
+        }
+        if (inFence) return;
+
+        // The PowerShell escape is checked against the line with double-backtick
+        // code spans removed: that is how Markdown quotes a run containing
+        // backticks, so a doubly-quoted occurrence is a document *describing*
+        // the escape rather than one corrupted by it. Single-backtick spans are
+        // left in place, because those backticks are part of the corrupted
+        // token itself. The C-style escapes drop single-backtick spans too,
+        // since a backticked \n is ordinary documentation.
+        const quoted = line.replace(/``.+?``/g, "");
+        const found = new Set();
+        if (quoted.includes("`r`n")) found.add("`r`n");
+        for (const match of quoted.replace(/`[^`]*`/g, "").matchAll(/\\r\\n|\\n/g)) {
+            found.add(match[0]);
+        }
+        if (!found.size) return;
+
+        const glued = /(?:`r`n|\\r\\n|\\n)\s*#{1,6}\s/.test(quoted);
+        issues.push({
+            severity: "warning",
+            line: index + 1,
+            message:
+                `has a literal ${[...found].map((s) => `"${s}"`).join(" and ")} ` +
+                `escape sequence in body text on line ${index + 1}` +
+                (glued
+                    ? ", with a heading immediately after it — that heading does not start a line, so it is not being parsed as a heading."
+                    : ". If a line break was intended, the escape was not interpreted.")
+        });
+    });
+
+    return issues;
+}
+
+/**
  * Heuristic lint of a document's metadata blocks against
  * chapter-metadata.instructions.md. Not a full structural validator (it does
  * not know which headings are "addressable chapters" per folder — see that
@@ -283,6 +351,9 @@ export function validateDocument(relPath, markdown) {
     }
 
     const { fileTitle, fileMeta, chapters } = parseDocument(markdown);
+    for (const issue of escapeSequenceIssues(markdown)) {
+        issues.push({ severity: issue.severity, message: `${relPath} ${issue.message}` });
+    }
     const allowedStatus = STATUS_BY_FOLDER[kind];
     const optionalFields = new Set([
         ...COMMON_OPTIONAL_FIELDS,

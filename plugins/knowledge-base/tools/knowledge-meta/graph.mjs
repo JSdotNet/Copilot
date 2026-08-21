@@ -10,7 +10,7 @@
 
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
-import { parseDocument, folderKindForPath, resolveType, slugify, typeIssues } from "./metadata.mjs";
+import { parseDocument, folderKindForPath, resolveType, slugify, typeIssues, escapeSequenceIssues } from "./metadata.mjs";
 
 /** Every knowledge folder this convention recognizes. A repository adopts any subset. */
 export const KNOWLEDGE_FOLDERS = [".arc42", ".domain", ".backlog", ".tech", ".design"];
@@ -149,6 +149,14 @@ export async function buildGraph(repoRoot) {
         nodes.set(fileNode.id, fileNode);
 
         for (const issue of typeIssues(folder, "file", fileMeta)) {
+            problems.push({
+                severity: issue.severity,
+                path: relPath,
+                message: `${relPath} ${issue.message}`,
+            });
+        }
+
+        for (const issue of escapeSequenceIssues(raw)) {
             problems.push({
                 severity: issue.severity,
                 path: relPath,
