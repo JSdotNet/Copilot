@@ -71,7 +71,7 @@ both in its layer table and in its file-level `order` field.
 
 \`\`\`meta
 status: candidate
-kind: framework
+type: framework
 version: "9.0"
 depends-on: [".tech/shared.md#net-runtime"]
 related: [".arc42/04-solution-strategy.md#technology-choices"]
@@ -91,7 +91,7 @@ context to be understood, not a design document.
 ## Metadata fields
 
 `.tech` uses the common fields from
-`knowledge-chapter-metadata.instructions.md` (`status` required;
+`knowledge-chapter-metadata.instructions.md` (`status` and `type` required;
 `related`, `issue`, `effort`, and `roadmap` optional) plus the folder-specific
 fields below.
 
@@ -109,11 +109,18 @@ Maturity of the technology **in this project**, on a tech-radar-style ladder:
 
 Early in a project most entries are legitimately `candidate`.
 
+### type
+
+What kind of technology the chapter describes. Required on every technology
+chapter. One of: `language`, `runtime`, `framework`, `library`, `package`,
+`tool`, `service`, `platform`, `protocol`, `format`.
+
+This field was previously called `kind`. The old name still parses, so an
+existing `.tech` folder keeps working after a generator sync, but it reports a
+warning — rename it to `type`.
+
 ### Folder-specific fields
 
-- **kind** (required) — the node type in the graph. One of: `language`,
-  `runtime`, `framework`, `library`, `package`, `tool`, `service`, `platform`,
-  `protocol`, `format`.
 - **version** (optional) — the pinned or targeted version, as a quoted string
   (e.g. `"9.0"`, `"^5.2"`). Omit when no version is committed to yet.
 - **depends-on** (optional) — list of `<path>#<heading-slug>` references to

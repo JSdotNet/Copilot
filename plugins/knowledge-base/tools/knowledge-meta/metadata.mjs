@@ -13,33 +13,62 @@ const STATUS_BY_FOLDER = {
     design: ["draft", "active", "deprecated"],
 };
 
-// Fields a folder requires on every metadata block, beyond `status`.
-const FOLDER_REQUIRED_FIELDS = {
-    domain: [],
-    arc42: [],
-    backlog: [],
-    tech: ["kind"],
-    design: [],
+// Allowed `type` values per folder, split by block level. `type` records *what
+// kind of thing* a chapter or file is — the classification that used to be
+// written as a heading prefix (`## Aggregate: Order`). Heading text now carries
+// the name alone, so anchors are slugs of the bare name.
+//
+// A folder whose lists are empty defines no kind distinction of its own: in
+// `.arc42`, `.backlog`, and `.design` the only such distinction (chapter vs
+// section, item vs sub-item) is already carried by heading level, so inventing
+// values there would restate the document structure. `type` is omitted in those
+// folders and reported when used.
+const TYPE_BY_FOLDER = {
+    domain: {
+        chapter: [
+            "aggregate",
+            "entity",
+            "value-object",
+            "enum",
+            "shared-value-objects",
+            "shared-enums",
+            "domain-service",
+            "domain-event",
+            "feature",
+            "sub-feature",
+            "term",
+        ],
+        file: ["context-map", "domain", "features", "model", "flow", "dependencies", "naming"],
+    },
+    tech: {
+        chapter: [
+            "language",
+            "runtime",
+            "framework",
+            "library",
+            "package",
+            "tool",
+            "service",
+            "platform",
+            "protocol",
+            "format",
+        ],
+        file: [],
+    },
+    arc42: { chapter: [], file: [] },
+    backlog: { chapter: [], file: [] },
+    design: { chapter: [], file: [] },
 };
 
-// Allowed values for enumerated folder-specific fields.
-const TECH_KINDS = [
-    "language",
-    "runtime",
-    "framework",
-    "library",
-    "package",
-    "tool",
-    "service",
-    "platform",
-    "protocol",
-    "format",
-];
+// `.tech` spelled this concept `kind` before `type` was unified across folders.
+// The old name keeps working so an existing repository is not broken by a
+// generator sync, but it lints as a warning and is not documented any more.
+const LEGACY_TYPE_FIELD_BY_FOLDER = { tech: "kind" };
 
 // Fields every folder's chapter/file block may carry, plus folder-specific
 // extras layered in below. `order` is file-level only (see validateDocument):
 // it declares the reading order of a directory's entries.
-const COMMON_OPTIONAL_FIELDS = ["related", "issue", "effort", "roadmap"];
+const COMMON_OPTIONAL_FIELDS = ["type", "related", "issue", "effort", "roadmap"];
 
 // `roadmap` entries are lowercase kebab-case tag slugs, not chapter references.
 const ROADMAP_TAG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -61,6 +90,27 @@ export function folderKindForPath(relPath) {
     if (normalized.startsWith(".tech/")) return "tech";
     if (normalized.startsWith(".design/")) return "design";
     return null;
+}
+
+/**
+ * The `type` values a folder allows on a block at this level, or `[]` when the
+ * folder defines no kind distinction. `level` is "file" for the level-1 block
+ * and "chapter" for every other heading.
+ */
+export function typeValuesFor(folder, level) {
+    return TYPE_BY_FOLDER[folder]?.[level] ?? [];
+}
+
+/**
+ * The effective `type` of a block, falling back to the folder's legacy field
+ * name where one exists. Returns null when the block declares no type.
+ */
+export function resolveType(folder, meta) {
+    if (!meta) return null;
+    if (meta.type !== undefined && meta.type !== null && meta.type !== "") return meta.type;
+    const legacy = LEGACY_TYPE_FIELD_BY_FOLDER[folder];
+    const value = legacy ? meta[legacy] : null;
+    return value === undefined || value === "" ? null : value;
 }
 
 function parseScalar(raw) {
@@ -163,12 +213,55 @@ export function parseDocument(markdown) {
 // remaining whitespace character with a hyphen — it does *not* collapse runs.
 // "Organizational & Process Constraints" therefore anchors as
 // "organizational--process-constraints" (double hyphen where the & was).
-function slugify(text) {
+export function slugify(text) {
     return text
         .toLowerCase()
         .trim()
         .replace(/[^\w\s-]/g, "")
         .replace(/\s/g, "-");
+}
+
+/**
+ * Validate one block's `type` against its folder's vocabulary.
+ *
+ * Messages are sentence fragments beginning with a verb, so each caller can
+ * prefix its own subject. Shared by the document lint and by graph
+ * construction, so the canvas, the CLI, and CI all report the same thing.
+ */
+export function typeIssues(folder, blockLevel, meta) {
+    const issues = [];
+    if (!meta) return issues;
+
+    const allowed = typeValuesFor(folder, blockLevel);
+    const declared = resolveType(folder, meta);
+    if (allowed.length) {
+        if (declared === null) {
+            issues.push({
+                severity: "error",
+                message: `is missing required \`type\`. Expected one of: ${allowed.join(", ")}.`,
+            });
+        } else if (!allowed.includes(declared)) {
+            issues.push({
+                severity: "error",
+                message: `has type "${declared}", expected one of: ${allowed.join(", ")}.`,
+            });
+        }
+    } else if (declared !== null) {
+        issues.push({
+            severity: "warning",
+            message: `sets \`type\` to "${declared}", but the ${folder} folder defines no \`type\` value set at ${blockLevel} level — heading level already carries that distinction. Omit the field.`,
+        });
+    }
+
+    const legacy = LEGACY_TYPE_FIELD_BY_FOLDER[folder];
+    if (legacy && meta[legacy] != null) {
+        issues.push({
+            severity: "warning",
+            message: `uses \`${legacy}\`, which has been renamed to \`type\`. Rename the field; \`${legacy}\` still works but is no longer documented.`,
+        });
+    }
+
+    return issues;
 }
 
 /**
@@ -231,24 +324,12 @@ export function validateDocument(relPath, markdown) {
             });
         }
 
-        // Folder-specific required fields apply to chapter blocks, not to the
-        // file-level block (which describes the document as a whole).
-        if (chapter.level > 1) {
-            for (const required of FOLDER_REQUIRED_FIELDS[kind]) {
-                if (!(required in chapter.meta) || chapter.meta[required] === null) {
-                    issues.push({
-                        severity: "error",
-                        message: `${label} is missing required \`${required}\` for the ${kind} folder.`,
-                    });
-                }
-            }
-        }
-
-        if (kind === "tech" && chapter.meta.kind && !TECH_KINDS.includes(chapter.meta.kind)) {
-            issues.push({
-                severity: "error",
-                message: `${label} has kind "${chapter.meta.kind}", expected one of: ${TECH_KINDS.join(", ")}.`,
-            });
+        // `type` records what kind of thing this chapter or file is, in the
+        // vocabulary its folder defines. Folders that define no vocabulary
+        // (`.arc42`, `.backlog`, `.design`) omit the field entirely.
+        const blockLevel = chapter.level === 1 ? "file" : "chapter";
+        for (const issue of typeIssues(kind, blockLevel, chapter.meta)) {
+            issues.push({ severity: issue.severity, message: `${label} ${issue.message}` });
         }
 
         // A feature flag key names an application feature in the consuming

@@ -66,7 +66,7 @@ a file, then regenerate `_meta/`. See
 - **domain.md** — One chapter per Aggregate, Domain Service, Domain Event, or
   Shared Value Objects / Shared Enums grouping in the context.
   - Aggregate chapters include sub-chapters for their owned Entities, Value
-    Objects, and Enums.
+    Objects, and Enums, each carrying its own metadata block.
   - Domain Service chapters describe the service's responsibility and the
     aggregates/policies it coordinates.
   - Domain Event chapters are first-class addressable chapters and carry
@@ -94,10 +94,10 @@ a file, then regenerate `_meta/`. See
   - For each relationship, document DDD pattern, integration mechanism,
     contract, and why/what the dependency relies on.
 - **naming.md** — The context's ubiquitous-language naming registry: one
-  `## Term: <Canonical>` chapter per key term. Surface synonyms are recorded in
-  the `aliases` metadata field; a `related` reference links the term to the
-  chapter where it is modeled. This gives every synonym (code class name, id
-  field, consumer-side copy) a single canonical concept.
+  chapter per key term, headed by the canonical term itself. Surface synonyms
+  are recorded in the `aliases` metadata field; a `related` reference links the
+  term to the chapter where it is modeled. This gives every synonym (code class
+  name, id field, consumer-side copy) a single canonical concept.
 
 ## Folder rules
 
@@ -105,10 +105,11 @@ These rules describe the persisted shape of `.domain` assets only. Authoring
 workflow, routing, and cross-document governance are handled by separate
 instructions.
 - Every Aggregate, Domain Service, Domain Event, Shared Value Objects, and
-  Shared Enums chapter in `domain.md`, every Feature/Sub-feature chapter in
-  `features.md`, and every `## Term` chapter in `naming.md` must carry a
+  Shared Enums chapter in `domain.md`, every Entity/Value Object/Enum
+  sub-chapter inside an Aggregate, every Feature/Sub-feature chapter in
+  `features.md`, and every Term chapter in `naming.md` must carry a
   metadata block as described in
-  `knowledge-chapter-metadata.instructions.md`. Only `status` is
+  `knowledge-chapter-metadata.instructions.md`. `status` and `type` are
   required; the optional cross-folder tags (`related`) and issue link
   (`issue`) are included only when they have a value.
 - Every file in `.domain` — `context-map.md` and, per bounded context,
@@ -124,11 +125,34 @@ instructions.
   `deprecated` in this folder. Domain knowledge describes the current (or
   agreed-future) model, not a task queue, so there is no `done`: `active`
   means "this is the current model", `deprecated` means superseded.
+- The metadata block's `type` field records what kind of thing the chapter or
+  file is — the classification that is **never** written into the heading. This
+  folder's value sets are:
+
+  | Level | Values |
+  |---|---|
+  | Chapter | `aggregate`, `entity`, `value-object`, `enum`, `shared-value-objects`, `shared-enums`, `domain-service`, `domain-event`, `feature`, `sub-feature`, `term` |
+  | File | `context-map`, `domain`, `features`, `model`, `flow`, `dependencies`, `naming` |
+
+  Each file's `type` matches its filename: `domain.md` is `type: domain`,
+  `features.md` is `type: features`, and so on, with `context-map.md` at the
+  `.domain` root carrying `type: context-map`.
+- Heading text in `.domain` carries the **name only** — `## Order`, not
+  `## Aggregate: Order`. Anchors are therefore slugs of the bare name
+  (`.domain/order-management/domain.md#order`). The two exceptions are the
+  `## Shared Value Objects` and `## Shared Enums` chapters, whose headings name
+  a grouping rather than a single thing, so the descriptive text *is* the name.
+  File titles are the bounded-context name alone (`# Order Management`), with
+  the file's own `type` distinguishing the six files of a context.
+
+  A `.domain` folder written the old way (kind prefixes in headings, no `type`,
+  `#### <Name>` sub-chapters under `### Entities`) is migrated with the steps in
+  the knowledge-base plugin README under "Migrating to schema version 2".
 - `features.md` Feature/Sub-feature chapters may carry an additional
   `depends-on` field: a list of `<path>#<heading-slug>` references (see
   `knowledge-chapter-metadata.instructions.md` for the reference
   format) to other features that must be delivered first, e.g.
-  `depends-on: [.domain/order-management/features.md#feature-refunds]`.
+  `depends-on: [.domain/order-management/features.md#refunds]`.
   `domain.md` chapters (Aggregates, Domain Services, Domain Events, Shared
   Value Objects/Enums) do not use `depends-on` — they describe standing
   structure, and their relationships belong in `model.md`/`dependencies.md` or
@@ -165,7 +189,7 @@ instructions.
   just to document process-manager behavior; keep that semantics in the
   relevant Domain Service chapter unless a separate structure is later decided
   explicitly.
-- `naming.md` `Term` chapters carry an `aliases` field: a list of
+- `naming.md` Term chapters carry an `aliases` field: a list of
   plain-string surface names the term is also known by (code class/identifier
   names, snake_case id fields, or a consumer context's local copy name).
   Unlike `related`/`depends-on`, `aliases` entries are plain strings, not
@@ -178,10 +202,11 @@ instructions.
 ### domain.md
 
 ```markdown
-# Domain: <Bounded Context Name>
+# <Bounded Context Name>
 
 \`\`\`meta
 status: draft
+type: domain
 \`\`\`
 
 > One chapter per Aggregate, Domain Service, Domain Event, or Shared Value
@@ -190,42 +215,53 @@ status: draft
 > Objects, and Enums. Value Objects/Enums shared across multiple aggregates
 > get their own chapter at the end instead of being duplicated.
 
-## Aggregate: <AggregateName>
+## <AggregateName>
 
 \`\`\`meta
 status: draft
+type: aggregate
 \`\`\`
 
 Responsibility, lifecycle, and invariants of the aggregate (what it
 guarantees to be true at all times, and why it exists as a consistency
 boundary).
 
-### Entities
-
-#### <EntityName>
-
-Role within the aggregate, identity, and lifecycle notes.
-
-### Value Objects
-
-#### <ValueObjectName>
-
-Meaning, equality semantics, and validation rules.
-
-### Enums
-
-#### <EnumName>
-
-Values and what each one means in business terms.
-
-## Aggregate: <NextAggregateName>
-
-...
-
-## Domain Service: <DomainServiceName>
+### <EntityName>
 
 \`\`\`meta
 status: draft
+type: entity
+\`\`\`
+
+Role within the aggregate, identity, and lifecycle notes.
+
+### <ValueObjectName>
+
+\`\`\`meta
+status: draft
+type: value-object
+\`\`\`
+
+Meaning, equality semantics, and validation rules.
+
+### <EnumName>
+
+\`\`\`meta
+status: draft
+type: enum
+\`\`\`
+
+Values and what each one means in business terms.
+
+## <NextAggregateName>
+
+...
+
+## <DomainServiceName>
+
+\`\`\`meta
+status: draft
+type: domain-service
 \`\`\`
 
 Responsibility of the service, which aggregates/policies it coordinates, and
@@ -234,10 +270,11 @@ why the behavior does not belong on a single aggregate.
 Invocation semantics: <command-invoked | scheduled |
 query/composition-oriented | event-triggered policy/process manager>.
 
-## Domain Event: <EventName>
+## <EventName>
 
 \`\`\`meta
 status: draft
+type: domain-event
 \`\`\`
 
 Published when <business trigger>.
@@ -258,11 +295,17 @@ Published when <business trigger>.
 
 \`\`\`meta
 status: draft
+type: shared-value-objects
 \`\`\`
 
 > Value Objects used by more than one aggregate in this bounded context.
 
 ### <SharedValueObjectName>
+
+\`\`\`meta
+status: draft
+type: value-object
+\`\`\`
 
 Meaning, equality semantics, validation rules, and which aggregates use it.
 
@@ -270,49 +313,68 @@ Meaning, equality semantics, validation rules, and which aggregates use it.
 
 \`\`\`meta
 status: draft
+type: shared-enums
 \`\`\`
 
 > Enums used by more than one aggregate in this bounded context.
 
 ### <SharedEnumName>
 
+\`\`\`meta
+status: draft
+type: enum
+\`\`\`
+
 Values and what each one means in business terms, and which aggregates use it.
 ```
+
+The Entity, Value Object, and Enum sub-chapters sit directly under their
+aggregate as `###` headings. There are no `### Entities` / `### Value Objects`
+/ `### Enums` grouping headings — `type` already says which is which, and the
+grouping headings only pushed every real chapter a level deeper and added
+anchors nobody references.
+
+`### Payload`, `### Consumers`, and `### Published language rules` under a
+Domain Event are structural sub-sections of that one chapter, not addressable
+chapters, so they carry no metadata block.
 
 ### features.md
 
 ```markdown
-# Features: <Bounded Context Name>
+# <Bounded Context Name>
 
 \`\`\`meta
 status: draft
+type: features
 \`\`\`
 
 > Features and sub-features this bounded context supports, described in
 > business/ubiquitous language rather than implementation terms.
 
-## Feature: <FeatureName>
+## <FeatureName>
 
 \`\`\`meta
 status: draft
+type: feature
 feature-flag: <application-feature-key>
 \`\`\`
 
 Short description of the capability and the business value it delivers.
 
-### Sub-feature: <SubFeatureName>
+### <SubFeatureName>
 
 \`\`\`meta
 status: draft
+type: sub-feature
 \`\`\`
 
 Description of the sub-feature and how it fits under the parent feature.
 
-### Sub-feature: <NextSubFeatureName>
+### <NextSubFeatureName>
 
 ...
 
-## Feature: <NextFeatureName>
+## <NextFeatureName>
 
 ...
 ```
@@ -320,10 +382,11 @@ Description of the sub-feature and how it fits under the parent feature.
 ### model.md
 
 ```markdown
-# Domain Model: <Bounded Context Name>
+# <Bounded Context Name>
 
 \`\`\`meta
 status: draft
+type: model
 \`\`\`
 
 > Structural view of the domain model for this bounded context: aggregates,
@@ -357,10 +420,11 @@ classDiagram
 ### flow.md
 
 ```markdown
-# Flow: <Bounded Context Name>
+# <Bounded Context Name>
 
 \`\`\`meta
 status: draft
+type: flow
 \`\`\`
 
 > Lifecycle and process flows for this bounded context: how aggregates move
@@ -381,10 +445,11 @@ status: draft
 ### dependencies.md
 
 ```markdown
-# Dependencies: <Bounded Context Name>
+# <Bounded Context Name>
 
 \`\`\`meta
 status: draft
+type: dependencies
 \`\`\`
 
 > Dependencies this bounded context has on other bounded contexts or
@@ -416,10 +481,11 @@ status: draft
 ### naming.md
 
 ```markdown
-# Naming: <Bounded Context Name>
+# <Bounded Context Name>
 
 \`\`\`meta
 status: draft
+type: naming
 \`\`\`
 
 > Canonical ubiquitous-language terms for this bounded context and their
@@ -427,10 +493,11 @@ status: draft
 > is also known by are recorded in the aliases metadata field so any synonym
 > resolves back to one canonical concept.
 
-## Term: <Canonical Term>
+## <Canonical Term>
 
 \`\`\`meta
 status: draft
+type: term
 aliases: [<AliasA>, <AliasB>]
 related: [.domain/<context>/domain.md#<heading-slug>]
 \`\`\`

@@ -10,11 +10,11 @@
 
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
-import { parseDocument, folderKindForPath } from "./metadata.mjs";
+import { parseDocument, folderKindForPath, resolveType, slugify, typeIssues } from "./metadata.mjs";
 
 /** Every knowledge folder this convention recognizes. A repository adopts any subset. */
 export const KNOWLEDGE_FOLDERS = [".arc42", ".domain", ".backlog", ".tech", ".design"];
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 export const REPO_SCOPE = ".";
 export const GENERATOR = ".github/tools/knowledge-meta/build.mjs";
 
@@ -27,7 +27,11 @@ const REFERENCE_FIELDS = {
     implements: "implements",
 };
 
-const ATTRIBUTE_FIELDS = ["kind", "version", "issue", "aliases", "alternatives"];
+// The authored `type` field is emitted under the node key `kind`, because
+// `type` on a node is already the structural discriminator
+// (`file`/`chapter`/`heading`/`external`). `.tech` nodes have always carried
+// `kind`; the field is simply populated for every folder now.
+const ATTRIBUTE_FIELDS = ["version", "issue", "aliases", "alternatives"];
 
 // Non-reference fields whose authored form may be a scalar or a bracket list,
 // and which are always emitted as a list so a consumer reading graph.json never
@@ -65,9 +69,11 @@ function asList(value) {
     return Array.isArray(value) ? value : [value];
 }
 
-function applyMeta(node, meta) {
+function applyMeta(node, meta, folder) {
     if (!meta) return;
     node.status = meta.status ?? null;
+    const declaredType = resolveType(folder, meta);
+    if (declaredType !== null) node.kind = declaredType;
     for (const field of ATTRIBUTE_FIELDS) {
         if (meta[field] !== undefined && meta[field] !== null) node[field] = meta[field];
     }
@@ -83,6 +89,19 @@ function applyMeta(node, meta) {
         const refs = asList(meta[field]);
         if (refs.length) node[field] = refs;
     }
+}
+
+/**
+ * Compose a file node's display label.
+ *
+ * Heading text carries the name only, so every file in a `.domain` bounded
+ * context is titled with the bare context name — six nodes sharing one label.
+ * The file's `type` disambiguates them, and is left off when the title already
+ * says it ("Context Map" + `context-map`).
+ */
+function composeFileLabel(title, type) {
+    if (!type || slugify(title) === type) return title;
+    return `${title} (${type})`;
 }
 
 /**
@@ -112,9 +131,13 @@ export async function buildGraph(repoRoot) {
         const raw = await readFile(path.join(repoRoot, relPath), "utf8");
         const { fileTitle, chapters } = parseDocument(raw);
 
+        const fileMeta = chapters.find((c) => c.level === 1)?.meta ?? null;
         const fileNode = {
             id: relPath,
-            label: fileTitle ?? path.basename(relPath, ".md"),
+            label: composeFileLabel(
+                fileTitle ?? path.basename(relPath, ".md"),
+                resolveType(folder, fileMeta)
+            ),
             type: "file",
             folder,
             path: relPath,
@@ -122,8 +145,16 @@ export async function buildGraph(repoRoot) {
 
         // An .arc42 file is exactly one top-level chapter, so its level-1 block
         // serves as the file-level block; other folders follow the same shape.
-        applyMeta(fileNode, chapters.find((c) => c.level === 1)?.meta);
+        applyMeta(fileNode, fileMeta, folder);
         nodes.set(fileNode.id, fileNode);
+
+        for (const issue of typeIssues(folder, "file", fileMeta)) {
+            problems.push({
+                severity: issue.severity,
+                path: relPath,
+                message: `${relPath} ${issue.message}`,
+            });
+        }
 
         // Track the nearest enclosing addressable heading per level so
         // sub-chapters attach to their parent rather than to the file.
@@ -169,9 +200,17 @@ export async function buildGraph(repoRoot) {
                 level: chapter.level,
                 line: chapter.line,
             };
-            applyMeta(node, chapter.meta);
+            applyMeta(node, chapter.meta, folder);
             nodes.set(id, node);
             ancestors.push({ level: chapter.level, id });
+
+            for (const issue of typeIssues(folder, "chapter", chapter.meta)) {
+                problems.push({
+                    severity: issue.severity,
+                    path: relPath,
+                    message: `${id} ${issue.message}`,
+                });
+            }
 
             edges.push({
                 id: `contains:${parentId}->${id}`,
@@ -245,6 +284,7 @@ function summarize(nodes, edges) {
         edges: edges.length,
         nodesByFolder: count(nodes, "folder"),
         nodesByType: count(nodes, "type"),
+        nodesByKind: count(nodes, "kind"),
         nodesByStatus: count(nodes, "status"),
         edgesByType: count(edges, "type"),
     };

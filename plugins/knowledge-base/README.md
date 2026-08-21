@@ -111,7 +111,7 @@ repository's authoritative design source, through `ux-design:ux-designer`.
 
 | File | Pattern | Purpose |
 |------|---------|---------|
-| `knowledge-chapter-metadata.instructions.md` | all five folders | Required `meta` block fields and value ladders |
+| `knowledge-chapter-metadata.instructions.md` | all five folders | Required `meta` block fields, `status` ladders, and `type` value sets |
 | `knowledge-domain.instructions.md` | `.domain/**` | Bounded-context structure and ubiquitous language |
 | `knowledge-arc42.instructions.md` | `.arc42/**` | arc42 chapter, ADR, and TDR structure |
 | `knowledge-tech.instructions.md` | `.tech/**` | Technology graph, versions, maturity ladder |
@@ -165,6 +165,47 @@ for technologies that do not appear in package manifests.
 - `hooks.json` adds a session-start guardrail: knowledge folders are task-scoped
   context rather than baseline context, `meta` blocks are mandatory on every
   chapter, and `_meta/` is never hand-edited.
+
+## Migrating to schema version 2
+
+Schema version 2 moves the *kind* of a chapter out of its heading and into a
+`type` metadata field. A repository written against version 1 keeps parsing,
+but `build.mjs --check` reports errors until it is migrated. Re-sync
+`.github/tools/knowledge-meta/` from this plugin first, then:
+
+1. **Strip kind prefixes from `.domain` headings.** `## Aggregate: Order`
+   becomes `## Order`; the same for `Domain Service:`, `Domain Event:`,
+   `Feature:`, `Sub-feature:`, and `Term:`. File titles lose theirs too —
+   `# Domain: Order Management`, `# Features: Order Management`, and
+   `# Naming: Order Management` all become `# Order Management`.
+   `## Shared Value Objects` and `## Shared Enums` keep their headings: those
+   name a grouping, not a single thing.
+2. **Add `type` to every `meta` block.** Values come from the folder's own
+   instructions file — `knowledge-domain.instructions.md` for `.domain`,
+   `knowledge-tech.instructions.md` for `.tech`. File-level blocks take a
+   file-level value (`domain`, `features`, `model`, …) matching the filename.
+   `.arc42`, `.backlog`, and `.design` define no value set and take no `type`.
+3. **Promote Entity, Value Object, and Enum sub-chapters one level.** Delete
+   the `### Entities`, `### Value Objects`, and `### Enums` grouping headings
+   and lift their `#### <Name>` children to `### <Name>` directly under the
+   aggregate. Each now carries its own `meta` block with `type: entity`,
+   `type: value-object`, or `type: enum` — they are no longer covered by the
+   parent aggregate's block.
+4. **Rewrite every anchor.** Any `related` / `depends-on` entry pointing at a
+   prefixed heading now points at the bare name:
+   `#aggregate-order` → `#order`, `#feature-checkout` → `#checkout`,
+   `#term-basket` → `#basket`. Anchors in prose links need the same treatment.
+5. **Rename `.tech`'s `kind` field to `type`.** Values are unchanged. The old
+   name still parses so this step is not urgent, but it reports a warning until
+   done.
+6. **Regenerate and check.**
+
+   ```bash
+   node .github/tools/knowledge-meta/build.mjs
+   node .github/tools/knowledge-meta/build.mjs --check
+   ```
+
+   Run `knowledge-base-validate` for anything still reported.
 
 ## Folder structure
 
