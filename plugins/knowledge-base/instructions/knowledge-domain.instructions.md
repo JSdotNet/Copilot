@@ -145,6 +145,14 @@ instructions.
   File titles are the bounded-context name alone (`# Order Management`), with
   the file's own `type` distinguishing the six files of a context.
 
+  `context-map.md` is the exception, because it is the one `.domain` file that
+  is not about a single bounded context and so has no context name to carry.
+  Title it `# Context Map`. Do not title it after the product or the
+  repository: this is the document whose job is to enumerate the bounded
+  contexts, so naming it after one thing misrepresents it. `Context Map` was
+  never a kind prefix, so the strip rule does not apply to it — there is
+  nothing to strip.
+
   A `.domain` folder written the old way (kind prefixes in headings, no `type`,
   `#### <Name>` sub-chapters under `### Entities`) is migrated with the steps in
   the knowledge-base plugin README under "Migrating to schema version 2".
@@ -198,6 +206,44 @@ instructions.
   when the term has none.
 
 ## Templates
+
+### context-map.md
+
+```markdown
+# Context Map
+
+\`\`\`meta
+status: draft
+type: context-map
+order: ["<first-bounded-context>", "<second-bounded-context>"]
+\`\`\`
+
+> `.domain`'s root document. The title is always `Context Map` — this file
+> describes the landscape rather than any one context, so it does not take a
+> context name. Its `##` sections do not carry their own metadata blocks; the
+> file-level block above is the only metadata this file carries.
+
+## Subdomain landscape
+
+| Subdomain | Classification | Bounded context |
+|---|---|---|
+| <Subdomain> | Core / Supporting / Generic | <Bounded Context Name> |
+
+## Context map
+
+<Diagram or table of the relationships between bounded contexts, using
+explicit DDD relationship terminology — ACL, Customer/Supplier, Partnership,
+OHS + Published Language.>
+
+## Published languages
+
+<The contracts used across context boundaries, and which contexts consume
+each one.>
+
+## Strategic rules
+
+<Rules that constrain cross-context collaboration.>
+```
 
 ### domain.md
 

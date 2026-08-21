@@ -179,7 +179,9 @@ but `build.mjs --check` reports errors until it is migrated. Re-sync
    `# Domain: Order Management`, `# Features: Order Management`, and
    `# Naming: Order Management` all become `# Order Management`.
    `## Shared Value Objects` and `## Shared Enums` keep their headings: those
-   name a grouping, not a single thing.
+   name a grouping, not a single thing. `.domain/context-map.md` keeps
+   `# Context Map` — it never had a prefix, and it is not about one bounded
+   context, so it has no context name to fall back to.
 2. **Add `type` to every `meta` block.** Values come from the folder's own
    instructions file — `knowledge-domain.instructions.md` for `.domain`,
    `knowledge-tech.instructions.md` for `.tech`. File-level blocks take a
@@ -195,9 +197,13 @@ but `build.mjs --check` reports errors until it is migrated. Re-sync
    prefixed heading now points at the bare name:
    `#aggregate-order` → `#order`, `#feature-checkout` → `#checkout`,
    `#term-basket` → `#basket`. Anchors in prose links need the same treatment.
-5. **Rename `.tech`'s `kind` field to `type`.** Values are unchanged. The old
-   name still parses so this step is not urgent, but it reports a warning until
-   done.
+5. **Rename `.tech`'s `kind` field to `type`.** Easy to miss, because it is a
+   separate mechanical edit in a different folder from all the work above, and
+   nothing fails if you skip it. Values are unchanged — only the field name
+   moves, so this is a find-and-replace of `kind:` to `type:` across
+   `.tech/*.md`. `kind` remains supported as a deprecated alias that reports a
+   **warning, never an error**, so `.domain` can be migrated and landed on its
+   own and `.tech` can follow in a later commit.
 6. **Regenerate and check.**
 
    ```bash
