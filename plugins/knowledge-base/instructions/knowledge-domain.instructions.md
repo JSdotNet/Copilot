@@ -145,13 +145,17 @@ instructions.
   File titles are the bounded-context name alone (`# Order Management`), with
   the file's own `type` distinguishing the six files of a context.
 
-  `context-map.md` is the exception, because it is the one `.domain` file that
-  is not about a single bounded context and so has no context name to carry.
-  Title it `# Context Map`. Do not title it after the product or the
-  repository: this is the document whose job is to enumerate the bounded
-  contexts, so naming it after one thing misrepresents it. `Context Map` was
-  never a kind prefix, so the strip rule does not apply to it — there is
-  nothing to strip.
+  `context-map.md` is the one `.domain` file that is not about a single bounded
+  context, so it has no context name to carry. Title it after the system or
+  product the map covers — `# Backlog`, `# Order Platform` — with
+  `type: context-map` carrying the kind, exactly as everywhere else. Do **not**
+  title it `# Context Map` unless the repository has no meaningful system name
+  to use: that restates the `type` in the heading, which is the pattern this
+  convention exists to remove. The generator composes its node label as
+  `Backlog (context-map)`, so the kind is still visible in the graph, and the
+  label stays distinct when several repositories' knowledge folders are viewed
+  together. `Context Map` remains an accepted fallback, and the generator
+  suppresses the redundant suffix for it.
 
   A `.domain` folder written the old way (kind prefixes in headings, no `type`,
   `#### <Name>` sub-chapters under `### Entities`) is migrated with the steps in
@@ -210,7 +214,7 @@ instructions.
 ### context-map.md
 
 ```markdown
-# Context Map
+# <System or Product Name>
 
 \`\`\`meta
 status: draft
@@ -218,10 +222,11 @@ type: context-map
 order: ["<first-bounded-context>", "<second-bounded-context>"]
 \`\`\`
 
-> `.domain`'s root document. The title is always `Context Map` — this file
-> describes the landscape rather than any one context, so it does not take a
-> context name. Its `##` sections do not carry their own metadata blocks; the
-> file-level block above is the only metadata this file carries.
+> `.domain`'s root document. Title it after the system the map covers, not
+> `Context Map` — the `type` above already carries the kind, and the generator
+> labels this node `<System Name> (context-map)`. Its `##` sections do not carry
+> their own metadata blocks; the file-level block above is the only metadata
+> this file carries.
 
 ## Subdomain landscape
 

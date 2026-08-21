@@ -147,10 +147,16 @@ already slugifies to the kind:
 |---|---|---|---|
 | `.domain/order-management/domain.md` | `Order Management` | `domain` | `Order Management (domain)` |
 | `.domain/order-management/features.md` | `Order Management` | `features` | `Order Management (features)` |
+| `.domain/context-map.md` | `Backlog` | `context-map` | `Backlog (context-map)` |
 | `.domain/context-map.md` | `Context Map` | `context-map` | `Context Map` |
 | `.arc42/01-introduction-and-goals.md` | `01. Introduction and Goals` | none | `01. Introduction and Goals` |
 
 Node `id` is the path and was always unique; this only fixes the display label.
+
+The two `context-map.md` rows are the recommended shape and the fallback: title
+that file after the system it maps, and reach for the literal `Context Map` only
+when there is no meaningful system name. The suppression branch exists so the
+fallback does not render as `Context Map (context-map)`.
 
 ### Edge types
 
@@ -199,7 +205,7 @@ sorting filenames.
   "problems": [],
   "entries": [
     { "type": "file", "name": "context-map.md", "path": ".domain/context-map.md",
-      "title": "Context Map", "kind": "context-map", "status": "draft", "root": true },
+      "title": "Shop", "kind": "context-map", "status": "draft", "root": true },
     { "type": "directory", "name": "ordering", "path": ".domain/ordering",
       "title": "Ordering",
       "children": [
