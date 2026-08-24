@@ -16,7 +16,7 @@
 
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import { parseDocument, folderKindForPath, resolveType } from "./metadata.mjs";
+import { parseDocument, documentDigest, folderKindForPath, resolveType } from "./metadata.mjs";
 import { KNOWLEDGE_FOLDERS, SCHEMA_VERSION, REPO_SCOPE, GENERATOR } from "./graph.mjs";
 
 /** Read one directory into ordered `file` and `directory` outline entries. */
@@ -39,11 +39,20 @@ async function readDirectory(repoRoot, relDir, problems) {
 
     // Parse every file once: we need its title/status for the outline anyway,
     // and its file-level `order` to know whether it is the root document.
+    // The digest (lede, diagram count) comes out of the same pass, which is
+    // the whole point — a viewer listing this folder must not have to open the
+    // files to learn what the generator already read.
     const parsed = new Map();
     for (const name of files.sort()) {
         const relPath = `${relDir}/${name}`;
-        const { fileTitle, fileMeta } = parseDocument(await readFile(path.join(repoRoot, relPath), "utf8"));
-        parsed.set(name, { relPath, title: fileTitle, meta: fileMeta ?? {} });
+        const markdown = await readFile(path.join(repoRoot, relPath), "utf8");
+        const { fileTitle, fileMeta } = parseDocument(markdown);
+        parsed.set(name, {
+            relPath,
+            title: fileTitle,
+            meta: fileMeta ?? {},
+            digest: documentDigest(markdown),
+        });
     }
 
     const roots = [...parsed.entries()].filter(([, doc]) => Array.isArray(doc.meta.order));
@@ -99,6 +108,10 @@ async function readDirectory(repoRoot, relDir, problems) {
                 title: doc.title ?? path.basename(name, ".md"),
                 ...(fileKind ? { kind: fileKind } : {}),
                 status: doc.meta.status ?? null,
+                // Omitted rather than emitted empty, so adding these fields did
+                // not churn every entry of every existing index.
+                ...(doc.digest.summary ? { summary: doc.digest.summary } : {}),
+                ...(doc.digest.diagrams ? { diagrams: doc.digest.diagrams } : {}),
                 ...(name === rootName ? { root: true } : {}),
             });
         } else {

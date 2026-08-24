@@ -1,6 +1,6 @@
 ---
 name: knowledge-base-validate
-description: 'Validate and repair the .arc42/.domain/.tech/.design/.backlog knowledge folders — resolve broken metadata references, fix reading order, add missing meta blocks, and refresh stale _meta indexes. Use when: the knowledge-meta check fails, CI reports stale indexes, references do not resolve. Triggers on: "knowledge-meta failed", "broken reference", "stale _meta", "validate knowledge folders", "knowledge base check", "build.mjs --check".'
+description: 'Validate and repair the .arc42/.domain/.tech/.design/.backlog knowledge folders — resolve broken metadata references, fix reading order, add missing meta blocks, and refresh drifted _meta indexes. Use when: the knowledge-meta check fails, CI warns about drifted indexes, references do not resolve. Triggers on: "knowledge-meta failed", "broken reference", "stale _meta", "validate knowledge folders", "knowledge base check", "build.mjs --check".'
 ---
 
 # Knowledge base validate
@@ -9,7 +9,7 @@ description: 'Validate and repair the .arc42/.domain/.tech/.design/.backlog know
 
 Run the `knowledge-meta` check over a repository's knowledge folders and repair
 whatever it reports: unresolved references, inconsistent reading order, missing
-or malformed `meta` blocks, and stale committed `_meta/` indexes.
+or malformed `meta` blocks, and drifted committed `_meta/` indexes.
 
 ## Steps
 
@@ -49,21 +49,33 @@ or malformed `meta` blocks, and stale committed `_meta/` indexes.
 
 3. **Re-run the check** until it exits `0`.
 
-4. **Refresh the derived indexes** and commit them:
+4. **Refresh the derived indexes** if you want this branch current:
 
    ```
-   node .github/tools/knowledge-meta/build.mjs
-   git diff --stat -- "*_meta/*.json"
+   ./build/Update-KnowledgeIndex.ps1
    ```
 
-   Output is deterministic — no timestamps — so a clean `git diff` means the
-   committed indexes were already current. Any diff must be committed alongside
-   the Markdown change that caused it, otherwise CI fails on stale indexes.
+   Output is deterministic — no timestamps — so "nothing changed" means the
+   committed indexes were already current.
+
+   Committing the refresh is optional and usually not what you want. CI only
+   *warns* about drifted indexes, and the nightly job reconciles the default
+   branch in one pull request; regenerating them alongside an ordinary chapter
+   edit is what makes the generated JSON conflict on merge. Commit the refresh
+   when something is about to read the indexes from this branch — a release, a
+   local consumer — and otherwise leave it. See
+   `knowledge-derived-artifacts.instructions.md`.
 
 ## When CI fails but local is clean
 
-The workflow runs the same two commands. A CI-only failure almost always means
-the `_meta/` changes were not committed. Re-run step 4 and commit the result.
+A CI failure is about the *authored Markdown*, not the indexes: the workflow
+fails only on an unresolved reference or an inconsistent reading order, which is
+step 1 above. Drifted `_meta/` files produce a `::warning::` and never fail the
+run, so "the indexes were not committed" is not the explanation.
+
+If step 1 exits `0` locally but CI is red, compare against the merge result
+rather than your branch tip — a reference can break when two branches land
+together even though each was clean on its own.
 
 If the generator itself is missing from the repository, install it with the
 `knowledge-base-init` skill rather than copying files ad hoc.
