@@ -66,28 +66,56 @@ partial adoption is fully supported.
    filters to the adopted folders and change the branch name if the repository's
    default branch is not `main`.
 
+   This workflow *fails* on a broken reference or an inconsistent reading order,
+   and only *warns* when the committed indexes have drifted — see step 5 for why.
+
    If the repository has no GitHub Actions setup, skip this step and tell the
    user the generator must be run manually before committing.
 
-5. **Offer repository routing policy.** Show the user `assets/routing-snippet.md`
+5. **Install the two refresh paths.** Because the CI check no longer forces a
+   contributor to regenerate the indexes in their pull request — which is what
+   made those generated files conflict on merge — the repository needs a
+   deliberate way to refresh them instead. Install both:
+
+   - Copy `assets/build/Update-KnowledgeIndex.ps1` from the plugin root into
+     `build/Update-KnowledgeIndex.ps1`. This is the on-demand refresh: it wraps
+     the generator, takes `-Scope` and `-Check`, and reports which index files
+     moved. Put it wherever the repository keeps its scripts and adjust the
+     paths quoted elsewhere in this step if that is not `build/`.
+   - Copy `assets/workflows/knowledge-meta-nightly.yml` into
+     `.github/workflows/knowledge-meta-nightly.yml`. This is the scheduled
+     reconcile: it regenerates the indexes on the default branch and opens a
+     single pull request when — and only when — something drifted.
+
+   Two things to tune in the nightly workflow, both flagged in its header
+   comment: the `cron` time (put it ahead of any release job that reads the
+   indexes) and `REFRESH_BRANCH` (force-pushed on every run, so nothing else may
+   use that branch name).
+
+   The convention behind this split is in
+   `knowledge-derived-artifacts.instructions.md`. If the repository has no
+   GitHub Actions, install the script alone and tell the user refresh is now
+   entirely manual.
+
+6. **Offer repository routing policy.** Show the user `assets/routing-snippet.md`
    from the plugin root and offer to merge the relevant parts into the
    repository's `.github/copilot-instructions.md` and routing instructions. This
    is optional and repository-specific — never apply it silently.
 
-6. **Generate the indexes.**
+7. **Generate the indexes.**
 
    ```
-   node .github/tools/knowledge-meta/build.mjs
+   ./build/Update-KnowledgeIndex.ps1
    ```
 
    This writes `_meta/graph.json` and `_meta/index.json` at the repository root
-   and inside each adopted folder. Commit the generated files — CI compares
-   against them.
+   and inside each adopted folder, and lists what changed. Commit the generated
+   files — they are checked in so consumers can read them without a build step.
 
-7. **Verify.**
+8. **Verify.**
 
    ```
-   node .github/tools/knowledge-meta/build.mjs --check
+   ./build/Update-KnowledgeIndex.ps1 -Check
    ```
 
    Exit code `0` means every reference resolves and reading order is consistent.
@@ -97,7 +125,9 @@ partial adoption is fully supported.
 ## Notes
 
 - The generator resolves the repository root from the current working directory;
-  pass `--root <path>` when running it from elsewhere.
+  pass `--root <path>` when running it from elsewhere. The PowerShell wrapper
+  resolves it from the enclosing git working tree instead, so it runs from
+  anywhere in the repository.
 - Never hand-edit anything under `_meta/`; see
   `knowledge-derived-artifacts.instructions.md`.
 - Once the folders exist, the plugin's instruction files auto-apply to them, and

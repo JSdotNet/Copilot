@@ -221,6 +221,110 @@ export function slugify(text) {
         .replace(/\s/g, "-");
 }
 
+const SUMMARY_MAX_LENGTH = 300;
+
+/** Reduce a Markdown run to the plain text a list view can show on one line. */
+function toPlainText(markdown) {
+    return markdown
+        .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1") // image → its alt text
+        .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // link → its label
+        .replace(/`([^`]+)`/g, "$1") // code span → its content
+        .replace(/(\*\*|__|\*|_)(?=\S)(.+?)(?<=\S)\1/g, "$2") // emphasis markers
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+/**
+ * The document's lede and how many diagrams it embeds — the two things a
+ * viewer needs to render a folder's list view, and the two things it would
+ * otherwise have to open every file to learn.
+ *
+ * Both are by-products of a parse the generator is doing anyway, so carrying
+ * them on the derived index is what lets a consumer list a knowledge folder
+ * without reading a single Markdown file.
+ *
+ * `summary` is the blockquote that
+ * `knowledge-chapter-metadata.instructions.md` places directly after the
+ * file-level `meta` block, falling back to the first paragraph of prose when
+ * the file has no blockquote. Either way it is the text *before* the first
+ * `##`, reduced to plain text and capped at ~300 characters on a word
+ * boundary. `null` when the document opens straight into a chapter.
+ *
+ * `diagrams` counts embedded diagrams across the whole document: fenced
+ * ```mermaid blocks plus Markdown image embeds. Both are diagrams to a reader,
+ * and the knowledge folders use images for nothing else.
+ */
+export function documentDigest(markdown) {
+    const lines = markdown.split(/\r?\n/);
+
+    let diagrams = 0;
+    let inFence = false;
+    let fenceChar = null;
+
+    // The lede lives before the first `##`; `blockquote` wins over `paragraph`
+    // whichever order they appear in, per the metadata convention.
+    let seenTitle = false;
+    let ledeDone = false;
+    const blockquote = [];
+    const paragraph = [];
+    let collecting = null;
+
+    for (const line of lines) {
+        const fence = line.match(/^\s*(`{3,}|~{3,})\s*([^\s`~]*)/);
+        if (fence) {
+            if (!inFence) {
+                inFence = true;
+                fenceChar = fence[1][0];
+                if (fence[2].toLowerCase() === "mermaid") diagrams++;
+            } else if (fence[1][0] === fenceChar) {
+                inFence = false;
+                fenceChar = null;
+            }
+            collecting = null;
+            continue;
+        }
+        if (inFence) continue;
+
+        for (const _ of line.matchAll(/!\[[^\]]*\]\([^)]*\)/g)) diagrams++;
+
+        if (ledeDone) continue;
+
+        const heading = /^(#{1,6})\s+/.exec(line);
+        if (heading) {
+            // The first `#` opens the lede region; anything deeper closes it.
+            if (heading[1].length === 1 && !seenTitle) seenTitle = true;
+            else if (seenTitle) ledeDone = true;
+            collecting = null;
+            continue;
+        }
+        if (!seenTitle) continue;
+
+        if (line.trim() === "") {
+            collecting = null;
+            continue;
+        }
+        if (/^\s*>/.test(line)) {
+            if (collecting !== "blockquote" && blockquote.length) continue; // keep the first only
+            collecting = "blockquote";
+            blockquote.push(line.replace(/^\s*>\s?/, ""));
+        } else {
+            if (collecting !== "paragraph" && paragraph.length) continue;
+            collecting = "paragraph";
+            paragraph.push(line);
+        }
+    }
+
+    const source = blockquote.length ? blockquote : paragraph;
+    let summary = source.length ? toPlainText(source.join(" ")) : null;
+    if (summary && summary.length > SUMMARY_MAX_LENGTH) {
+        const clipped = summary.slice(0, SUMMARY_MAX_LENGTH);
+        const lastSpace = clipped.lastIndexOf(" ");
+        summary = `${(lastSpace > 0 ? clipped.slice(0, lastSpace) : clipped).replace(/[.,;:—-]$/, "")}…`;
+    }
+
+    return { summary: summary || null, diagrams };
+}
+
 /**
  * Validate one block's `type` against its folder's vocabulary.
  *

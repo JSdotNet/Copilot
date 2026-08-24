@@ -3,7 +3,7 @@
 Encapsulates the `.arc42` / `.domain` / `.tech` / `.design` / `.backlog`
 knowledge-folder convention: durable, cross-linked Markdown knowledge with
 machine-readable `meta` blocks, derived `_meta/` indexes, a graph canvas, and a
-CI check that keeps references and indexes honest.
+CI check that keeps references honest.
 
 ## Installation
 
@@ -18,7 +18,8 @@ Re-run the same command after changing the plugin.
 Each knowledge folder holds Markdown chapters. Every chapter carries a `meta`
 block declaring its identity, status, reading order, and its relationships to
 other chapters. A generator walks the corpus and writes derived indexes under
-`_meta/`, which CI validates on every pull request.
+`_meta/`, which CI validates on every pull request and a scheduled job keeps
+current.
 
 | Folder | Holds |
 |--------|-------|
@@ -36,8 +37,9 @@ Adoption is partial by design — a repository may take only `.domain` and
 ### Skill: `knowledge-base-init`
 
 Scaffolds the convention into a repository: creates the chosen folders, installs
-the generator to `.github/tools/knowledge-meta/`, installs the CI workflow,
-offers repository routing policy, and generates the first indexes.
+the generator to `.github/tools/knowledge-meta/`, installs the CI workflow and
+the two refresh paths, offers repository routing policy, and generates the
+first indexes.
 
 **Trigger keywords:** `knowledge base`, `knowledge folders`, `scaffold .arc42`,
 `scaffold .domain`, `set up .tech`, `set up .design`, `knowledge-meta`,
@@ -131,6 +133,12 @@ generator writes, so the live view and the committed indexes never disagree.
 
 ### Tooling: `knowledge-meta`
 
+```powershell
+./build/Update-KnowledgeIndex.ps1                      # refresh, and say what moved
+./build/Update-KnowledgeIndex.ps1 -Scope .tech
+./build/Update-KnowledgeIndex.ps1 -Check               # validate, write nothing
+```
+
 ```bash
 node .github/tools/knowledge-meta/build.mjs            # write every adopted scope
 node .github/tools/knowledge-meta/build.mjs --check    # CI: verify only
@@ -140,7 +148,7 @@ node .github/tools/knowledge-meta/build.mjs --root ../other-repo
 
 Output is deterministic — no timestamps — so a clean `git diff` proves the
 committed indexes are current. See `tools/knowledge-meta/README.md` for the
-output shape.
+output shape and for when to refresh.
 
 ### Tooling: `knowledge-tech`
 
@@ -157,7 +165,9 @@ for technologies that do not appear in package manifests.
 
 | File | Purpose |
 |------|---------|
-| `assets/workflows/knowledge-meta.yml` | CI workflow template installed by the init skill |
+| `assets/workflows/knowledge-meta.yml` | CI workflow template installed by the init skill: fails on broken references, warns on drifted indexes |
+| `assets/workflows/knowledge-meta-nightly.yml` | Scheduled index refresh; opens one pull request when the output drifted, nothing when it did not |
+| `assets/build/Update-KnowledgeIndex.ps1` | On-demand index refresh, with `-Scope` and `-Check`; reports which index files moved |
 | `assets/routing-snippet.md` | Optional repository-local context-loading and routing policy |
 
 ### Hook configuration
@@ -165,6 +175,22 @@ for technologies that do not appear in package manifests.
 - `hooks.json` adds a session-start guardrail: knowledge folders are task-scoped
   context rather than baseline context, `meta` blocks are mandatory on every
   chapter, and `_meta/` is never hand-edited.
+
+## Migrating to schema version 3
+
+Schema version 3 is **additive** over 2 and needs no authoring changes. A `file`
+entry in `index.json` may now carry two optional fields — `summary`, the
+document's lede, and `diagrams`, how many mermaid blocks and images it embeds —
+so a viewer can render a knowledge folder's list view without opening any
+Markdown. `graph.json` is unchanged apart from the version number.
+
+Re-sync `.github/tools/knowledge-meta/` from this plugin and regenerate; the
+diff is the new fields and the bumped `schemaVersion`. Also install the two
+refresh assets that ship with this version — `assets/build/Update-KnowledgeIndex.ps1`
+and `assets/workflows/knowledge-meta-nightly.yml` — and re-copy
+`assets/workflows/knowledge-meta.yml`, whose staleness step now warns instead of
+failing. See `knowledge-derived-artifacts.instructions.md` for the policy and
+for the freshness contract a runtime consumer of these indexes has to honour.
 
 ## Migrating to schema version 2
 
@@ -238,10 +264,13 @@ After running `knowledge-base-init`, a repository that adopted everything has:
 ├── _meta/{graph.json,index.json}
 └── <item>.md
 _meta/{graph.json,index.json}          # repository-wide rollup
+build/
+└── Update-KnowledgeIndex.ps1          # on-demand index refresh
 .github/
 ├── tools/knowledge-meta/              # the generator
 ├── tools/knowledge-tech/              # deterministic package inventory scripts
-└── workflows/knowledge-meta.yml       # the CI check
+├── workflows/knowledge-meta.yml       # the CI check
+└── workflows/knowledge-meta-nightly.yml   # the scheduled index refresh
 ```
 
 ## Enforcement
@@ -255,8 +284,13 @@ Five layers, weakest to strongest:
 3. **`meta` block rules** make every chapter's relationships explicit and
    checkable.
 4. **`build.mjs --check`** fails on unresolved references and inconsistent order.
-5. **The CI workflow** fails the pull request on broken references or stale
-   indexes.
+5. **The CI workflow** fails the pull request on broken references or
+   inconsistent reading order. Drifted `_meta/` indexes are reported as a
+   warning, not a failure — making every knowledge pull request carry a
+   regenerated index is what turns those files into merge conflicts. Refresh is
+   deliberate instead: `build/Update-KnowledgeIndex.ps1` on demand, the nightly
+   workflow on a schedule. A consumer that reads an index at runtime owes the
+   other half of that contract — re-read any source newer than the index.
 
 ## License
 

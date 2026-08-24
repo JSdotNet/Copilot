@@ -14,7 +14,10 @@ import { parseDocument, folderKindForPath, resolveType, slugify, typeIssues, esc
 
 /** Every knowledge folder this convention recognizes. A repository adopts any subset. */
 export const KNOWLEDGE_FOLDERS = [".arc42", ".domain", ".backlog", ".tech", ".design"];
-export const SCHEMA_VERSION = 2;
+// Shared by both artifacts, because they ship as one release. Version 3 is
+// additive over 2: `index.json` file entries gained optional `summary` and
+// `diagrams` fields, and `graph.json` is unchanged.
+export const SCHEMA_VERSION = 3;
 export const REPO_SCOPE = ".";
 export const GENERATOR = ".github/tools/knowledge-meta/build.mjs";
 

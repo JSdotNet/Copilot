@@ -1,6 +1,6 @@
 ---
 applyTo: "**/_meta/**"
-description: Convention for derived index artifacts — where generated, machine-readable views of canonical Markdown live, how they are named, and what every such file must declare.
+description: Convention for derived index artifacts — where generated, machine-readable views of canonical Markdown live, how they are named, what every such file must declare, how CI and scheduled refresh keep them current, and how a consumer reads one without going stale.
 ---
 
 # Derived metadata artifacts (`_meta/`)
@@ -90,8 +90,27 @@ payload:
 - **One generator, one artifact per scope.** A generator that produces several
   scopes writes each to its own `_meta/`; it does not merge them into one
   file.
-- **CI enforces freshness.** Every derived artifact needs a workflow that
-  regenerates it and fails when the committed copy differs.
+- **CI blocks on source errors, warns on staleness.** Every derived artifact
+  needs a workflow, and that workflow fails on anything wrong in the *authored*
+  Markdown — an unresolvable reference, an inconsistent reading order — because
+  those are real errors that do not fix themselves. It also regenerates the
+  artifact and compares it against the committed copy, but reports a difference
+  as a warning. Making every pull request carry a regenerated artifact is what
+  turns derived files into merge conflicts: two branches that each edit one
+  chapter both rewrite the same index, and the only way to resolve the JSON is
+  to re-run the generator — busywork on a file whose only correct content is
+  whatever the generator emits.
+- **Refresh is deliberate.** Because CI no longer forces it, a repository owes
+  contributors two ways to refresh: an on-demand command for anyone who wants
+  the indexes current in their own branch, and a scheduled job that reconciles
+  the default branch by opening a single pull request when the output drifted,
+  and doing nothing when it did not. Never regenerate on every knowledge edit.
+- **Consumers re-check what they read.** A consumer that reads a derived
+  artifact at runtime compares each entry's source file against the artifact
+  itself and re-reads the entries that are newer, rather than trusting the
+  artifact wholesale. One `stat` per entry, not a re-parse of the corpus. This
+  is what makes a warning-only freshness check safe: an edit made between
+  refreshes is never displayed stale.
 - **Generators live in `.github/tools/<tool-name>/`** with a `README.md`
   documenting usage and output shape.
 
@@ -101,8 +120,46 @@ payload:
 2. Add the generator under `.github/tools/<tool-name>/`, with a README.
 3. Emit the required envelope and keep the output deterministic.
 4. Write it to `<scope>/_meta/<artifact>.<format>`.
-5. Add a CI workflow that runs the generator and fails on a stale artifact.
-6. Reference it from the instructions file of the folder it describes.
+5. Add a CI workflow that runs the generator's validation and fails on it, and
+   that regenerates-and-diffs the artifact but only warns when it differs.
+6. Wire it into both refresh paths: the on-demand command a contributor runs in
+   their branch, and the scheduled job that reconciles the default branch.
+7. Reference it from the instructions file of the folder it describes.
+
+## Consuming a derived artifact
+
+A derived artifact used to be a convenience for tooling. Once something reads
+one at runtime — an app drawing a panel, a viewer listing a folder — it becomes
+load-bearing, and the freshness rules above only hold up if the consumer holds
+up its end.
+
+**Read the index, then verify each entry against its source.** For every entry
+the consumer is about to present, compare the modification time of the entry's
+`path` against that of the artifact file. When the source is newer, re-read
+that one source and use what it says; when it is not, trust the entry.
+
+```text
+for each entry in artifact.entries:
+    if mtime(entry.path) > mtime(artifact):
+        re-read entry.path      # this one drifted
+    else:
+        use entry               # index is authoritative
+```
+
+- **One `stat` per entry, never a re-parse.** The point of the index is to
+  avoid opening every source document. A staleness check that reads the files
+  it is checking has given that back.
+- **Re-read the drifted entries only.** A single edited chapter must not force
+  a full rebuild; the whole design is that the common case touches nothing.
+- **Fail soft on a missing or unreadable artifact.** A repository that has
+  never run the generator, or a scope it does not adopt, is a normal state —
+  fall back to reading the sources rather than erroring.
+- **Compare strictly newer.** A fresh clone stamps sources and artifact with
+  the same checkout time; treating a tie as stale re-reads the entire corpus on
+  first launch for no gain.
+
+Also honour `schemaVersion`: a consumer that does not recognise the value must
+fall back to the sources rather than guess at the payload shape.
 
 ## Knowledge artifacts
 

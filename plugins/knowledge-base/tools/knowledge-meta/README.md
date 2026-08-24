@@ -12,6 +12,17 @@ the `knowledge-derived-artifacts` instructions.
 
 ## Usage
 
+Prefer the wrapper — it reports which index files actually moved, so a refresh
+that changed nothing is visibly a no-op:
+
+```powershell
+./build/Update-KnowledgeIndex.ps1                 # every adopted scope
+./build/Update-KnowledgeIndex.ps1 -Scope .tech    # one scope only
+./build/Update-KnowledgeIndex.ps1 -Check          # validate, write nothing
+```
+
+The generator underneath, for CI and for anywhere pwsh is not available:
+
 ```bash
 # Regenerate every adopted scope
 node .github/tools/knowledge-meta/build.mjs
@@ -31,9 +42,27 @@ that actually exist produce a scope, so a repository that adopts just `.domain`
 and `.arc42` never grows `_meta/` folders for the rest. The generator exits `2`
 when no knowledge folder is present at all.
 
-Run the generator whenever you add, rename, or re-link a chapter or file in a
-knowledge folder. `.github/workflows/knowledge-meta.yml` enforces both that
-every reference resolves and that the committed indexes are current.
+### When to run it
+
+**Not on every edit.** Regenerating the indexes in the same pull request that
+edits a chapter is what makes them conflict on merge: two branches that each
+touch one chapter both rewrite the same JSON, and the only way to resolve it is
+to re-run the generator. So refresh is deliberate and happens in two places:
+
+| Path | What it is | When |
+|---|---|---|
+| `./build/Update-KnowledgeIndex.ps1` | on demand | You want the indexes current in your own branch — before a release, or because something reads them locally. |
+| `.github/workflows/knowledge-meta-nightly.yml` | scheduled | Reconciles the default branch, opening one pull request when the output drifted and nothing when it did not. |
+
+`.github/workflows/knowledge-meta.yml` **fails** on a broken reference or an
+inconsistent reading order — those are errors in the authored Markdown and they
+do not fix themselves — and only **warns** when the committed indexes have
+drifted.
+
+That is safe because a consumer reading these indexes at runtime is required to
+compare each entry's source file against the index it came from and re-read the
+entries that are newer. See `knowledge-derived-artifacts.instructions.md` for
+both halves of the contract.
 
 ## Outputs
 
@@ -60,7 +89,7 @@ followed, so a scoped graph stays about its own folder.
 |---|---|
 | `metadata.mjs` | Parses the `meta` blocks — the single implementation of the schema defined by the `knowledge-chapter-metadata` instructions. Shared with the `knowledge-graph` canvas. |
 | `graph.mjs` | Graph construction, scope discovery, and scope projection. Imported by the CLI *and* by the `knowledge-graph` canvas, so the written indexes and the live view can never disagree. |
-| `outline.mjs` | Reading-order resolution from the `order` field on each directory's root document. |
+| `outline.mjs` | Reading-order resolution from the `order` field on each directory's root document, plus the per-file lede and diagram count a list view needs. |
 | `build.mjs` | CLI wrapper: writes both artifacts per scope, prints stats, exits non-zero on errors. |
 
 This folder is self-contained — copy it into a repository as
@@ -74,7 +103,7 @@ mappable to D3, vis.js, or Sigma.
 
 ```jsonc
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "generatedBy": ".github/tools/knowledge-meta/build.mjs",
   "scope": ".tech",
   "sources": [".tech"],
@@ -214,19 +243,22 @@ sorting filenames.
 
 ```jsonc
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "generatedBy": ".github/tools/knowledge-meta/build.mjs",
   "scope": ".domain",
   "sources": [".domain"],
   "problems": [],
   "entries": [
     { "type": "file", "name": "context-map.md", "path": ".domain/context-map.md",
-      "title": "Shop", "kind": "context-map", "status": "draft", "root": true },
+      "title": "Shop", "kind": "context-map", "status": "draft",
+      "summary": "How the shop's bounded contexts relate.", "root": true },
     { "type": "directory", "name": "ordering", "path": ".domain/ordering",
       "title": "Ordering",
       "children": [
         { "type": "file", "name": "domain.md", "path": ".domain/ordering/domain.md",
-          "title": "Ordering", "kind": "domain", "status": "draft", "root": true },
+          "title": "Ordering", "kind": "domain", "status": "draft",
+          "summary": "Owns the lifecycle of a customer order.", "diagrams": 1,
+          "root": true },
         { "type": "file", "name": "features.md", "path": ".domain/ordering/features.md",
           "title": "Ordering", "kind": "features", "status": "draft" }
       ] }
@@ -239,6 +271,32 @@ identically-titled files of a bounded context. It is omitted for folders that
 define no value set. On an `area` entry it is the knowledge folder itself
 (`domain`, `arc42`, …), which is that entry's equivalent answer to "what kind of
 thing is this".
+
+### `summary` and `diagrams`
+
+Two optional fields on a `file` entry, both omitted when they would be empty.
+They exist so a viewer can render a knowledge folder's **list view** — a lede
+under each title, a "3 diagrams" badge beside a chapter — without opening a
+single Markdown file. Without them a consumer has to parse the whole corpus to
+draw a list, which is the exact cost the index was built to avoid. Both fall
+out of the parse the generator already performs, so they cost nothing to emit.
+
+**`summary`** — the document's lede. That is the blockquote the
+`knowledge-chapter-metadata` instructions place directly after the file-level
+`meta` block; a document with no blockquote falls back to its first paragraph
+of prose. Either way it is the text before the first `##`, reduced to plain
+text (links and emphasis flattened to their content) and capped at 300
+characters on a word boundary with an ellipsis. Omitted when the document opens
+straight into a chapter.
+
+**`diagrams`** — how many diagrams the document embeds, counting mermaid code
+fences and Markdown image embeds across the whole file. Both are diagrams to a
+reader, and the knowledge folders use images for nothing else. A fence nested
+inside a wider fence is content, not a diagram, and is not counted. Omitted when
+the document embeds none.
+
+Neither field is a reference, so neither produces a graph edge; they do not
+appear in `graph.json` at all.
 
 At the repository scope the top level is `type: "area"` — one entry per
 knowledge folder, in canonical area order.
