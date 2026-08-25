@@ -257,7 +257,7 @@ for technologies that do not appear in package manifests.
 | `assets/workflows/knowledge-meta.yml` | CI workflow template installed by the init skill: fails on broken references, warns on drifted indexes |
 | `assets/workflows/knowledge-meta-nightly.yml` | Scheduled index refresh; opens one pull request when the output drifted, nothing when it did not |
 | `assets/build/Update-KnowledgeIndex.ps1` | On-demand index refresh, with `-Scope` and `-Check`; reports which index files moved |
-| `assets/routing-snippet.md` | Optional repository-local context-loading and routing policy |
+| `assets/routing-snippet.md` | Optional repository-local context-loading and routing policy, plus the `Read(_meta/**)` deny rule that keeps generated indexes out of agent context |
 | `assets/code-sync-protocol.md` | Shared rules for the `capture-*` / `build-*` skills: counterpart resolution, evidence rules including why unit tests are first-class evidence for capture, the five-way drift verdict, status rules, index regeneration, and the report table. An asset rather than an instruction, because an honest `applyTo` glob for these rules would have to cover source trees and would break the plugin's silence in non-adopting repositories |
 
 ### Hook configuration
