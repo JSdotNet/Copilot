@@ -165,6 +165,12 @@ did at its first, and a run that outgrows the window loses to compaction exactly
 it was carrying that context for. Handoff caps the **session**, not the run: the run
 continues in a fresh session, from the state already on disk.
 
+The `session-handoff` skill is the procedure for the steps below — it captures the state,
+writes the brief the next session reads, marks the run, and hands back the message to paste.
+Use it rather than improvising a handoff. It also covers the two cases this section does not:
+a session with no run at all, and work whose next step belongs to a different repository
+(where the run cannot follow, because run state is stored per project).
+
 The plugin's telemetry hook announces the gauge crossings that drive this — once per
 crossing, on the tool call that crosses it, latched so it does not repeat:
 

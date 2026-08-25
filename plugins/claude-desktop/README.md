@@ -144,6 +144,13 @@ with no PR yet are reported, not remediated; raising the PR stays a deliberate c
   it. Reads `.claude/start.md` (template:
   [`resources/claude-start-template.md`](resources/claude-start-template.md)), falling back
   to `.claude/orch-context.md`, the repository's getting-started docs, and then inference.
+- `skills/session-handoff/` — package this session's state into a brief another session can
+  continue from: the same worktree, a new worktree, or a different repository. Writes the
+  brief to `~/.claude/handoffs/` (template:
+  [`resources/session-handoff-template.md`](resources/session-handoff-template.md)), marks
+  the orchestration run handed off when there is one, and hands back the paste-ready first
+  message. Run it when the 85% context warning fires, or before a stage known to be
+  expensive.
 
 #### Automation Skills
 
