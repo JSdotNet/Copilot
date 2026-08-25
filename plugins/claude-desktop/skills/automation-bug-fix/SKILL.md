@@ -1,124 +1,138 @@
 ---
 name: automation-bug-fix
 description: >
-  Pick up all open GitHub issues labelled 'bug', let the user confirm the selection, claim
-  each one, then hand back a ready-to-run orch-bug invocation per issue for the user to
-  launch as its own session. Use when: triaging the bug backlog, preparing parallel
-  bug-fix work, or running a scheduled bug sweep to keep the backlog moving.
+  Pick the single highest-priority open GitHub issue labelled 'bug', claim it, and resolve
+  it in this session by running orch-bug through to Personal Validation. One issue per run,
+  no extra sessions. Use when: working the bug backlog one item at a time, or running a
+  scheduled bug sweep that has to finish its work unattended.
 ---
 
 # Automation: Bug Fix
 
 ## Purpose
 
-Fetch every open GitHub issue labelled `bug`, deduplicate against already-active work, let
-the user confirm the selection, claim each confirmed issue, and hand back one ready-to-run
-`orch-bug` invocation per issue.
+Take the bug backlog down by exactly one. Fetch the open GitHub issues labelled `bug`, skip
+everything already in flight, select the single highest-priority remaining issue, claim it,
+and run `orch-bug` on it **in this session** — through reproduction, root cause, TDD fix, and
+verification, stopping at Personal Validation.
 
-This skill **dispatches; it does not orchestrate.** It deliberately does not spawn an agent
-per issue. `orch-bug` runs through the `orchestrator` agent, which must own its own session
-to hold the Personal Validation gate, write dashboard state, and ask the user a question — a
-backgrounded orchestrator can do none of the three. See **Session Ownership** and
-**Sub-Agent Constraints** in `instructions/orch-execution-model.instructions.md`. The user
-launches each handoff as its own session, where `orch-bug` behaves exactly as designed.
+## One Issue Per Run
+
+This skill handles **one issue, in one session, per run.** It never prepares work for a
+second session and never spawns an agent to run the orchestration.
+
+That is a hard constraint, not a preference. `orch-bug` runs through the `orchestrator`
+agent, which must own its session to hold the Personal Validation gate, write dashboard
+state, and ask the user a question — and a scheduled routine cannot open a second session to
+give it one. See **Session Ownership** and **Sub-Agent Constraints** in
+`instructions/orch-execution-model.instructions.md`. Because the scope is a single issue,
+this session *is* the owner session and `orch-bug` behaves exactly as designed.
+
+To work more than one bug, run this skill again. Each run picks the next issue, because the
+previous one is now claimed and filtered out as in flight.
 
 ## Inputs
 
 - GitHub repository in `owner/repo` format (required).
-- Additional label filters to narrow the set — e.g. `critical`, `sprint-42` (optional;
-  default: `bug` only).
-- Maximum issues to claim and hand off in one run (default: `3`; prevents claiming the
-  whole backlog at once).
+- Additional label filters to narrow the candidate set — e.g. `critical`, `sprint-42`
+  (optional; default: `bug` only).
 - Severity hint for `orch-bug`: `critical`, `high`, `medium`, or `low`
   (optional; default: derived from issue labels when present, otherwise `medium`).
-- Base branch each session should branch from (default: repository default branch).
+- Base branch to branch from (default: repository default branch).
+- Selection override: an explicit issue number to work instead of the ranked pick (optional).
 
-> Issues are fetched regardless of current assignee. Once an issue is confirmed, it is
-> assigned to `@me` and labelled `in-progress` so the handoff is not picked up twice.
+> Candidates are fetched regardless of current assignee. The selected issue is assigned to
+> `@me` and labelled `in-progress` **before** work starts, so a later run — or a run on
+> another machine — filters it out instead of picking it up twice.
 
 ## Skill Dependencies
 
-This skill orchestrates the following installed skills:
+This skill invokes the following installed skill:
 
-- **`orch-bug`** (`plugins/claude-desktop`) — drives the full bug-resolution workflow:
-  triage, root-cause analysis, TDD fix, testing, code review, and local-run monitoring.
-  This skill does not invoke it — it prepares the invocation the user runs per issue.
+- **`orch-bug`** (`plugins/claude-desktop`) — drives the full bug-resolution workflow: scope
+  discovery, reproduction, root-cause analysis, TDD fix, verification, and local-run
+  monitoring, up to Personal Validation. This skill selects and claims the issue, then hands
+  the session to it.
+
+If `orch-bug` is not installed, work the stages listed in Phase 4 manually and say in the
+summary that the run went without the orchestration wrapper.
 
 ## Workflow
 
-### Phase 1 — Fetch Open Bug Issues
+### Phase 1 — Fetch Candidate Bug Issues
 
 1. List all open issues labelled `bug` (plus any additional label filters):
 
    ```bash
    gh issue list --repo <owner/repo> --state open --label "bug" \
-     --json number,title,body,labels,assignees,milestone,url
+     --json number,title,body,labels,assignees,milestone,url,createdAt
    ```
 
-2. Present the full list to the user — include **all** unassigned and assigned issues:
+2. If no issues come back, report "no open bug issues" and stop. Under a schedule this is a
+   clean no-op run.
 
-   | # | Title | Labels | Assignees | Milestone |
-   |---|-------|--------|-----------|-----------|
-   | #42 | `Login fails with special chars` | `bug`, `high` | `@alice` | v2.1 |
-   | #37 | `NPE on empty cart` | `bug` | — | — |
+### Phase 2 — Filter Out Work Already In Flight
 
-3. If no issues are found, report that and stop.
+3. Drop every candidate that is already being worked:
 
-### Phase 2 — Deduplicate Against Active Work
+   - Labelled `in-progress` — a previous run of this skill claimed it.
+   - A branch or worktree already carries its issue number. Check with
+     `git --no-pager worktree list` and `git branch --all`.
+   - An open pull request references it: `gh pr list --repo <owner/repo> --state open
+     --search "<number>"`.
+   - Assigned to somebody other than the current user.
 
-4. Check for work already in flight on the fetched issue numbers: run
-   `git --no-pager worktree list` and `git branch --all` and match branch names carrying
-   the issue number. Mark any issue that already has one as **skipped**. An issue already
-   labelled `in-progress` counts as in flight — a previous run of this skill claimed it.
+4. If every candidate is filtered out, report that the backlog is fully in flight and stop
+   without claiming anything.
 
-5. Show the deduplication result:
+### Phase 3 — Select One Issue
 
-   | # | Title | Work Exists | Action |
-   |---|-------|-------------|--------|
-   | #42 | `Login fails with special chars` | No | Will start |
-   | #37 | `NPE on empty cart` | Yes — worktree `fix/37-empty-cart` | Skipped |
+5. Rank the remaining candidates and take the **top one only**:
 
-### Phase 3 — User Confirmation
+   a. Severity from labels, highest first: `critical` > `high` > `medium` > `low`. An issue
+      with no severity label sorts at the configured severity hint, defaulting to `medium`.
+   b. Break ties by age — oldest `createdAt` first, so nothing starves at the bottom.
 
-6. Ask the user to confirm which issues to prepare handoffs for:
-   - "All of the above" (up to the configured maximum).
-   - A specific subset by issue number.
+   When the selection override names an issue number, take that issue instead, and still
+   apply the Phase 2 in-flight check to it — report and stop if it is already being worked.
 
-   Do not proceed until the user confirms.
+6. Report the selection: the chosen issue, its derived severity, and the count of candidates
+   filtered out and left for later runs. Name the runner-up, so the next run's pick is
+   predictable.
 
-7. If the total exceeds the configured maximum of **3**, warn the user and ask them
-   to reduce the selection or raise the limit.
+7. **Confirmation depends on whether a user is there.**
 
-### Phase 4 — Claim and Prepare Handoffs
+   - **Interactive run:** ask the user to confirm the selected issue, or name a different
+     one. Do not proceed until they answer.
+   - **Unattended run** (scheduled routine, no user turn available): proceed without
+     confirmation. Three things make that safe — the scope is a single issue, the claim in
+     Phase 4 prevents a double pickup, and `orch-bug` still stops at Personal Validation, so
+     nothing reaches a pull request without the user.
 
-8. For each confirmed issue (sequentially, one at a time):
+### Phase 4 — Claim and Resolve
 
-   a. Determine severity from issue labels: `critical` → critical, `high` → high,
-      `medium` → medium, `low` → low. Fall back to the configured severity hint.
+8. Claim the issue before touching any code:
 
-   b. Claim the issue:
+   ```bash
+   gh issue edit <number> --repo <owner/repo> --add-assignee "@me"
+   gh issue edit <number> --repo <owner/repo> --add-label "in-progress"
+   ```
 
-      ```bash
-      # Assign to current user
-      gh issue edit <number> --repo <owner/repo> --add-assignee "@me"
+   If the `in-progress` label does not exist in the repository yet, create it first:
 
-      # Mark as in progress
-      gh issue edit <number> --repo <owner/repo> --add-label "in-progress"
-      ```
+   ```bash
+   gh label create "in-progress" --repo <owner/repo> --color "0075ca" \
+     --description "Issue is actively being worked on"
+   ```
 
-      If the `in-progress` label does not yet exist in the repository, create it first:
+   If the claim fails (no write access, label creation rejected), stop here and report it.
+   Never start work on an issue that could not be claimed.
 
-      ```bash
-      gh label create "in-progress" --repo <owner/repo> --color "0075ca"         --description "Issue is actively being worked on"
-      ```
-
-   c. Emit the ready-to-run handoff for that issue: the prompt the user pastes as the first
-      message of a new session. Keep it verbatim and self-contained, so it works without
-      this conversation.
+9. Run `orch-bug` in **this session** with the issue context below. Pass the GitHub origin as
+   `githubIssue` to `start_run`, so the run reports its captured result and QA report back to
+   the issue.
 
    ```text
-   Use the orch-bug skill.
-
    Bug: "<issue title>"
    GitHub issue: #<number> in <owner/repo>
    URL: <issue url>
@@ -131,39 +145,32 @@ This skill orchestrates the following installed skills:
    Severity: <derived severity>
    Fix type: <"hotfix" if labelled hotfix or critical, otherwise "standard">
    Runtime validation target: local run + monitoring
-   Suggested branch: fix/<number>-<slug> from <base branch>
-
-   Work through all orch-bug stages:
-   1. Triage and reproduce the bug.
-   2. Identify the root cause.
-   3. Implement a TDD fix (failing test first, then minimal fix).
-   4. Verify no regressions.
-   5. Run locally and capture runtime evidence.
-
-   Preserve the GitHub issue origin above and pass it as `githubIssue` to `start_run`, so
-   the run reports its captured result and QA report back to the issue.
+   Branch: fix/<number>-<slug> from <base branch>
    ```
 
-9. **Never launch an agent to run the handoff.** Emitting the block is where this skill's
-   job ends. Spawning a background or worktree-isolated agent per issue would put the
-   orchestrator in a position where it cannot gate, ask, or track — the reason this skill
-   dispatches instead. If the user asks for the work to start now, hand them the first
-   handoff and let them run it in this session or a new one.
+   `orch-bug` owns the workflow from here: scope discovery, reproduction, root cause, a
+   failing-test-first fix, verification, and local runtime validation. It stops at Personal
+   Validation, and the pull request stays a separate, explicitly approved step.
+
+10. **Never spawn an agent to run the orchestration**, and never start a second issue in this
+    run — not even when the fix turns out to be trivial and the context still has room. The
+    next issue is the next run's job.
 
 ### Phase 5 — Summary
 
-10. Output a summary table:
+11. Output a summary:
 
-    | Issue | Title | Severity | Assigned | Label | Handoff |
-    |-------|-------|----------|----------|-------|---------|
-    | #42 | `Login fails with special chars` | High | `@me` | `in-progress` | Ready to run |
-    | #37 | `NPE on empty cart` | — | — | — | Skipped (work exists) |
+    | Field | Value |
+    |-------|-------|
+    | Issue worked | #42 — `Login fails with special chars` |
+    | Severity | High |
+    | Claimed | `@me`, `in-progress` |
+    | Outcome | Fix implemented, awaiting Personal Validation |
+    | Candidates deferred | 4 (next up: #37 — `NPE on empty cart`) |
+    | In flight, skipped | 2 |
 
-11. Tell the user how to launch: open one new session per handoff — a new worktree session
-    for each, so parallel fixes do not collide — and paste that issue's block as the first
-    message. Each session then runs `orch-bug` as its own foreground orchestration, free to
-    ask clarifying questions, hold Personal Validation, and report to the dashboard under
-    its own run.
+12. State what the next run will pick up, and what still needs the user — Personal Validation
+    on this fix, and the pull request behind it.
 
 ## Dashboard Interface
 
@@ -174,42 +181,44 @@ dashboard calls below and continue through standard chat interaction. Follow the
 for the tool cadence.
 
 - Open the dashboard per the shared contract, then call `start_run` with
-  `skillId: "automation-bug-fix"` and these stages: Fetch Open Bug Issues,
-  Deduplicate Against Active Work, User Confirmation, Claim and Prepare Handoffs,
-  Summary.
+  `skillId: "automation-bug-fix"` and these stages: Fetch Candidate Bug Issues, Filter Out
+  Work Already In Flight, Select One Issue, Claim and Resolve, Summary.
 - Before each phase, call `update_stage` with `status: "in_progress"`.
 - After each phase, call `update_stage` again with `status: "done"` (or
   `"blocked"`/`"skipped"`) and an `output` summary of that phase's result.
-- Call `finish_run` with the final status and a summary once every confirmed issue is
-  claimed and its handoff emitted. This run covers the dispatch only; each launched
-  `orch-bug` session opens its own run.
+- The `orch-bug` orchestration in Phase 4 opens its own run, with the selection run's
+  `githubIssue` metadata carried into its `start_run`. Reference that run id in this run's
+  Claim and Resolve stage output rather than duplicating its stages here.
+- Call `finish_run` once the orchestration reaches Personal Validation, or once the run
+  concludes without a selection.
 
 See `plugins/claude-desktop/mcp/orch-dashboard/README.md` for the full dashboard tool
 contract.
 
 ## Output
 
-- One ready-to-run `orch-bug` invocation per confirmed bug issue, for the user to launch as
-  its own session.
-- Each confirmed issue assigned to `@me` and labelled `in-progress`.
-- Summary table with issue, severity, assignment, label, and handoff status.
-- No agents spawned, and no issue claimed twice.
+- Exactly one bug issue selected, claimed, and resolved up to Personal Validation.
+- The remaining candidates ranked and deferred, with the next run's pick named.
+- No extra sessions requested, no agents spawned, and no issue claimed twice.
 
 ## Notes
 
-- Issues are fetched regardless of current assignee; assignment to `@me` happens when the
-  handoff is prepared, not before.
-- The `in-progress` label is created automatically if it does not exist.
-- Issues are claimed sequentially to avoid `gh` rate limits.
-- Hard default maximum is **3 issues per run** per repository. Raise it explicitly only when
-  needed, so a sweep does not claim the whole backlog.
-- Safe to run unattended or on a schedule: this skill only reads, claims, and reports. It
-  never writes code, never runs a build, and never opens a pull request — those all happen
-  in the sessions the user launches from its handoffs.
-- If the `orch-bug` skill is not installed, the handoff still carries the full bug context;
-  the session performs the stages manually without the structured orchestration wrapper.
+- Safe to run on a schedule. A run either resolves one bug or is a clean no-op; it never
+  claims more than it works, so an interrupted run leaves at most one issue labelled
+  `in-progress` with a branch to pick back up.
+- The `in-progress` label is created automatically if it does not exist. Remove it when an
+  issue is abandoned, or later runs will keep skipping it.
 - Severity is inferred from issue labels in this priority order:
-  `critical` > `high` > `medium` > `low`. When no matching label is found the
-  configured severity hint is used, defaulting to `medium`.
-- For Jira bug tickets, replace Phase 1 with a Jira skill query using the same
-  field mapping (key, summary, description, priority, fix-version).
+  `critical` > `high` > `medium` > `low`. When no matching label is found the configured
+  severity hint is used, defaulting to `medium`.
+- To work several bugs in parallel, launch several sessions yourself and run this skill once
+  in each — every run claims a different issue, so they do not collide. Do not try to make
+  one run cover several issues.
+- For Jira bug tickets, replace Phase 1 with a Jira skill query using the same field mapping
+  (key, summary, description, priority, fix-version).
+
+## Related Skills
+
+- `start-session-from-issue` — the same single-issue pickup for any issue filter, routing to
+  whichever `orch-*` skill matches the issue type rather than always `orch-bug`.
+- `pr-merge-ready` — takes the pull request behind this fix to merge-ready, one PR per pass.

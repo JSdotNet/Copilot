@@ -230,9 +230,10 @@ session.
 
 ## Related Skills
 
-- `start-session-from-issue` — the same "prepare, do not launch" contract, starting from
-  GitHub issues rather than from a session already in progress.
-- `automation-bug-fix` — prepares one ready-to-run `orch-bug` handoff per open bug.
+- `start-session-from-issue` — starts a session's work from a single GitHub issue, where
+  this skill continues work already in progress.
+- `automation-bug-fix` — claims the single highest-priority open bug and runs `orch-bug` on
+  it in its own session.
 - `push-branch` — get the commits onto the remote first when the next session will work from
   a clone rather than from this worktree.
 - `start` — how the next session brings the application back up.

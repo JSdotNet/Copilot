@@ -76,6 +76,10 @@ This skill orchestrates the following installed skills:
    - Proceed with implementing finding #1, or
    - Select a different finding by number.
 
+   **Unattended run** (scheduled routine, no user turn available): proceed with finding #1
+   without confirmation. Only one finding is implemented per run either way, and Phase 4 still
+   holds the pull request until the user is back.
+
 ### Phase 3 — Implement the Winning Finding
 
 9. Use the `tdd` skill to implement the fix in a Red-Green-Refactor cycle:

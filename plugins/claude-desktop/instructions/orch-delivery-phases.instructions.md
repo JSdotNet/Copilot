@@ -165,10 +165,11 @@ conventions)*
 Applies to every orchestration. Runs after the pull request and any documentation update
 work, and before Summary.
 
-- **Detect whether the session was started from a GitHub issue** by checking the session's
-  issue linkage metadata when available, then the handoff metadata produced by
-  `start-session-from-issue` and `automation-bug-fix` (`GitHub issue origin`, `Repository`,
-  `Issue Number`, and `Issue URL`), which arrives as the session's first message.
+- **Detect whether the session was started from a GitHub issue** by checking the run's
+  `githubIssue` metadata when available, then the issue origin block that
+  `start-session-from-issue` or `automation-bug-fix` recorded when it claimed the issue and
+  routed this orchestration (`GitHub issue origin`, `Repository`, `Issue Number`, and
+  `Issue URL`).
 - **Skip this phase** (mark it `skipped`) when no GitHub issue origin is present, when the
   issue number or repository cannot be determined, or when GitHub issue tooling is not
   available. Include the reason in the stage `output`.

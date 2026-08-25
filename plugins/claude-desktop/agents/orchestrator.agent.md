@@ -147,7 +147,7 @@ consuming repository's optional runtime context file, whose convention is define
     run off to a fresh session** rather than continuing inline until compaction interrupts
     it. See the shared **Context and Token Insight**
     (`orch-dashboard-contract.instructions.md`).
-14. **Update the originating GitHub issue when present.** Before Summary, detect issue-origin runs from the `githubIssue` metadata recorded on the run (`start_run`) or from the handoff that opened the session (`start-session-from-issue`, `automation-bug-fix`), then comment on that issue with the captured result, pull request link when available, Personal Validation decision, and QA report. Skip with a reason when no issue origin is present; block on posting errors.
+14. **Update the originating GitHub issue when present.** Before Summary, detect issue-origin runs from the `githubIssue` metadata recorded on the run (`start_run`) or from the issue origin block recorded by the pickup skill that routed this run (`start-session-from-issue`, `automation-bug-fix`), then comment on that issue with the captured result, pull request link when available, Personal Validation decision, and QA report. Skip with a reason when no issue origin is present; block on posting errors.
 15. **Hand off before compaction, not after.** A run is not obliged to finish in the session
     that started it. When the context gauge reaches the handoff threshold, persist the gating
     decisions with `set_run_context`, then call it again with `handoff: true` and a
@@ -173,8 +173,9 @@ consuming repository's optional runtime context file, whose convention is define
   `AskUserQuestion` for a decision the run does not own; it is available because the agent
   runs in the foreground. The harness strips it from sub-agents, which is why an `orch-*` run
   is never nested inside another agent — see **Never run an orchestration as a sub-agent** in
-  `orch-execution-model.instructions.md`. Fan-out over several issues or PRs belongs to the
-  dispatch skills, which hand the user one ready-to-run invocation per item.
+  `orch-execution-model.instructions.md`. There is no fan-out over issues or PRs anywhere: the
+  pickup skills select a single item per run and route it to this agent in their own session,
+  per **One item per run, and never a fan-out** in the same instruction file.
 - **Sub-agents report decisions up; they never prompt.** When a sub-agent this agent launched
   returns an open question rather than a result, this agent is the one that asks the user —
   and it never lets a sub-agent guess in order to keep moving. Per **Sub-Agent Constraints**

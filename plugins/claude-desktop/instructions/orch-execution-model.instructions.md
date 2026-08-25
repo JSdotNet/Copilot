@@ -199,11 +199,16 @@ mechanism; background sub-agents remain reserved for concurrent monitoring.
   for a decision it does not own, and ownership of the dashboard run (which the two rules
   above reserve for the owner session, and whose telemetry is session-wide). So the
   `orchestrator` agent is always a session's main loop, never something another agent spawns.
-  Parallelism across items comes from **more sessions**, not from nesting orchestrations: a
-  skill that fans out over issues or PRs prepares one ready-to-run invocation per item and
-  hands them back for the user to launch, as `automation-bug-fix` and
-  `start-session-from-issue` do. Delegation *within* a run — build, test, QA, large edits —
-  stays sub-agent work as described under **Delegation Order**.
+  Delegation *within* a run — build, test, QA, large edits — stays sub-agent work as
+  described under **Delegation Order**.
+- **One item per run, and never a fan-out.** A skill that works from a queue of issues or
+  pull requests selects **one** item, claims it, and runs the orchestration for it in its own
+  session, as `automation-bug-fix`, `start-session-from-issue`, and `pr-merge-ready` do. It
+  does not prepare work for other sessions, because a run cannot start one: a scheduled
+  routine gets a single session, and there is no host capability for opening more. Parallelism
+  across items therefore comes from the **user** starting another session and running the
+  skill again — each run claims a different item, so concurrent runs do not collide. A skill
+  that instead handed back N invocations would be handing back work nothing can launch.
 
 ### Session Handoff
 
