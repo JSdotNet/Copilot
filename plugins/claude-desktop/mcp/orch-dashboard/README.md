@@ -98,7 +98,7 @@ tool list rather than hardcoding one.
 - `open_dashboard()` -> `{ dashboardUrl, diagramUrl, documentUrl, stateDir }`
   Starts the local HTTP server if it is not already running and returns the URLs. Call once
   per session and hand the user `dashboardUrl`; the page updates itself from then on.
-- `start_run({ skillId, title, stages: [{ name, agents? }], originalPrompt?, promptHistory?, githubIssue?, changeKind?, resume? })` -> `{ runId, resumed, dashboardUrl }`
+- `start_run({ skillId, title, stages: [{ name, agents? }], originalPrompt?, promptHistory?, githubIssue?, changeKind?, resume? })` -> `{ runId, resumed, dashboardUrl, sessionTitle }`
   Call once at the start of an orchestration, listing every stage up front — including a
   **Personal Validation** stage, a separate **Create Pull Request** stage after it (mark it
   `skipped` when there is no change set), and a final **Summary** stage. By default it
@@ -117,9 +117,11 @@ tool list rather than hardcoding one.
   created while approval is `pending` or `rejected`. When Personal Validation requests
   changes, keep the same run, record `approval: "rejected"`, reopen the relevant earlier
   stage, and reset to `pending` before the revised handoff.
-- `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput?, links?, scenarios?, monitoring? })`
+- `update_stage({ runId, stageIndex | stageName, status, output?, appendOutput?, links?, scenarios?, monitoring? })` -> `{ ok, sessionTitle }`
   Call at the start of a stage (`status: "in_progress"`) and again when it finishes. Each
-  transition to `done` increments that stage's completion count. For Personal Validation,
+  transition to `done` increments that stage's completion count. `sessionTitle` is the name
+  the run has earned from where its output landed so far (see **Session Naming**), or `null`
+  when nothing has been written yet; rename the session when it differs from the last name set. For Personal Validation,
   pass `links` such as the running app URL, Aspire dashboard, or a focused review route. For
   QA stages, also pass:
   - `scenarios: [{ name, status: "pass"|"fail"|"flaky", notes?, evidence?: [{ type?, path, description? }] }]`
@@ -193,6 +195,49 @@ Two accuracy caveats worth knowing:
   calls to the *same* tool can swap durations between themselves. Totals stay correct.
 - The context gauge is derived from the last root-agent message's prompt size in the
   transcript, which is the closest available equivalent of a live context reading.
+
+## Session Naming
+
+`session-title.mjs` derives a prefixed session name from **where a run's output landed**, so a
+list of parallel sessions can be scanned by the kind of work each one did. The destination is
+observed, not declared: the telemetry hook folds every write tool's `file_path` into the run,
+and `start_run` and `update_stage` return the resulting `sessionTitle` for the orchestrator to
+rename the session to.
+
+| Where the run wrote | Prefix |
+| --- | --- |
+| `.domain/<context>/**` | `domain:<context>` |
+| `.arc42/**` | `arc42` |
+| `.tech/**` | `tech` |
+| `.design/**` | `design` |
+| `.backlog/**` | `backlog` |
+| anywhere else in the worktree | `code` |
+| published as a Claude Artifact | `artifact` |
+
+Keying on the destination rather than on `skillId` means an ad-hoc session classifies the same
+way an orchestrated one does, and a skill that turns out to touch something other than its
+usual folder is labelled by what it actually did. The rules:
+
+- **The most-written destination wins**, ties going to the rarer folder over `code`. A
+  documentation-drift edit to one knowledge chapter therefore does not relabel a code run.
+- **A published artifact outranks the file tally.** It is the run's shareable deliverable and
+  the one output that cannot be found again by browsing the repository.
+- **A bounded context is appended** as `<prefix>:<context>` when exactly one is involved —
+  read from the `.domain/` folder name directly, or matched against the declared context list
+  from a code path (`src/Acme.Billing/` → `billing`), which is what the knowledge convention's
+  "keep context and module names aligned" rule buys. Two contexts means none is shown.
+- **Nothing observed means no name.** `computeSessionTitle` returns `null` until a write lands,
+  because renaming earlier would replace the host's own summary of the opening prompt with an
+  unprefixed copy of the run title.
+- **`_meta/` is excluded** — a run that regenerated derived indexes is not *about* them.
+
+Bash-driven writes are deliberately not tracked: `git status` and `sed -i` are not separable by
+inspecting a command string, and a guess that misfires renames the session wrongly.
+Under-counting only costs a less specific prefix. The session's git branch and worktree are
+unaffected either way — those are fixed when the session is created.
+
+Both halves are covered by `dev/session-title-test.mjs` (the rules) and
+`dev/session-title-integration-test.mjs` (the wiring, driving the real server and hook).
 
 ## Session Model
 

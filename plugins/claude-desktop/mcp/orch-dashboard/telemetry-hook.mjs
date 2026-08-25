@@ -18,6 +18,7 @@
 //   session.usage_info         transcript JSONL      (last root message's prompt size)
 //   session.compaction_start   PreCompact hook       (trigger: manual | auto)
 //   (no Copilot equivalent)    SessionEnd hook       (stamps the run idle — see idle.mjs)
+//   (no Copilot equivalent)    PostToolUse write     (output destination — see session-title.mjs)
 //
 // The adapter also runs one way outward: when a PostToolUse sample pushes the run-level
 // context gauge past a threshold, the hook answers with a warning instead of staying silent
@@ -35,6 +36,7 @@ import path from "node:path";
 import { readActive, writeActive, readTelemetry, writeTelemetry, runsDir } from "./state.mjs";
 import { readRun, writeRun } from "./store.mjs";
 import { isIdle, markIdle } from "./idle.mjs";
+import { recordDestination } from "./session-title.mjs";
 import {
     categorizeTool,
     appendToolCall,
@@ -350,6 +352,10 @@ async function main() {
             stageIndex: stage ? stage.index : null,
             stageName: stage ? stage.name : null,
         });
+        // Where this call put its output, for the run's session title. Every write tool goes
+        // through here, so the tally reflects the whole run rather than the scope a skill
+        // declared for itself up front.
+        await recordDestination(run, { toolName: name, input: payload.tool_input || {}, cwd: payload.cwd });
         // A Task/Agent call is the one place a hook learns which sub-agent ran, so it
         // doubles as the `subagent.completed` equivalent.
         if (AGENT_TOOLS.has(name)) {
