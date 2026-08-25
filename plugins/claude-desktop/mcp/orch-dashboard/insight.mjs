@@ -260,7 +260,7 @@ export const CONTEXT_PRESSURE_THRESHOLDS = [
         action:
             "Prepare a session handoff: persist every decision that gates a later phase with set_run_context, " +
             "finish the stage in flight, and start no further heavy stage inline. " +
-            "See Execution Model -> Session Handoff.",
+            "See Execution Model -> Session Handoff, and the session-handoff skill.",
     },
     {
         pct: 85,
@@ -269,7 +269,8 @@ export const CONTEXT_PRESSURE_THRESHOLDS = [
             "Hand off now: set_run_context with handoff true and a handoffNote holding the resume invocation, " +
             "leave the stage in flight in_progress, hand the invocation to the user, and end this session so the " +
             "run continues in a fresh context instead of being compacted mid-orchestration. " +
-            "See Execution Model -> Session Handoff.",
+            "Run the session-handoff skill: it captures the state, writes the brief the next session reads, " +
+            "marks the run, and hands back the message to paste. See Execution Model -> Session Handoff.",
     },
 ];
 
