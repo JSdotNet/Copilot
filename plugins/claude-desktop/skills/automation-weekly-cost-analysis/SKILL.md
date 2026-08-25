@@ -58,8 +58,9 @@ This skill has no hard skill dependencies, but pairs well with:
    - If instruction bloat is flagged: note that `automation-guidelines-cap-analysis` can help.
    - If a high-cost model is used for low-complexity tasks: suggest a cheaper model tier for
      those agent files.
-   - If session count is high: suggest batching issues into fewer handoffs with
-     `start-session-from-issue` to avoid redundant context loads.
+   - If session count is high: check whether runs are being restarted rather than handed
+     off. `session-handoff` resumes a run from persisted state instead of reloading its
+     whole context, and each issue is meant to cost one session, not several.
 
 ### Phase 3 — Produce Report
 

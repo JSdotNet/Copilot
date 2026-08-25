@@ -120,8 +120,8 @@ Everything after the Personal Validation gate the `orch-*` orchestrations stop a
 - `skills/create-pull-request/` — open a PR for the current branch, body grounded in the diff
 - `skills/update-pr-branch/` — integrate the base branch and resolve conflicts
 - `skills/fix-pr-checks/` — read failing job logs, reproduce, fix, push until green
-- `skills/pr-merge-ready/` — sweep your open sessions' PRs and clear their blockers; built
-  for `/loop`
+- `skills/pr-merge-ready/` — take one pull request to merge-ready and clear its blockers;
+  built for `/loop`, one PR per pass
 
 | Question | Skill |
 | --- | --- |
@@ -129,14 +129,15 @@ Everything after the Personal Validation gate the `orch-*` orchestrations stop a
 | The branch is done — open a PR | `create-pull-request` |
 | GitHub says the branch has conflicts or is out of date | `update-pr-branch` |
 | Checks are red | `fix-pr-checks` |
-| Which of my open sessions need what, on a timer | `pr-merge-ready` |
+| What does this PR still need, on a timer | `pr-merge-ready` |
 | Reviewers left comments | `pr-remarks-review` (plugin: `review`) |
 
-`pr-merge-ready` is scoped to the open worktree sessions on this machine — it matches each
-session branch to its pull request and works inside that session's existing worktree. It never
-runs `gh pr checkout`, so it cannot fight the worktree that already holds the branch. Sessions
-with no PR yet are reported, not remediated; raising the PR stays a deliberate call via
-`create-pull-request`.
+`pr-merge-ready` works **one pull request per pass**, in the session that runs it: it scores
+the PR, clears its primary blocker, re-scores, and reports what the next pass should take.
+Under `/loop` consecutive passes rotate through your open PRs, which is how a queue gets
+cleared without a second session or a background agent per PR. It never runs `gh pr checkout`,
+so it cannot fight the worktree that already holds the branch. A branch with no PR yet is
+reported, not remediated; raising the PR stays a deliberate call via `create-pull-request`.
 
 #### Developer Skills
 
@@ -155,16 +156,29 @@ with no PR yet are reported, not remediated; raising the PR stays a deliberate c
 #### Automation Skills
 
 - `skills/azure-sre-to-github-issue/` — create GitHub issues from active Azure SRE alerts
-- `skills/start-session-from-issue/` — prepare one ready-to-run, plan-first session handoff
-  per matching issue
-- `skills/automation-bug-fix/` — claim each confirmed open `bug` issue and prepare one
-  ready-to-run `orch-bug` handoff for it
+- `skills/start-session-from-issue/` — start this session's work from a single matching
+  issue: claim it, route it to the `orch-*` skill its type calls for, and run that here
+- `skills/automation-bug-fix/` — claim the single highest-priority open `bug` issue and
+  resolve it here with `orch-bug`
 - `skills/automation-package-update/` — update outdated NuGet packages and open a PR
 - `skills/automation-performance-review/` — find, implement, and PR a performance improvement
 - `skills/automation-review/` — full review cycle with optional issue creation
 - `skills/automation-week-starter/` — weekly "what's new" digest for configured topics
 - `skills/automation-weekly-cost-analysis/` — weekly token/cost report from recorded runs
 - `skills/automation-whats-new/` — open and merged pull requests since the last run
+
+Each of these completes its work in **the one session that runs it**. The skills that work
+from a queue — `start-session-from-issue`, `automation-bug-fix`, `pr-merge-ready` — select a
+single issue or pull request per run, claim it, and carry it through in that session. They
+never hand back a batch of invocations for other sessions to pick up, because a scheduled
+routine gets one session and cannot open another. To work several items at once, start another
+session and run the skill again: every run claims a different item, so concurrent runs do not
+collide.
+
+Unattended runs are the design target, not an edge case. Where a skill would normally ask the
+user to confirm its selection, a run with no user turn available proceeds on the single item it
+picked — the claim guards against a double pickup, and the Personal Validation gate still
+holds every pull request until the user is back.
 
 ## Configuration Layers
 

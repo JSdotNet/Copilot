@@ -220,7 +220,7 @@ contract.
 
 - `create-pull-request` — open the PR in the first place.
 - `fix-pr-checks` — for check failures that are not caused by the integration.
-- `pr-merge-ready` — run this integration across every open session's PR, on a timer.
+- `pr-merge-ready` — pick the pull request that needs this integration and run it, one PR per pass, on a timer.
 - `sync` (plugin: `csharp-coding`) — the simpler .NET-only rebase of a session worktree branch,
   for a branch that has no PR yet.
 

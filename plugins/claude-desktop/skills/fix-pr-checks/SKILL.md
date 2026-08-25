@@ -184,7 +184,7 @@ contract.
 
 - `update-pr-branch` — when the failure is a conflict or an out-of-date base.
 - `create-pull-request` — opening the PR.
-- `pr-merge-ready` — sweep every open session's PR and clear its merge blockers.
+- `pr-merge-ready` — score one pull request against the merge-ready checklist and clear its blockers, one PR per pass.
 - `phase-build-test` — the shared build-and-test procedure the `orch-*` orchestrations run
   before a PR exists.
 - `github-actions` (plugin: `github`) — when the workflow definition itself is wrong.

@@ -85,7 +85,10 @@ This skill orchestrates the following installed skills:
 ### Phase 5 — Issue Creation (Optional)
 
 7. Present the findings that match the configured severity filter.
-8. Ask the user to confirm which findings should become GitHub issues.
+8. Ask the user to confirm which findings should become GitHub issues. On an **unattended run**
+   with no user turn available, create issues for the findings matching the severity filter
+   without confirmation — an issue is a tracked note, reversible by closing it — and say in the
+   summary that they were created unconfirmed.
 9. For each approved finding, use the `create-github-issue` skill to create an issue with:
    - **Title:** `[Review] <finding summary>`
    - **Body:** finding detail, file and line, layer (TODO / Suggestion / Code Review),
