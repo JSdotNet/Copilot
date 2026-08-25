@@ -1,6 +1,6 @@
 ---
 name: build-bounded-context
-description: 'Build direction, bounded-context kind: turn an agreed but unbuilt .domain/<context>/ folder into a change brief plus a change category for establishing the boundary, then stop. Use when: a bounded context is modelled but no module implements it, the context map names a context that does not exist in code, an anti-corruption layer is agreed but absent, build the bounded context we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees. DO NOT USE FOR: writing a chapter from a bounded-context that already exists in code (use capture-bounded-context), or for the aggregate, feature, term, or building-block chapters around it (use the matching build-* skill).'
+description: 'Build direction, bounded-context kind: turn an agreed but unbuilt .domain/<context>/ folder into a change brief plus a change category for establishing the boundary, then stop. Use when: a bounded context is modelled but no module implements it, the context map names a context that does not exist in code, an anti-corruption layer is agreed but absent, build the bounded context we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees. DO NOT USE FOR: writing a chapter from a bounded-context that already exists in code (use capture-bounded-context), or for the aggregate, feature, or building-block chapters around it (use the matching build-* skill).'
 ---
 
 # Build a bounded context from its folder

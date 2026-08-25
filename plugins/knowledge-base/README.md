@@ -132,14 +132,13 @@ That is why a build skill reads code — not to change it, but to establish what
 already there so the brief asks only for the delta, and an update brief lists
 where the current behaviour lives.
 
-Eight kinds, two directions each:
+Seven kinds, two directions each:
 
 | Kind | Target | `type` value(s) | Spec-side write |
 |------|--------|-----------------|-----------------|
 | `aggregate` | `.domain/<context>/domain.md` | `aggregate`, `entity`, `value-object`, `enum`, `shared-value-objects`, `shared-enums`, `domain-event` | `orch-domain` |
 | `domain-service` | `.domain/<context>/domain.md` | `domain-service`, plus `domain-event` for events the service itself raises | `orch-domain` |
 | `feature` | `.domain/<context>/features.md` | `feature`, `sub-feature` | `orch-domain` |
-| `term` | `.domain/<context>/naming.md` | `term` | `orch-domain` |
 | `bounded-context` | `.domain/<context>/` — the whole folder | file-level `domain`, `features`, `model`, `flow`, `dependencies`, `naming`, plus `context-map` at the `.domain` root | `orch-domain` |
 | `building-block` | `.arc42/05-building-block-view.md` | none — `.arc42` defines no value set | `orch-arc42-content` |
 | `deployment` | `.arc42/07-deployment-view.md` | none — `.arc42` defines no value set | `orch-arc42-content` |
@@ -158,10 +157,27 @@ A **domain service** is the deliberate exception: it is defined by coordinating
 across boundaries rather than living in one, so folding it into a boundary's pass
 would be backwards. It keeps its own pair, and owns the events it raises itself.
 
+**`capture-feature` runs the application.** `features.md` is the one knowledge
+file written from the user's point of view, so that pass starts the app, walks
+the feature, and captures a screenshot per step — reading a controller tells you
+a route exists, while using the feature tells you what the product lets someone
+do, in what order, with what wording. It prefers the repository's own runtime and
+QA workflows (`qa:aspire-run`, `qa:playwright-screenshot`) where installed, runs
+only against a local or disposable environment, never exercises a destructive
+step to document it, and keeps the screenshots as report evidence rather than
+committing them to a knowledge folder.
+
+**`naming.md` term chapters have no pair of their own.** They are written through
+`orch-domain`, and populated incrementally by the capture passes: whenever one
+resolves a counterpart by inference rather than by an existing alias, it proposes
+a term with the discovered code name as an `alias`, which turns a one-off
+inference into a durable pairing for the next pass. A `bounded-context` capture
+creates the file as part of the context folder.
+
 `.tech` has no pair here — `knowledge-tech-update` already covers that direction
 — and neither does `.backlog`.
 
-The shared rules live once in `assets/code-sync-protocol.md`, which all 16 skills
+The shared rules live once in `assets/code-sync-protocol.md`, which all 14 skills
 reference and none repeats: counterpart resolution, the evidence rules (including
 why unit tests are first-class evidence for capture rather than a cross-check), a
 five-way drift verdict (`aligned`, `code-ahead`, `spec-ahead`, `conflict`,

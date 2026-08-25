@@ -1,6 +1,6 @@
 ---
 name: capture-bounded-context
-description: 'Capture direction, bounded-context kind: read an implemented module or service boundary and scaffold or refresh a whole .domain/<context>/ folder — domain.md, features.md, model.md, flow.md, dependencies.md, naming.md — plus its context-map.md entry and order. Use when: a module exists with no bounded context folder, the context map is missing a context, dependencies between contexts are undocumented, document the bounded contexts we built. Reads source and tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt bounded-context chapter into work (use build-bounded-context), or for the aggregate, feature, term, or building-block chapters around it (use the matching capture-* skill).'
+description: 'Capture direction, bounded-context kind: read an implemented module or service boundary and scaffold or refresh a whole .domain/<context>/ folder — domain.md, features.md, model.md, flow.md, dependencies.md, naming.md — plus its context-map.md entry and order. Use when: a module exists with no bounded context folder, the context map is missing a context, dependencies between contexts are undocumented, document the bounded contexts we built. Reads source and tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt bounded-context chapter into work (use build-bounded-context), or for the aggregate, feature, or building-block chapters around it (use the matching capture-* skill).'
 ---
 
 # Capture a bounded context from code
@@ -187,6 +187,9 @@ published language is a finding worth flagging explicitly, per the folder rules.
 - Do not write integration prose in place of a named DDD pattern.
 - Do not forget `context-map.md`'s `order` — a listed file that does not exist
   is an error, and an unlisted one is a warning.
-- Do not write the individual aggregate, feature, or term chapter bodies here.
-  Those are their own capture passes.
+- Do not write the individual aggregate or feature chapter bodies here. Those
+  have their own capture passes. `naming.md` term bodies have no dedicated pass:
+  create the file with its file-level block, and leave the terms to be proposed
+  by the capture passes that resolve a counterpart by inference, written through
+  `orch-domain`.
 - Do not hand-edit files under `_meta/`.

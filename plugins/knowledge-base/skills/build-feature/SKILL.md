@@ -1,6 +1,6 @@
 ---
 name: build-feature
-description: 'Build direction, feature kind: turn an agreed but unbuilt `type: feature` or `type: sub-feature` chapter in .domain/<context>/features.md into a change brief plus a change category, then stop. Use when: the feature is agreed but not shipped, a sub-feature is missing from a shipped feature, the chapter names a feature flag that does not exist, build the feature we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees. DO NOT USE FOR: writing a chapter from a feature that already exists in code (use capture-feature), or for the aggregate, domain-service, term, or bounded-context chapters around it (use the matching build-* skill).'
+description: 'Build direction, feature kind: turn an agreed but unbuilt `type: feature` or `type: sub-feature` chapter in .domain/<context>/features.md into a change brief plus a change category, then stop. Use when: the feature is agreed but not shipped, a sub-feature is missing from a shipped feature, the chapter names a feature flag that does not exist, build the feature we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees. DO NOT USE FOR: writing a chapter from a feature that already exists in code (use capture-feature), or for the aggregate, domain-service, or bounded-context chapters around it (use the matching build-* skill).'
 ---
 
 # Build a feature from its chapter

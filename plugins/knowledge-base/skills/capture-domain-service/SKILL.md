@@ -1,6 +1,6 @@
 ---
 name: capture-domain-service
-description: 'Capture direction, domain-service kind: read an implemented domain service, policy, or process manager and write or refresh its `type: domain-service` chapter in .domain/<context>/domain.md, including invocation semantics. Use when: coordinating logic exists in code with no chapter, a policy or process manager is undocumented, the chapter omits which aggregates the service coordinates, document the domain services in this context. Reads source and tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt domain-service chapter into work (use build-domain-service), or for the aggregate, feature, term, or bounded-context chapters around it (use the matching capture-* skill).'
+description: 'Capture direction, domain-service kind: read an implemented domain service, policy, or process manager and write or refresh its `type: domain-service` chapter in .domain/<context>/domain.md, including invocation semantics. Use when: coordinating logic exists in code with no chapter, a policy or process manager is undocumented, the chapter omits which aggregates the service coordinates, document the domain services in this context. Reads source and tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt domain-service chapter into work (use build-domain-service), or for the aggregate, feature, or bounded-context chapters around it (use the matching capture-* skill).'
 ---
 
 # Capture a domain service from code
