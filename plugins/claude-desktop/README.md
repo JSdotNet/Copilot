@@ -192,14 +192,14 @@ user-global file:
 | macOS/Linux | `~/.claude/orchestration/model-selection.md` |
 
 Categories, defaults, and the resolution order are defined in
-`instructions/orch-model-selection.instructions.md`.
+`instructions/orch-model-selection.instructions.md`. This is the **only** override tier:
+model choice is a personal cost and speed preference, so there is deliberately no
+repository-level model override and `.claude/model-selection.md` is never read.
 
-### 3. Team Repo Model Override — `.claude/model-selection.md`
+A category model also applies only where its stage is delegated with an `Agent` call — a
+stage that runs inline uses the session's model whatever the table says.
 
-A repository may override the model chosen for any orchestration category, using the same
-`Category` / `Model` table.
-
-### 4. Per-Repo Startup and QA Context — `.claude/orch-context.md`
+### 3. Per-Repo Startup and QA Context — `.claude/orch-context.md`
 
 A repository may declare how its application starts and how it should be validated, so the
 QA phase stops guessing the AppHost or interrupting the run to ask. The convention is defined
@@ -209,7 +209,7 @@ A repository with nothing to start declares `**Runnable application:** none`, an
 Validation is then marked `skipped` cleanly. The file must never contain secrets and never
 pins a model.
 
-### 5. Per-Repo Interactive Startup — `.claude/start.md`
+### 4. Per-Repo Interactive Startup — `.claude/start.md`
 
 A repository may declare the developer-facing start: the command and the URL to open, plus
 optional sign-in, area map, and troubleshooting notes. Read only by the `start` skill, which
@@ -264,7 +264,6 @@ Works best with these plugins from the same marketplace installed:
 
 - `architecture` — architecture guidance
 - `csharp-coding` — code implementation with TDD
-- `product-owner` — user stories and backlog management
 - `review` — reusable review skills
 - `qa` — runtime QA validation (Aspire + Playwright)
 

@@ -38,25 +38,18 @@ user to run something themselves.
 |---|---|
 | The change requires a new architectural decision | `orch-adr` |
 | The change requires a new bounded context or service boundary | `orch-create-service`, or `orch-architecture` for the boundary decision |
+| The change reshapes the **documented** domain model — a new aggregate root, a changed aggregate invariant, or a renamed concept in the ubiquitous language | `orch-domain` (`knowledge-base`), which owns the domain model; skip this row when that plugin is absent |
 | The change requires a cross-cutting redesign | `orch-blueprint`, or `orch-arc42` for structured architecture documentation |
 | Accepting known debt instead of fixing it | `orch-tdr` |
 
 Everything else — an unwritten specification, absent acceptance criteria, a bug with no
 reproduction, a request that arrived as one sentence — is derived in the skill's first
-stage, not escalated.
+stage, not escalated. Adding a field, an entity, or a method inside an existing aggregate is
+ordinary implementation work: only a change to the documented model itself escalates.
 
-### Exception: `orch-feature` and `orch-bug`
-
-- `orch-feature` and `orch-bug` handle the most common ad-hoc requests, so they own a
-  **Stage 0: Scope Discovery** that derives missing scope, acceptance or verification
-  criteria, and impacted code paths from the request and codebase.
-- For those two skills, missing context is a reason to run Stage 0 — not a reason to stop,
-  and never a reason to skip the orchestration and implement inline.
-- Stopping still applies when the change requires a new architectural decision, a new
-  bounded context, or a cross-cutting redesign. In that case route to `orch-adr`,
-  `orch-architecture`, or `orch-blueprint` only after the user approves that escalation.
-- The other code-modifying orchestrations use the same Personal Validation gate and only
-  stop early for the escalation cases above.
+That first stage is named **Stage 0: Scope Discovery** in every code-modifying skill, and it
+is split between a delegated search half and an inline decision half — see **Splitting Scope
+Discovery** below.
 
 ## MCP Server Strategy (Shared)
 
@@ -94,11 +87,22 @@ Defines *where* an orchestration runs and *how* its progress is tracked. Applies
 ### Delegation Order
 
 1. **Do it inline** for short, decision-heavy steps that need the run's context.
-2. **Delegate to a sub-agent (default for heavy work).** Use a sub-agent for build, test,
-   Playwright execution, and large code changes. A sub-agent gets its own context but the
-   **same worktree**, so evidence paths, the change set, and the running application all
-   stay valid for the owner session. This keeps verbose output out of the orchestrator's
-   context without breaking the dashboard.
+2. **Delegate to a sub-agent (the default for heavy work, not a suggestion).** A sub-agent
+   gets its own context but the **same worktree**, so evidence paths, the change set, and the
+   running application all stay valid for the owner session. This keeps verbose output out of
+   the orchestrator's context without breaking the dashboard.
+
+   Four kinds of work are delegated by default, and running them inline is a defect in the
+   run rather than a shortcut:
+   - **Build & Test** — per `skills/phase-build-test/SKILL.md`.
+   - **QA Validation** — per `skills/phase-qa-validation/SKILL.md`.
+   - **Scope Discovery's search half** — see **Splitting Scope Discovery** below.
+   - **Broad exploration and large edits** — reading across many files to find something,
+     or a refactor whose diff is larger than the reasoning about it.
+
+   The test is what the step *leaves behind*: a step whose output is large and whose
+   conclusion is small belongs in a sub-agent, because the owner session only needs the
+   conclusion but pays for the output on every remaining turn of the run.
 3. **Run a background sub-agent only for genuinely concurrent long-running work** — in
    practice, `qa:qa-monitor` tailing Aspire logs while Playwright drives scenarios. Launch
    it with the `Agent` tool's `run_in_background`, steer it with `SendMessage`, and do not
@@ -111,7 +115,51 @@ Defines *where* an orchestration runs and *how* its progress is tracked. Applies
    started still alive.
 
 Whichever form is used, pass the model resolved for that stage's category per
-`instructions/orch-model-selection.instructions.md` in the `Agent` call's `model`.
+`instructions/orch-model-selection.instructions.md` in the `Agent` call's `model`. That
+parameter is the *only* place a category model takes effect — an inline stage runs on the
+session's model no matter what the table says, so skipping delegation silently discards the
+model choice along with the context saving.
+
+### Splitting Scope Discovery
+
+Every code-modifying skill opens with a **Scope Discovery** stage (`Stage 0`, or the
+equivalent intake stage). It does two different jobs, and only one of them belongs inline:
+
+| Half | Work | Where it runs |
+|---|---|---|
+| **Search** | Identify the impacted or suspected code paths and the integration points they touch; identify the governing instructions — `CLAUDE.md`, matching `**/*.instructions.md`, guidelines and ADRs | A **read-only search sub-agent** in the same worktree |
+| **Decision** | Restate the requested behavior, derive the acceptance or verification criteria, record the derived scope and assumptions, decide whether to escalate | **Inline**, in the owner session |
+
+The split follows the same test as every other delegation: the search half reads widely and
+concludes briefly, while the decision half is short, judgement-heavy, and feeds every later
+stage. Run whole and inline, Scope Discovery loads the codebase into the context that then
+has to survive Implementation, QA, and the approval gate.
+
+- **Ask the search sub-agent for a findings list**, not for file contents: the paths, the
+  integration points, and the governing instructions that actually apply, each with one line
+  of why. It does not propose scope, derive criteria, or decide escalation.
+- **The orchestrator keeps the decision half**, because escalation and acceptance criteria
+  are the run's own judgement and cannot be handed to an agent that cannot ask the user.
+- **Skip the split when the search is trivially small** — a named file, a one-line change, or
+  an already-approved specification that names its own impacted paths. The sub-agent is
+  overhead when there is nothing to search.
+
+### Turn Cost
+
+Every tool call is a model turn, and every turn re-reads the entire prompt. Context size and
+turn count therefore multiply: at a large context, an extra round-trip is expensive in a way
+it never is early in a run. Two habits follow:
+
+- **Batch shell work.** Chained or scripted commands cost one turn; the same commands issued
+  one at a time cost one turn each, at full prompt price. Shell calls are the most numerous
+  tool calls an orchestration makes, so this is where batching pays most.
+- **Ask for the answer, not the material.** Prefer a search that returns the matching lines
+  over reading whole files to find them, and prefer a sub-agent's summary over its
+  transcript. Material read into the owner session is re-billed on every later turn; an
+  answer is paid for once.
+
+Neither is a reason to guess. Read what the decision actually needs — the waste being named
+here is re-reading and drip-feeding, not thoroughness.
 
 **Escalate to sub-agent delegation when the run-level context gauge approaches its limit.**
 The gauge described in **Context and Token Insight** (`orch-dashboard-contract.instructions.md`)

@@ -192,6 +192,14 @@ export function recordContextSample(run, sample) {
     if (Number.isFinite(Number(sample.tokenLimit)) && Number(sample.tokenLimit) > 0) {
         ctx.tokenLimit = Number(sample.tokenLimit);
     }
+    // A prompt the model actually read is proof of a window at least that large. Trusting a
+    // stated limit over an observed sample is what pins the gauge above 100% for a whole
+    // run, which silently disables the pressure ladder (every threshold crosses at once on
+    // the first sample, then latches). The observation wins.
+    if (Number.isFinite(Number(ctx.tokenLimit)) && currentTokens > Number(ctx.tokenLimit)) {
+        ctx.tokenLimit = currentTokens;
+        ctx.tokenLimitInferred = true;
+    }
     for (const field of ["messagesLength", "conversationTokens", "systemTokens", "toolDefinitionsTokens"]) {
         if (Number.isFinite(Number(sample[field]))) ctx[field] = Number(sample[field]);
     }

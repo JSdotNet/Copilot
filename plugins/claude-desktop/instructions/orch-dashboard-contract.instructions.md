@@ -136,7 +136,10 @@ does not report them.
   percentage, the component breakdown (system, conversation, tool definitions), the peak
   observed during the run, and the count and reasons of compaction and truncation events.
   The gauge deliberately **ignores sub-agent samples**, because a sub-agent runs in its own
-  context window.
+  context window. `tokenLimit` follows the model's window and is raised to match any larger
+  prompt actually observed, so the gauge cannot sit above 100% for a whole run — which would
+  cross and latch every pressure threshold on the first sample and leave the ladder silent
+  from then on.
 
 How to use these:
 
@@ -145,13 +148,19 @@ How to use these:
   figure would conflict with the captured one. Keep stage `output` focused on what the
   stage did and produced.
 - **Never read the headline input + output figure as context consumption.** A stage showing
-  a multi-million-token total against a 200k window is normal cache behavior, not an
+  a multi-million-token total against the context window is normal cache behavior, not an
   emergency. Compare stages on the **uncached** figure, and read occupancy off the run-level
   gauge.
 - **Read the uncached per-stage figure as the signal for which phase is expensive.** A stage
-  whose uncached delta dwarfs the rest — especially one with a large sub-agent subtotal — is
-  evidence that the stage should be split into smaller stages or delegated, and is worth
-  naming in the Summary phase as a qualitative observation.
+  whose uncached delta dwarfs the rest is evidence that it should be split into smaller
+  stages or delegated, and is worth naming in the Summary phase as a qualitative
+  observation. Read the **sub-agent subtotal** the opposite way: it is the share of that
+  stage that was kept *out* of the owner session's context window, so a heavy stage with a
+  large subtotal is delegation working, while a heavy stage with none is a stage that ran
+  inline and charged the whole run for it.
+- **A heavy phase reporting a zero sub-agent subtotal is a finding.** Build & Test and QA
+  Validation are delegated by default; a zero subtotal on either means the phase ran inline
+  against its own skill's contract.
 - **Act on the run-level gauge before it forces compaction.** The telemetry hook announces
   each threshold it crosses, and `orch-execution-model.instructions.md` defines the ladder:
   **Delegation Order** to push the next heavy step to a sub-agent in the same worktree, and

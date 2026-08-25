@@ -821,7 +821,7 @@ const tools = [
     {
         name: "update_stage",
         description:
-            "Update one stage of a tracked run: its status and/or captured output. Call at the start of a stage (status: in_progress) and again when it finishes (status: done/blocked/skipped) with a summary of what was produced. For Personal Validation, pass links to local review targets. For QA/validation stages, also pass scenarios and/or monitoring so the dashboard can show pass/fail results and evidence.",
+            "Update one stage of a tracked run. Call once at its start (in_progress) and once when it ends (done/blocked/skipped) with a summary. Personal Validation: pass links to review targets. QA stages: pass scenarios and monitoring so results and evidence render inline.",
         inputSchema: {
             type: "object",
             properties: {
@@ -829,38 +829,37 @@ const tools = [
                 stageIndex: { type: "number" },
                 stageName: { type: "string" },
                 status: { type: "string", enum: VALID_STATUSES },
-                output: { type: "string", description: "Free-form output/result text to show for this stage." },
-                appendOutput: { type: "boolean", description: "If true (default false), append to existing output instead of replacing it." },
+                output: { type: "string", description: "What the stage did and produced." },
+                appendOutput: { type: "boolean", description: "Append to existing output instead of replacing. Default false." },
                 links: {
                     type: "array",
-                    description: "Quick-action links for this stage, such as the running app, Aspire dashboard, or local review URL for Personal Validation. Replaces any links previously recorded for this stage.",
+                    description: "Quick-action buttons (running app, Aspire dashboard, review target). Replaces this stage's existing links.",
                     items: {
                         type: "object",
                         properties: {
-                            label: { type: "string", description: "Button label shown in the dashboard." },
-                            url: { type: "string", description: "HTTP(S) or same-origin URL to open." },
-                            description: { type: "string", description: "Optional explanatory text shown below the button." },
+                            label: { type: "string" },
+                            url: { type: "string", description: "HTTP(S) or same-origin." },
+                            description: { type: "string" },
                         },
                         required: ["label", "url"],
                     },
                 },
                 scenarios: {
                     type: "array",
-                    description: "QA scenario results for this stage (e.g. from the qa plugin's playwright validation). Replaces any scenarios previously recorded for this stage.",
+                    description: "QA scenario results. Replaces this stage's existing scenarios.",
                     items: {
                         type: "object",
                         properties: {
-                            name: { type: "string", description: "Scenario name/description." },
+                            name: { type: "string" },
                             status: { type: "string", enum: VALID_SCENARIO_STATUSES },
-                            notes: { type: "string", description: "Findings, console/network errors, or other detail for this scenario." },
+                            notes: { type: "string", description: "Findings, console/network errors." },
                             evidence: {
                                 type: "array",
-                                description: "Evidence files proving the result, e.g. Playwright screenshots/recordings.",
                                 items: {
                                     type: "object",
                                     properties: {
-                                        type: { type: "string", description: "screenshot, video, log, trace, or other." },
-                                        path: { type: "string", description: "Path to the evidence file, relative to the git worktree root." },
+                                        type: { type: "string", enum: ["screenshot", "video", "log", "trace", "other"] },
+                                        path: { type: "string", description: "Relative to the git worktree root; outside paths are rejected." },
                                         description: { type: "string" },
                                     },
                                     required: ["path"],
@@ -872,7 +871,7 @@ const tools = [
                 },
                 monitoring: {
                     type: "object",
-                    description: "Runtime monitoring summary for this stage (e.g. from the qa plugin's Aspire log monitoring).",
+                    description: "Runtime log/trace summary for this stage.",
                     properties: {
                         summary: { type: "string" },
                         findings: {

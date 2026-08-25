@@ -38,8 +38,9 @@ requirements and architecture — through local validation using dashboard.
 > Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
-> (category defaults, overridable via personal global model selection or
-> `.claude/model-selection.md` in the consuming repo).
+> (category defaults, overridable via personal global model selection). A category model
+> applies only where the stage is delegated with an `Agent` call; an inline stage runs on
+> the session's model.
 
 ### Stage 0: Scope Discovery
 
@@ -59,9 +60,10 @@ Escalate instead of continuing when the request needs a new architectural decisi
 bounded context, or a cross-cutting redesign — recommend `orch-adr`, `orch-architecture`,
 or `orch-blueprint` first and ask the user.
 
-**Agents:** none required (orchestrator). Optionally `product-owner:product-owner` for
-acceptance criteria wording; `architecture:architect` only when architectural impact is
-suspected.
+**Agents:** the orchestrator owns the decision half; the **Identify** bullets above are
+delegated to a read-only search sub-agent per **Splitting Scope Discovery** in
+`instructions/orch-execution-model.instructions.md`. `architecture:architect` only when architectural
+impact is suspected.
 
 ### Stage 1: Specification & Architecture Intake
 - **Review the scope recorded in Stage 0** and its acceptance criteria
@@ -69,7 +71,7 @@ suspected.
 - **Capture implementation constraints** and affected integration points
 - **Define the local validation target** for the approved change
 
-**Agents:** `product-owner:product-owner`, `architecture:architect`
+**Agents:** `architecture:architect`
 
 ### Stage 2: Implementation
 - **Write code following standards** and patterns

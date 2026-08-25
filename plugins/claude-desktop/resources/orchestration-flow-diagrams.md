@@ -90,8 +90,8 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
-| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
-| MVP Scope Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Scope Discovery | `orchestrator` agent, optionally `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| MVP Scope Intake | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
 | Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
@@ -122,7 +122,7 @@ flowchart TD
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
 | Dependency Analysis | `csharp-coding:coding` | `microsoft-learn` |
-| Update Planning | `product-owner:product-owner` | — |
+| Update Planning | `csharp-coding:coding` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
 | Security Validation | `csharp-coding:coding` | — |
 | Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
@@ -307,8 +307,8 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
-| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
-| Specification & Architecture Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Scope Discovery | `orchestrator` agent, optionally `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Specification & Architecture Intake | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
 | Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
 | QA Validation | `qa:qa`, `qa:qa-monitor`, `aspire` | `playwright` *(capture for new functionality only)* |
@@ -337,8 +337,8 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
-| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
-| Bug Intake & Reproduction | `product-owner:product-owner` | — |
+| Scope Discovery | `orchestrator` agent, optionally `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Bug Intake & Reproduction | `csharp-coding:coding`, `qa:qa` (runtime repro) | — |
 | Root Cause Analysis | `csharp-coding:coding` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
 | Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
@@ -369,7 +369,7 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
-| Scope Discovery | `orchestrator` agent, optionally `architecture:architect`, `product-owner:product-owner` | `jsdotnet-guidelines-mcpserver` |
+| Scope Discovery | `orchestrator` agent, optionally `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Structure & Architecture Intake | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Refactor Planning | `architecture:architect`, `csharp-coding:coding` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
@@ -401,8 +401,8 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
-| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
-| Specification Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Scope Discovery | `orchestrator` agent, optionally `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Specification Intake | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
 | Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |
@@ -432,8 +432,8 @@ flowchart TD
 
 | Phase | Agents | MCP servers |
 |-------|--------|-------------|
-| Scope Discovery | `orchestrator` agent, optionally `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
-| Specification Intake | `product-owner:product-owner`, `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Scope Discovery | `orchestrator` agent, optionally `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
+| Specification Intake | `architecture:architect` | `jsdotnet-guidelines-mcpserver` |
 | Implementation Planning | `architecture:architect` | — |
 | Implementation | `csharp-coding:coding` | `microsoft-learn` |
 | Build & Test | `csharp-coding:coding` | `microsoft-learn` *(targeted remediation only)* |

@@ -7,7 +7,7 @@ description: Defines when and how orch-* orchestration skills use the orch-dashb
 
 ## Purpose
 
-- The `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner`
+- The `architecture`, `domain-design`, `ux-design`, and `documentation`
   plugins have **no dependency** on the dashboard. Their agents and skills only produce
   Markdown/Mermaid file artifacts and never reference a viewer.
 - `claude-desktop`'s `orch-*` skills own viewer usage instead: when an orchestrated stage hands
@@ -62,7 +62,6 @@ Render after a coordinated agent drafts or revises a Markdown document:
 - `ux-design:ux-designer` — design guideline and design review documents.
 - `documentation:documentation` / `documentation:profile` — how-tos, explanations,
   articles, proposals, ideas, and profile artifacts.
-- `product-owner:product-owner` — epics, stories, and bugs.
 
 Render the same Markdown content the agent wrote to its file artifact.
 

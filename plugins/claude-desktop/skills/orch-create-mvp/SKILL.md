@@ -37,8 +37,9 @@ Execute a complete MVP development workflow from planning through local run and 
 > Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
-> (category defaults, overridable via personal global model selection or
-> `.claude/model-selection.md` in the consuming repo).
+> (category defaults, overridable via personal global model selection). A category model
+> applies only where the stage is delegated with an `Agent` call; an inline stage runs on
+> the session's model.
 
 ### Stage 0: Scope Discovery
 
@@ -62,17 +63,22 @@ when the MVP needs a new architectural decision or a documented target architect
 implementation — recommend `orch-blueprint`, `orch-architecture`, or `orch-adr` and ask
 the user. Product-definition work at that level belongs there, not here.
 
-**Agents:** none required (orchestrator). Optionally `product-owner:product-owner` for
-feature framing and acceptance criteria; `architecture:architect` when the target
-architecture needs shaping.
+**Agents:** the orchestrator owns the decision half; the **Identify** bullets above are
+delegated to a read-only search sub-agent per **Splitting Scope Discovery** in
+`instructions/orch-execution-model.instructions.md`. `architecture:architect` when the target architecture
+needs shaping.
 
 ### Stage 1: MVP Scope Intake
 - **Review the MVP scope recorded in Stage 0** and its acceptance criteria
+- **Establish the initial domain vocabulary** — the handful of core concepts the MVP is about,
+  named once here so the implementation does not invent competing terms per feature
 - **Record feature priorities** and delivery order
 - **Identify dependencies** and risks
 - **Record the validation target** for the implementation run
 
-**Agents:** `product-owner:product-owner`, `architecture:architect`
+**Agents:** `architecture:architect`; `domain-design:domain-architect` when the MVP defines a
+new domain rather than extending a documented one. Keep it to the vocabulary and the context
+boundaries — full domain modeling belongs to `orch-domain`.
 
 ### Stage 2: Implementation Planning
 - **Break the recorded MVP into implementation slices**

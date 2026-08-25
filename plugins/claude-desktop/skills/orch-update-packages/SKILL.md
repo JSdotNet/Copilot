@@ -40,8 +40,9 @@ Execute a complete package update workflow with validation, testing, and local r
 > Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
-> (category defaults, overridable via personal global model selection or
-> `.claude/model-selection.md` in the consuming repo).
+> (category defaults, overridable via personal global model selection). A category model
+> applies only where the stage is delegated with an `Agent` call; an inline stage runs on
+> the session's model.
 
 ### Stage 1: Dependency Analysis
 - **Scan all dependencies** for updates available
@@ -59,7 +60,7 @@ Execute a complete package update workflow with validation, testing, and local r
   strategy, and anything deliberately deferred
 - **Coordinate with stakeholders** for major version upgrades
 
-**Agents:** `product-owner:product-owner`
+**Agents:** `csharp-coding:coding`
 
 ### Stage 3: Implementation
 - **Update packages** using appropriate package managers:

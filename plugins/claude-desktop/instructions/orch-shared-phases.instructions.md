@@ -22,19 +22,29 @@ is actually in. They were previously one 47 KB file, which meant every run carri
 phases it had not reached yet and the ones its tier would never run — on every turn, until
 the run ended.
 
-| File | Holds | When a run reads it |
+| File | Holds | Read it |
 | --- | --- | --- |
 | `orch-execution-model.instructions.md` | Code-modifying context and escalation, MCP server strategy, session ownership, delegation order, sub-agent constraints, run state and resume, **Session Handoff** | Once, at the start of the run |
-| `orch-delivery-phases.instructions.md` | Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary | When the run reaches Personal Validation |
+| `orch-model-selection.instructions.md` | Category → model resolution and the personal override | Once, before `start_run` |
 | `orch-dashboard-contract.instructions.md` | The dashboard reporting contract, surfacing the dashboard, context and token insight | Once, before the first `update_stage` |
-| `skills/phase-build-test/SKILL.md` and `skills/phase-qa-validation/SKILL.md` | Build & Test and QA Validation, in full | When the orchestrator invokes them |
+| `orch-repo-context.instructions.md` | The `.claude/orch-context.md` convention | **Only if `.claude/orch-context.md` exists.** Check for the file first; when it is absent there is no convention to apply |
+| `orch-delivery-phases.instructions.md` | Personal Validation, Create Pull Request, Documentation Update, GitHub Issue Update, Summary | **Only when the run reaches Personal Validation** — not at the start |
+| `dashboard-usage.instructions.md` | When to open the Markdown and Mermaid viewers | **Only when a stage renders a diagram or document** |
+| `skills/phase-build-test/SKILL.md` and `skills/phase-qa-validation/SKILL.md` | Build & Test and QA Validation, in full | When the orchestrator invokes them. It reads them itself, because it owns depth selection and the dashboard stage; the sub-agent it delegates to receives the instruction, not the file |
 
 Build & Test and QA Validation are **not** defined in this file or in its companions. They
 are invokable skills and their procedure lives only there; the instruction files name them,
 their position in the tier, and their model category, and stop.
 
-Read what the run needs, not the whole set — reading all four files up front costs what the
-single file cost and defeats the split.
+**This table is a rule, not a reading suggestion.** Loading the whole set up front costs
+what the single 47 KB file cost and defeats the split entirely — and it costs it on *every
+turn* for the rest of the run, because everything read stays in the prompt. Roughly a third
+of these bytes belong to phases a given run has not reached, or to a convention its
+repository does not use. A run that reads all of them has not been more thorough; it has
+paid for the prose it did not need, repeatedly.
+
+Re-reading a file the run already loaded is free — it is already in context. Reading one it
+does not need is not.
 
 ## How Skills Reference These Phases
 

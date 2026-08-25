@@ -21,8 +21,9 @@ Execute a general architecture workflow with the Claude Code orchestration dashb
 > Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
-> (category defaults, overridable via personal global model selection or
-> `.claude/model-selection.md` in the consuming repo).
+> (category defaults, overridable via personal global model selection). A category model
+> applies only where the stage is delegated with an `Agent` call; an inline stage runs on
+> the session's model.
 
 ### Stage 1: Goal & Guideline Retrieval
 - **Clarify the architecture objective** and expected output

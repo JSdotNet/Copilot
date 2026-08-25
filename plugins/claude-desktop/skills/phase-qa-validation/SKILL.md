@@ -15,6 +15,34 @@ automatically from the kind of change so callers do not re-describe QA rules.
 - Documentation/config orchestrations skip this phase.
 - Skip when the repository declares it has no runnable application (see **Repo Context**).
 
+## Run This Phase In A Sub-Agent
+
+**Scenario execution is delegated, not run inline.** This is the single most expensive
+phase to run in the owner session: browser snapshots, `browser_evaluate` results, page
+accessibility trees, and Aspire log pages are large, and every one read inline is re-sent on
+every later turn of the run — through Personal Validation, the pull request, and the
+summary. Delegated, the owner session pays for the QA *result* instead of the QA *session*.
+
+- **Invoke `qa:qa` with a single `Agent` call** in the **same worktree** (never
+  `isolation: "worktree"` — an isolated checkout cannot see the change set under test or
+  reach the running application), using the model resolved for this phase's category per
+  `instructions/orch-model-selection.instructions.md`.
+- **Keep `qa:qa-monitor` a separate background agent.** Its own context window is the point:
+  log and trace polling is high-volume and low-value to retain, so it belongs anywhere other
+  than the session that has to survive to Personal Validation. Merging monitoring into the
+  QA agent, or running it inline, puts exactly that volume back into a context that keeps
+  paying for it.
+- **Ask for the report, never the transcript.** The sub-agent returns the structured
+  **Outputs** below — per-scenario pass/fail, evidence paths, monitoring findings. It does
+  not return page snapshots, DOM dumps, log pages, or a narration of the steps it drove.
+- **The orchestrator reports the dashboard stage** from that report, including `scenarios`
+  and `monitoring` — the sub-agent never calls dashboard tools itself.
+- **Run inline only when delegation is impossible** (the `Agent` tool is unavailable), or
+  for startup-only validation, which is a handful of calls and not worth a sub-agent.
+
+Evidence paths must still resolve under the orchestrating worktree root — see **Evidence
+Location** below, which is why the QA sub-agent shares the worktree rather than isolating.
+
 ## Repo Context
 
 The consuming repository may supply `.claude/orch-context.md`, read once per run by
@@ -41,41 +69,16 @@ behavior described below, note the fallback once, and continue.
 
 ## Depth Selection (Automatic)
 
-Before running a QA mode that depends on an MCP server, verify that the required MCP
-tooling is available. Required tooling includes `playwright` for browser automation,
-screenshots, videos, or any user-requested evidence capture, and any monitoring MCP/tooling
-declared by repo context or needed for the selected runtime validation.
+Before running a QA mode that depends on an MCP server, verify that the required MCP tooling
+is available: `playwright` for browser automation and any screenshot or video evidence, and
+`aspire` for log, trace, resource, or health evidence. The server configuration lives with
+the QA plugin — `qa:playwright-validation` for the Playwright MCP entry, `qa:aspire-log-monitor`
+for `aspire mcp init` / `aspire mcp start`. This phase only decides what to do when the
+tooling is missing.
 
-For Playwright-backed validation, the preflight is:
-
-1. Confirm the consuming repo/session has the Playwright MCP server configured before QA
-   starts, for example:
-
-   ```json
-   {
-     "servers": {
-       "playwright": {
-         "command": "npx",
-         "args": ["-y", "@playwright/mcp@latest"]
-       }
-     }
-   }
-   ```
-
-2. Confirm Claude Code was restarted or its MCP servers were reloaded after
-   configuration, so the `browser_*` Playwright tools are visible to the QA/orchestration
-   agent that will run validation.
-3. Run a live capture smoke check before scenarios: use Playwright MCP to navigate to the
-   target page and take a screenshot. If navigation or screenshot capture fails, screenshot
-   and video capture are unavailable for this run.
-
-For Aspire-backed monitoring, confirm Aspire MCP is initialized and running before
-validation when logs, traces, metrics, resources, or health evidence are required:
-
-```bash
-aspire mcp init
-aspire mcp start
-```
+The Playwright preflight is one live check, not a config inspection: navigate to the target
+page and take a screenshot before running scenarios. If that fails, screenshot and video
+capture are unavailable for this run — treat it per the selected QA depth below.
 
 When QA is delegated to `qa:qa` or `qa:qa-monitor`, verify availability in the target
 agent/session tool surface, not only in the parent orchestration session. The QA plugin
@@ -132,8 +135,9 @@ Applies when the repository does not declare a QA depth in `.claude/orch-context
      told otherwise, so this phase must not be marked `done` while one is still running.
   5. **Record the QA result** with pass/fail per scenario and the captured evidence.
 
-  Playwright execution itself stays in the orchestrating session (inline or via a
-  sub-agent in the **same worktree**) so it exercises the actual change set.
+  Playwright execution stays in the orchestrating **worktree** — delegated to a sub-agent
+  that shares it, per **Run This Phase In A Sub-Agent** — so it exercises the actual change
+  set while its output stays out of the owner session's context.
 - **Bug fix or change to existing functionality → targeted QA validation without required capture:**
   1. **Run the application locally** via the `aspire` / `aspire-run` skill and verify the
      affected scenarios.
@@ -176,6 +180,10 @@ or a restart, and do not ask the user to restart the app manually as the normal 
 - Monitoring findings (Aspire log/trace/metric anomalies) when monitoring ran.
 - These outputs feed the shared Personal Validation phase (the recorded QA review the user
   reviews).
+
+These are what the QA sub-agent returns, and all of it. A failure is reported with the
+evidence path and the specific error, not with the page snapshot or log page it came from —
+the evidence file is the record, and the dashboard renders it from disk on demand.
 
 ## Dashboard Reporting
 

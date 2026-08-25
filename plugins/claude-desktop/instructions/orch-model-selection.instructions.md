@@ -9,8 +9,8 @@ description: Defines the model-selection categories the orchestrator uses to pic
 
 - Make the `orchestrator` agent (`agents/orchestrator.agent.md`) the **single** place that
   chooses a model for every step of an `orch-*` run. Every other agent used by an
-  orchestration (`product-owner:product-owner`, `architecture:architect`,
-  `csharp-coding:coding`, `qa:qa`, `qa:qa-monitor`, `documentation:profile`, etc.) has no
+  orchestration (`architecture:architect`, `csharp-coding:coding`, `qa:qa`,
+  `qa:qa-monitor`, `documentation:profile`, etc.) has no
   `model` in its own frontmatter for this reason — pinning a model on the agent itself would
   create a second, conflicting source of truth. Only `orchestrator.agent.md` pins its own
   model, because it is the one agent that must run under a fixed, known model to reliably
@@ -18,10 +18,24 @@ description: Defines the model-selection categories the orchestrator uses to pic
 - Define the categories **once** so a maintainer edits this file instead of re-describing
   model choice in every `orch-*/SKILL.md`.
 - Let an individual user override model choice outside the repository, and let a consuming
-  repository define team-shared overrides without editing plugin files.
+  repository stay out of model choice entirely.
 - Pick the **best-matching model per category** — never default to the cheapest model just
   because it is cheap, and never pin an exact version number that goes stale the moment a
   newer release ships.
+
+## Category Models Only Apply To Delegated Stages
+
+**A stage run inline runs on the session's model, whatever this file says.** The `model`
+parameter exists on the `Agent` tool and in agent frontmatter; there is no mechanism that
+switches the model of the main loop mid-run. So a category that resolves to `sonnet` costs
+`opus` money the moment its stage is executed inline instead of delegated.
+
+This is not a detail of the mechanism — it is the mechanism. Every category below is a claim
+about a stage that will be delegated, and the categories deliver nothing on a run that does
+everything itself. The delegation rules in **Delegation Order**
+(`orch-execution-model.instructions.md`) and the two phase skills are what make this file
+real; treat a stage that resolves to a non-session model and then runs inline as a defect in
+the run, not as a harmless simplification.
 
 ## Use Aliases, Never Version-Pinned IDs
 
@@ -50,24 +64,44 @@ description: Defines the model-selection categories the orchestrator uses to pic
 ## Categories
 
 Each stage in an `orch-*` skill delegates to one or more agents (its `**Agents:**` line).
-Every agent used across the `orch-*` skills maps to exactly one category below. Add new
-agents to this table when a new `orch-*` skill introduces one.
+Every agent used across the `orch-*` skills maps to a category below. Add new agents to this
+table when a new `orch-*` skill introduces one.
+
+Category follows the **work**, not only the agent. Most agents appear once, so the agent
+names the category on its own. `csharp-coding:coding` is the exception, because the same
+agent both runs the suites and repairs them: **the stage decides**. Build & Test resolves it
+to `sonnet`; Implementation — including the fix for a build that Build & Test just returned
+red — resolves it to `opus`. When a stage could read either way, resolve to the category
+whose **Typical Stages** names it.
 
 | Category | Typical Stages | Agents | Model | Rationale |
 | --- | --- | --- | --- | --- |
-| **Planning & Product Definition** | Feature/bug/package specification intake | `product-owner:product-owner` | `sonnet` | Prose-heavy drafting (stories, acceptance criteria, plans) needs solid general reasoning to keep scope and criteria coherent, but not the strongest tier. |
-| **Architecture & Design** | Architecture & Design intake, ADR/TDR/arc42/Blueprint drafting | `architecture:architect`, `domain-design:domain-architect` | `opus` | Trade-off analysis and long-term design decisions warrant the strongest reasoning available. |
-| **Implementation & Coding** | Implementation, Build & Test, module/service scaffolding | `csharp-coding:coding` | `opus` | Precise, tool-heavy code generation and TDD, where a subtle mistake costs a whole validation cycle. |
-| **Testing, QA & Monitoring** | QA Validation, runtime monitoring | `qa:qa`, `qa:qa-monitor` | `sonnet` | Tool-heavy but procedural: driving Playwright and reading logs/traces rewards throughput over deep reasoning. |
-| **Review** | Create Pull Request (PR description + final polish), Summary | *(default; no dedicated agent — the orchestrator performs these directly)* | `opus` | Highest-quality judgment for catching bugs and writing an accurate PR description; not on the hot path, so the strongest model is worth it. |
+| **Architecture & Design** | Architecture & Design intake, ADR/TDR/arc42/Blueprint drafting | `architecture:architect` | `opus` | Trade-off analysis and long-term design decisions warrant the strongest reasoning available. |
+| **Implementation & Coding** | Implementation, module/service scaffolding, fixing a red build | `csharp-coding:coding` | `opus` | Precise, tool-heavy code generation and TDD, where a subtle mistake costs a whole validation cycle. |
+| **Testing, QA & Monitoring** | Build & Test, QA Validation, runtime monitoring | `qa:qa`, `qa:qa-monitor`, `csharp-coding:coding` *(running the suites, not fixing them)* | `sonnet` | Tool-heavy but procedural: running builds and suites, driving Playwright, and reading logs/traces reward throughput over deep reasoning. Diagnosing and fixing a failure is Implementation & Coding, and resolves to `opus` there. |
+| **Domain Design** | Bounded-context and boundary review during service/module creation | `domain-design:domain-architect` | `opus` | Boundary and ubiquitous-language decisions are expensive to reverse once code exists. |
 | **Documentation & Low-Complexity** | `orch-repo` documentation/README stages, Summary | `documentation:profile` | `haiku` | Genuinely low-complexity formatting/writing — the one category where the lightweight model is the right match, not a cost shortcut. |
 | **Human-in-the-Loop** | Personal Validation | *(none)* | *(none)* | No agent and no model: this phase always hands control back to the user. |
 | **Fallback / Unclassified** | Any stage whose agent is not yet listed above, and any `(default)` stage with no clear category match | *(any)* | *(session default)* | Let the session's own model run it until the agent is added to this table — safer than guessing a family for an uncategorized case. |
 
-A stage may list agents from more than one category (for example a combined
-"Specification & Architecture Intake" stage naming both `product-owner:product-owner` and
-`architecture:architect`). Resolve the model per named agent, not once per stage, so each
-agent still gets its own category's model.
+Stages the orchestrator performs itself — Create Pull Request, Summary, and Scope Discovery's
+decision half — have no category, because they run inline and inline stages always run on the
+session's model. Do not add a category for them: it would resolve to a value nothing can
+apply.
+
+**What actually varies.** The orchestrator is pinned to `opus`, so the two `opus` categories
+resolve to the model the owner session is already running and change nothing on their own —
+they are here to state intent, and to stay correct if that pin ever changes. The categories
+that genuinely move cost today are **Testing, QA & Monitoring** (`sonnet`) and **Documentation
+& Low-Complexity** (`haiku`). Expect a run's `tokenUsage.models` to show `opus` plus `sonnet`
+whenever Build & Test or QA Validation ran.
+
+A stage may list agents from more than one category (for example `orch-bug`'s "Bug Intake &
+Reproduction", naming `csharp-coding:coding` and `qa:qa`). Resolve the model per named
+agent, not once per stage, so each
+agent still gets its own category's model — and for the one agent that spans two categories,
+per named agent **in that stage**, so the same agent can be `sonnet` in Build & Test and
+`opus` in Implementation within a single run.
 
 ## When to Leave the Model Unset
 
@@ -89,11 +123,15 @@ stopping at the first match:
 2. **Personal global override** — if `CLAUDE_ORCH_MODEL_SELECTION_PATH` points to a readable
    file, read that file; otherwise check the default user-global file path (see below). If
    the file lists an entry for the stage's category, use that value.
-3. **Team repo override** — if the consuming repository defines `.claude/model-selection.md`
-   (see below) and it lists an entry for the stage's category, use that value.
-4. **Category model** — otherwise use the alias named in the table above.
-5. **Session default** — if the stage's agent is not yet categorized, leave the model unset
+3. **Category model** — otherwise use the alias named in the table above.
+4. **Session default** — if the stage's agent is not yet categorized, leave the model unset
    and flag it for follow-up (add the agent to the table above).
+
+There is deliberately **no repository-level model override**. Model choice is a personal cost
+and speed preference, not a property of the repository being worked on, and a committed
+override would silently change what every collaborator's runs cost. A repository that needs
+to influence a run does so through `.claude/orch-context.md`
+(`orch-repo-context.instructions.md`), which sets runtime and QA context and never a model.
 
 None of the agents invoked by an orchestration pin their own `model`, so there is no
 "agent's pinned model" tier to consider — the orchestrator's resolution above is the only
@@ -103,10 +141,15 @@ sub-agents such as the parallel `qa:qa-monitor`.
 
 ## Personal Global Override File
 
-- A user may define personal model preferences outside every repository. This keeps personal
-  cost and speed preferences out of team-shared instructions and avoids accidental commits.
-- Preferred explicit path: set `CLAUDE_ORCH_MODEL_SELECTION_PATH` to a Markdown file using
-  the same table format as the team repo override below.
+This is the **only** override tier. A user may define personal model preferences outside
+every repository, which keeps personal cost and speed preferences out of shared instructions
+and avoids accidental commits.
+
+- Preferred explicit path: set `CLAUDE_ORCH_MODEL_SELECTION_PATH` to a Markdown file holding
+  a two-column `Category` / `Model` table, using the exact category names from the table
+  above. The `Model` value is normally an alias (`opus`, `sonnet`, `haiku`, `fable`) or
+  `inherit`; an exact model ID is allowed when the user deliberately pins a version and
+  accepts the maintenance cost. List only the categories being overridden.
 - Default path when the environment variable is unset:
 
 | OS | Default path |
@@ -115,10 +158,13 @@ sub-agents such as the parallel `qa:qa-monitor`.
 | macOS/Linux | `~/.claude/orchestration/model-selection.md` |
 
 - The orchestrator reads at most one personal file: the environment-variable path when set,
-  otherwise the default path. If the selected file is missing, unreadable, malformed, or a
-  category is not listed, fall back to the next step in the Resolution Order.
-- Do **not** support repo-local personal files such as `.claude/model-selection.local.md`.
-  Personal overrides belong outside the repo; repository files are team-shared by default.
+  otherwise the default path. It is read **once per run** before `start_run`, and the
+  resolved mapping is reused for every stage in that run. If the selected file is missing,
+  unreadable, malformed, or a category is not listed, fall back to the next step in the
+  Resolution Order.
+- Do **not** read any model-selection file inside the repository — not
+  `.claude/model-selection.md`, and not a repo-local personal variant such as
+  `.claude/model-selection.local.md`. Model choice never comes from the repo.
 
 ```markdown
 # Orchestration Model Selection Overrides
@@ -129,31 +175,6 @@ sub-agents such as the parallel `qa:qa-monitor`.
 | Review | inherit |
 ```
 
-## Team Repo Override File
-
-- A consuming repository may create `.claude/model-selection.md` at its repo root to
-  override any category's default for the whole team.
-- Format: a Markdown table with two columns, `Category` and `Model`, using the exact category
-  names from the table above. The `Model` value is normally an alias (`opus`, `sonnet`,
-  `haiku`, `fable`), `inherit`, or an exact model ID when the repo deliberately pins a
-  version. Prefer aliases unless there is a clear reason to accept the maintenance cost of an
-  exact pin. Only include the rows being overridden; omitted categories keep the plugin
-  defaults unless a personal global override already supplied that category.
-
-```markdown
-# Orchestration Model Selection Overrides
-
-| Category | Model |
-| --- | --- |
-| Testing, QA & Monitoring | opus |
-| Documentation & Low-Complexity | sonnet |
-```
-
-- The orchestrator reads the personal and team files once per run (if present) before
-  `start_run`, and reuses the resolved mapping for every stage in that run.
-- If a file is missing, malformed, or a category is not listed, fall back to the next step in
-  the Resolution Order.
-
 ## Quality Checks
 
 - [ ] Every agent referenced by an `orch-*/SKILL.md` `**Agents:**` line has a category in the
@@ -162,13 +183,18 @@ sub-agents such as the parallel `qa:qa-monitor`.
       its own `model` in frontmatter.
 - [ ] The orchestrator resolves and applies a model before each stage transition, following
       the Resolution Order, and never hardcodes a version number while doing so.
-- [ ] A personal global override, when present, takes precedence over a team repo override.
-- [ ] A team repo override in `.claude/model-selection.md`, when present, takes precedence
-      over the category default.
+- [ ] A personal global override, when present, takes precedence over the category default.
+- [ ] No model-selection file is read from inside the repository, and no `orch-*` asset
+      documents one as a supported override source.
 - [ ] Personal Validation never receives a model or agent assignment.
 - [ ] This file names aliases, not exact version-pinned model IDs, so it does not need an
       edit every time a new model ships.
 - [ ] An unset model is used deliberately (Fallback/Unclassified, or an explicit `inherit`
       override), not as the blanket default for every category.
+- [ ] Every stage whose category resolves to a model other than the session's is actually
+      delegated with an `Agent` call — a category model on an inline stage is inert.
+- [ ] `tokenUsage.models` on a finished run shows more than one model whenever the run had a
+      delegated stage in a non-session category. One model on such a run means the
+      resolution never reached an `Agent` call.
 - [ ] No repo-local personal override path such as `.claude/model-selection.local.md` is
       supported or treated as a readable config source.
