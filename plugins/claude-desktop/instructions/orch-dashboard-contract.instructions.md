@@ -86,6 +86,41 @@ every dashboard tool under the other.
   status and summary once the pull request and any applicable GitHub issue update are complete
   (or the run concludes without one).
 
+### Naming the Session
+
+`start_run` and `update_stage` return a `sessionTitle`: a prefixed name derived from where this
+run's output has actually landed, so a list of parallel sessions can be scanned by the kind of
+work each one did.
+
+- **When `sessionTitle` is non-null and differs from the name you last set**, rename the
+  session to it — `set_session_title` with `session_id: "self"` in Claude Code Desktop, or
+  whatever the host exposes for renaming the current session. If the host exposes no such tool,
+  skip this silently; it is a convenience, never a gate.
+- **When it is `null`, do nothing.** Nothing has been written yet, so the destination is still
+  unknown and the host's own title is the better name.
+- **Do not compose the name yourself.** The prefix is computed from observed writes in
+  `session-title.mjs`; hand-assembling one puts a second, drifting grammar into the session
+  list. Pass the returned string through unchanged.
+
+The name settles on its own: it sharpens when the first writes land, then stops moving once the
+dominant destination is established, so the rename is normally a one-time event mid-run.
+
+| Where the run wrote | Prefix |
+| --- | --- |
+| `.domain/<context>/**` | `domain:<context>` |
+| `.arc42/**` | `arc42` |
+| `.tech/**` | `tech` |
+| `.design/**` | `design` |
+| `.backlog/**` | `backlog` |
+| anywhere else in the worktree | `code` |
+| published as a Claude Artifact | `artifact` |
+
+A bounded context is appended as `<prefix>:<context>` whenever exactly one is involved —
+resolved from the `.domain/` folder names directly, or matched against them from a code path,
+which is what the convention's "keep context and module names aligned" rule buys. Generated
+`_meta/` files never count, an artifact publish outranks the folder tally, and the session's
+git branch and worktree are unaffected: they are fixed when the session is created.
+
 ### Surfacing the Dashboard
 
 A run the user cannot see is a run they cannot steer. Show the dashboard where the host can

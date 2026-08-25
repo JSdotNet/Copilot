@@ -79,6 +79,12 @@ Practical consequences:
   state layout, and security posture. Registered automatically by this plugin; requires
   Node 18+ on `PATH` and has no npm dependencies.
 
+  It also names the session: every run's output destination is observed through the telemetry
+  hook, and `start_run`/`update_stage` hand back a prefixed `sessionTitle`
+  (`domain:<context>`, `arc42`, `tech`, `design`, `backlog`, `code`, or `artifact`) so a list
+  of parallel sessions can be scanned by the kind of work each one did. See **Session Naming**
+  in the server README for the precedence rules.
+
 ### Hooks
 
 - `hooks/hooks.json` — a `SessionStart` prompt hook that routes governed task categories to

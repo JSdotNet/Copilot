@@ -38,6 +38,7 @@ import { summarizeInsights, summarizeContext } from "./insight.mjs";
 import { renderReportMarkdown, renderReportHtml } from "./report.mjs";
 import { runsDir, stateDir, worktreeRoot, readActive, writeActive } from "./state.mjs";
 import { isIdle, clearIdle, isHandoffPending, markHandoff, clearHandoff } from "./idle.mjs";
+import { computeSessionTitle } from "./session-title.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -595,7 +596,7 @@ const tools = [
     {
         name: "start_run",
         description:
-            "Start tracking a new orchestration run. Call once at the beginning of an orch-* skill, listing every workflow stage up front so the dashboard can show overall progress immediately.",
+            "Start tracking a new orchestration run. Call once at the beginning of an orch-* skill, listing every workflow stage up front so the dashboard can show overall progress immediately. Returns `sessionTitle` once the run has been observed writing output — on a fresh run it is null and no rename is due yet.",
         inputSchema: {
             type: "object",
             properties: {
@@ -677,7 +678,7 @@ const tools = [
                     }
                     await writeActive({ runId: existing.id, stage: null, updatedAt: new Date().toISOString() });
                     bus.emit("update");
-                    return { runId: existing.id, resumed: true, run: existing, dashboardUrl };
+                    return { runId: existing.id, resumed: true, run: existing, dashboardUrl, sessionTitle: computeSessionTitle(existing) };
                 }
             }
             const normalizedOriginalPrompt = typeof originalPrompt === "string" && originalPrompt.trim() ? originalPrompt.trim() : "";
@@ -714,7 +715,7 @@ const tools = [
             await writeRun(baseDir, run);
             await writeActive({ runId: run.id, stage: null, updatedAt: now });
             bus.emit("update");
-            return { runId: run.id, resumed: false, dashboardUrl };
+            return { runId: run.id, resumed: false, dashboardUrl, sessionTitle: computeSessionTitle(run) };
         },
     },
     {
@@ -821,7 +822,7 @@ const tools = [
     {
         name: "update_stage",
         description:
-            "Update one stage of a tracked run. Call once at its start (in_progress) and once when it ends (done/blocked/skipped) with a summary. Personal Validation: pass links to review targets. QA stages: pass scenarios and monitoring so results and evidence render inline.",
+            "Update one stage of a tracked run. Call once at its start (in_progress) and once when it ends (done/blocked/skipped) with a summary. Personal Validation: pass links to review targets. QA stages: pass scenarios and monitoring so results and evidence render inline. Returns the run's current `sessionTitle`, derived from where its output has landed so far; rename the session when it differs from the last name you set.",
         inputSchema: {
             type: "object",
             properties: {
@@ -898,6 +899,7 @@ const tools = [
                 throw new ToolError(`status must be one of ${VALID_STATUSES.join(", ")}`);
             }
             let activeStage = undefined;
+            let sessionTitle = null;
             await withRunLock(runId, async () => {
                 const run = await readRun(baseDir, runId);
                 if (!run) throw new ToolError(`No run with id ${runId}`);
@@ -943,13 +945,16 @@ const tools = [
                 stage.updatedAt = nowIso;
                 run.updatedAt = nowIso;
                 clearIdle(run);
+                // Read inside the lock, off the same run the telemetry hook has been folding
+                // write destinations into, so the name reflects everything observed up to now.
+                sessionTitle = computeSessionTitle(run);
                 await writeRun(baseDir, run);
             });
             // Written outside the run lock: the telemetry hook reads this pointer to
             // attribute tool calls and token usage to the stage that is running now.
             if (activeStage !== undefined) await setActiveStage(runId, activeStage);
             bus.emit("update");
-            return { ok: true };
+            return { ok: true, sessionTitle };
         },
     },
     {
