@@ -16,7 +16,7 @@ Re-run the same command after changing the plugin.
 ## What the convention is
 
 Each knowledge folder holds Markdown chapters. Every chapter carries a `meta`
-block declaring its identity, status, reading order, and its relationships to
+block declaring its identity, status, number, date, and its relationships to
 other chapters. A generator walks the corpus and writes derived indexes under
 `_meta/`, which CI validates on every pull request and a scheduled job keeps
 current.
@@ -48,7 +48,8 @@ first indexes.
 ### Skill: `knowledge-base-validate`
 
 Runs the check and repairs what it reports — broken references, missing or
-malformed `meta` blocks, inconsistent reading order, stale committed indexes.
+malformed `meta` blocks, fields the schema no longer defines, stale committed
+indexes.
 
 **Trigger keywords:** `knowledge-meta failed`, `broken reference`, `stale _meta`,
 `validate knowledge folders`, `knowledge base check`, `build.mjs --check`
@@ -266,6 +267,59 @@ for technologies that do not appear in package manifests.
   context rather than baseline context, `meta` blocks are mandatory on every
   chapter, and `_meta/` is never hand-edited.
 
+## Migrating to 0.9.0: the `order` field is removed
+
+**Breaking for every repository that adopted the convention before 0.9.0.** The
+file-level `order` field is gone from the metadata schema, and `build.mjs
+--check` reports an **error** on every block that still carries one.
+
+A metadata block describes the thing it sits under, and a directory's reading
+order is not a property of one document inside it. So reading order moved out of
+metadata and into the folder convention: each directory's root document is read
+first — `.domain/context-map.md`, a bounded context's `domain.md`,
+`.tech/technology-graph.md`, `.design/README.md` — then that folder's prescribed
+files in the sequence its instructions file documents, then anything else
+filename-sorted. `.arc42` and `.backlog` sort by filename outright, as `.arc42`
+always did. Nothing is authored per repository any more, so adding a file needs
+no declaration and the whole class of drift between a list and its directory is
+gone. The convention is encoded once, in `DIRECTORY_CONVENTION` in
+`.github/tools/knowledge-meta/outline.mjs`.
+
+To migrate, re-sync `.github/tools/knowledge-meta/` from this plugin, then:
+
+1. **Delete every `order` field.** They are all on file-level blocks:
+   `.domain/context-map.md`, each `.domain/<context>/domain.md`,
+   `.tech/technology-graph.md`, `.design/README.md`. Remove the line; change
+   nothing else in the block.
+2. **Check the order you get is the order you want.** Run
+   `node .github/tools/knowledge-meta/build.mjs` and read the resulting
+   `index.json`. Where a hand-declared order disagrees with the convention, the
+   convention wins — a repository-specific sequence is no longer expressible, by
+   design.
+3. **Give each directory the root document its folder names.** A directory
+   without one is reported as a warning and simply sorts by filename.
+4. **Commit the regenerated `_meta/` indexes.** Entry order may move; the
+   `schemaVersion` does not change, because the derived shape is identical.
+
+`.arc42` repositories are unaffected: they never declared `order`.
+
+### New in the same release: `number`, `date`, `index`
+
+Three **additive** fields give the generator what it needs to build a good
+outline without any document listing its siblings. Nothing existing breaks if you
+adopt none of them.
+
+| Field | Level | What it does |
+|---|---|---|
+| `number` | file | This document's number in its directory — arc42 chapter 9, ADR 7, TDR 2. A numbered filename (`09-…`, `7-…`, `ADR-0007-…`) supplies it on its own, so the field is for when the filename cannot. A numbered directory sorts by number, so 10 follows 7 instead of following 1. |
+| `date` | file or chapter | The calendar day the document records — a decision taken, debt logged — as `YYYY-MM-DD`. Not a modification timestamp. |
+| `index` | file | `index: root` makes this document its directory's entry point, overriding the convention; `index: exclude` keeps it out of `index.json` while leaving it in `graph.json`. |
+
+Worth doing on adoption: mark `.arc42/adr/README.md` and `.arc42/tdr/README.md`
+with `index: root` — neither folder has a convention root, so without it each is
+a bare numbered list — and give existing ADRs and TDRs their `date`. Both show up
+in `index.json` and on `graph.json` file nodes immediately after a regenerate.
+
 ## Migrating to schema version 3
 
 Schema version 3 is **additive** over 2 and needs no authoring changes. A `file`
@@ -373,9 +427,9 @@ Five layers, weakest to strongest:
    context or hand-editing derived files.
 3. **`meta` block rules** make every chapter's relationships explicit and
    checkable.
-4. **`build.mjs --check`** fails on unresolved references and inconsistent order.
-5. **The CI workflow** fails the pull request on broken references or
-   inconsistent reading order. Drifted `_meta/` indexes are reported as a
+4. **`build.mjs --check`** fails on unresolved references and schema violations.
+5. **The CI workflow** fails the pull request on broken references or a `meta`
+   block that violates the schema. Drifted `_meta/` indexes are reported as a
    warning, not a failure — making every knowledge pull request carry a
    regenerated index is what turns those files into merge conflicts. Refresh is
    deliberate instead: `build/Update-KnowledgeIndex.ps1` on demand, the nightly

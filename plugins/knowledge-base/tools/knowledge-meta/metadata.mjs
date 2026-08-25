@@ -66,13 +66,48 @@ const TYPE_BY_FOLDER = {
 const LEGACY_TYPE_FIELD_BY_FOLDER = { tech: "kind" };
 
 // Fields every folder's chapter/file block may carry, plus folder-specific
-// extras layered in below. `order` is file-level only (see validateDocument):
-// it declares the reading order of a directory's entries.
-const COMMON_OPTIONAL_FIELDS = ["type", "related", "issue", "effort", "roadmap"];
+// extras layered in below.
+const COMMON_OPTIONAL_FIELDS = ["type", "related", "issue", "effort", "roadmap", "date"];
 
 // `roadmap` entries are lowercase kebab-case tag slugs, not chapter references.
 const ROADMAP_TAG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const FILE_ONLY_FIELDS = ["order"];
+
+// Fields that steer how this document appears in the generated outline, and so
+// describe the document's place in its directory rather than a chapter inside
+// it. Valid on the file-level block only.
+const FILE_ONLY_FIELDS = ["index", "number"];
+
+// What `index` may say. `root` makes this document its directory's entry point;
+// `exclude` keeps it out of the outline. Absent means an ordinary listed
+// document, which is the case for nearly every file.
+const INDEX_VALUES = ["root", "exclude"];
+
+// `date` is a calendar date, deliberately not a timestamp: it records when the
+// thing the document describes was decided or logged, which is a fact about the
+// content, not about the last time someone touched the file.
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+const NUMBER_PATTERN = /^\d+$/;
+
+// A leading number in a filename, with an optional label before it, so
+// `01-introduction.md`, `0007-use-postgres.md`, and `ADR-0007-use-postgres.md`
+// all yield their number. The separator is required, so `2024-review.md` reads
+// as number 2024 but `introduction.md` yields nothing.
+const FILENAME_NUMBER_PATTERN = /^(?:[A-Za-z]+[-_ ])?(\d+)(?:[-_. ]|$)/;
+
+// Fields the schema once defined and no longer does. Reported by name rather
+// than as a generic unrecognized field, because a repository that adopted the
+// convention earlier still carries them and the author needs to be told what
+// replaced them, not just that the field is unknown.
+const REMOVED_FIELDS = {
+    order:
+        "reading order is generated from the folder convention plus what each " +
+        "document says about itself. Delete the field; where the generated order is " +
+        "not what you want, give the documents a `number` or mark the directory's " +
+        "entry point with `index: root`. See " +
+        "knowledge-chapter-metadata.instructions.md.",
+};
+
 const FOLDER_EXTRA_FIELDS = {
     domain: ["depends-on", "aliases", "feature-flag"],
     arc42: [],
@@ -437,6 +472,124 @@ export function escapeSequenceIssues(markdown) {
 }
 
 /**
+ * The number in a file or directory name, or `null` when it carries none.
+ *
+ * Takes the basename, so it works for `01-introduction.md` and for a numbered
+ * subdirectory alike.
+ */
+export function fileNumberFromPath(relPath) {
+    const name = relPath.replace(/\\/g, "/").split("/").pop() ?? "";
+    const match = FILENAME_NUMBER_PATTERN.exec(name);
+    return match ? Number(match[1]) : null;
+}
+
+/**
+ * This document's number, from its `number` field if it declares one and from
+ * its filename otherwise.
+ *
+ * The authored field wins, so a document can be renumbered without renaming the
+ * file — and a file whose name already carries the number needs no field at
+ * all. `numberIssues` reports the two disagreeing.
+ */
+export function documentNumber(relPath, meta) {
+    const declared = meta?.number;
+    if (typeof declared === "string" && NUMBER_PATTERN.test(declared)) return Number(declared);
+    return fileNumberFromPath(relPath);
+}
+
+/**
+ * How this document's `index` field steers the outline: `"root"`, `"exclude"`,
+ * or `null` for an ordinary listed document.
+ */
+export function indexRole(meta) {
+    const value = meta?.index;
+    return typeof value === "string" && INDEX_VALUES.includes(value) ? value : null;
+}
+
+/**
+ * Lint the fields that steer outline generation — `index`, `number`, `date`.
+ *
+ * Exported so the graph build reports them, not just the canvas: these fields
+ * decide what `index.json` looks like, and a typo in one silently generates a
+ * different outline rather than failing.
+ *
+ * `level` is "file" for the level-1 block and "chapter" for every other heading.
+ */
+export function outlineFieldIssues(relPath, meta, level) {
+    const issues = [];
+    if (!meta) return issues;
+
+    if (level !== "file") {
+        for (const field of FILE_ONLY_FIELDS) {
+            if (meta[field] != null) {
+                issues.push({
+                    severity: "error",
+                    message: `has \`${field}\`, which belongs on the file-level block only — it places the document in its directory, not a chapter in its document.`,
+                });
+            }
+        }
+        // The remaining checks are about the file-level fields above plus
+        // `date`, which is legal here; fall through for `date` only.
+    }
+
+    if (level === "file" && meta.index != null) {
+        if (indexRole(meta) === null) {
+            issues.push({
+                severity: "error",
+                message: `has \`index\` "${meta.index}", expected one of: ${INDEX_VALUES.join(", ")}. Omit the field for an ordinary listed document.`,
+            });
+        }
+    }
+
+    if (level === "file" && meta.number != null) {
+        const raw = meta.number;
+        if (typeof raw !== "string" || !NUMBER_PATTERN.test(raw)) {
+            issues.push({
+                severity: "error",
+                message: `has \`number\` "${Array.isArray(raw) ? raw.join(", ") : raw}" — a document's number is a single non-negative integer.`,
+            });
+        } else {
+            const fromName = fileNumberFromPath(relPath);
+            if (fromName !== null && fromName !== Number(raw)) {
+                issues.push({
+                    severity: "warning",
+                    message: `declares \`number: ${raw}\` but its filename reads ${fromName}. The field wins; rename the file or drop the field so a reader sees one number.`,
+                });
+            }
+        }
+    }
+
+    if (meta.date != null) {
+        const raw = meta.date;
+        if (typeof raw !== "string" || !DATE_PATTERN.test(raw)) {
+            issues.push({
+                severity: "error",
+                message: `has \`date\` "${Array.isArray(raw) ? raw.join(", ") : raw}" — a date is a single calendar day in \`YYYY-MM-DD\` form.`,
+            });
+        }
+    }
+
+    return issues;
+}
+
+/**
+ * Fields this block carries that the schema used to define and no longer does.
+ *
+ * Exported so the graph build reports them the same way it reports `typeIssues`
+ * — a repository that adopted an earlier version of the convention still has
+ * these fields in its Markdown, and CI is where it needs to be told.
+ */
+export function removedFieldIssues(meta) {
+    if (!meta) return [];
+    return Object.keys(meta)
+        .filter((key) => key in REMOVED_FIELDS)
+        .map((key) => ({
+            severity: "error",
+            message: `has \`${key}\`, which is no longer part of the metadata schema — ${REMOVED_FIELDS[key]}`,
+        }));
+}
+
+/**
  * Heuristic lint of a document's metadata blocks against
  * chapter-metadata.instructions.md. Not a full structural validator (it does
  * not know which headings are "addressable chapters" per folder — see that
@@ -551,15 +704,21 @@ export function validateDocument(relPath, markdown) {
             }
         }
 
+        for (const issue of removedFieldIssues(chapter.meta)) {
+            issues.push({ severity: issue.severity, message: `${label} ${issue.message}` });
+        }
+
+        for (const issue of outlineFieldIssues(
+            relPath,
+            chapter.meta,
+            chapter.level === 1 ? "file" : "chapter"
+        )) {
+            issues.push({ severity: issue.severity, message: `${label} ${issue.message}` });
+        }
+
         for (const [key, value] of Object.entries(chapter.meta)) {
             if (key === "status") continue;
-            if (FILE_ONLY_FIELDS.includes(key) && chapter.level > 1) {
-                issues.push({
-                    severity: "error",
-                    message: `${label} has \`${key}\`, which belongs on the file-level block only — it describes the document's directory, not a chapter.`,
-                });
-                continue;
-            }
+            if (key in REMOVED_FIELDS) continue; // already reported above
             if (!optionalFields.has(key)) {
                 issues.push({
                     severity: "warning",
@@ -573,32 +732,6 @@ export function validateDocument(relPath, markdown) {
                     severity: "warning",
                     message: `${label} sets \`${key}\` to an empty/null value — omit the field instead per the omit-when-empty rule.`,
                 });
-            }
-        }
-
-        if (chapter.level === 1 && "order" in chapter.meta) {
-            const entries = chapter.meta.order;
-            if (!Array.isArray(entries)) {
-                issues.push({
-                    severity: "error",
-                    message: `${label} has \`order\` that is not a list. Use a list of sibling file or directory names.`,
-                });
-            } else {
-                for (const entry of entries) {
-                    if (typeof entry !== "string" || entry.includes("/")) {
-                        issues.push({
-                            severity: "error",
-                            message: `${label} has \`order\` entry "${entry}" — entries must be plain names of siblings in the same directory, not paths.`,
-                        });
-                    }
-                }
-                const duplicates = entries.filter((e, i) => entries.indexOf(e) !== i);
-                if (duplicates.length) {
-                    issues.push({
-                        severity: "error",
-                        message: `${label} lists ${[...new Set(duplicates)].join(", ")} more than once in \`order\`.`,
-                    });
-                }
             }
         }
     }

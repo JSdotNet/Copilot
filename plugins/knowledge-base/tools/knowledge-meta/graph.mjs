@@ -10,7 +10,17 @@
 
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
-import { parseDocument, folderKindForPath, resolveType, slugify, typeIssues, escapeSequenceIssues } from "./metadata.mjs";
+import {
+    parseDocument,
+    folderKindForPath,
+    resolveType,
+    slugify,
+    typeIssues,
+    removedFieldIssues,
+    outlineFieldIssues,
+    documentNumber,
+    escapeSequenceIssues,
+} from "./metadata.mjs";
 
 /** Every knowledge folder this convention recognizes. A repository adopts any subset. */
 export const KNOWLEDGE_FOLDERS = [".arc42", ".domain", ".backlog", ".tech", ".design"];
@@ -34,7 +44,7 @@ const REFERENCE_FIELDS = {
 // `type` on a node is already the structural discriminator
 // (`file`/`chapter`/`heading`/`external`). `.tech` nodes have always carried
 // `kind`; the field is simply populated for every folder now.
-const ATTRIBUTE_FIELDS = ["version", "issue", "aliases", "alternatives"];
+const ATTRIBUTE_FIELDS = ["version", "issue", "aliases", "alternatives", "date"];
 
 // Non-reference fields whose authored form may be a scalar or a bracket list,
 // and which are always emitted as a list so a consumer reading graph.json never
@@ -149,9 +159,29 @@ export async function buildGraph(repoRoot) {
         // An .arc42 file is exactly one top-level chapter, so its level-1 block
         // serves as the file-level block; other folders follow the same shape.
         applyMeta(fileNode, fileMeta, folder);
+        // Set outside applyMeta because it also comes from the filename, which
+        // no metadata field can supply.
+        const number = documentNumber(relPath, fileMeta);
+        if (number !== null) fileNode.number = number;
         nodes.set(fileNode.id, fileNode);
 
         for (const issue of typeIssues(folder, "file", fileMeta)) {
+            problems.push({
+                severity: issue.severity,
+                path: relPath,
+                message: `${relPath} ${issue.message}`,
+            });
+        }
+
+        for (const issue of removedFieldIssues(fileMeta)) {
+            problems.push({
+                severity: issue.severity,
+                path: relPath,
+                message: `${relPath} ${issue.message}`,
+            });
+        }
+
+        for (const issue of outlineFieldIssues(relPath, fileMeta, "file")) {
             problems.push({
                 severity: issue.severity,
                 path: relPath,
@@ -216,6 +246,22 @@ export async function buildGraph(repoRoot) {
             ancestors.push({ level: chapter.level, id });
 
             for (const issue of typeIssues(folder, "chapter", chapter.meta)) {
+                problems.push({
+                    severity: issue.severity,
+                    path: relPath,
+                    message: `${id} ${issue.message}`,
+                });
+            }
+
+            for (const issue of removedFieldIssues(chapter.meta)) {
+                problems.push({
+                    severity: issue.severity,
+                    path: relPath,
+                    message: `${id} ${issue.message}`,
+                });
+            }
+
+            for (const issue of outlineFieldIssues(relPath, chapter.meta, "chapter")) {
                 problems.push({
                     severity: issue.severity,
                     path: relPath,

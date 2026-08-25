@@ -86,6 +86,19 @@ instructions.
 - The metadata block's `status` field uses `draft`, `proposed`, `active`, or
   `deprecated` in this folder. Architecture documentation describes a
   standing decision/structure, not a task, so there is no `done`.
+- **Chapters are ordered by their number, not by their filename string.** The
+  `<NN>-` prefix supplies it, so `10-quality-requirements.md` sorts after
+  `09-architecture-decisions.md` rather than after `01-…`. Only add an explicit
+  `number` field when a file's name cannot carry the number.
+- **ADRs and TDRs are numbered records with a date.** Number them in the
+  filename (`7-use-postgres.md`) or, where the filename is a plain slug, in a
+  `number` field — either way the number is what orders the folder, so an
+  unpadded 10 still follows 7. Give each one a `date` for the day the decision
+  was taken or the debt logged; it is content, not a modification timestamp.
+- **Give `adr/` and `tdr/` an index document.** Neither folder has a root
+  document by convention, so mark the one that introduces the set — usually
+  `README.md` — with `index: root` and it sorts first. Without it the folder is
+  a bare numbered list.
 
 ## Template
 

@@ -54,10 +54,10 @@ to re-run the generator. So refresh is deliberate and happens in two places:
 | `./build/Update-KnowledgeIndex.ps1` | on demand | You want the indexes current in your own branch — before a release, or because something reads them locally. |
 | `.github/workflows/knowledge-meta-nightly.yml` | scheduled | Reconciles the default branch, opening one pull request when the output drifted and nothing when it did not. |
 
-`.github/workflows/knowledge-meta.yml` **fails** on a broken reference or an
-inconsistent reading order — those are errors in the authored Markdown and they
-do not fix themselves — and only **warns** when the committed indexes have
-drifted.
+`.github/workflows/knowledge-meta.yml` **fails** on a broken reference or a
+`meta` block that violates the schema — those are errors in the authored
+Markdown and they do not fix themselves — and only **warns** when the committed
+indexes have drifted.
 
 That is safe because a consumer reading these indexes at runtime is required to
 compare each entry's source file against the index it came from and re-read the
@@ -89,7 +89,7 @@ followed, so a scoped graph stays about its own folder.
 |---|---|
 | `metadata.mjs` | Parses the `meta` blocks — the single implementation of the schema defined by the `knowledge-chapter-metadata` instructions. Shared with the `knowledge-graph` canvas. |
 | `graph.mjs` | Graph construction, scope discovery, and scope projection. Imported by the CLI *and* by the `knowledge-graph` canvas, so the written indexes and the live view can never disagree. |
-| `outline.mjs` | Reading-order resolution from the `order` field on each directory's root document, plus the per-file lede and diagram count a list view needs. |
+| `outline.mjs` | Outline generation: root-document resolution (`index: root`, else the `DIRECTORY_CONVENTION` table), numbered ordering, and the per-file lede and diagram count a list view needs. |
 | `build.mjs` | CLI wrapper: writes both artifacts per scope, prints stats, exits non-zero on errors. |
 
 This folder is self-contained — copy it into a repository as
@@ -204,6 +204,11 @@ branch on shape. `effort` is emitted as a number rather than the authored
 string, so a viewer can total or threshold it directly; a value that is not a
 non-negative integer is left off the node and reported as a lint error instead.
 
+`date` rides along as the authored `YYYY-MM-DD` string. `number` is emitted as a
+number on **file** nodes only, resolved from the `number` field or the filename,
+so an ADR node knows it is ADR 7 without the consumer parsing paths. `index`
+steers outline generation only and never reaches a node.
+
 ## Validation
 
 `--check` exits `1` on any `problems` entry at `error` severity:
@@ -218,7 +223,15 @@ non-negative integer is left off the node and reported as a lint error instead.
 | A `type` set in a folder that defines no value set | warning |
 | A literal `` `r`n `` / `\r\n` / `\n` escape sequence in body text | warning |
 | `.tech` still using the old `kind` field name | warning |
-| An `order` entry that is missing, duplicated, or names a non-sibling | error |
+| An `order` field, removed from the schema — reading order now comes from the folder convention | error |
+| An `index` value other than `root` or `exclude` | error |
+| Two documents in one directory declaring `index: root` | error |
+| Two documents in one directory claiming the same `number` | error |
+| A `number` that is not a single non-negative integer | error |
+| A `date` that is not a `YYYY-MM-DD` calendar day | error |
+| `index` or `number` on a chapter block rather than the file-level block | error |
+| A `number` field disagreeing with the number in its own filename | warning |
+| A directory missing the root document its folder convention names | warning |
 
 ### Literal escape sequences
 
@@ -266,6 +279,27 @@ sorting filenames.
 }
 ```
 
+A numbered area carries `number` on every entry it could resolve one for, and
+`date` wherever the document declares one:
+
+```jsonc
+"entries": [
+  { "type": "file", "name": "README.md", "path": ".arc42/adr/README.md",
+    "title": "Architecture Decisions", "status": "active", "root": true },
+  { "type": "file", "name": "2-record-decisions.md", "path": ".arc42/adr/2-record-decisions.md",
+    "title": "Record Decisions", "status": "active", "number": 2, "date": "2025-11-02" },
+  { "type": "file", "name": "7-use-postgres.md", "path": ".arc42/adr/7-use-postgres.md",
+    "title": "Use PostgreSQL", "status": "active", "number": 7, "date": "2026-03-04" },
+  { "type": "file", "name": "10-adopt-aspire.md", "path": ".arc42/adr/10-adopt-aspire.md",
+    "title": "Adopt .NET Aspire", "status": "active", "number": 10, "date": "2026-07-19" }
+]
+```
+
+`number` is resolved from the `number` field or the filename, whichever is
+available, and a `directory` entry gets one from a numbered folder name. Both
+`number` and `date` are omitted when there is nothing to report, like every
+other optional entry field.
+
 On a `file` entry, `kind` is the authored `type` field — what distinguishes six
 identically-titled files of a bounded context. It is omitted for folders that
 define no value set. On an `area` entry it is the knowledge folder itself
@@ -301,12 +335,25 @@ appear in `graph.json` at all.
 At the repository scope the top level is `type: "area"` — one entry per
 knowledge folder, in canonical area order.
 
-Ordering comes from the `order` field on the file-level `meta` block of each
-directory's **root document**, which always sorts first. A directory with no
-root document falls back to filename sort — which is why the numbered `.arc42`
-chapters need no declaration. Entries listed but missing are errors; entries
-present but unlisted are warnings and get appended alphabetically. See
-the `knowledge-chapter-metadata` instructions.
+Ordering never comes from one document listing its siblings. Per directory:
+
+1. The **root document** sorts first — the file declaring `index: root`, else the
+   entry point its folder convention names (`outline.mjs`'s
+   `DIRECTORY_CONVENTION` table). A convention-covered directory missing its root
+   document is a warning; two `index: root` in one directory is an error.
+2. If anything left carries a **number** — from the `number` field, or parsed
+   from a numbered filename such as `09-…`, `7-…`, or `ADR-0007-…` — the
+   directory sorts by that number ascending, so 10 follows 7. Unnumbered entries
+   are filename-sorted after the numbered run.
+3. Otherwise the folder convention's prescribed sequence applies, with anything
+   else filename-sorted in between.
+4. A directory that is neither numbered nor covered by a convention sorts by
+   filename.
+
+A document declaring `index: exclude` is left out of the outline but stays a node
+in `graph.json` — it is still referenceable content, just not something a viewer
+lists. So an area's `index.json` file count can be lower than its
+`graph.json` file-node count. See the `knowledge-chapter-metadata` instructions.
 
 `_`-prefixed folders (such as `_meta/` itself) are tooling, not content, and
 are excluded from the outline.

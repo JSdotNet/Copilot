@@ -91,7 +91,7 @@ chapters and generated `_meta/*.json` indexes.
    node .github/tools/knowledge-meta/build.mjs --scope .tech --check
    ```
 
-   If either command reports unresolved references, inconsistent order, or stale generated
+   If either command reports unresolved references, schema violations, or stale generated
    indexes, fix the source Markdown or run `knowledge-base-validate`.
 
 ## Output expectations

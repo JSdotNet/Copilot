@@ -68,8 +68,10 @@ placeholders.
 ```
 
 Add a file only when a topic genuinely does not belong to an existing one, and
-register it in `README.md` in the same change — both in its index and in the
-file-level `order` field.
+register it in `README.md`'s index in the same change. Reading order needs no
+declaration: `README.md` is `.design`'s root document and is read first, then the
+files in the order shown in the tree above, with anything extra sorted by
+filename after them. See `knowledge-chapter-metadata.instructions.md`.
 
 ## Folder rules
 

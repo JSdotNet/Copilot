@@ -66,8 +66,8 @@ partial adoption is fully supported.
    filters to the adopted folders and change the branch name if the repository's
    default branch is not `main`.
 
-   This workflow *fails* on a broken reference or an inconsistent reading order,
-   and only *warns* when the committed indexes have drifted — see step 5 for why.
+   This workflow *fails* on a broken reference or a schema violation, and only
+   *warns* when the committed indexes have drifted — see step 5 for why.
 
    If the repository has no GitHub Actions setup, skip this step and tell the
    user the generator must be run manually before committing.
@@ -118,7 +118,7 @@ partial adoption is fully supported.
    ./build/Update-KnowledgeIndex.ps1 -Check
    ```
 
-   Exit code `0` means every reference resolves and reading order is consistent.
+   Exit code `0` means every reference resolves and the schema is satisfied.
    Exit code `2` means no knowledge folder was found — step 2 did not run or ran
    in the wrong directory.
 
