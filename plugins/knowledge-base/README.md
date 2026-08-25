@@ -109,6 +109,79 @@ repository's authoritative design source, through `ux-design:ux-designer`.
 **Trigger keywords:** `design tokens`, `color scheme`, `design guideline`,
 `interaction rule`, `accessibility guideline`, `component library`, `edit .design`
 
+### Skills: `capture-<kind>` and `build-<kind>`
+
+Two directions between a knowledge chapter and the code that implements it:
+
+- **`capture-<kind>`** — something exists in the application and the
+  chapter is missing, thin, or stale, so read the implementation and write the
+  chapter. Source and tests are the only evidence; comments, TODOs, and disabled
+  tests are not. The write routes through the folder's own orchestration skill.
+- **`build-<kind>`** — a chapter is agreed but unbuilt, so turn it
+  into a change brief (outcomes, invariants, ubiquitous language, out of scope,
+  acceptance checks) plus a change category, then stop. It never edits a source
+  or test tree, and never names a code-side orchestration — which delivery flow
+  picks the brief up is the user's decision, made after reading it.
+
+**`build` covers both from scratch and update**, despite the name. The change
+category is that axis, and counterpart resolution picks between them before the
+brief is written: `new functionality` when no counterpart exists at all, `change
+to existing behaviour` when one exists and the chapter asks for more, and
+`defect` when one was believed to already satisfy an agreed chapter and does not.
+That is why a build skill reads code — not to change it, but to establish what is
+already there so the brief asks only for the delta, and an update brief lists
+where the current behaviour lives.
+
+Eight kinds, two directions each:
+
+| Kind | Target | `type` value(s) | Spec-side write |
+|------|--------|-----------------|-----------------|
+| `aggregate` | `.domain/<context>/domain.md` | `aggregate`, `entity`, `value-object`, `enum`, `shared-value-objects`, `shared-enums`, `domain-event` | `orch-domain` |
+| `domain-service` | `.domain/<context>/domain.md` | `domain-service`, plus `domain-event` for events the service itself raises | `orch-domain` |
+| `feature` | `.domain/<context>/features.md` | `feature`, `sub-feature` | `orch-domain` |
+| `term` | `.domain/<context>/naming.md` | `term` | `orch-domain` |
+| `bounded-context` | `.domain/<context>/` — the whole folder | file-level `domain`, `features`, `model`, `flow`, `dependencies`, `naming`, plus `context-map` at the `.domain` root | `orch-domain` |
+| `building-block` | `.arc42/05-building-block-view.md` | none — `.arc42` defines no value set | `orch-arc42-content` |
+| `deployment` | `.arc42/07-deployment-view.md` | none — `.arc42` defines no value set | `orch-arc42-content` |
+| `design-component` | `.design/component-libraries.md` | none — `.design` defines no value set | `orch-design` |
+
+**The aggregate is the unit, not its parts.** One pass covers the root, every
+entity, value object, and enum it owns, the shared value-object and enum
+groupings, and the domain events it raises. An aggregate is a consistency
+boundary and its parts are only meaningful in terms of that boundary, so
+capturing them separately would mean reading the same root several times and
+deciding the boundary several times, with several chances to decide it
+differently — and building them separately would produce work items that cannot
+land independently.
+
+A **domain service** is the deliberate exception: it is defined by coordinating
+across boundaries rather than living in one, so folding it into a boundary's pass
+would be backwards. It keeps its own pair, and owns the events it raises itself.
+
+`.tech` has no pair here — `knowledge-tech-update` already covers that direction
+— and neither does `.backlog`.
+
+The shared rules live once in `assets/code-sync-protocol.md`, which all 16 skills
+reference and none repeats: counterpart resolution, the evidence rules (including
+why unit tests are first-class evidence for capture rather than a cross-check), a
+five-way drift verdict (`aligned`, `code-ahead`, `spec-ahead`, `conflict`,
+`unresolved`, where `conflict` always stops and asks), the status rules, index
+regeneration, and a shared report table.
+
+Counterpart resolution deliberately uses **no metadata field** linking a chapter
+to a code path — a path in a `meta` block rots on the first refactor and gives no
+signal when it does. It goes through `naming.md` `aliases`, then the `.arc42`
+building-block view, then the observed naming convention, and reports
+`unresolved` rather than guessing.
+
+The dependency on the `orch-*` skills is one-way. A capture skill names its
+folder's orchestration and hands over grounded input; no `orch-*` skill knows
+these skills exist.
+
+**Trigger keywords:** `document what we built`, `capture from code`,
+`.domain is stale`, `build the aggregate we agreed`, `build this chapter`,
+`change brief`, `spec code drift`, `the code has an invariant the chapter omits`
+
 ### Instructions (auto-applied)
 
 | File | Pattern | Purpose |
@@ -169,6 +242,7 @@ for technologies that do not appear in package manifests.
 | `assets/workflows/knowledge-meta-nightly.yml` | Scheduled index refresh; opens one pull request when the output drifted, nothing when it did not |
 | `assets/build/Update-KnowledgeIndex.ps1` | On-demand index refresh, with `-Scope` and `-Check`; reports which index files moved |
 | `assets/routing-snippet.md` | Optional repository-local context-loading and routing policy |
+| `assets/code-sync-protocol.md` | Shared rules for the `capture-*` / `build-*` skills: counterpart resolution, evidence rules including why unit tests are first-class evidence for capture, the five-way drift verdict, status rules, index regeneration, and the report table. An asset rather than an instruction, because an honest `applyTo` glob for these rules would have to cover source trees and would break the plugin's silence in non-adopting repositories |
 
 ### Hook configuration
 
