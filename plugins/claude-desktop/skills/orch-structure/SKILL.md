@@ -39,8 +39,9 @@ reference updates needed to keep the repository working after the move.
 > Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
-> (category defaults, overridable via personal global model selection or
-> `.claude/model-selection.md` in the consuming repo).
+> (category defaults, overridable via personal global model selection). A category model
+> applies only where the stage is delegated with an `Agent` call; an inline stage runs on
+> the session's model.
 
 ### Stage 0: Scope Discovery
 
@@ -69,9 +70,10 @@ Escalate instead of continuing when the request needs a different work type:
 - A new bounded context, service boundary, module, or service routes to
   `orch-create-module` or `orch-create-service`.
 
-**Agents:** none required (orchestrator). Optionally `architecture:architect` when the
-layout rule needs architecture interpretation; `product-owner:product-owner` only when
-verification criteria need backlog wording.
+**Agents:** the orchestrator owns the decision half; the **Identify** bullets above are
+delegated to a read-only search sub-agent per **Splitting Scope Discovery** in
+`instructions/orch-execution-model.instructions.md`. Optionally `architecture:architect` when the layout rule
+needs architecture interpretation.
 
 **MCP Servers:** `jsdotnet-guidelines-mcpserver`
 

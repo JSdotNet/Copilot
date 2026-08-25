@@ -12,10 +12,9 @@ description: Defines the optional .claude/orch-context.md convention a consuming
   guessing the AppHost or interrupting a run to ask the user.
 - Define the convention **once** here, so a maintainer edits this file instead of
   re-describing repo context in every `orch-*/SKILL.md`.
-- Keep the file strictly about **runtime and validation context**. Model choice stays in
-  `.claude/model-selection.md` (see
-  `orch-model-selection.instructions.md`), and MCP server configuration stays in the
-  repository's own `.mcp.json` and instruction files.
+- Keep the file strictly about **runtime and validation context**. Model choice is personal
+  and never comes from the repository (see `orch-model-selection.instructions.md`), and MCP
+  server configuration stays in the repository's own `.mcp.json` and instruction files.
 - Interactive developer startup — the URL to open, and optionally sign-in and an area map —
   belongs in `.claude/start.md`, read by the `start` skill (`skills/start/SKILL.md`). That
   file falls back to this one, so neither states the same thing twice.
@@ -26,9 +25,8 @@ description: Defines the optional .claude/orch-context.md convention a consuming
 - The file is **optional**. When it is missing, behavior is unchanged: orchestrations
   discover the AppHost and entry points as they do today, record ambiguous discovery in the
   relevant stage output, and continue with the appropriate validation result.
-- The orchestrator reads it **once per run**, alongside `.claude/model-selection.md`,
-  before `start_run`, and persists the relevant values into the run context so every stage
-  that needs them gets the same answer.
+- The orchestrator reads it **once per run**, before `start_run`, and persists the relevant
+  values into the run context so every stage that needs them gets the same answer.
 
 ## Schema
 
@@ -144,8 +142,8 @@ run, or `qa:qa` delegation is attempted.
   credentials live and how to obtain them — never a password, token, key, or connection
   string.
 - **No model IDs.** This file must not pin a model, a model family, or a tier. Model choice
-  belongs to `.claude/model-selection.md` and the categories in
-  `orch-model-selection.instructions.md`.
+  belongs to the personal override and the categories in
+  `orch-model-selection.instructions.md`; the repository never sets it.
 - **Degrade gracefully.** A missing section, an unrecognized `## QA Depth` value, or
   malformed content is not an error: fall back to the existing behavior for that concern,
   note the fallback once, and continue the run. Never block a run on this file.

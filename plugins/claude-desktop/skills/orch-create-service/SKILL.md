@@ -38,8 +38,9 @@ Execute a complete workflow for adding a new service to an existing project, wit
 > Personal Validation.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
-> (category defaults, overridable via personal global model selection or
-> `.claude/model-selection.md` in the consuming repo).
+> (category defaults, overridable via personal global model selection). A category model
+> applies only where the stage is delegated with an `Agent` call; an inline stage runs on
+> the session's model.
 
 ### Stage 0: Scope Discovery
 
@@ -63,17 +64,25 @@ service, or when the service boundary itself is an open architectural question �
 `orch-create-module`, `orch-adr`, `orch-architecture`, or `orch-blueprint` and ask the
 user.
 
-**Agents:** none required (orchestrator). Optionally `product-owner:product-owner` for
-acceptance criteria wording; `architecture:architect` when the service boundary needs
-review.
+**Agents:** the orchestrator owns the decision half; the **Identify** bullets above are
+delegated to a read-only search sub-agent per **Splitting Scope Discovery** in
+`instructions/orch-execution-model.instructions.md`. `architecture:architect` when the service boundary
+needs review.
 
 ### Stage 1: Specification Intake
 - **Review the service responsibility and boundaries recorded in Stage 0**
+- **Check the boundary against the existing domain model** — where the repository documents
+  bounded contexts, confirm the service maps to exactly one, and that its contracts use that
+  context's ubiquitous language rather than inventing parallel terms
 - **Capture API or messaging contracts** for the new service
-- **Identify upstream/downstream dependencies**
+- **Identify upstream/downstream dependencies**, naming the integration pattern where the
+  service talks to another context (anti-corruption layer, shared kernel, published language)
 - **Set acceptance criteria** and operational expectations
 
-**Agents:** `product-owner:product-owner`, `architecture:architect`
+**Agents:** `architecture:architect`; `domain-design:domain-architect` when the service
+introduces, splits, or renames a bounded context. A service that sits wholly inside an
+existing context does not need the domain pass. Full domain modeling is `orch-domain`'s
+work, not this stage's — route there instead of modeling here.
 
 ### Stage 2: Implementation Planning
 - **Map the recorded design** to the repository structure

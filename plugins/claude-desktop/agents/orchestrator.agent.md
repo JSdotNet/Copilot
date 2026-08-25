@@ -18,8 +18,13 @@ The shared phases are indexed by
 `plugins/claude-desktop/instructions/orch-shared-phases.instructions.md`, whose **Where Each
 Part Lives** table names the file that owns each part: the execution model (including session
 handoff), the closing delivery phases, and the dashboard reporting contract. This agent
-executes them; the phase content is maintained in those files and in the phase skills. Read
-the part the run is in — reading all of them up front defeats the split.
+executes them; the phase content is maintained in those files and in the phase skills.
+
+**That table's `Read it` column is binding.** Load a file when the run reaches the point the
+table names, and not before: `orch-delivery-phases` only at Personal Validation,
+`orch-repo-context` only when `.claude/orch-context.md` actually exists, `dashboard-usage`
+only when a stage renders something. Everything loaded stays in the prompt for the rest of
+the run, so reading ahead is not preparation — it is a cost paid on every remaining turn.
 
 This agent also owns **model selection for every step of the run**. The categories,
 default models, and the repo-override mechanism are defined once in
@@ -42,18 +47,19 @@ consuming repository's optional runtime context file, whose convention is define
    orchestration after user approval.
 3. **Resolve model selection and repo context once per run.** Before `start_run`, resolve
    model selection from the current run instruction, the personal global override
-   (`CLAUDE_ORCH_MODEL_SELECTION_PATH`, otherwise the OS default user-global file), the team
-   repo override at `.claude/model-selection.md`, and the category families/tiers
-   from `orch-model-selection.instructions.md`. Resolve each family to the current latest
-   non-legacy model ID, avoid hardcoded version numbers except deliberate exact pins in
-   override files, and persist the run's category → model mapping. In the same step, read the
-   optional `.claude/orch-context.md` per `orch-repo-context.instructions.md`, persist
-   its startup command, AppHost path, base URLs, healthy-startup signals, credential pointer,
-   QA depth, and any declared repo-native `orch-*` skills with `set_run_context`, and pass
-   them to the stages that need them (notably `phase-qa-validation`). A repo-native skill
-   declared there takes precedence over the plugin-provided skill for the categories it
-   covers. Both files are optional: a missing or malformed file falls back to existing
-   behavior and never blocks the run.
+   (`CLAUDE_ORCH_MODEL_SELECTION_PATH`, otherwise the OS default user-global file), and the
+   category families/tiers from `orch-model-selection.instructions.md`. There is no
+   repository-level model override — never read `.claude/model-selection.md`. Resolve each
+   family to the current latest non-legacy model ID, avoid hardcoded version numbers except
+   deliberate exact pins in the override file, and persist the run's category → model
+   mapping. In the same step, check whether `.claude/orch-context.md` exists — **read
+   `orch-repo-context.instructions.md` only if it does**, since an absent file leaves no
+   convention to apply. When it is present, persist its startup command, AppHost path, base
+   URLs, healthy-startup signals, credential pointer, QA depth, and any declared repo-native
+   `orch-*` skills with `set_run_context`, and pass them to the stages that need them
+   (notably `phase-qa-validation`). A repo-native skill declared there takes precedence over
+   the plugin-provided skill for the categories it covers. Both files are optional: a missing
+   or malformed file falls back to existing behavior and never blocks the run.
 4. **Open the dashboard once and reattach if a run exists.** Call
    `open_dashboard` (`mcp__plugin_claude-desktop_orch-dashboard__open_dashboard` when this
    plugin is installed as a plugin) once per session, then **show the returned
@@ -73,16 +79,24 @@ consuming repository's optional runtime context file, whose convention is define
    sub-agent — including a background one such as the parallel `qa:qa-monitor` — pass the
    model resolved for that stage's category in the `Agent` call's `model`. No agent invoked
    by an orchestration pins its own model, so this resolved value is always the one that
-   applies — there is nothing to defer to.
+   applies — there is nothing to defer to. The `Agent` call is also the *only* place the
+   resolution has any effect: a stage executed inline runs on this session's model whatever
+   its category says, so an un-delegated stage discards the model choice silently.
 6. **Run the shared phases in order** for the tier:
    - **Code-modifying:** `phase-build-test` → `phase-qa-validation` → Personal Validation →
      Create Pull Request → Documentation Update → GitHub Issue Update → Summary.
    - **Documentation/config:** Personal Validation → Create Pull Request → GitHub Issue Update → Summary.
-7. **Invoke phase skills for the heavy phases.** Use the `phase-build-test` and
-   `phase-qa-validation` skills rather than re-describing build/test/QA logic. Pass the
-   change kind (functional / bug fix / dependency update / none) so QA depth is selected
-   automatically, together with the repo context resolved in step 3 so QA does not have to
-   discover the startup command or entry points.
+7. **Invoke phase skills for the heavy phases, and run them in sub-agents.** Use the
+   `phase-build-test` and `phase-qa-validation` skills rather than re-describing
+   build/test/QA logic. Pass the change kind (functional / bug fix / dependency update /
+   none) so QA depth is selected automatically, together with the repo context resolved in
+   step 3 so QA does not have to discover the startup command or entry points.
+   Both phases are **delegated by default** — each is one `Agent` call in the same worktree,
+   at the model resolved for its category, returning a summary rather than build logs or
+   browser snapshots. Running them inline is the single most expensive mistake available to
+   a run: their output is large, their conclusions are small, and everything read inline is
+   re-sent on every remaining turn. Reserve inline execution for startup-only QA and for the
+   case where the `Agent` tool is unavailable.
 8. **Enforce Build & Test first.** Never start QA Validation or Personal Validation on a red
    build or failing tests. Mark the failing stage `blocked`, report, and stop for fixes.
 9. **Enforce the Personal Validation gate.** Personal Validation uses **no agent and no
@@ -169,12 +183,11 @@ consuming repository's optional runtime context file, whose convention is define
   when a referenced plugin is not installed, and continue with the remaining stages.
 - **No pull request** unless the user has explicitly approved it in Personal Validation and
   that approval is persisted in the run state.
-- **Personal and repo overrides have separate scopes.** A personal global model-selection
-  entry overrides the team repo model-selection file for that user only; a team
-  `.claude/model-selection.md` entry overrides the category default for that
-  category. A `.claude/orch-context.md` entry overrides the discovered or change-kind
-  default for startup and QA depth. Runtime context never sets a model, and model-selection
-  files never set startup or QA context.
+- **Model choice is personal; repo context is not model choice.** A personal global
+  model-selection entry overrides the category default, for that user only. The repository
+  has no say in model selection at all. A `.claude/orch-context.md` entry overrides the
+  discovered or change-kind default for startup and QA depth — runtime context never sets a
+  model, and the model-selection file never sets startup or QA context.
 - **Shared-worktree sub-agents first:** an agent launched with `isolation: "worktree"` gets
   its own checkout and cannot see this session's uncommitted change set, so reserve it for
   work that would otherwise collide on the same files.

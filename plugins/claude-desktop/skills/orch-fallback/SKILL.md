@@ -38,8 +38,9 @@ belongs to.
 > directly and say so.
 >
 > Model choice per stage follows `instructions/orch-model-selection.instructions.md`
-> (category defaults, overridable via personal global model selection or
-> `.claude/model-selection.md` in the consuming repo).
+> (category defaults, overridable via personal global model selection). A category model
+> applies only where the stage is delegated with an `Agent` call; an inline stage runs on
+> the session's model.
 
 ### Stage 1: Routing Check
 - **Confirm no dedicated `orch-*` skill matches** the task category, plugin-provided or

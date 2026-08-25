@@ -262,7 +262,23 @@ case that must still be refused:
 node plugins/claude-desktop/mcp/orch-dashboard/dev/handoff-test.mjs
 ```
 
-It uses a throwaway state directory and exits non-zero on the first failed check.
+`dev/subagent-telemetry-test.mjs` drives the telemetry hook the same way — a payload on
+stdin, transcripts laid out as Claude Code writes them — and asserts that delegated work is
+attributed. Claude Code writes a sub-agent's messages to `<sessionId>/subagents/agent-*.jsonl`
+rather than inlining them in the root transcript, so a hook that reads only the payload's
+path reports `tokenUsage.subAgent` as zero however much a run delegates:
+
+```bash
+node plugins/claude-desktop/mcp/orch-dashboard/dev/subagent-telemetry-test.mjs
+```
+
+Both use a throwaway state directory and exit non-zero on the first failed check.
+
+Set `ORCH_DASHBOARD_TOKEN_LIMIT` to override the context window the gauge is a percentage of,
+for a session deliberately capped below its model's window. Left unset, the limit follows the
+model and is raised to match any larger prompt actually observed — a limit below the real
+window would put the gauge over 100% for a whole run, crossing and latching every pressure
+threshold on the first sample.
 
 ## Install
 

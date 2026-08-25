@@ -94,7 +94,9 @@ export async function readTelemetry(sessionId) {
     try {
         return JSON.parse(await readFile(telemetryFile(sessionId), "utf8"));
     } catch {
-        return { pendingTools: {}, transcriptOffset: 0, transcriptPath: null };
+        // `subAgentOffsets` is a per-file cursor map for the sibling subagents/ transcripts
+        // (see telemetry-hook.mjs), keyed by absolute path.
+        return { pendingTools: {}, transcriptOffset: 0, transcriptPath: null, subAgentOffsets: {} };
     }
 }
 
