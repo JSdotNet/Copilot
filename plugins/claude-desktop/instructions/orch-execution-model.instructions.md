@@ -203,12 +203,20 @@ mechanism; background sub-agents remain reserved for concurrent monitoring.
   described under **Delegation Order**.
 - **One item per run, and never a fan-out.** A skill that works from a queue of issues or
   pull requests selects **one** item, claims it, and runs the orchestration for it in its own
-  session, as `automation-bug-fix`, `start-session-from-issue`, and `pr-merge-ready` do. It
-  does not prepare work for other sessions, because a run cannot start one: a scheduled
-  routine gets a single session, and there is no host capability for opening more. Parallelism
-  across items therefore comes from the **user** starting another session and running the
-  skill again — each run claims a different item, so concurrent runs do not collide. A skill
-  that instead handed back N invocations would be handing back work nothing can launch.
+  session, as `automation-bug-fix`, `start-session-from-issue`, and `pr-merge-ready` do. An
+  `orch-*` run does not prepare work for other sessions and does not spawn them: it owns a
+  dashboard run, a Personal Validation gate, and a user turn, none of which survives being
+  split across sessions mid-orchestration. Parallelism across items comes from the **user**
+  starting another session and running the skill again — each run claims a different item, so
+  concurrent runs do not collide.
+
+  This is a rule about **orchestrations**, not a statement that sessions cannot be created.
+  They can: a one-time scheduled task (`fireAt`) becomes a fresh session, and the plugin's
+  `workflow-issue-sweep` uses exactly that to spawn a worker per issue. That mechanism is
+  available to `workflow-*` skills, which own no dashboard run and hold no gate. It stays
+  unavailable to `orch-*` skills, because a spawned session starts with no memory of the run
+  that spawned it — so an orchestration handed across one would lose the context its later
+  stages depend on.
 
 ### Session Handoff
 
