@@ -21,7 +21,11 @@ and wired exactly as they would be for a real user.
 
 ### 1. Locate the AppHost
 
-- Look for a project ending in `.AppHost` (convention) or ask the user for the path.
+- Use the AppHost path the caller supplied when there is one. Otherwise look for a project
+  ending in `.AppHost` (convention). Ask for the path only when discovery found nothing *and*
+  you have a user turn — when an orchestration invoked you (as a sub-agent or a child
+  session) there is no user to ask, so return the question and your best candidate to your
+  caller instead of stalling.
 - Confirm the solution builds: `dotnet build` on the AppHost project if not already built.
 
 ### 2. Start the App
@@ -59,8 +63,9 @@ tool list. If `list_resources` is missing, an older Aspire CLI may still expose 
 
 Fallback (no MCP server): only allowed for startup-only checks where MCP-backed resource
 state, log, trace, metric, or health evidence is not required. For QA validation that
-requires Aspire monitoring or evidence, missing Aspire MCP blocks the phase; stop and ask
-the user to start/configure Aspire MCP before continuing.
+requires Aspire monitoring or evidence, missing Aspire MCP blocks the phase; stop and report
+that Aspire MCP must be started/configured before validation can continue — to the user when
+you have a user turn, otherwise to your caller as a blocked result.
 
 ### 4. Resolve Endpoint URLs
 

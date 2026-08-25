@@ -146,8 +146,10 @@ Produce a summary containing:
 
 - **QA agent** (`qa:qa`) — hands its monitoring summary back for inclusion in the
   combined QA report.
-- **Coding agent** (`csharp-coding:coding`) — for a runtime bug found during monitoring,
-  proposed with explicit user approval.
+- **Coding agent** (`csharp-coding:coding`) — for a runtime bug found during monitoring.
+  Propose it, never perform it: ask for explicit approval when you have a user turn, and
+  otherwise return the recommendation and its reason to whoever invoked you rather than
+  waiting for an approval that cannot arrive.
 
 ## Skills Reference
 
