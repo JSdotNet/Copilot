@@ -1,6 +1,6 @@
 ---
 name: capture-bounded-context
-description: 'Capture direction, bounded-context kind: read an implemented module or service boundary and scaffold or refresh a whole .domain/<context>/ folder — domain.md, features.md, model.md, flow.md, dependencies.md, naming.md — plus its context-map.md entry and order. Use when: a module exists with no bounded context folder, the context map is missing a context, dependencies between contexts are undocumented, document the bounded contexts we built. Reads source and tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt bounded-context chapter into work (use build-bounded-context), or for the aggregate, feature, or building-block chapters around it (use the matching capture-* skill).'
+description: 'Capture direction, bounded-context kind: read an implemented module or service boundary and scaffold or refresh a whole .domain/<context>/ folder — domain.md, features.md, model.md, flow.md, dependencies.md, naming.md — plus its context-map.md entry. Use when: a module exists with no bounded context folder, the context map is missing a context, dependencies between contexts are undocumented, document the bounded contexts we built. Reads source and tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt bounded-context chapter into work (use build-bounded-context), or for the aggregate, feature, or building-block chapters around it (use the matching capture-* skill).'
 ---
 
 # Capture a bounded context from code
@@ -9,7 +9,7 @@ description: 'Capture direction, bounded-context kind: read an implemented modul
 
 A module, service, or subsystem exists with its own model and its own language,
 and `.domain/` does not have a folder for it — or has one whose
-`dependencies.md`, `model.md`, or reading `order` no longer matches the code.
+`dependencies.md` or `model.md` no longer matches the code.
 This skill reads the boundary, establishes what the context is, and routes the
 whole folder through `orch-domain`.
 
@@ -20,8 +20,8 @@ inside a file, it is the folder. The chapters inside it are the other kinds'
 scope.
 
 A context folder is created **whole**. Creating only `domain.md` leaves the
-folder malformed: `domain.md` is the folder's root document and its `order`
-lists the rest, so the rest has to exist.
+folder malformed: `domain.md` is the folder's root document and the convention
+expects the rest of the standard files beside it.
 
 Read `assets/code-sync-protocol.md` before starting. It carries the counterpart
 resolution ladder, the evidence rules, the five-way drift verdict, the status
@@ -51,7 +51,7 @@ The context folder's files and the code that evidences each one:
 | `flow.md` | State machines and process sequences the boundary actually has — status transitions, saga steps, scheduled progressions. Omit the file entirely when there is no flow |
 | `dependencies.md` | Outbound and inbound cross-context relationships: project references, HTTP or gRPC clients, message subscriptions and publications, shared database access, and translator or adapter types that indicate an anti-corruption layer |
 | `naming.md` | The boundary's vocabulary and the surface names each term wears — the registry every later counterpart resolution starts from |
-| `context-map.md` | The context added to the subdomain landscape and the context map at the `.domain` root, with its `order` entry |
+| `context-map.md` | The context added to the subdomain landscape and the context map at the `.domain` root |
 
 The DDD relationship semantics in `dependencies.md` are observable, and vague
 integration prose is what this file exists to replace. A translator type that
@@ -129,9 +129,10 @@ published language is a finding worth flagging explicitly, per the folder rules.
 7. **Create the folder whole, and update the root.** Create `domain.md`,
    `features.md`, `model.md`, `dependencies.md`, and `naming.md` together, each
    with its file-level `meta` block and matching `type`. Add `flow.md` only when
-   the context actually has a flow. Set `domain.md`'s `order` to list the rest,
-   and add the context to `context-map.md`'s `order`. A missing `order` entry is
-   a warning; a listed file that does not exist is an error.
+   the context actually has a flow. Add the context to `context-map.md`'s
+   subdomain landscape and context map. Reading order needs no declaration — it
+   comes from the folder convention, so a missing `domain.md` is what gets
+   reported, not a missing list entry.
 
 8. **Route the write through `orch-domain`.** Hand over the drafted content and
    the evidence behind each claim. `orch-domain` owns template conformance, the
@@ -153,9 +154,9 @@ published language is a finding worth flagging explicitly, per the folder rules.
 - A complete `.domain/<context>/` folder written through `orch-domain`, with
   every file carrying its file-level `meta` block and matching `type`.
 - `flow.md` present only when the context genuinely has a flow.
-- `domain.md` as the folder's root document, with `order` listing the rest.
-- `context-map.md` updated: the subdomain classification, the context map entry,
-  and the root `order`.
+- `domain.md` present as the folder's root document.
+- `context-map.md` updated: the subdomain classification and the context map
+  entry.
 - `dependencies.md` naming an explicit DDD pattern and integration mechanism per
   relationship, with contract references.
 - Any boundary crossing without an anti-corruption layer or published language
@@ -178,15 +179,13 @@ published language is a finding worth flagging explicitly, per the folder rules.
   code. Stop and put the decision to the user.
 - Do not create a context folder for a boundary that is only a folder. A bounded
   context is a language boundary.
-- Do not create `domain.md` alone. The folder is created whole, because
-  `domain.md`'s `order` lists the rest.
+- Do not create `domain.md` alone. The folder is created whole; `domain.md` is
+  only its entry point.
 - Do not create an empty `flow.md`. Omit the file when there is no flow.
 - Do not put per-chapter `meta` blocks in `context-map.md`, `model.md`,
   `flow.md`, or `dependencies.md`. Their `##` sections carry none; the
   file-level block is the only metadata those files have.
 - Do not write integration prose in place of a named DDD pattern.
-- Do not forget `context-map.md`'s `order` — a listed file that does not exist
-  is an error, and an unlisted one is a warning.
 - Do not write the individual aggregate or feature chapter bodies here. Those
   have their own capture passes. `naming.md` term bodies have no dedicated pass:
   create the file with its file-level block, and leave the terms to be proposed

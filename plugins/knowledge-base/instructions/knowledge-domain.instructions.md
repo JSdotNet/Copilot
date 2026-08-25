@@ -47,12 +47,13 @@ When starting a new bounded context, create the folder and the standard files
 the templates below, and add `flow.md` when the context has lifecycle or
 process flows.
 
-Reading order is declared in Markdown, not inferred from filenames:
-`context-map.md` is `.domain`'s root document and its file-level `order` lists
-the bounded contexts; each context's `domain.md` is that folder's root document
-and its `order` lists the remaining files. Update both when adding a context or
-a file, then regenerate `_meta/`. See
-`knowledge-chapter-metadata.instructions.md`.
+Reading order comes from this convention, not from a metadata field and not from
+filenames. `context-map.md` is `.domain`'s root document and is read first,
+followed by the bounded contexts in alphabetical order; inside a context,
+`domain.md` is the root document and the rest read in the order listed in the
+tree above — `features.md`, `model.md`, `flow.md`, `dependencies.md`,
+`naming.md`. Adding a context or a file needs no declaration anywhere; just
+regenerate `_meta/`. See `knowledge-chapter-metadata.instructions.md`.
 
 ## File responsibilities
 
@@ -222,7 +223,6 @@ instructions.
 \`\`\`meta
 status: draft
 type: context-map
-order: ["<first-bounded-context>", "<second-bounded-context>"]
 \`\`\`
 
 > `.domain`'s root document. Prefer titling it after the system the map covers,

@@ -22,8 +22,8 @@
     every adopted scope plus the repository-wide rollup.
 
 .PARAMETER Check
-    Validate references and reading order without writing anything. Exits
-    non-zero when a reference does not resolve or an `order` declaration is
+    Validate the authored Markdown without writing anything. Exits
+    non-zero when a reference does not resolve or a `meta` block is
     inconsistent. This is what CI runs as its blocking step.
 
 .PARAMETER Root

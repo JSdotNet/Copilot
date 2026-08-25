@@ -1,6 +1,6 @@
 ---
 name: knowledge-base-validate
-description: 'Validate and repair the .arc42/.domain/.tech/.design/.backlog knowledge folders — resolve broken metadata references, fix reading order, add missing meta blocks, and refresh drifted _meta indexes. Use when: the knowledge-meta check fails, CI warns about drifted indexes, references do not resolve. Triggers on: "knowledge-meta failed", "broken reference", "stale _meta", "validate knowledge folders", "knowledge base check", "build.mjs --check".'
+description: 'Validate and repair the .arc42/.domain/.tech/.design/.backlog knowledge folders — resolve broken metadata references, remove fields the schema no longer defines, add missing meta blocks, and refresh drifted _meta indexes. Use when: the knowledge-meta check fails, CI warns about drifted indexes, references do not resolve. Triggers on: "knowledge-meta failed", "broken reference", "stale _meta", "validate knowledge folders", "knowledge base check", "build.mjs --check".'
 ---
 
 # Knowledge base validate
@@ -8,8 +8,8 @@ description: 'Validate and repair the .arc42/.domain/.tech/.design/.backlog know
 ## Purpose
 
 Run the `knowledge-meta` check over a repository's knowledge folders and repair
-whatever it reports: unresolved references, inconsistent reading order, missing
-or malformed `meta` blocks, and drifted committed `_meta/` indexes.
+whatever it reports: unresolved references, fields the schema no longer defines,
+missing or malformed `meta` blocks, and drifted committed `_meta/` indexes.
 
 ## Steps
 
@@ -23,7 +23,7 @@ or malformed `meta` blocks, and drifted committed `_meta/` indexes.
 
    | Code | Meaning | Action |
    |------|---------|--------|
-   | `0` | Every reference resolves, order is consistent | Go to step 4 |
+   | `0` | Every reference resolves, every block matches the schema | Go to step 4 |
    | `1` | One or more problems at `error` severity | Go to step 2 |
    | `2` | No knowledge folder found | Wrong directory, or the repo has not adopted the convention — run `knowledge-base-init` instead |
 
@@ -39,7 +39,12 @@ or malformed `meta` blocks, and drifted committed `_meta/` indexes.
    | Unresolved reference | A `related`, `depends-on`, or `refines` target was renamed, moved, or never existed | Repoint the reference at the real chapter, or remove it if the relationship is gone. Never delete the target to silence the error. |
    | Missing `meta` block | A chapter was added without one | Add a block per `knowledge-chapter-metadata.instructions.md` |
    | Malformed `meta` block | Wrong field name, wrong value shape, or bad fencing | Correct it against `knowledge-chapter-metadata.instructions.md` |
-   | Inconsistent reading order | Duplicate or missing `order` values within a folder | Renumber the affected folder so `order` is unique and gapless |
+   | Removed schema field | An `order` field left over from before reading order moved to the folder convention | Delete the field. If the generated order is then wrong, give the documents a `number` or mark the entry point `index: root` |
+   | Duplicate `number` | Two documents in one directory claim the same number | Renumber one of them, in its filename or its `number` field, so each number identifies one document |
+   | Two `index: root` | Two documents in one directory both claim to be its entry point | Keep the one that introduces the directory and drop the field from the other |
+   | Bad `number` / `date` / `index` value | A non-integer number, a date that is not `YYYY-MM-DD`, or an `index` other than `root`/`exclude` | Correct the value; `date` is a calendar day the content records, not a modification timestamp |
+   | `index` or `number` on a chapter block | Both place the document in its directory, so they belong on the file-level block | Move the field to the file-level block, or drop it if the chapter needed neither |
+   | No entry point | A directory the convention covers is missing its root document, or has excluded it | Create the expected file, or mark the right one `index: root` |
    | Unknown status or type | A value outside the allowed ladder or value set | Use one of the values listed in the folder's own instruction file |
    | Missing `type` | A `.domain` or `.tech` block with no `type`, or a heading still carrying a kind prefix | Add `type` from the folder's value set and strip the prefix from the heading |
    | Literal escape sequence in body text | A `` `r`n `` or `\n` was written instead of a line break, usually by a tool writing the file through a shell | Replace it with a real line break. Check whether a heading was glued onto the previous line and silently stopped being a heading |
@@ -69,7 +74,7 @@ or malformed `meta` blocks, and drifted committed `_meta/` indexes.
 ## When CI fails but local is clean
 
 A CI failure is about the *authored Markdown*, not the indexes: the workflow
-fails only on an unresolved reference or an inconsistent reading order, which is
+fails only on an unresolved reference or a schema violation, which is
 step 1 above. Drifted `_meta/` files produce a `::warning::` and never fail the
 run, so "the indexes were not committed" is not the explanation.
 

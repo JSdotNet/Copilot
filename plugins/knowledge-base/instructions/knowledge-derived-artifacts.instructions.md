@@ -92,7 +92,7 @@ payload:
   file.
 - **CI blocks on source errors, warns on staleness.** Every derived artifact
   needs a workflow, and that workflow fails on anything wrong in the *authored*
-  Markdown — an unresolvable reference, an inconsistent reading order — because
+  Markdown — an unresolvable reference, a block that violates the schema — because
   those are real errors that do not fix themselves. It also regenerates the
   artifact and compares it against the committed copy, but reports a difference
   as a warning. Making every pull request carry a regenerated artifact is what
@@ -177,6 +177,9 @@ repository actually adopts, plus a repository-wide rollup:
 | `.design/_meta/*.json` | `.design` | both of the above, scoped | same |
 
 `index.json` carries the **reading order** of an area, which a viewer uses
-instead of sorting filenames alphabetically. Its source of truth is the
-`order` field on the file-level `meta` block of each directory's root
-document — see `knowledge-chapter-metadata.instructions.md`.
+instead of sorting filenames alphabetically. It is generated from the folder
+convention — each directory's root document first, then the sequence that
+folder's instructions file documents — plus what a document says about itself:
+its `number`, and whether its `index` field makes it the directory's entry point
+or keeps it out of the outline. No document declares the order of its siblings.
+See `knowledge-chapter-metadata.instructions.md`.

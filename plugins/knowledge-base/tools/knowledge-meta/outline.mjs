@@ -1,23 +1,169 @@
 // outline.mjs — derives the ordered reading outline of a knowledge area from
-// the `order` field in each directory's root document.
+// the folder convention, not from anything authored per repository.
 //
 // Markdown stays canonical; this produces the *derived* index that a viewer
 // reads to present files in their intended order instead of alphabetically.
 //
 // Ordering rules, per directory:
-//   1. The directory's *root document* is the file whose file-level `meta`
-//      block carries `order`. It always sorts first.
-//   2. `order` lists the remaining entries — plain names of sibling files
-//      (`shared.md`) or subdirectories (`inbox`) — in reading order.
-//   3. Anything present but unlisted is appended, filename-sorted, and
-//      reported as a problem so the declaration cannot silently drift.
-//   4. A directory with no root document falls back to filename sort, which is
-//      why the numbered .arc42 chapters need no declaration at all.
+//   1. The directory's *root document* sorts first — the file declaring
+//      `index: root`, or failing that the entry point its folder convention
+//      names (`.domain/context-map.md`, a bounded context's `domain.md`,
+//      `.tech/technology-graph.md`, `.design/README.md`).
+//   2. If anything left carries a **number** — from a `number` field or from a
+//      numbered filename — the directory is a numbered set (arc42 chapters,
+//      ADRs, TDRs) and sorts by that number ascending, unnumbered entries
+//      filename-sorted after them.
+//   3. Otherwise the remaining prescribed files follow in the sequence that
+//      folder's own instructions file documents in its structure block, with
+//      anything else — an extra file, a bounded-context subdirectory, a
+//      repository-chosen `.tech` layer — filename-sorted in between.
+//   4. A directory that is neither numbered nor covered by a convention sorts
+//      by filename, which is what the flat `.backlog` concerns want.
+//
+// A document declaring `index: exclude` is left out of the outline entirely.
+//
+// So reading order is a property of the *convention* by default and of the
+// document itself where the document has something to say — its number, or that
+// it is its directory's entry point. What it is never a property of is some
+// other document's metadata block.
 
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import { parseDocument, documentDigest, folderKindForPath, resolveType } from "./metadata.mjs";
+import {
+    parseDocument,
+    documentDigest,
+    folderKindForPath,
+    resolveType,
+    documentNumber,
+    fileNumberFromPath,
+    indexRole,
+} from "./metadata.mjs";
 import { KNOWLEDGE_FOLDERS, SCHEMA_VERSION, REPO_SCOPE, GENERATOR } from "./graph.mjs";
+
+/**
+ * Reading order per directory shape, keyed by knowledge folder with each
+ * subdirectory level written as `*`. `root` is the entry point; `first` and
+ * `last` pin the prescribed siblings around whatever else the directory holds.
+ *
+ * This mirrors the structure block in each folder's own instructions file —
+ * change one and change the other in the same edit.
+ */
+const DIRECTORY_CONVENTION = {
+    ".domain": { root: "context-map.md", first: [], last: [] },
+    ".domain/*": {
+        root: "domain.md",
+        first: ["features.md", "model.md", "flow.md", "dependencies.md", "naming.md"],
+        last: [],
+    },
+    ".tech": { root: "technology-graph.md", first: ["shared.md"], last: ["tooling.md"] },
+    ".design": {
+        root: "README.md",
+        first: [
+            "design-principles.md",
+            "color-scheme.md",
+            "typography-and-layout.md",
+            "interaction-guidelines.md",
+            "accessibility.md",
+            "component-libraries.md",
+        ],
+        last: [],
+    },
+};
+
+/** The convention for a directory, or `null` when it sorts by filename. */
+function conventionFor(relDir) {
+    const [area, ...rest] = relDir.replace(/\\/g, "/").split("/");
+    const key = rest.length ? `${area}/${rest.map(() => "*").join("/")}` : area;
+    return DIRECTORY_CONVENTION[key] ?? null;
+}
+
+/**
+ * Which entry is this directory's root document.
+ *
+ * An authored `index: root` wins over the convention, so a folder the
+ * convention says nothing about — `.arc42/adr/`, a repository's own
+ * subdirectory — can still name its entry point. Two of them is an error:
+ * a directory has one way in.
+ */
+function resolveRoot(relDir, parsed, excluded, convention, problems) {
+    const declared = [...parsed.entries()].filter(([, doc]) => indexRole(doc.meta) === "root");
+    if (declared.length > 1) {
+        problems.push({
+            severity: "error",
+            path: relDir,
+            message: `${relDir} has more than one document declaring \`index: root\` (${declared
+                .map(([name]) => name)
+                .join(", ")}); a directory has exactly one entry point.`,
+        });
+    }
+    if (declared.length) return declared[0][0];
+
+    if (!convention) return null;
+    if (parsed.has(convention.root)) return convention.root;
+
+    problems.push(
+        excluded.has(convention.root)
+            ? {
+                  severity: "warning",
+                  path: `${relDir}/${convention.root}`,
+                  message: `${relDir}/${convention.root} is the directory's root document by convention but declares \`index: exclude\`, so the directory now has no entry point. Drop the field, or mark another file \`index: root\`.`,
+              }
+            : {
+                  severity: "warning",
+                  path: relDir,
+                  message: `${relDir} has no ${convention.root}; the convention makes it this directory's root document and the first thing read. Declare \`index: root\` on another file to name a different entry point.`,
+              }
+    );
+    return null;
+}
+
+/**
+ * Order one directory's entries: root document first, then by number if the
+ * directory is a numbered set, otherwise by the folder convention.
+ *
+ * `numbers` maps an entry name to its number, or to `null` when it has none.
+ */
+function orderedSequence(relDir, names, numbers, rootName, problems) {
+    const rest = [...names].filter((name) => name !== rootName).sort();
+    const lead = rootName ? [rootName] : [];
+
+    const numbered = rest.filter((name) => numbers.get(name) !== null);
+    if (numbered.length) {
+        const byNumber = new Map();
+        for (const name of numbered) {
+            const number = numbers.get(name);
+            if (byNumber.has(number)) {
+                problems.push({
+                    severity: "error",
+                    path: `${relDir}/${name}`,
+                    message: `${relDir}/${name} and ${relDir}/${byNumber.get(number)} are both numbered ${number}; a number identifies one document in its directory.`,
+                });
+            } else {
+                byNumber.set(number, name);
+            }
+        }
+        // Sorted by number, then by name so a duplicated number is still
+        // deterministic rather than dependent on directory read order.
+        const inOrder = [...numbered].sort(
+            (a, b) => numbers.get(a) - numbers.get(b) || a.localeCompare(b)
+        );
+        return [...lead, ...inOrder, ...rest.filter((name) => numbers.get(name) === null)];
+    }
+
+    const convention = conventionFor(relDir);
+    if (!convention) return [...lead, ...rest];
+
+    const pinnedFirst = convention.first.filter((name) => rest.includes(name));
+    const pinnedLast = convention.last.filter((name) => rest.includes(name));
+    const pinned = new Set([...pinnedFirst, ...pinnedLast]);
+
+    return [
+        ...lead,
+        ...pinnedFirst,
+        ...rest.filter((name) => !pinned.has(name)),
+        ...pinnedLast,
+    ];
+}
 
 /** Read one directory into ordered `file` and `directory` outline entries. */
 async function readDirectory(repoRoot, relDir, problems) {
@@ -38,61 +184,48 @@ async function readDirectory(repoRoot, relDir, problems) {
     }
 
     // Parse every file once: we need its title/status for the outline anyway,
-    // and its file-level `order` to know whether it is the root document.
-    // The digest (lede, diagram count) comes out of the same pass, which is
+    // and the digest (lede, diagram count) comes out of the same pass, which is
     // the whole point — a viewer listing this folder must not have to open the
     // files to learn what the generator already read.
     const parsed = new Map();
+    const excluded = new Set();
     for (const name of files.sort()) {
         const relPath = `${relDir}/${name}`;
         const markdown = await readFile(path.join(repoRoot, relPath), "utf8");
         const { fileTitle, fileMeta } = parseDocument(markdown);
+        const meta = fileMeta ?? {};
+        // `index: exclude` keeps a document out of the outline. It is dropped
+        // here rather than filtered later so it can never be picked as the root
+        // document or occupy a number.
+        if (indexRole(meta) === "exclude") {
+            excluded.add(name);
+            continue;
+        }
         parsed.set(name, {
             relPath,
             title: fileTitle,
-            meta: fileMeta ?? {},
+            meta,
+            number: documentNumber(relPath, meta),
             digest: documentDigest(markdown),
         });
     }
 
-    const roots = [...parsed.entries()].filter(([, doc]) => Array.isArray(doc.meta.order));
-    if (roots.length > 1) {
-        problems.push({
-            severity: "error",
-            path: relDir,
-            message: `${relDir} has more than one document declaring \`order\` (${roots
-                .map(([name]) => name)
-                .join(", ")}); exactly one root document may define the directory's reading order.`,
-        });
-    }
+    const convention = conventionFor(relDir);
+    const rootName = resolveRoot(relDir, parsed, excluded, convention, problems);
 
-    const [rootName, rootDoc] = roots[0] ?? [];
-    const declared = rootDoc?.meta.order ?? [];
-    const remaining = new Set([...parsed.keys(), ...dirs].filter((name) => name !== rootName));
-
-    const sequence = [];
-    for (const name of declared) {
-        if (!remaining.delete(name)) {
-            problems.push({
-                severity: "error",
-                path: rootDoc.relPath,
-                message: `\`order\` lists "${name}", which is not a file or directory in ${relDir}.`,
-            });
-            continue;
-        }
-        sequence.push(name);
-    }
-    for (const name of [...remaining].sort()) {
-        if (rootName) {
-            problems.push({
-                severity: "warning",
-                path: rootDoc.relPath,
-                message: `${relDir}/${name} is missing from \`order\` in ${rootName}; appended alphabetically. Add it to pin its position.`,
-            });
-        }
-        sequence.push(name);
-    }
-    if (rootName) sequence.unshift(rootName);
+    // A subdirectory has no metadata block, so its number can only come from
+    // its name.
+    const numbers = new Map([
+        ...[...parsed.entries()].map(([name, doc]) => [name, doc.number]),
+        ...dirs.map((name) => [name, fileNumberFromPath(name)]),
+    ]);
+    const sequence = orderedSequence(
+        relDir,
+        [...parsed.keys(), ...dirs],
+        numbers,
+        rootName,
+        problems
+    );
 
     const outline = [];
     for (const name of sequence) {
@@ -110,6 +243,8 @@ async function readDirectory(repoRoot, relDir, problems) {
                 status: doc.meta.status ?? null,
                 // Omitted rather than emitted empty, so adding these fields did
                 // not churn every entry of every existing index.
+                ...(doc.number !== null ? { number: doc.number } : {}),
+                ...(doc.meta.date ? { date: doc.meta.date } : {}),
                 ...(doc.digest.summary ? { summary: doc.digest.summary } : {}),
                 ...(doc.digest.diagrams ? { diagrams: doc.digest.diagrams } : {}),
                 ...(name === rootName ? { root: true } : {}),
@@ -124,6 +259,7 @@ async function readDirectory(repoRoot, relDir, problems) {
                 // A directory shows the title of its own root document, so a
                 // viewer can label it without opening anything.
                 title: children.find((c) => c.root)?.title ?? name,
+                ...(numbers.get(name) !== null ? { number: numbers.get(name) } : {}),
                 children,
             });
         }

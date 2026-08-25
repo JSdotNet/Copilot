@@ -43,8 +43,11 @@ channel, by tier, or by service — and keep the set small.
 ```
 
 Add a new layer file only when a technology genuinely does not belong to an
-existing layer, and register it in `technology-graph.md` in the same change —
-both in its layer table and in its file-level `order` field.
+existing layer, and register it in `technology-graph.md`'s layer table in the
+same change. Reading order needs no declaration: `technology-graph.md` is read
+first, then `shared.md`, then the layer files alphabetically, then `tooling.md`
+last — the order shown in the tree above. See
+`knowledge-chapter-metadata.instructions.md`.
 
 ## File responsibilities
 
@@ -55,8 +58,7 @@ both in its layer table and in its file-level `order` field.
   - Explains the status ladder and how to read/extend the graph.
   - Its `##` sections do **not** carry per-chapter metadata blocks; the file
     carries a file-level block only (same rule as `.domain/context-map.md`).
-  - As `.tech`'s root document, its file-level `order` declares the reading
-    order of the layer files.
+  - It is `.tech`'s root document, so it is the first file read in the folder.
 - **`_meta/*.json`** — Derived, generated indexes for this folder.
   Never hand-edited; see `knowledge-derived-artifacts.instructions.md`
   and the knowledge-meta tooling README (`.github/tools/knowledge-meta/README.md`).

@@ -1,6 +1,6 @@
 {
   "name": "knowledge-base",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Repository knowledge-folder convention for .arc42, .domain, .tech, .design, and .backlog: parseable chapter metadata, derived _meta indexes, a reference-graph canvas, per-folder orchestration skills, bidirectional capture and build skills between chapters and code, and enforcement tooling.",
   "author": {
     "name": "Job Schepers"

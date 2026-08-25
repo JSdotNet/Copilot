@@ -222,9 +222,26 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
   it is not validated here beyond the slug shape. A chapter may contribute to
   several roadmap items. Available in every folder. Omit the field entirely
   when the chapter belongs to no roadmap item.
-- **order** (optional, **file-level blocks only**) — declares the reading
-  order of the directory this document sits in. See
-  "[Declaring reading order](#declaring-reading-order)" below.
+- **date** (optional) — the calendar day this chapter or file records, in
+  `YYYY-MM-DD` form: the day a decision was taken, debt was logged, or a record
+  was dated. It is **not** a last-modified timestamp — git already knows that,
+  and a hand-maintained one goes stale the first time someone forgets. Set it
+  where the date is part of the content (an ADR's decision date, a TDR's logged
+  date) and omit it everywhere else. Available in every folder.
+- **number** (optional, **file-level blocks only**) — this document's number
+  within its directory, as a single non-negative integer: arc42 chapter 9, ADR
+  7, TDR 2. A numbered filename (`09-architecture-decisions.md`,
+  `7-use-postgres.md`) supplies the number on its own, so the field is only
+  needed when the filename does not carry one, or carries the wrong one. See
+  "[Where reading order comes from](#where-reading-order-comes-from)".
+- **index** (optional, **file-level blocks only**) — how this document steers
+  the generated outline. `index: root` makes it its directory's entry point, so
+  it sorts first; `index: exclude` keeps it out of `_meta/index.json` altogether
+  while leaving it in the reference graph. Omit the field for an ordinary listed
+  document, which is nearly every file.
+
+`number` and `index` are file-level only because they place the *document* in
+its directory. A chapter's position is already its position in the document.
 
 Folder-specific fields (e.g. `depends-on` on features/backlog/tech chapters,
 `feature-flag` on domain feature chapters, `implements` on backlog chapters,
@@ -275,40 +292,70 @@ related: [.domain/sync/features.md#offline-sync]
   chapter or file with no relations, no estimate, and no issue shows only
   `status` and, where the folder defines one, `type`.
 
-## Declaring reading order
+## Where reading order comes from
 
 Files in a knowledge folder have an intended reading order that alphabetical
 sorting does not capture — `.domain` reads `domain` → `features` → `model`
-before `naming`, not the other way round. That order is declared in Markdown
-so it stays canonical, and compiled into `_meta/index.json` for viewers.
+before `naming`, not the other way round, and ADR 10 comes after ADR 7 rather
+than after ADR 1.
 
-Per directory, exactly one file may be the **root document**: the one whose
-file-level block carries `order`. It always sorts first, and its `order` lists
-the remaining entries — plain names of sibling files (`shared.md`) or
-subdirectories (`ordering`), never paths:
+That order is never declared by *listing siblings* in one document's block. It
+comes from the folder convention, and from what a document says about **itself**
+— its number, or that it is its directory's entry point.
 
-```markdown
-# Technology Graph
+Per directory, `_meta/index.json` is generated like this:
 
-\`\`\`meta
-status: candidate
-order: ["shared.md", "backend.md", "web.md", "tooling.md"]
-\`\`\`
-```
+1. **The root document sorts first** — the file declaring `index: root`, or
+   failing that the entry point its folder convention names:
 
-Rules:
+   | Directory | Root document by convention |
+   |---|---|
+   | `.domain/` | `context-map.md` |
+   | `.domain/<context>/` | `domain.md` |
+   | `.tech/` | `technology-graph.md` |
+   | `.design/` | `README.md` |
+   | `.arc42/`, `.backlog/` | none — declare `index: root` if the directory has one |
 
-- `order` is valid on a **file-level** block only. On a chapter block it is an
-  error — chapters are already ordered by their position in the document.
-- A directory with no root document falls back to filename sort. This is why
-  the numbered `.arc42` chapters (`01-…`, `02-…`) need no declaration.
-- An entry listed in `order` that does not exist is an error; a file or
-  subdirectory that exists but is unlisted is a warning and gets appended
-  alphabetically. Add it to `order` to pin its position.
-- Two documents in one directory both declaring `order` is an error.
+   A directory the convention covers but whose root document is missing is
+   reported as a warning. `index: root` overrides the convention, and two of
+   them in one directory is an error.
 
-Update `order` whenever a file is added to or removed from a directory that
-has a root document, then regenerate.
+2. **If anything left carries a number, the directory is a numbered set** and
+   sorts by that number ascending — arc42 chapters, ADRs, TDRs. The number comes
+   from the `number` field, or from a numbered filename when there is no field:
+   `09-architecture-decisions.md`, `7-use-postgres.md`, and
+   `ADR-0007-use-postgres.md` all read as numbers. Numbering by filename is
+   worth preferring, because it is the ordering a reader sees in a directory
+   listing too. Two documents claiming one number is an error; anything
+   unnumbered is filename-sorted after the numbered run.
+
+3. **Otherwise the folder convention orders it**: that folder's prescribed files
+   in the sequence its instructions file documents in its **Structure** block —
+   `.domain`'s `features` → `model` → `flow` → `dependencies` → `naming`,
+   `.design`'s principles-then-tokens run, `.tech`'s `shared.md` first and
+   `tooling.md` last — with anything else filename-sorted in between.
+
+4. **A directory that is neither numbered nor covered by a convention sorts by
+   filename**, which is what the flat `.backlog` concerns want.
+
+`index: exclude` drops a document from the outline entirely. It stays a node in
+`graph.json`, because it is still real content that other chapters may
+reference — it is just not something a viewer lists.
+
+Nothing here lists a directory's contents from inside one of its documents, so
+adding or removing a file needs no edit to any *other* file. Regenerate `_meta/`
+and it lands in the right place.
+
+Reading order used to be declared in an `order` field on the file-level block,
+listing the names of a directory's other entries. That field is **removed** from
+the schema: a metadata block describes the thing it sits under, and a
+directory's reading order is not a property of one document inside it. A block
+that still carries `order` is a validation error — delete it, and use `number`
+or `index: root` if the order it declared is not what the rules above produce.
+
+The convention's own part of this lives in the `DIRECTORY_CONVENTION` table in
+`.github/tools/knowledge-meta/outline.mjs`. Keep that table and the folders'
+**Structure** blocks in step with each other.
 
 ## Derived metadata index
 
