@@ -176,15 +176,69 @@ reported, not remediated; raising the PR stays a deliberate call via `create-pul
 Each of these completes its work in **the one session that runs it**. The skills that work
 from a queue — `start-session-from-issue`, `automation-bug-fix`, `pr-merge-ready` — select a
 single issue or pull request per run, claim it, and carry it through in that session. They
-never hand back a batch of invocations for other sessions to pick up, because a scheduled
-routine gets one session and cannot open another. To work several items at once, start another
-session and run the skill again: every run claims a different item, so concurrent runs do not
-collide.
+never hand back a batch of invocations for other sessions to pick up. To work several items at
+once, start another session and run the skill again: every run claims a different item, so
+concurrent runs do not collide. (Automatic fan-out is possible, but it belongs to the
+`workflow-*` skills below — an `orch-*` run cannot be handed across sessions without losing
+the context its later stages depend on.)
 
 Unattended runs are the design target, not an edge case. Where a skill would normally ask the
 user to confirm its selection, a run with no user turn available proceeds on the single item it
 picked — the claim guards against a double pickup, and the Personal Validation gate still
 holds every pull request until the user is back.
+
+#### Workflow Skills
+
+- `skills/workflow-issue-sweep/` — triage the backlog for relevance and for collision with
+  work in flight, propose stale issues for closure, then spawn up to five worker sessions and
+  a morning brief
+- `skills/workflow-resolve-issue/` — claim one open issue, cut it a dedicated worktree and
+  branch, resolve it with the `resolve-issue.workflow.js` script, then open a pull request or
+  park the worktree for validation
+- `skills/workflow-morning-brief/` — read every worker result and report what needs you
+
+Together they form the **issue sweep**, which spans sessions that cannot see each other and
+coordinate through files on disk. `instructions/workflow-issue-sweep-contract.instructions.md`
+owns that contract — the sweep directory layout, the manifest and worker result schemas, and
+the spawn rules:
+
+```text
+routine session (workflow-issue-sweep)
+  ├── triage → mark → spawn ──┬── worker #42 (workflow-resolve-issue) → PR, or parked
+  │                           └── ... up to maxParallel, staggered
+  ├── closure approval  ← stays open for the user
+  └── ends
+
+  (later)  brief session (workflow-morning-brief) → reads every result → one report
+```
+
+The sweep spawns its workers as **one-time scheduled tasks** (`fireAt`, never `cronExpression`),
+each becoming a fresh session with its own worktree. It spawns *before* it asks the closure
+question, so a question waiting at 06:00 does not keep the backlog idle. Scheduled tasks only
+fire while the host application is open — a sweep at 06:00 on a machine closed until 09:00
+produces its work at 09:00.
+
+Each worker routes on **evidence gathered after the work**, not on the issue text: a change
+whose every acceptance criterion is proved by a test, that touched no runtime surface, took no
+assumption, and left no major finding open becomes a pull request. Anything else is committed
+and **parked** — worktree left in place, handoff brief written, `needs-validation` on the
+issue. Expect parking to be common; that is the bar working, not the sweep failing.
+
+`workflow-*` skills drive the `Workflow` tool rather than an `orch-*` orchestration:
+invoking one is the explicit opt-in that tool requires, and the script beside the skill holds
+the phase order, the bounded build-repair loop, and the review gate as deterministic control
+flow instead of model judgement. They keep the one-item-per-run rule above, and they are not
+governed by the `orch-*` instruction files (`applyTo: 'skills/orch-*/SKILL.md'`).
+
+`workflow-resolve-issue` is the unattended twin of `start-session-from-issue`, and it diverges
+on the one point that cannot survive a routine: with no user turn to hold Personal Validation,
+**the pull request itself becomes the review surface**. Its body carries the derived acceptance
+criteria, the verification result, the review findings left open, and every assumption the run
+took instead of asking — read that last section first. Set `prMode: "draft"` when a pull
+request should not present itself as a merge candidate before you have looked. Each run works
+a dedicated worktree, so concurrent runs cannot corrupt each other's change sets; they can
+still contend for ports and local databases, which is what the sweep's `staggerMinutes`
+addresses — raise it, or give each run its own ports via `.claude/orch-context.md`.
 
 ## Configuration Layers
 
