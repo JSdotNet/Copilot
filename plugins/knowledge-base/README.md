@@ -269,6 +269,62 @@ for technologies that do not appear in package manifests.
   context rather than baseline context, `meta` blocks are mandatory on every
   chapter, and `_meta/` is never hand-edited.
 
+## 0.11.0: invariants as a table
+
+**Additive, and no migration.** Aggregate chapters in `.domain/<context>/domain.md`
+now carry an `### Invariants` sub-section instead of describing their rules in
+prose:
+
+```markdown
+## Order
+
+\`\`\`meta
+status: active
+type: aggregate
+tests: [unit:dotnet:Ordering.Domain.Tests.OrderTests]
+\`\`\`
+
+An order a customer is assembling, and the consistency boundary for its lines.
+
+### Invariants
+
+| Rule | Enforced at | Evidence |
+|---|---|---|
+| An order has at least one line before it can be confirmed | `Confirm()` | `Ordering.Domain.Tests.OrderTests.CannotConfirmAnEmptyOrder` |
+| A confirmed order cannot be cancelled | `Cancel()` | `untested` |
+| Line quantities are positive | `AddLine()` | `Ordering.Domain.Tests.OrderTests.RejectsZeroQuantity` |
+| Whether a partially refunded order may be re-confirmed | `open` | Nobody owns this yet — asked in the 2026-08 session |
+```
+
+The rules were always the most valuable content in `.domain`, and the only
+content with no shape. `build-aggregate` already required each invariant written
+out in full with one acceptance check per rule, and `capture-aggregate` already
+mined unit tests for them — both against a paragraph, which is not quotable,
+countable, or linkable. Three columns fix that:
+
+- **`Rule`**, one per row, because a row is the unit a brief quotes and a check
+  is derived from. Merged rows silently merge acceptance checks.
+- **`Enforced at`** is the column prose loses: the constructor, or the named
+  transition. It is what tells a build pass where the guard clause belongs, and
+  a rule whose enforcement point cannot be named is usually a caller's rule
+  rather than an invariant.
+- **`Evidence`** is a `tests` selector or the literal `untested`. Coverage
+  becomes visible per rule instead of per chapter.
+
+An **`open`** row is the Event Storming hot spot, kept in place. The sync
+protocol already said an unsettled rule is recorded as an open question rather
+than captured as fact, but never said where it lived; now it does. An `open` row
+does not block `status: active` — a model can be current and still carry an
+unanswered question — but `build-*` reports it as a decision needed rather than
+briefing a rule nobody agreed.
+
+Nothing to re-sync: the generator needs no change, no `type` value is added, and
+`schemaVersion` stays at 4. `### Invariants` is a structural sub-section like
+`### Payload`, so `build.mjs --check` reports the same expected "heading with no
+`meta` block" warning for it. To adopt, move an aggregate's rules out of its
+prose as you next touch it — or run `capture-aggregate`, which now writes the
+table directly from the guard clauses and tests it reads.
+
 ## 0.10.0: linking test cases
 
 **Additive.** A new optional `tests` field, on chapter and file blocks in every

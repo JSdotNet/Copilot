@@ -49,6 +49,11 @@ the existing `.domain/` contents, and continue.
 - Hand off to `domain-design:domain-architect` for the actual modeling
   decisions: aggregate boundaries, invariants, domain services, domain
   events, feature breakdown, or naming/alias resolution.
+- Record every aggregate's rules in its `### Invariants` table, one row per
+  rule, with the `Enforced at` point named. A rule the session could not settle
+  stays as an `open` row carrying the question — do not resolve a hot spot by
+  choosing an answer for the domain expert, and do not drop it to make the table
+  look finished.
 - Draft or refresh content using the exact templates in
   `knowledge-domain.instructions.md` (`domain.md`, `features.md`, `model.md`,
   `flow.md`, `dependencies.md`, `naming.md`).
