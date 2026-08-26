@@ -211,6 +211,22 @@ service raises it.
    Record caller-side rules as such, or leave them out; do not promote one call
    site to an invariant.
 
+   Write the surviving rules into the chapter's `### Invariants` table, one row
+   each, per `knowledge-domain.instructions.md`. Step 3 gives you `Enforced at` —
+   the constructor or the named transition the guard clause actually sits in —
+   and step 4 gives you `Evidence`: the test selector that asserts the rule, or
+   `untested` where a guard clause enforces a rule no test covers. Do not
+   collapse several rules into one row to keep the table short. A row is the unit
+   a `build-*` pass quotes and an acceptance check is derived from, so a merged
+   row silently merges two acceptance checks into one.
+
+   Both of step 4's informative absences land in this table rather than being
+   dropped. A rule the code enforces with no test becomes a row whose `Evidence`
+   is `untested` — a real finding, and the quickest view of where the suite is
+   thin. A rule visible only in a disabled test, a TODO, or a comment is never
+   recorded as holding; it becomes an `open` row with the question itself in
+   `Evidence`.
+
 6. **Settle every placement.** Working from the step 3 inventory and the step 4
    tests, decide for each type:
    - Is it an aggregate root of its own? Check for a repository or store whose

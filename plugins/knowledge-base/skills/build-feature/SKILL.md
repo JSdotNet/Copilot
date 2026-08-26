@@ -63,7 +63,10 @@ its prerequisites exist produces work that cannot land.
 
 The invariants for a feature brief come from the `related` `domain.md` chapters,
 not from the feature chapter itself — `features.md` describes capability, and
-the rules live with the model. Pull them in; do not paraphrase them.
+the rules live with the model. Pull them in; do not paraphrase them. They are
+rows of those chapters' `### Invariants` tables, so quote them row by row with
+each row's `Enforced at` point, and leave `open` rows out of the invariants list
+— report them as decisions the feature depends on.
 
 ## Workflow
 

@@ -77,7 +77,7 @@ to build the draft silently because its parent is agreed.
 | Identity | An id type and an assignment path — constructor argument, factory, or store-assigned | The root's constructor and factory methods |
 | Responsibility | Public methods that let a caller do what the chapter describes, and nothing beyond it | The root's public surface |
 | Consistency boundary | One transactional unit: a repository whose granularity is this root, owned collections held inline, other aggregates referenced by id | The repository interface and the persistence mapping |
-| Invariants | Enforcement in the constructor and in every mutating method, not in a caller | Guard clauses on the root itself |
+| Invariants (one row of the `### Invariants` table each) | Enforcement at the row's `Enforced at` point — that constructor or that named transition — on the root itself, never in a caller | Guard clauses on the root itself |
 | Lifecycle | The creation path plus exactly the state transitions the chapter allows — and no transition it does not | The mutating methods and any status field |
 
 ### Owned entities, value objects, and enums
@@ -131,6 +131,21 @@ An invariant the chapter states and the code does not enforce is the
 highest-value line in the brief, and the one most likely to be dropped if it is
 not written out. Never summarize the invariants as "as per the chapter".
 
+The chapter's `### Invariants` table makes this mechanical. Carry each row into
+the brief as its own invariant, quoting the `Rule` text rather than paraphrasing
+it, and carry that row's `Enforced at` value with it — that is what says whether
+the guard clause belongs in the constructor or in one transition, and it is
+precisely the part an implementer cannot recover from the code. A row whose
+`Evidence` is a passing test selector is already enforced: verify it and drop it
+from the ask rather than briefing work that is done. A row whose `Evidence` is
+`untested` still needs its acceptance check even where the guard clause already
+exists — an unasserted rule is one refactor from being gone.
+
+A row with `open` in `Enforced at` is **not briefed**. Nobody has agreed that
+rule yet, so there is nothing to build from it and no acceptance check to derive.
+Name it in the brief as needing a decision, exactly as the status gate names an
+unsettled sub-chapter, and leave it out of the invariants list.
+
 ## Workflow
 
 1. **Load governed context.** Read `assets/code-sync-protocol.md`,
@@ -181,8 +196,9 @@ not written out. Never summarize the invariants as "as per the chapter".
    behaviour beyond subscribing to an event, and any sub-chapter left unsettled
    by the status gate. An unstated boundary is the one that gets crossed.
 
-8. **Derive the acceptance checks.** Turn each invariant and each outcome into a
-   statement a test can assert — that constructing the root or an owned type
+8. **Derive the acceptance checks.** Turn each `### Invariants` row and each
+   outcome into a statement a test can assert — one check per row, so the two
+   counts match and a dropped rule is visible — that constructing the root or an owned type
    with an invalid value is rejected, that a forbidden transition throws, that
    two value objects with equal components are equal, that an owned entity is
    reachable and savable only through its root, that the enum has exactly the
@@ -204,9 +220,10 @@ not written out. Never summarize the invariants as "as per the chapter".
   `change to existing behaviour`, or `defect`, with the reasoning for it.
 - **Outcomes** — what is true once the aggregate is built, in the domain's
   language, observable rather than procedural.
-- **Invariants** — every rule the chapters state, written out in full, each
-  marked as already enforced (with the passing test that shows it) or not yet
-  enforced.
+- **Invariants** — one entry per `### Invariants` row, quoted in full, each
+  carrying its `Enforced at` point and marked as already enforced (with the
+  passing test that shows it) or not yet enforced. `open` rows are listed
+  separately as decisions needed, never as invariants to build.
 - **Ubiquitous language** — the canonical terms with their `naming.md` aliases,
   covering the root, owned types, enum members, and event payload fields.
 - **Out of scope** — the adjacent chapters, services, and contexts this change
@@ -242,6 +259,10 @@ not written out. Never summarize the invariants as "as per the chapter".
   wrong.
 - Do not summarize the invariants by reference. Write each one out; the
   reference is what gets lost.
+- Do not brief an `open` row, and do not resolve one by picking the answer that
+  suits the brief. An unsettled rule is a decision to ask for.
+- Do not drop a row's `Enforced at` value. "Enforce this invariant" without the
+  enforcement point is the paraphrase this table exists to prevent.
 - Do not ask for work that already exists — read the counterpart and its passing
   tests first.
 - Do not treat a TODO, a comment, or a disabled test as proof that something is

@@ -68,6 +68,8 @@ regenerate `_meta/`. See `knowledge-chapter-metadata.instructions.md`.
   Shared Value Objects / Shared Enums grouping in the context.
   - Aggregate chapters include sub-chapters for their owned Entities, Value
     Objects, and Enums, each carrying its own metadata block.
+  - Aggregate chapters also carry an `### Invariants` table — the rules the
+    aggregate guarantees, one row per rule. See the folder rules below.
   - Domain Service chapters describe the service's responsibility and the
     aggregates/policies it coordinates.
   - Domain Event chapters are first-class addressable chapters and carry
@@ -197,6 +199,39 @@ instructions.
   cross-context row when applicable (for example: `ACL`,
   `Customer/Supplier`, `Partnership`, `OHS + Published Language`) and identify
   the contract/published language entry used by consumers.
+- Every Aggregate chapter in `domain.md` carries an `### Invariants`
+  sub-section directly under its prose: a table with one row per rule the
+  aggregate guarantees. It is a structural sub-section of that one chapter, not
+  an addressable chapter, so it carries no metadata block — like `### Payload`
+  under a Domain Event. Entity and Value Object sub-chapters may carry the same
+  table when they enforce rules of their own; where they do not, their prose
+  validation rules are enough and the aggregate's table is the record.
+
+  | Column | Holds |
+  |---|---|
+  | `Rule` | One rule, in the domain's own language, stated as a claim that is either true or false. One rule per row — a row holding three related rules cannot be checked, enforced, or accepted as one thing. |
+  | `Enforced at` | Where the aggregate guarantees it: `constructor`, a named transition (`Confirm()`, `AddLine()`), or `all mutations` when it genuinely holds across every one. |
+  | `Evidence` | What establishes that it holds: a selector from the chapter's `tests` field, or `untested` when a guard clause enforces the rule and no test asserts it. |
+
+  `Enforced at` is the column that prose loses. An invariant is what the type
+  guarantees no matter who calls it, and *where* it is guaranteed is what tells
+  a `build-*` pass whether a guard clause belongs in the constructor or in one
+  transition. A rule whose enforcement point cannot be named is usually a
+  caller's rule rather than an invariant — see `assets/code-sync-protocol.md`.
+
+  `untested` is a real and useful state: write it rather than leaving the cell
+  empty. An empty cell reads as "not filled in yet", which is a different claim,
+  and a rule nothing asserts is one refactor away from being gone.
+- A rule that is **not yet settled** is recorded in the same table as a row with
+  `open` in `Enforced at` and the open question itself in `Evidence`. This is
+  the hot spot of an Event Storming session kept in place rather than resolved
+  by guessing, and it is where `assets/code-sync-protocol.md` means a rule to go
+  when it says to record it as an open question instead of capturing it as fact.
+
+  An `open` row does not stop a chapter reaching `status: active` — a model can
+  be the current one and still carry a known unanswered question. It does stop
+  that one rule being *built*: a `build-*` pass names it as needing a decision
+  instead of briefing an implementation of a rule nobody has agreed.
 - In Domain Service chapters, state invocation semantics when it clarifies
   behavior boundaries: whether logic is command-invoked, scheduled,
   query/composition-oriented, or event-triggered policy/process-manager
@@ -276,9 +311,15 @@ status: draft
 type: aggregate
 \`\`\`
 
-Responsibility, lifecycle, and invariants of the aggregate (what it
-guarantees to be true at all times, and why it exists as a consistency
-boundary).
+Responsibility, lifecycle, and why this aggregate exists as a consistency
+boundary. The rules it guarantees go in the `### Invariants` table below rather
+than in this prose.
+
+### Invariants
+
+| Rule | Enforced at | Evidence |
+|---|---|---|
+| <One rule, as a claim that is either true or false> | <constructor / <Transition>() / all mutations / open> | <tests selector / untested / the open question> |
 
 ### <EntityName>
 
@@ -388,9 +429,11 @@ aggregate as `###` headings. There are no `### Entities` / `### Value Objects`
 grouping headings only pushed every real chapter a level deeper and added
 anchors nobody references.
 
-`### Payload`, `### Consumers`, and `### Published language rules` under a
-Domain Event are structural sub-sections of that one chapter, not addressable
-chapters, so they carry no metadata block.
+`### Invariants` under an Aggregate, and `### Payload`, `### Consumers`, and
+`### Published language rules` under a Domain Event, are structural
+sub-sections of that one chapter rather than addressable chapters, so they carry
+no metadata block. `build.mjs --check` reports each as a heading with no `meta`
+block; that warning is expected for these four headings.
 
 ### features.md
 
