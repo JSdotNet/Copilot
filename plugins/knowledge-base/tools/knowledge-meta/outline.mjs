@@ -41,6 +41,20 @@ import {
 import { KNOWLEDGE_FOLDERS, SCHEMA_VERSION, REPO_SCOPE, GENERATOR } from "./graph.mjs";
 
 /**
+ * A document's `tests` entries as a list, whatever shape they were authored in.
+ *
+ * Carried on a `file` entry for the same reason `summary` and `diagrams` are: a
+ * viewer drawing a folder's list view wants to badge what covers each document
+ * without opening it. Chapter-level entries stay in `graph.json`, which is where
+ * a consumer goes for per-chapter detail.
+ */
+function testList(meta) {
+    const value = meta?.tests;
+    if (value === null || value === undefined) return [];
+    return Array.isArray(value) ? value : [value];
+}
+
+/**
  * Reading order per directory shape, keyed by knowledge folder with each
  * subdirectory level written as `*`. `root` is the entry point; `first` and
  * `last` pin the prescribed siblings around whatever else the directory holds.
@@ -234,6 +248,7 @@ async function readDirectory(repoRoot, relDir, problems) {
             // Titles are name-only, so every file in a `.domain` bounded context
             // shares one title; `kind` is what tells them apart in a viewer.
             const fileKind = resolveType(folderKindForPath(doc.relPath), doc.meta);
+            const tests = testList(doc.meta);
             outline.push({
                 type: "file",
                 name,
@@ -245,6 +260,9 @@ async function readDirectory(repoRoot, relDir, problems) {
                 // not churn every entry of every existing index.
                 ...(doc.number !== null ? { number: doc.number } : {}),
                 ...(doc.meta.date ? { date: doc.meta.date } : {}),
+                // Always a list, so a list view can badge "2 tests" without
+                // branching on whether the author wrote a scalar.
+                ...(tests.length ? { tests } : {}),
                 ...(doc.digest.summary ? { summary: doc.digest.summary } : {}),
                 ...(doc.digest.diagrams ? { diagrams: doc.digest.diagrams } : {}),
                 ...(name === rootName ? { root: true } : {}),

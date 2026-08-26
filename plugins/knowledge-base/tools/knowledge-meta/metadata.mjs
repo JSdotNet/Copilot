@@ -67,10 +67,73 @@ const LEGACY_TYPE_FIELD_BY_FOLDER = { tech: "kind" };
 
 // Fields every folder's chapter/file block may carry, plus folder-specific
 // extras layered in below.
-const COMMON_OPTIONAL_FIELDS = ["type", "related", "issue", "effort", "roadmap", "date"];
+const COMMON_OPTIONAL_FIELDS = ["type", "related", "issue", "effort", "roadmap", "date", "tests"];
 
 // `roadmap` entries are lowercase kebab-case tag slugs, not chapter references.
 const ROADMAP_TAG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+// `tests` links a chapter or file to the test cases that assert what it claims.
+// Entries are `<level>:<runner>:<selector>` — coarse to fine, so a consumer can
+// group by level, pick a command from the runner, and hand the selector to that
+// runner verbatim.
+//
+// The level vocabulary is deliberately tiny and about *reach*, not about which
+// tool ran it: a unit test pins a rule inside one unit, an integration test
+// crosses a process or a store, an end-to-end test drives the product the way a
+// user does. That is the distinction a reader of a chapter wants ("is this
+// covered end to end?") and the one a runner cannot supply, since the same
+// runner routinely hosts all three.
+const TEST_LEVELS = ["unit", "integration", "e2e"];
+
+// How each known runner turns a selector into an argv.
+//
+// This mapping is the reason a test reference carries a runner rather than a
+// bare path: a consumer that knows the runner can *run* the test. That is also
+// what makes this field admissible where a `code-path` field is not — see
+// "Why a test link and not a code link" in
+// knowledge-chapter-metadata.instructions.md. A selector that stops resolving
+// fails a run out loud; a source path in a metadata block rots in silence.
+//
+// Selectors are runner-native, because a runner-native selector is exactly what
+// a person pastes into a terminal. Where a runner needs a file *and* a title,
+// the two are joined with `#`, matching the `<path>#<slug>` shape this schema
+// already uses for chapter references.
+const TEST_RUNNERS = {
+    dotnet: {
+        selector: "fully-qualified test class or method name",
+        argv: (selector) => ["dotnet", "test", "--filter", `FullyQualifiedName~${selector}`],
+    },
+    playwright: {
+        selector: "<spec path>, optionally #<test title>",
+        argv: (selector) => {
+            const [spec, title] = splitSpecAndTitle(selector);
+            return ["npx", "playwright", "test", spec, ...(title ? ["-g", title] : [])];
+        },
+    },
+    vitest: {
+        selector: "<spec path>, optionally #<test name>",
+        argv: (selector) => {
+            const [spec, title] = splitSpecAndTitle(selector);
+            return ["npx", "vitest", "run", spec, ...(title ? ["-t", title] : [])];
+        },
+    },
+    jest: {
+        selector: "<spec path>, optionally #<test name>",
+        argv: (selector) => {
+            const [spec, title] = splitSpecAndTitle(selector);
+            return ["npx", "jest", spec, ...(title ? ["-t", title] : [])];
+        },
+    },
+    pytest: {
+        selector: "pytest node id",
+        argv: (selector) => ["pytest", selector],
+    },
+};
+
+// A `tests` entry that starts like a knowledge path is a chapter reference
+// pasted into a field that takes test identifiers. Worth its own message,
+// because the author's intent is obvious and the fix is to move it to `related`.
+const KNOWLEDGE_PATH_PREFIX = /^\.(?:domain|arc42|backlog|tech|design)\//;
 
 // Fields that steer how this document appears in the generated outline, and so
 // describe the document's place in its directory rather than a chapter inside
@@ -403,6 +466,117 @@ export function typeIssues(folder, blockLevel, meta) {
     return issues;
 }
 
+/** Split a `<spec>#<title>` selector; title is null when the entry has none. */
+function splitSpecAndTitle(selector) {
+    const idx = selector.indexOf("#");
+    if (idx === -1) return [selector, null];
+    return [selector.slice(0, idx).trim(), selector.slice(idx + 1).trim() || null];
+}
+
+/** Every test level this schema defines, in reach order. */
+export const testLevels = () => [...TEST_LEVELS];
+
+/**
+ * Every runner the tooling can build a command for, each with the selector shape
+ * it expects — what a viewer needs to explain the field to whoever is filling it
+ * in.
+ */
+export const testRunners = () =>
+    Object.entries(TEST_RUNNERS).map(([runner, { selector }]) => ({ runner, selector }));
+
+/**
+ * Split one `tests` entry into `{ level, runner, selector }`, or null when it is
+ * not in `<level>:<runner>:<selector>` form.
+ *
+ * Only the first two colons delimit: a selector routinely contains its own
+ * (`pytest` node ids, a `file:line`), and everything after the runner belongs to
+ * the runner.
+ */
+export function parseTestReference(ref) {
+    const raw = String(ref ?? "").trim();
+    const first = raw.indexOf(":");
+    if (first <= 0) return null;
+    const second = raw.indexOf(":", first + 1);
+    if (second <= first + 1) return null;
+    const selector = raw.slice(second + 1).trim();
+    if (!selector) return null;
+    return { level: raw.slice(0, first).trim(), runner: raw.slice(first + 1, second).trim(), selector };
+}
+
+/**
+ * The command that runs one `tests` entry, as `{ level, runner, selector,
+ * command }` with `command` an argv array — or null when the entry is malformed
+ * or names a runner this tooling has no mapping for.
+ *
+ * The argv is meant to be run from the repository root. A repository whose
+ * runner needs a different working directory, a project path, or a config flag
+ * wraps this rather than reshaping the reference: the reference identifies the
+ * test, and how this repository invokes its runners is a property of the
+ * repository.
+ *
+ * This is the seam a UI "run this test" affordance sits on. It is deliberately
+ * a pure function that returns an argv and executes nothing.
+ */
+export function testCommand(ref) {
+    const parsed = parseTestReference(ref);
+    if (!parsed) return null;
+    const runner = TEST_RUNNERS[parsed.runner];
+    if (!runner) return null;
+    return { ...parsed, command: runner.argv(parsed.selector) };
+}
+
+/**
+ * Validate a block's `tests` entries.
+ *
+ * Messages are sentence fragments beginning with a verb, matching `typeIssues`,
+ * so the document lint, the graph build, and the canvas all report the same
+ * thing with their own subject prefixed.
+ *
+ * An unknown runner is a warning rather than an error: the level and the
+ * selector still say what covers this chapter, and a repository on a stack this
+ * tooling has never heard of should not be blocked from recording that. What it
+ * loses is the run command, which the message says.
+ */
+export function testIssues(meta) {
+    const issues = [];
+    if (!meta || meta.tests == null) return issues;
+
+    for (const entry of toList(meta.tests)) {
+        if (KNOWLEDGE_PATH_PREFIX.test(entry)) {
+            issues.push({
+                severity: "error",
+                message: `has \`tests\` entry "${entry}", which is a chapter reference — \`tests\` holds \`<level>:<runner>:<selector>\` test identifiers. A link to another chapter belongs in \`related\`.`,
+            });
+            continue;
+        }
+
+        const parsed = parseTestReference(entry);
+        if (!parsed) {
+            issues.push({
+                severity: "error",
+                message: `has \`tests\` entry "${entry}", which is not \`<level>:<runner>:<selector>\` — e.g. \`unit:dotnet:Ordering.Domain.Tests.OrderTests\`. Entries cannot contain a comma, since that separates the list.`,
+            });
+            continue;
+        }
+
+        if (!TEST_LEVELS.includes(parsed.level)) {
+            issues.push({
+                severity: "error",
+                message: `has \`tests\` entry "${entry}" with level "${parsed.level}", expected one of: ${TEST_LEVELS.join(", ")}.`,
+            });
+        }
+
+        if (!(parsed.runner in TEST_RUNNERS)) {
+            issues.push({
+                severity: "warning",
+                message: `has \`tests\` entry "${entry}" naming runner "${parsed.runner}", which this tooling has no command mapping for (known: ${Object.keys(TEST_RUNNERS).join(", ")}), so nothing can offer to run it. The entry is kept as written.`,
+            });
+        }
+    }
+
+    return issues;
+}
+
 /**
  * Flag literal escape sequences sitting in Markdown body text.
  *
@@ -702,6 +876,12 @@ export function validateDocument(relPath, markdown) {
                     });
                 }
             }
+        }
+
+        // `tests` names the test cases that assert what this chapter claims,
+        // as `<level>:<runner>:<selector>` identifiers a runner can resolve.
+        for (const issue of testIssues(chapter.meta)) {
+            issues.push({ severity: issue.severity, message: `${label} ${issue.message}` });
         }
 
         for (const issue of removedFieldIssues(chapter.meta)) {

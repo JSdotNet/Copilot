@@ -16,10 +16,10 @@ Re-run the same command after changing the plugin.
 ## What the convention is
 
 Each knowledge folder holds Markdown chapters. Every chapter carries a `meta`
-block declaring its identity, status, number, date, and its relationships to
-other chapters. A generator walks the corpus and writes derived indexes under
-`_meta/`, which CI validates on every pull request and a scheduled job keeps
-current.
+block declaring its identity, status, number, date, its relationships to other
+chapters, and the test cases that assert what it claims. A generator walks the
+corpus and writes derived indexes under `_meta/`, which CI validates on every
+pull request and a scheduled job keeps current.
 
 | Folder | Holds |
 |--------|-------|
@@ -203,7 +203,7 @@ these skills exist.
 
 | File | Pattern | Purpose |
 |------|---------|---------|
-| `knowledge-chapter-metadata.instructions.md` | all five folders | Required `meta` block fields, `status` ladders, and `type` value sets |
+| `knowledge-chapter-metadata.instructions.md` | all five folders | Required `meta` block fields, `status` ladders, `type` value sets, and the `tests` test-case link format |
 | `knowledge-domain.instructions.md` | `.domain/**` | Bounded-context structure and ubiquitous language |
 | `knowledge-arc42.instructions.md` | `.arc42/**` | arc42 chapter, ADR, and TDR structure |
 | `knowledge-tech.instructions.md` | `.tech/**` | Technology graph, versions, maturity ladder |
@@ -218,8 +218,10 @@ repositories and files that have not adopted the convention.
 ### Extension: `knowledge-canvas`
 
 Renders the knowledge graph as an interactive canvas — chapters as nodes,
-`related` / `depends-on` / `refines` as edges — using the same graph code the
-generator writes, so the live view and the committed indexes never disagree.
+`related` / `depends-on` / `implements` as edges — using the same graph code the
+generator writes, so the live view and the committed indexes never disagree. The
+node inspector lists a chapter's test links with the command that runs each one,
+which is where a "run this test" button goes.
 
 ### Tooling: `knowledge-meta`
 
@@ -266,6 +268,55 @@ for technologies that do not appear in package manifests.
 - `hooks.json` adds a session-start guardrail: knowledge folders are task-scoped
   context rather than baseline context, `meta` blocks are mandatory on every
   chapter, and `_meta/` is never hand-edited.
+
+## 0.10.0: linking test cases
+
+**Additive.** A new optional `tests` field, on chapter and file blocks in every
+folder, records the test cases that assert what a chapter claims:
+
+```markdown
+## Order
+
+\`\`\`meta
+status: active
+type: aggregate
+tests: [unit:dotnet:Ordering.Domain.Tests.OrderTests, e2e:playwright:tests/e2e/checkout.spec.ts#Guest checkout completes]
+\`\`\`
+```
+
+Each entry is `<level>:<runner>:<selector>`, coarse to fine: a level (`unit`,
+`integration`, `e2e`) so a reader can see whether a capability is covered end to
+end, a runner so a command can be derived, and that runner's own selector so it
+can be handed over verbatim.
+
+This is the one link from a chapter into a code tree that this convention allows,
+and the reason is that it is **executable**. A source path in a metadata block
+rots on the first refactor and gives no signal when it does — which is why
+`code-sync-protocol.md` pairs chapters to code through naming instead. A test
+identifier that stops resolving fails a run, out loud, in the same CI that runs
+the suite.
+
+`testCommand()` in `tools/knowledge-meta/metadata.mjs` turns one entry into an
+argv and executes nothing, so a "run this test" affordance in a viewer and the
+command this convention documents are the same one:
+
+```js
+testCommand("unit:dotnet:Ordering.Domain.Tests.OrderTests");
+// → { level, runner, selector,
+//     command: ["dotnet", "test", "--filter", "FullyQualifiedName~Ordering.Domain.Tests.OrderTests"] }
+```
+
+`dotnet`, `playwright`, `vitest`, `jest`, and `pytest` have command mappings; a
+runner outside that set still records what covers the chapter and is reported as
+a warning, because nothing can offer to run it. Add one by extending
+`TEST_RUNNERS` in `metadata.mjs`.
+
+Nothing existing breaks if you adopt none of it. To adopt: re-sync
+`.github/tools/knowledge-meta/` from this plugin, add `tests` where a chapter has
+tests worth naming, and regenerate — `graph.json` nodes and `index.json` file
+entries carry the field, and `schemaVersion` goes to 4. A `capture-*` pass now
+records the tests it read as `tests` entries, so the fastest way to populate an
+adopted repository is to capture the chapters that already have suites.
 
 ## Migrating to 0.9.0: the `order` field is removed
 
@@ -319,6 +370,14 @@ Worth doing on adoption: mark `.arc42/adr/README.md` and `.arc42/tdr/README.md`
 with `index: root` — neither folder has a convention root, so without it each is
 a bare numbered list — and give existing ADRs and TDRs their `date`. Both show up
 in `index.json` and on `graph.json` file nodes immediately after a regenerate.
+
+## Migrating to schema version 4
+
+Schema version 4 is **additive** over 3: both derived artifacts gained the
+optional `tests` field described under "0.10.0: linking test cases" above, and
+nothing else about their shape changed. Re-sync
+`.github/tools/knowledge-meta/` and regenerate; the diff is the new field where
+a document declares one, and the bumped `schemaVersion`.
 
 ## Migrating to schema version 3
 

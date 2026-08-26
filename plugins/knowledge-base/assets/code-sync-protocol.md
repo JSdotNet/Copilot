@@ -45,6 +45,13 @@ path** — a path in a `meta` block rots on the first refactor and gives no sign
 when it does. Resolution goes through naming instead, in this order. Stop at the
 first rung that produces a single unambiguous match.
 
+The one link this schema does carry is `tests`, and the difference is the whole
+reason it is allowed: a test identifier is *executable*, so an entry that stops
+resolving fails a run instead of quietly pointing at nothing. It is a record of
+what asserts a chapter, not a shortcut through the ladder below — a `tests`
+entry names a test, and the counterpart still has to be resolved by naming. See
+"Linking test cases" in `knowledge-chapter-metadata.instructions.md`.
+
 1. **`naming.md` aliases.** Look up the chapter's canonical term in
    `.domain/<context>/naming.md` and read its `aliases` field. Those entries are
    exactly the surface names the concept wears in code — class names, identifier
@@ -138,6 +145,31 @@ Two absences carry information, and neither is evidence of behaviour:
 Reading the tests is a step in its own right in every capture skill, placed
 immediately after reading the implementation. It is the step most easily skimped
 and the one that most changes the quality of the resulting chapter.
+
+### Record the tests you read, in `tests`
+
+A capture pass has just done the work of finding which tests assert a chapter.
+That finding is worth keeping, so put it in the chapter's `tests` field as
+`<level>:<runner>:<selector>` entries — the format is in
+`knowledge-chapter-metadata.instructions.md`.
+
+Two rules on top of the ones there:
+
+- **Only the tests that actually assert the chapter.** A test read while tracing
+  the counterpart, but which asserts something else, is not a link. `tests` is
+  not a record of what the pass happened to open.
+- **Never a disabled test.** The evidence rules above already refuse it as
+  evidence; linking it would make the chapter look covered by the one test that
+  asserts nothing.
+
+Entries go in with the drafted content, so they route through the folder's
+orchestration skill along with everything else — a capture pass does not edit a
+knowledge file directly, and that includes this field.
+
+A build pass writes no `tests` entries: the tests in its brief do not exist yet.
+Its acceptance checks are what those entries will name once someone has written
+them, which is a reason to phrase each check as something a single test can
+assert.
 
 ## Drift verdict
 
