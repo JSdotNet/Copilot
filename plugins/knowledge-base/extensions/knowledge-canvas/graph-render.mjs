@@ -47,6 +47,10 @@ export function renderGraphPage({ scopes = ["."], scope = "." } = {}) {
   .stat span:last-child { font-variant-numeric: tabular-nums; opacity: 0.75; }
   .muted { opacity: 0.6; }
   #problems { color: #9a6700; font-size: 0.75rem; }
+  .test { margin: 0.25rem 0; }
+  .test-level { display: inline-block; padding: 0.05rem 0.4rem; border-radius: 999px; font-size: 0.66rem; font-weight: 600; text-transform: uppercase; background: #0969da; color: white; }
+  .test-selector { font-family: monospace; font-size: 0.72rem; margin-left: 0.3rem; }
+  .test-cmd { font-family: monospace; font-size: 0.68rem; opacity: 0.7; margin: 0.1rem 0 0 0.2rem; user-select: all; }
 </style>
 </head>
 <body>
@@ -97,6 +101,40 @@ function colorFor(node) {
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// One row per test link: the level as a badge, the runner's own selector, and —
+// where the server could resolve one — the command that runs it, ready to copy.
+// A run button belongs here later; the argv it would need is already on the
+// response, so nothing about the format has to change for it.
+function testRows(refs) {
+  const commands = (graph && graph.testCommands) || {};
+  return []
+    .concat(refs)
+    .map((ref) => {
+      const parts = String(ref).split(":");
+      const level = parts.length > 2 ? parts[0] : "?";
+      const runner = parts.length > 2 ? parts[1] : "?";
+      const selector = parts.length > 2 ? parts.slice(2).join(":") : String(ref);
+      const argv = commands[ref];
+      const command = argv
+        ? '<div class="test-cmd">' + escapeHtml(argv.map(quoteArg).join(" ")) + "</div>"
+        : '<div class="test-cmd muted">no command for runner "' + escapeHtml(runner) + '"</div>';
+      return (
+        '<div class="test"><span class="test-level">' +
+        escapeHtml(level) +
+        '</span><span class="test-selector">' +
+        escapeHtml(selector) +
+        "</span>" +
+        command +
+        "</div>"
+      );
+    })
+    .join("");
+}
+
+function quoteArg(arg) {
+  return arg.indexOf(" ") === -1 ? arg : '"' + arg + '"';
 }
 
 async function load() {
@@ -250,6 +288,7 @@ function showDetails(node) {
     "<div class=\\"field\\"><b>type</b>" + escapeHtml(d.type) + "</div>",
     d.alternatives ? "<div class=\\"field\\"><b>alternatives</b>" + escapeHtml([].concat(d.alternatives).join(", ")) + "</div>" : "",
     d.roadmap ? "<div class=\\"field\\"><b>roadmap</b>" + escapeHtml([].concat(d.roadmap).join(", ")) + "</div>" : "",
+    d.tests ? '<div class="field"><b>tests</b>' + testRows(d.tests) + "</div>" : "",
     d.issue ? "<div class=\\"field\\"><b>issue</b>" + escapeHtml(d.issue) + "</div>" : "",
     "<div class=\\"field\\"><b>outgoing</b>" + refList(outgoing, "out") + "</div>",
     "<div class=\\"field\\"><b>incoming</b>" + refList(incoming, "in") + "</div>",

@@ -47,6 +47,8 @@ missing or malformed `meta` blocks, and drifted committed `_meta/` indexes.
    | No entry point | A directory the convention covers is missing its root document, or has excluded it | Create the expected file, or mark the right one `index: root` |
    | Unknown status or type | A value outside the allowed ladder or value set | Use one of the values listed in the folder's own instruction file |
    | Missing `type` | A `.domain` or `.tech` block with no `type`, or a heading still carrying a kind prefix | Add `type` from the folder's value set and strip the prefix from the heading |
+   | Malformed `tests` entry | Not `<level>:<runner>:<selector>`, an unknown level, or a chapter reference pasted into `tests` | Rewrite the entry per "Linking test cases" in `knowledge-chapter-metadata.instructions.md`. A link to another chapter belongs in `related` |
+   | Unmapped test runner | A `tests` entry names a runner the tooling has no command for, so nothing can offer to run it (warning) | Leave it if the runner is genuinely what runs the test; add its command to `TEST_RUNNERS` in `.github/tools/knowledge-meta/metadata.mjs` to make it runnable |
    | Literal escape sequence in body text | A `` `r`n `` or `\n` was written instead of a line break, usually by a tool writing the file through a shell | Replace it with a real line break. Check whether a heading was glued onto the previous line and silently stopped being a heading |
 
    Fix the **source Markdown**, never the generated JSON. Anything under `_meta/`

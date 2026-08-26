@@ -23,6 +23,7 @@ import {
     parseDocument,
     validateDocument,
     folderKindForPath,
+    testCommand,
 } from "../../tools/knowledge-meta/metadata.mjs";
 
 // Repository root: the CLI launches project-scoped extensions with cwd set
@@ -33,6 +34,27 @@ const REPO_ROOT = process.cwd();
 const instances = new Map();
 // Same, for knowledge-graph canvas instances.
 const graphInstances = new Map();
+
+/**
+ * Annotate a graph document with the command that runs each `tests` entry, so
+ * the inspector can show something a reader can copy and a future run
+ * affordance has an argv to hand to a runner.
+ *
+ * Canvas-only, deliberately: the committed `graph.json` carries the authored
+ * identifier and nothing derived from it, because a command depends on the
+ * tooling version rather than on the Markdown. Entries whose runner has no
+ * mapping are simply absent from the map — the entry itself still shows.
+ */
+function withTestCommands(document) {
+    const testCommands = {};
+    for (const { data } of document.elements.nodes) {
+        for (const ref of data.tests ?? []) {
+            const resolved = testCommand(ref);
+            if (resolved) testCommands[ref] = resolved.command;
+        }
+    }
+    return Object.keys(testCommands).length ? { ...document, testCommands } : document;
+}
 
 function resolveRelPath(relPath) {
     const normalized = relPath.replace(/\\/g, "/").replace(/^\/+/, "");
@@ -125,7 +147,7 @@ async function startGraphServer(defaultScope) {
                 if (!entry.graph) entry.graph = await buildGraph(REPO_ROOT);
                 const document = await buildGraphDocument(REPO_ROOT, scope, entry.graph);
                 res.setHeader("Content-Type", "application/json; charset=utf-8");
-                res.end(JSON.stringify(document));
+                res.end(JSON.stringify(withTestCommands(document)));
                 return;
             }
             if (url.pathname === "/api/outline") {

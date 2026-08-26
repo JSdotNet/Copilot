@@ -91,6 +91,7 @@ followed, so a scoped graph stays about its own folder.
 | `graph.mjs` | Graph construction, scope discovery, and scope projection. Imported by the CLI *and* by the `knowledge-graph` canvas, so the written indexes and the live view can never disagree. |
 | `outline.mjs` | Outline generation: root-document resolution (`index: root`, else the `DIRECTORY_CONVENTION` table), numbered ordering, and the per-file lede and diagram count a list view needs. |
 | `build.mjs` | CLI wrapper: writes both artifacts per scope, prints stats, exits non-zero on errors. |
+| `escape-lint.test.mjs`, `tests-field.test.mjs` | Self-contained checks — `node <file>` — over the escape-sequence lint and over `tests` parsing, its run-command mapping, and its lint. |
 
 This folder is self-contained — copy it into a repository as
 `.github/tools/knowledge-meta/` and it runs with no other files installed.
@@ -103,7 +104,7 @@ mappable to D3, vis.js, or Sigma.
 
 ```jsonc
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "generatedBy": ".github/tools/knowledge-meta/build.mjs",
   "scope": ".tech",
   "sources": [".tech"],
@@ -197,10 +198,10 @@ fallback does not render as `Context Map (context-map)`.
 | `implements` | The `implements` metadata field (`.backlog`). |
 
 `aliases` (`.domain`), `alternatives` (`.tech`), `feature-flag` (`.domain`),
-and `roadmap` (every folder) are plain-string fields, not references, so they
-stay node attributes and produce no edges. `feature-flag` and `roadmap` accept
-a scalar or a list but are always emitted as a list, so a consumer never has to
-branch on shape. `effort` is emitted as a number rather than the authored
+and `roadmap` and `tests` (every folder) are plain-string fields, not
+references, so they stay node attributes and produce no edges. `feature-flag`,
+`roadmap`, and `tests` accept a scalar or a list but are always emitted as a
+list, so a consumer never has to branch on shape. `effort` is emitted as a number rather than the authored
 string, so a viewer can total or threshold it directly; a value that is not a
 non-negative integer is left off the node and reported as a lint error instead.
 
@@ -208,6 +209,36 @@ non-negative integer is left off the node and reported as a lint error instead.
 number on **file** nodes only, resolved from the `number` field or the filename,
 so an ADR node knows it is ADR 7 without the consumer parsing paths. `index`
 steers outline generation only and never reaches a node.
+
+### Running a node's linked tests
+
+A node's `tests` entries are `<level>:<runner>:<selector>` identifiers — see
+"Linking test cases" in the `knowledge-chapter-metadata` instructions for the
+format and the vocabularies. `metadata.mjs` exports the mapping from an entry to
+a command:
+
+```js
+import { testCommand } from "./metadata.mjs";
+
+testCommand("e2e:playwright:tests/e2e/checkout.spec.ts#Guest checkout completes");
+// → { level: "e2e", runner: "playwright",
+//     selector: "tests/e2e/checkout.spec.ts#Guest checkout completes",
+//     command: ["npx", "playwright", "test", "tests/e2e/checkout.spec.ts",
+//               "-g", "Guest checkout completes"] }
+```
+
+`command` is an argv array meant to run from the repository root, and the
+function executes nothing — it is the seam a "run this test" affordance sits on,
+so a viewer's run button and this convention's documented command are the same
+one. It returns `null` for a malformed entry, and for a runner outside
+`TEST_RUNNERS`.
+
+Unlike `effort`, an entry the lint rejects is still emitted on the node.
+`testCommand` returns `null` for it, so nothing can act on it by accident, and
+keeping it means a chapter that declared four links does not silently render as
+three. `parseTestReference` and `testRunners` are exported alongside, for a consumer
+that wants the parts of one entry, or the known runners and the selector shape
+each expects, without building a command.
 
 ## Validation
 
@@ -231,6 +262,10 @@ steers outline generation only and never reaches a node.
 | A `date` that is not a `YYYY-MM-DD` calendar day | error |
 | `index` or `number` on a chapter block rather than the file-level block | error |
 | A `number` field disagreeing with the number in its own filename | warning |
+| A `tests` entry not in `<level>:<runner>:<selector>` form | error |
+| A `tests` entry whose level is outside `unit`, `integration`, `e2e` | error |
+| A `tests` entry that is a `<path>#<slug>` chapter reference rather than a test identifier | error |
+| A `tests` entry naming a runner the tooling has no command for | warning |
 | A directory missing the root document its folder convention names | warning |
 
 ### Literal escape sequences
@@ -256,7 +291,7 @@ sorting filenames.
 
 ```jsonc
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "generatedBy": ".github/tools/knowledge-meta/build.mjs",
   "scope": ".domain",
   "sources": [".domain"],
@@ -305,6 +340,14 @@ identically-titled files of a bounded context. It is omitted for folders that
 define no value set. On an `area` entry it is the knowledge folder itself
 (`domain`, `arc42`, …), which is that entry's equivalent answer to "what kind of
 thing is this".
+
+### `tests` on a file entry
+
+A `file` entry carries the document's **file-level** `tests` entries, always as a
+list. It is there for the same reason `summary` is: a list view wants to badge
+what covers each document — "2 tests", "no e2e" — without opening it.
+Chapter-level entries are not rolled up into it; those live on their chapter's
+node in `graph.json`, which is where a consumer goes for per-chapter detail.
 
 ### `summary` and `diagrams`
 
@@ -372,3 +415,11 @@ The canvas has a scope selector, rebuilds from disk on open (so it never shows
 a stale index), and exposes `refresh_graph` and `set_scope` actions. It also
 serves the live outline at `/api/outline?scope=<scope>` for tools that want the
 reading order without reading the committed `index.json`.
+
+Its node inspector lists a node's test links — level badge, selector, and the
+command that runs it. The canvas's `/api/graph` response carries one extra
+top-level key for that, `testCommands`, mapping each `tests` entry in the graph
+to its resolved argv. It is canvas-only and deliberately absent from the
+committed `graph.json`: a command depends on the tooling version, not on the
+Markdown, so baking it into a derived artifact would make that artifact stale
+for a reason the Markdown cannot explain.

@@ -20,14 +20,15 @@ import {
     outlineFieldIssues,
     documentNumber,
     escapeSequenceIssues,
+    testIssues,
 } from "./metadata.mjs";
 
 /** Every knowledge folder this convention recognizes. A repository adopts any subset. */
 export const KNOWLEDGE_FOLDERS = [".arc42", ".domain", ".backlog", ".tech", ".design"];
-// Shared by both artifacts, because they ship as one release. Version 3 is
-// additive over 2: `index.json` file entries gained optional `summary` and
-// `diagrams` fields, and `graph.json` is unchanged.
-export const SCHEMA_VERSION = 3;
+// Shared by both artifacts, because they ship as one release. Version 4 is
+// additive over 3: both artifacts gained an optional `tests` field carrying the
+// `<level>:<runner>:<selector>` test identifiers a chapter or file declares.
+export const SCHEMA_VERSION = 4;
 export const REPO_SCOPE = ".";
 export const GENERATOR = ".github/tools/knowledge-meta/build.mjs";
 
@@ -49,7 +50,11 @@ const ATTRIBUTE_FIELDS = ["version", "issue", "aliases", "alternatives", "date"]
 // Non-reference fields whose authored form may be a scalar or a bracket list,
 // and which are always emitted as a list so a consumer reading graph.json never
 // has to branch on shape. `aliases`/`alternatives` above stay verbatim.
-const LIST_ATTRIBUTE_FIELDS = ["feature-flag", "roadmap"];
+//
+// `tests` is here rather than in REFERENCE_FIELDS because a test identifier
+// names something in a test project, not a chapter, so it produces no edge — the
+// same reason `feature-flag` and `roadmap` stay attributes.
+const LIST_ATTRIBUTE_FIELDS = ["feature-flag", "roadmap", "tests"];
 
 // Fields authored as an integer scalar. The parser hands back the raw string,
 // so they are coerced here and a viewer can sum or threshold them directly.
@@ -173,6 +178,14 @@ export async function buildGraph(repoRoot) {
             });
         }
 
+        for (const issue of testIssues(fileMeta)) {
+            problems.push({
+                severity: issue.severity,
+                path: relPath,
+                message: `${relPath} ${issue.message}`,
+            });
+        }
+
         for (const issue of removedFieldIssues(fileMeta)) {
             problems.push({
                 severity: issue.severity,
@@ -246,6 +259,14 @@ export async function buildGraph(repoRoot) {
             ancestors.push({ level: chapter.level, id });
 
             for (const issue of typeIssues(folder, "chapter", chapter.meta)) {
+                problems.push({
+                    severity: issue.severity,
+                    path: relPath,
+                    message: `${id} ${issue.message}`,
+                });
+            }
+
+            for (const issue of testIssues(chapter.meta)) {
                 problems.push({
                     severity: issue.severity,
                     path: relPath,

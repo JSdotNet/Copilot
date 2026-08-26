@@ -134,7 +134,8 @@ plain-string surface names and `feature-flag` (same file) is a list of
 application feature keys, neither of them `<path>#<heading-slug>` references,
 and in `.tech`, `alternatives` (defined in
 `knowledge-tech.instructions.md`) is likewise a
-plain-string list. The universal `roadmap` field below behaves the same way.
+plain-string list. The universal `roadmap` and `tests` fields below behave the
+same way.
 
 ### Chapter and file references
 
@@ -228,6 +229,21 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
   and a hand-maintained one goes stale the first time someone forgets. Set it
   where the date is part of the content (an ADR's decision date, a TDR's logged
   date) and omit it everywhere else. Available in every folder.
+- **tests** (optional) — list of the test cases that assert what this chapter
+  or file claims, each written as a `<level>:<runner>:<selector>` test
+  identifier:
+
+  ```text
+  tests: [unit:dotnet:Ordering.Domain.Tests.OrderTests, e2e:playwright:tests/checkout.spec.ts#Guest checkout completes]
+  ```
+
+  Entries are test identifiers, **not** `<path>#<heading-slug>` chapter
+  references — like `roadmap` they stay node attributes and produce no graph
+  edges. Available in every folder, at chapter and file level. Omit the field
+  entirely when nothing is linked. See
+  "[Linking test cases](#linking-test-cases)" for the format, the level and
+  runner vocabularies, and why this field exists where a code-path field
+  deliberately does not.
 - **number** (optional, **file-level blocks only**) — this document's number
   within its directory, as a single non-negative integer: arc42 chapter 9, ADR
   7, TDR 2. A numbered filename (`09-architecture-decisions.md`,
@@ -262,6 +278,140 @@ related: [.domain/sync/features.md#offline-sync]
 \`\`\`
 ```
 
+## Linking test cases
+
+A chapter states what something does; a test asserts it. `tests` records that
+pairing, so a chapter can say what backs it up, a reader can see whether a
+capability is covered end to end, and a viewer can offer to run the thing.
+
+### Why a test link and not a code link
+
+This schema deliberately has **no field linking a chapter to a source path** —
+see "Counterpart resolution" in the `capture-*`/`build-*` skills' shared
+`code-sync-protocol.md`. A path in a metadata block rots on the first refactor
+and gives no signal when it does, so a chapter and its implementation are paired
+through naming instead.
+
+A test link is admissible for exactly the reason a code link is not: **it is
+executable**. An entry that stops resolving fails a run, out loud, in the same CI
+that runs the suite. That only holds if the entry is something a runner can be
+handed — which is why the format is a runner selector and not a file and a
+line.
+
+So an entry means *this test asserts what this chapter claims*. It does not mean
+"this is roughly the area of code involved". A test that merely touches the same
+subsystem is not a link; leave it out.
+
+### Entry format
+
+Three parts, coarse to fine:
+
+```text
+<level>:<runner>:<selector>
+```
+
+Only the first two colons delimit. A selector routinely contains colons of its
+own — a pytest node id, a `file:line` — so everything after the runner
+belongs to the runner.
+
+**level** — how far the test reaches:
+
+| Level | Reach |
+|---|---|
+| `unit` | Pins a rule inside one unit, in memory. |
+| `integration` | Crosses a real boundary: a store, a queue, an HTTP surface, another service. |
+| `e2e` | Drives the product the way a user does. |
+
+The level is authored rather than inferred from the runner, because one runner
+routinely hosts all three — `dotnet` runs unit tests and API integration tests
+alike — and "is this covered end to end?" is the question a reader of the
+chapter actually has.
+
+**runner** and **selector** — which tool runs it, and how that tool addresses
+it:
+
+| Runner | Selector | The command it maps to |
+|---|---|---|
+| `dotnet` | Fully-qualified test class or method name | `dotnet test --filter "FullyQualifiedName~<selector>"` |
+| `playwright` | `<spec path>`, optionally `#<test title>` | `npx playwright test <spec> [-g "<title>"]` |
+| `vitest` | `<spec path>`, optionally `#<test name>` | `npx vitest run <spec> [-t "<name>"]` |
+| `jest` | `<spec path>`, optionally `#<test name>` | `npx jest <spec> [-t "<name>"]` |
+| `pytest` | A pytest node id, `<path>::<Class>::<test>` | `pytest "<selector>"` |
+
+Selectors are runner-native, because a runner-native selector is exactly what a
+person pastes into a terminal. Where a runner needs a file *and* a title, the two
+are joined with `#` — the same separator this schema already uses between a
+path and a heading.
+
+Prefer the form that does not name a file, where the runner offers one: a
+`dotnet` fully-qualified name survives a file move, a spec path does not. Point
+at the narrowest test that actually asserts the chapter, and prefer one class or
+one spec over a long list of methods — an entry should be something you would
+run.
+
+A runner outside that table is not an error: the level and the selector still say
+what covers the chapter. What it loses is the run command, so the generator
+reports it as a warning. Teaching the tooling a new runner means adding its
+command to `TEST_RUNNERS` in `.github/tools/knowledge-meta/metadata.mjs`.
+
+### Rules
+
+- Entries **cannot contain a comma** — that is what separates the bracket
+  list. Where a test title contains one, address the test by a form that has
+  none: a fully-qualified name, a whole spec file, or a shorter unambiguous
+  title.
+- A chapter with no `tests` is not a chapter that is untested; it is one that has
+  not been linked. The absence deliberately carries no claim, and `tests` is not
+  a coverage metric.
+- A file-level `tests` field covers the document as a whole — the suite for a
+  bounded context, the acceptance suite for a backlog item. Chapter entries are
+  the per-chapter detail. Neither implies the other, and neither has to contain
+  the other.
+- Delete an entry in the same change that deletes or renames the test it names. A
+  run that finds nothing is the signal; a dead entry left behind is a link that
+  lies until someone runs it.
+- Never write an entry for a skipped, disabled, or commented-out test. A disabled
+  test asserts nothing, and linking it makes a chapter look covered when it is
+  not.
+
+A delivered backlog item, and a domain aggregate whose invariants are pinned,
+therefore read:
+
+```markdown
+## Guest Checkout
+
+\`\`\`meta
+status: done
+effort: 5
+tests: [integration:dotnet:Ordering.Api.Tests.GuestCheckoutTests, e2e:playwright:tests/e2e/checkout.spec.ts#Guest checkout completes]
+\`\`\`
+```
+
+```markdown
+## Order
+
+\`\`\`meta
+status: active
+type: aggregate
+tests: unit:dotnet:Ordering.Domain.Tests.OrderTests
+\`\`\`
+```
+
+### Running a linked test
+
+`testCommand("<level>:<runner>:<selector>")`, exported from
+`.github/tools/knowledge-meta/metadata.mjs`, returns
+`{ level, runner, selector, command }` — `command` being an argv array meant
+to run from the repository root — or `null` when the entry is malformed or
+names a runner with no mapping. It executes nothing, so it is the seam a "run
+this test" affordance sits on: the command a viewer offers and the command this
+convention documents are the same one.
+
+A repository whose runner needs a different working directory, a project path, or
+a config flag wraps that argv. The reference identifies the test; how this
+repository invokes its runners is a property of the repository, not of the
+chapter.
+
 ## Authoring guidance
 
 - Heading text is the name of the thing only. Record what kind of thing it is
@@ -282,6 +432,10 @@ related: [.domain/sync/features.md#offline-sync]
 - Keep `roadmap` tags spelled exactly as the consuming repository's roadmap
   spells them; a mistyped tag silently drops the chapter out of that roadmap
   item's view rather than failing loudly.
+- Link a test only when it asserts what the chapter claims, and remove the entry
+  in the same change that removes or renames the test. An entry that no longer
+  resolves is caught by running it — which is the whole reason this field holds
+  a runner selector rather than a path.
 - Do not invent additional top-level fields without updating either this
   file (for a universal field) or the relevant folder's instructions file
   (for a folder-specific field) first — the derived index tooling depends on a
