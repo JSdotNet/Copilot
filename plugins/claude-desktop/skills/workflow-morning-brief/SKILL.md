@@ -1,11 +1,7 @@
 ---
 name: workflow-morning-brief
-description: >
-  Report what an overnight issue sweep actually did: read the sweep manifest and every worker
-  result, and produce one brief covering the pull requests opened, the worktrees parked and
-  waiting for validation, the closure proposals still unanswered, and everything that failed —
-  each with the one command that acts on it. Use when: starting the day after a sweep,
-  reviewing overnight automation, or checking what a scheduled backlog run produced.
+description: 'Report what an overnight issue sweep actually did: read the sweep manifest and every worker result, and produce one brief covering the pull requests opened, the worktrees parked and waiting for validation, the closure proposals still unanswered, and everything that failed — each with the one command that acts on it.'
+disable-model-invocation: true
 ---
 
 # Workflow: Morning Brief

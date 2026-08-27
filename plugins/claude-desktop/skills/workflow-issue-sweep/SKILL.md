@@ -1,12 +1,7 @@
 ---
 name: workflow-issue-sweep
-description: >
-  Sweep a repository's open issues: judge which are still relevant, propose the stale ones for
-  closure and close the ones you approve, skip anything that would collide with work already in
-  flight, then hand the rest to up to 5 parallel worker sessions that each resolve one issue in
-  its own worktree, and schedule a morning brief that reports the outcome. Use when: running a
-  scheduled backlog sweep, clearing an issue backlog in parallel, triaging stale issues, or
-  starting the day with the backlog already moving.
+description: 'Sweep a repository''s open issues: judge which are still relevant, propose the stale ones for closure and close the ones you approve, skip anything that would collide with work already in flight, then hand the rest to up to 5 parallel worker sessions that each resolve one issue in its own worktree, and schedule a morning brief that reports the outcome.'
+disable-model-invocation: true
 ---
 
 # Workflow: Issue Sweep

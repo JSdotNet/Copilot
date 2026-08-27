@@ -14,13 +14,15 @@ description: Create or refine a focused SKILL.md with clear trigger conditions, 
 ## Workflow
 
 1. Define one primary workflow for the skill.
-2. Draft frontmatter with a `name` matching the folder and a `description` that names each
-   distinct case the skill handles.
-3. Draft the workflow steps, then add inputs, outputs, and quality checks only where the
+2. Decide the invocation mode: could the model usefully reach for this skill on its own, or
+   must another skill or agent reach it? If neither, set `disable-model-invocation: true`.
+3. Draft frontmatter with a `name` matching the folder and a `description` that matches the
+   mode — each distinct case it handles when model-invoked, one human-facing line when not.
+4. Draft the workflow steps, then add inputs, outputs, and quality checks only where the
    steps leave them unclear.
-4. Describe actions rather than host-specific tool names, so both hosts read the skill alike.
-5. Reference instruction and resource files by relative path.
-6. Prune against
+5. Describe actions rather than host-specific tool names, so both hosts read the skill alike.
+6. Reference instruction and resource files by relative path.
+7. Prune against
    [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md):
    40-line budget, no rule stated twice.
 

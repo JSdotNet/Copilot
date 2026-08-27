@@ -37,9 +37,10 @@ In case of conflict, follow the Priority Guidelines over Context File Priority.
 
 1. `.github/instructions/markdown.instructions.md`
 2. `.github/instructions/customization-structure.instructions.md`
-3. `.github/instructions/agent-language-and-tone.instructions.md`
-4. `.github/instructions/agent-handoff.instructions.md` (when editing agent files)
-5. Existing plugin-local authoring instructions, for example:
+3. `.github/instructions/skill-invocation.instructions.md` (when editing `plugins/*/skills/**/SKILL.md`)
+4. `.github/instructions/agent-language-and-tone.instructions.md`
+5. `.github/instructions/agent-handoff.instructions.md` (when editing agent files)
+6. Existing plugin-local authoring instructions, for example:
    - `plugins/spec-builder/instructions/authoring/create-agent.instructions.md`
    - `plugins/spec-builder/instructions/authoring/create-instruction.instructions.md`
    - `plugins/spec-builder/instructions/authoring/create-plugin.instructions.md`
@@ -129,6 +130,7 @@ Sources:
 When authoring skills and plugins:
 
 - Keep skill definitions focused, with clear trigger intent and expected output.
+- Choose each skill's invocation mode deliberately, and name converter skills `to-<spec>` or `from-<spec>`. Source: `.github/instructions/skill-invocation.instructions.md`.
 - Keep plugin manifests aligned to existing schema and folder pointers.
 - Keep assets in English for `.github/**` customization content.
 - Prefer standalone plugin behavior; a plugin should function when installed alone.

@@ -21,7 +21,7 @@
       "name": "claude-desktop",
       "source": "./plugins/claude-desktop",
       "description": "Claude Code plugin for orchestration workflows, pull request delivery, and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
-      "version": "0.7.0"
+      "version": "0.8.0"
     },
     {
       "name": "csharp-coding",
@@ -51,7 +51,7 @@
       "name": "fincent",
       "source": "./plugins/fincent",
       "description": "Copilot plugin for Fincent project story review, dev, domain alignment, story point estimation, PR review, PR remark resolution, sprint reporting, and demo presentation workflows.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     },
     {
       "name": "github",
@@ -68,8 +68,8 @@
     {
       "name": "knowledge-base",
       "source": "./plugins/knowledge-base",
-      "description": "Repository knowledge-folder convention for .arc42, .domain, .tech, .design, .backlog, and .ai: parseable chapter metadata, runnable test-case links, AI adoption tracked per development-flow stage, derived _meta indexes, a reference-graph canvas, per-folder orchestration skills, bidirectional capture and build skills between chapters and code, and enforcement tooling.",
-      "version": "0.12.0"
+      "description": "Repository knowledge-folder convention for .arc42, .domain, .tech, .design, .backlog, and .ai: parseable chapter metadata, runnable test-case links, AI adoption tracked per development-flow stage, derived _meta indexes, a reference-graph canvas, per-folder orchestration skills, bidirectional to-spec-<kind> and from-spec-<kind> skills between chapters and code, and enforcement tooling.",
+      "version": "0.13.0"
     },
     {
       "name": "product-owner",
@@ -93,7 +93,7 @@
       "name": "spec-builder",
       "source": "./plugins/spec-builder",
       "description": "Copilot plugin focused on GitHub customization asset authoring workflows.",
-      "version": "0.1.0"
+      "version": "0.2.0"
     },
     {
       "name": "ux-design",

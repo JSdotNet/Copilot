@@ -1,10 +1,7 @@
 ---
 name: automation-bug-fix
-description: >
-  Pick the single highest-priority open GitHub issue labelled 'bug', claim it, and resolve
-  it in this session by running orch-bug through to Personal Validation. One issue per run,
-  no extra sessions. Use when: working the bug backlog one item at a time, or running a
-  scheduled bug sweep that has to finish its work unattended.
+description: 'Pick the single highest-priority open GitHub issue labelled ''bug'', claim it, and resolve it in this session by running orch-bug through to Personal Validation. One issue per run, no extra sessions.'
+disable-model-invocation: true
 ---
 
 # Automation: Bug Fix

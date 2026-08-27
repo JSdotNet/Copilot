@@ -1,13 +1,7 @@
 ---
 name: workflow-resolve-issue
-description: >
-  Resolve one open GitHub issue end to end, unattended: claim it, provision a dedicated git
-  worktree and branch for it, run the resolve-issue Workflow script (scope, TDD
-  implementation, build and test with bounded repair, multi-lens review), then either open a
-  pull request when the change proves itself, or park the worktree with a handoff brief when
-  it needs a human to validate it. One issue per run, isolated from every other run. Use
-  when: running a scheduled issue-resolution routine, working as a worker session spawned by
-  workflow-issue-sweep, or resolving a single issue in its own worktree.
+description: 'Resolve one open GitHub issue end to end, unattended: claim it, provision a dedicated git worktree and branch for it, run the resolve-issue Workflow script (scope, TDD implementation, build and test with bounded repair, multi-lens review), then either open a pull request when the change proves itself, or park the worktree with a handoff brief when it needs a human to validate it. One issue per run, isolated from every other run.'
+disable-model-invocation: true
 ---
 
 # Workflow: Resolve GitHub Issue

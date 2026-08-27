@@ -1,6 +1,6 @@
 ---
 name: orch-backlog
-description: 'Orchestrate changes to .backlog/ — durable work-item chapters grouped by concern. Use for any create/update of a .backlog/<concern-type>-<concern-slug>.md file, its Items, or Sub-items, including small status or content updates. Drafts content via write-epic/write-story/write-bug, enforces knowledge-backlog.instructions.md structure and knowledge-chapter-metadata.instructions.md metadata blocks, and hands off to create-github-issue/update-github-issue when publishing.'
+description: 'Orchestrate changes to .backlog/ — durable work-item chapters grouped by concern. Use for any create/update of a .backlog/<concern-type>-<concern-slug>.md file, its Items, or Sub-items, including small status or content updates. Drafts content via to-epic/to-story/to-bug, enforces knowledge-backlog.instructions.md structure and knowledge-chapter-metadata.instructions.md metadata blocks, and hands off to create-github-issue/update-github-issue when publishing.'
 ---
 
 # Orchestrate Backlog Knowledge (`.backlog/`)
@@ -49,7 +49,7 @@ Stage 1 from the request and the existing `.backlog/` contents, and continue.
 ### Stage 2: Item Drafting
 
 - For a new Item or Sub-item, draft its content with the matching skill for
-  quality/shape: `write-epic`, `write-story`, or `write-bug`. These skills
+  quality/shape: `to-epic`, `to-story`, or `to-bug`. These skills
   shape content quality, not a stored type label — the saved artifact still
   uses the plain Item/Sub-item chapter structure from
   `knowledge-backlog.instructions.md`.
@@ -58,7 +58,7 @@ Stage 1 from the request and the existing `.backlog/` contents, and continue.
 - For a content/status update to an existing item, edit in place without
   re-running the drafting skill unless the description materially changes.
 
-**Skills Used:** `write-epic`, `write-story`, `write-bug`
+**Skills Used:** `to-epic`, `to-story`, `to-bug`
 
 ### Stage 3: Metadata & Cross-Reference Enforcement
 

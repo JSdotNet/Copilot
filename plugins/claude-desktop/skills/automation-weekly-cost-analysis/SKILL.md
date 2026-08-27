@@ -1,10 +1,7 @@
 ---
 name: automation-weekly-cost-analysis
-description: >
-  Analyse the token usage the orch-dashboard recorded for the week's orchestration runs,
-  surface the top actionable cost-reduction tips, and produce a concise report.
-  Use when: scheduled weekly cost review, investigating unexpected token spend,
-  or optimising model and prompt usage.
+description: 'Analyse the token usage the orch-dashboard recorded for the week''s orchestration runs, surface the top actionable cost-reduction tips, and produce a concise report.'
+disable-model-invocation: true
 ---
 
 # Automation: Weekly Cost Analysis

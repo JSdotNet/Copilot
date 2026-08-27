@@ -1,10 +1,7 @@
 ---
 name: automation-review
-description: >
-  Run a full automated review cycle on the codebase or a specific scope: collects TODO items,
-  surfaces future-improvement suggestions, and runs a structured code review. Produces a
-  prioritised findings report and optionally opens GitHub issues for the highest-priority items.
-  Use when: scheduled code-health check, pre-release review, or after a large batch of changes.
+description: 'Run a full automated review cycle on the codebase or a specific scope: collects TODO items, surfaces future-improvement suggestions, and runs a structured code review. Produces a prioritised findings report and optionally opens GitHub issues for the highest-priority items.'
+disable-model-invocation: true
 ---
 
 # Automation: Review

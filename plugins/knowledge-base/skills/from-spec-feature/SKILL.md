@@ -1,6 +1,7 @@
 ---
-name: build-feature
-description: 'Build direction, feature kind: turn an agreed but unbuilt `type: feature` or `type: sub-feature` chapter in .domain/<context>/features.md into a change brief plus a change category, then stop. Use when: the feature is agreed but not shipped, a sub-feature is missing from a shipped feature, the chapter names a feature flag that does not exist, build the feature we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees. DO NOT USE FOR: writing a chapter from a feature that already exists in code (use capture-feature), or for the aggregate, domain-service, or bounded-context chapters around it (use the matching build-* skill).'
+name: from-spec-feature
+description: 'From-spec direction (build), feature kind: turn an agreed but unbuilt `type: feature` or `type: sub-feature` chapter in .domain/<context>/features.md into a change brief plus a change category, then stop.'
+disable-model-invocation: true
 ---
 
 # Build a feature from its chapter
@@ -95,7 +96,7 @@ each row's `Enforced at` point, and leave `open` rows out of the invariants list
 
 5. **Reach a verdict.** Land on exactly one of the protocol's five verdicts.
    `spec-ahead` is the case this skill exists for. On `aligned`, stop and say
-   so. On `code-ahead`, stop and hand the scope to `capture-feature`; the
+   so. On `code-ahead`, stop and hand the scope to `to-spec-feature`; the
    chapter is stale, not unbuilt. On `conflict`, stop and ask — a conflict never
    becomes a `defect` brief on this skill's own authority.
 

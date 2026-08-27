@@ -1,6 +1,6 @@
 ---
-name: capture-design-component
-description: 'Capture direction, design-component kind: read the component library and component usage actually in the code and write or refresh the component chapters in .design/component-libraries.md, with adoption, token usage, and known gaps. Use when: a component library is in use with no chapter, the recommendation is stale, components were hand-rolled around a gap, document the component adoption we have. Reads source and manifests as evidence, defers to the authoritative design source, and routes the write through orch-design. DO NOT USE FOR: turning an agreed but unbuilt design-component chapter into work (use build-design-component), or for the building-block, deployment, or feature chapters around it (use the matching capture-* skill).'
+name: to-spec-design-component
+description: 'To-spec direction (capture), design-component kind: read the component library and component usage actually in the code and write or refresh the component chapters in .design/component-libraries.md, with adoption, token usage, and known gaps. Use when: a component library is in use with no chapter, the recommendation is stale, components were hand-rolled around a gap, document the component adoption we have. Reads source and manifests as evidence, defers to the authoritative design source, and routes the write through orch-design. DO NOT USE FOR: turning an agreed but unbuilt design-component chapter into work (use from-spec-design-component), or for the building-block, deployment, or feature chapters around it (use the matching to-spec-* skill).'
 ---
 
 # Capture component adoption from code
@@ -132,7 +132,7 @@ chapter as accepted practice.
 5. **Reach a verdict.** Compare what the code establishes against what the
    chapter currently says, and land on exactly one of the protocol's five
    verdicts. `code-ahead` is the case this skill exists for. On `spec-ahead`,
-   stop and hand the scope to `build-design-component`. On `conflict`, stop and
+   stop and hand the scope to `from-spec-design-component`. On `conflict`, stop and
    ask; never resolve it by overwriting the chapter.
 
 6. **Draft the chapter.** Write to the template in
