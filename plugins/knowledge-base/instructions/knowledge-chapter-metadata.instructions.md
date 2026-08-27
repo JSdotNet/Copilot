@@ -1,11 +1,11 @@
 ---
-applyTo: ".domain/**,.arc42/**,.backlog/**,.tech/**,.design/**"
-description: Common per-chapter and per-file metadata convention for .domain, .arc42, .backlog, .tech, and .design, so tooling can parse status, dependencies, and cross-references.
+applyTo: ".domain/**,.arc42/**,.backlog/**,.tech/**,.design/**,.ai/**"
+description: Common per-chapter and per-file metadata convention for .domain, .arc42, .backlog, .tech, .design, and .ai, so tooling can parse status, dependencies, and cross-references.
 ---
 
 # Chapter and file metadata
 
-`.domain`, `.arc42`, `.backlog`, `.tech`, and `.design` are intended to be read by a
+`.domain`, `.arc42`, `.backlog`, `.tech`, `.design`, and `.ai` are intended to be read by a
 visualization and indexing tooling, not just by humans. To make that
 possible, every **chapter** in these folders carries a small, parseable
 metadata block directly under its heading, in a fenced `meta` (YAML) code
@@ -30,10 +30,13 @@ already treat as an addressable unit:
 - `.design/<name>.md` — the file's top-level chapter, and every `##` chapter
   inside it. `###` sub-headings are covered by their parent `##` chapter and
   carry a block only if they need independent status or cross-references.
+- `.ai/<nn>-<stage>.md` and `.ai/concepts.md` — each `## <Chapter Name>`
+  chapter (one graph node per chapter).
 
-- `.domain` `context-map.md`, `model.md`, `flow.md`, and `dependencies.md` and
-  `.tech` `technology-graph.md` are strategic/structural artifacts; their `##`
-  sections do **not** carry per-chapter metadata blocks.
+- `.domain` `context-map.md`, `model.md`, `flow.md`, and `dependencies.md`,
+  `.tech` `technology-graph.md`, and `.ai` `adoption-map.md` are
+  strategic/structural artifacts; their `##` sections do **not** carry
+  per-chapter metadata blocks.
 
 ## Chapter metadata block format
 
@@ -86,7 +89,7 @@ correct, with `type: shared-value-objects`.
 ## File-level metadata block
 
 In addition to per-chapter blocks, every file in `.domain`, `.arc42`,
-`.backlog`, `.tech`, and `.design` carries one file-level metadata block
+`.backlog`, `.tech`, `.design`, and `.ai` carries one file-level metadata block
 describing the document as a whole. This gives the tooling a
 status/relations rollup for the
 file itself, distinct from the status of any individual chapter inside it —
@@ -132,9 +135,11 @@ reference field: in `.domain`, `aliases` (defined in
 `knowledge-domain.instructions.md`) is a list of
 plain-string surface names and `feature-flag` (same file) is a list of
 application feature keys, neither of them `<path>#<heading-slug>` references,
-and in `.tech`, `alternatives` (defined in
+in `.tech`, `alternatives` (defined in
 `knowledge-tech.instructions.md`) is likewise a
-plain-string list. The universal `roadmap` and `tests` fields below behave the
+plain-string list, and in `.ai`, `stage` (defined in
+`knowledge-ai.instructions.md`) is a list of stage
+slugs. The universal `roadmap` and `tests` fields below behave the
 same way.
 
 ### Chapter and file references
@@ -162,8 +167,9 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
   in `knowledge-domain.instructions.md`,
   `knowledge-arc42.instructions.md`,
   `knowledge-backlog.instructions.md`,
-  `knowledge-tech.instructions.md`, or
-  `knowledge-design.instructions.md` for the value set
+  `knowledge-tech.instructions.md`,
+  `knowledge-design.instructions.md`, or
+  `knowledge-ai.instructions.md` for the value set
   that applies to the folder you're editing. A file-level `status` reflects
   the document as a whole and is set independently of its chapters' own
   `status` values (e.g. a file can be `active` overall while one chapter
@@ -175,12 +181,13 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
   and file-level blocks alike, with a separate value set for each level where
   the folder distinguishes them.
 
-  Only two folders define a value set:
+  Three folders define a value set:
 
   | Folder | Chapter values | File values |
   |---|---|---|
   | `.domain` | `aggregate`, `entity`, `value-object`, `enum`, `shared-value-objects`, `shared-enums`, `domain-service`, `domain-event`, `feature`, `sub-feature`, `term` | `context-map`, `domain`, `features`, `model`, `flow`, `dependencies`, `naming` |
   | `.tech` | `language`, `runtime`, `framework`, `library`, `package`, `tool`, `service`, `platform`, `protocol`, `format` | none |
+  | `.ai` | `practice`, `agent`, `skill`, `plugin`, `mcp-server`, `hook`, `workflow`, `model`, `concept`, `guardrail` | `adoption-map`, `stage`, `concepts` |
 
   `.arc42`, `.backlog`, and `.design` deliberately define **no** value set. Their
   only kind distinction — chapter vs section, item vs sub-item — is already
@@ -259,9 +266,10 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
 `number` and `index` are file-level only because they place the *document* in
 its directory. A chapter's position is already its position in the document.
 
-Folder-specific fields (e.g. `depends-on` on features/backlog/tech chapters,
+Folder-specific fields (e.g. `depends-on` on features/backlog/tech/ai chapters,
 `feature-flag` on domain feature chapters, `implements` on backlog chapters,
-`version`/`alternatives` on tech chapters) are documented in that folder's
+`version`/`alternatives` on tech chapters, `stage` on ai chapters) are
+documented in that folder's
 own instructions file, not here — this file only defines the fields common
 to every folder.
 
@@ -468,6 +476,7 @@ Per directory, `_meta/index.json` is generated like this:
    | `.domain/<context>/` | `domain.md` |
    | `.tech/` | `technology-graph.md` |
    | `.design/` | `README.md` |
+   | `.ai/` | `adoption-map.md` |
    | `.arc42/`, `.backlog/` | none — declare `index: root` if the directory has one |
 
    A directory the convention covers but whose root document is missing is
@@ -475,7 +484,8 @@ Per directory, `_meta/index.json` is generated like this:
    them in one directory is an error.
 
 2. **If anything left carries a number, the directory is a numbered set** and
-   sorts by that number ascending — arc42 chapters, ADRs, TDRs. The number comes
+   sorts by that number ascending — arc42 chapters, ADRs, TDRs, `.ai` stage
+   files. The number comes
    from the `number` field, or from a numbered filename when there is no field:
    `09-architecture-decisions.md`, `7-use-postgres.md`, and
    `ADR-0007-use-postgres.md` all read as numbers. Numbering by filename is
@@ -527,6 +537,7 @@ _meta/index.json          # reading outline, all adopted folders
 .backlog/_meta/…
 .tech/_meta/…
 .design/_meta/…
+.ai/_meta/…
 ```
 
 Only folders the repository actually has produce a scope.

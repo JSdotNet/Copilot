@@ -18,7 +18,7 @@
     moved, so a refresh that changed nothing is visibly a no-op.
 
 .PARAMETER Scope
-    Refresh one knowledge folder only (for example `.tech`). Omit to refresh
+    Refresh one knowledge folder only (for example `.tech` or `.ai`). Omit to refresh
     every adopted scope plus the repository-wide rollup.
 
 .PARAMETER Check
