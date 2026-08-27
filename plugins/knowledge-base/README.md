@@ -210,6 +210,26 @@ these skills exist.
 `.domain is stale`, `build the aggregate we agreed`, `build this chapter`,
 `change brief`, `spec code drift`, `the code has an invariant the chapter omits`
 
+### Skill: `backlog-import-plan`
+
+User-invoked, standing outside the `to-spec-<kind>`/`from-spec-<kind>` family: it turns
+agreed spec material — a `.domain` feature chapter, a `.backlog` Epic/Story, an ADR, or
+other planning material — into a **Backlog import plan**, an ordered, dependency-linked
+sequence of `prompt` entries in the Backlog product's own entry-text grammar, ready to
+paste or upload. It stops once the plan is produced; it never talks to the Backlog app,
+runs a generated prompt, or touches GitHub. The grammar it targets — entry/sub-item
+shape, metadata tokens, and the shared-`#tag` re-import mechanics — lives in
+`assets/backlog-import-grammar.md`, kept separate from the skill body because it mirrors
+a fixed external format rather than this plugin's own conventions.
+
+It is not named `from-spec-<kind>` because it does not fit that family's shape: a
+`from-spec-<kind>` skill resolves a counterpart in *this* repository's own code against
+one of five fixed chapter kinds and emits a generic change brief; this skill has no code
+counterpart to resolve, accepts source material that spans multiple chapter kinds (and
+even ad hoc notes), and emits one specific, opinionated document shape owned by a single
+downstream consumer product. Nothing invokes it by name, so it carries
+`disable-model-invocation: true`.
+
 ### Instructions (auto-applied)
 
 | File | Pattern | Purpose |
@@ -274,6 +294,7 @@ for technologies that do not appear in package manifests.
 | `assets/build/Update-KnowledgeIndex.ps1` | On-demand index refresh, with `-Scope` and `-Check`; reports which index files moved |
 | `assets/routing-snippet.md` | Optional repository-local context-loading and routing policy, plus the `Read(_meta/**)` deny rule that keeps generated indexes out of agent context |
 | `assets/code-sync-protocol.md` | Shared rules for the `to-spec-*` / `from-spec-*` skills: counterpart resolution, evidence rules including why unit tests are first-class evidence for capture, the five-way drift verdict, status rules, index regeneration, and the report table. An asset rather than an instruction, because an honest `applyTo` glob for these rules would have to cover source trees and would break the plugin's silence in non-adopting repositories |
+| `assets/backlog-import-grammar.md` | Grammar reference for `backlog-import-plan`: the Backlog product's entry/sub-item shape, metadata sigils and named tokens, and the shared-`#tag` re-import mechanics a generated plan must match |
 
 ### Hook configuration
 
