@@ -18,6 +18,13 @@ the way it does; `.tech` links back to it rather than restating rationale.
 > models technologies as a domain concept, that lives in `.domain/` — keep the
 > two separate and cross-link with `related` when they touch.
 
+> `.tech` is also the **registry for AI tooling** — Claude Code, an MCP server,
+> a model provider — with its version and its maturity here. How that tooling is
+> actually used across the development flow, and how far that use has been
+> adopted, is `.ai/`. A `.ai` chapter points at the `.tech` chapter with
+> `depends-on`; the reverse link is never written. See
+> `knowledge-ai.instructions.md`.
+
 ## Context-loading policy
 
 - `.tech` is **not** baseline repository context. Load it for stack, dependency,

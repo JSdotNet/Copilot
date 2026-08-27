@@ -1,6 +1,6 @@
 ---
 name: knowledge-base-validate
-description: 'Validate and repair the .arc42/.domain/.tech/.design/.backlog knowledge folders — resolve broken metadata references, remove fields the schema no longer defines, add missing meta blocks, and refresh drifted _meta indexes. Use when: the knowledge-meta check fails, CI warns about drifted indexes, references do not resolve. Triggers on: "knowledge-meta failed", "broken reference", "stale _meta", "validate knowledge folders", "knowledge base check", "build.mjs --check".'
+description: 'Validate and repair the .arc42/.domain/.tech/.design/.backlog/.ai knowledge folders — resolve broken metadata references, remove fields the schema no longer defines, add missing meta blocks, and refresh drifted _meta indexes. Use when: the knowledge-meta check fails, CI warns about drifted indexes, references do not resolve. Triggers on: "knowledge-meta failed", "broken reference", "stale _meta", "validate knowledge folders", "knowledge base check", "build.mjs --check".'
 ---
 
 # Knowledge base validate
@@ -46,7 +46,7 @@ missing or malformed `meta` blocks, and drifted committed `_meta/` indexes.
    | `index` or `number` on a chapter block | Both place the document in its directory, so they belong on the file-level block | Move the field to the file-level block, or drop it if the chapter needed neither |
    | No entry point | A directory the convention covers is missing its root document, or has excluded it | Create the expected file, or mark the right one `index: root` |
    | Unknown status or type | A value outside the allowed ladder or value set | Use one of the values listed in the folder's own instruction file |
-   | Missing `type` | A `.domain` or `.tech` block with no `type`, or a heading still carrying a kind prefix | Add `type` from the folder's value set and strip the prefix from the heading |
+   | Missing `type` | A `.domain`, `.tech`, or `.ai` block with no `type`, or a heading still carrying a kind prefix | Add `type` from the folder's value set and strip the prefix from the heading |
    | Malformed `tests` entry | Not `<level>:<runner>:<selector>`, an unknown level, or a chapter reference pasted into `tests` | Rewrite the entry per "Linking test cases" in `knowledge-chapter-metadata.instructions.md`. A link to another chapter belongs in `related` |
    | Unmapped test runner | A `tests` entry names a runner the tooling has no command for, so nothing can offer to run it (warning) | Leave it if the runner is genuinely what runs the test; add its command to `TEST_RUNNERS` in `.github/tools/knowledge-meta/metadata.mjs` to make it runnable |
    | Literal escape sequence in body text | A `` `r`n `` or `\n` was written instead of a line break, usually by a tool writing the file through a shell | Replace it with a real line break. Check whether a heading was glued onto the previous line and silently stopped being a heading |

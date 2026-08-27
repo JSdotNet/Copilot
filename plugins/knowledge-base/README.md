@@ -1,7 +1,7 @@
 # Knowledge Base Plugin
 
-Encapsulates the `.arc42` / `.domain` / `.tech` / `.design` / `.backlog`
-knowledge-folder convention: durable, cross-linked Markdown knowledge with
+Encapsulates the `.arc42` / `.domain` / `.tech` / `.design` / `.backlog` /
+`.ai` knowledge-folder convention: durable, cross-linked Markdown knowledge with
 machine-readable `meta` blocks, derived `_meta/` indexes, a graph canvas, and a
 CI check that keeps references honest.
 
@@ -28,6 +28,7 @@ pull request and a scheduled job keeps current.
 | `.tech/` | Technology graph: platforms, runtimes, frameworks, versions, maturity |
 | `.design/` | UX and visual design guidelines, tokens, design rules |
 | `.backlog/` | Durable work-item chapters |
+| `.ai/` | How the team develops with AI: usage per flow stage, concepts, adoption status |
 
 Adoption is partial by design — a repository may take only `.domain` and
 `.arc42`, and the tooling emits scopes for the folders that actually exist.
@@ -100,6 +101,16 @@ diagram in sync with the `depends-on` edges.
 
 **Trigger keywords:** `technology graph`, `add technology`, `pin version`,
 `promote to adopted`, `retire technology`, `edit .tech`
+
+### Skill: `orch-ai`
+
+Orchestrates `.ai/` changes — a usage recorded at a flow stage, an adoption
+status promoted or demoted, a concept, a stage added — with a placement and
+boundary check that keeps tool registration in `.tech/` and keeps the adoption
+map in sync with the stage files.
+
+**Trigger keywords:** `AI adoption`, `we now use this agent`, `add to the flow`,
+`promote to adopted`, `retire this practice`, `AI harness`, `edit .ai`
 
 ### Skill: `orch-design`
 
@@ -203,11 +214,12 @@ these skills exist.
 
 | File | Pattern | Purpose |
 |------|---------|---------|
-| `knowledge-chapter-metadata.instructions.md` | all five folders | Required `meta` block fields, `status` ladders, `type` value sets, and the `tests` test-case link format |
+| `knowledge-chapter-metadata.instructions.md` | all six folders | Required `meta` block fields, `status` ladders, `type` value sets, and the `tests` test-case link format |
 | `knowledge-domain.instructions.md` | `.domain/**` | Bounded-context structure and ubiquitous language |
 | `knowledge-arc42.instructions.md` | `.arc42/**` | arc42 chapter, ADR, and TDR structure |
 | `knowledge-tech.instructions.md` | `.tech/**` | Technology graph, versions, maturity ladder |
 | `knowledge-design.instructions.md` | `.design/**` | Design guideline scope and token rules |
+| `knowledge-ai.instructions.md` | `.ai/**` | AI usage per flow stage, the adoption ladder, and the `.tech` boundary |
 | `knowledge-backlog.instructions.md` | `.backlog/**` | Work-item chapter structure |
 | `knowledge-derived-artifacts.instructions.md` | `**/_meta/**` | Placement, naming, and envelope rules for generated files |
 | `knowledge-naming.instructions.md` | knowledge folders and `_meta` | Underscore and dot prefixes, kebab-case, no redundant suffixes |
@@ -268,6 +280,75 @@ for technologies that do not appear in package manifests.
 - `hooks.json` adds a session-start guardrail: knowledge folders are task-scoped
   context rather than baseline context, `meta` blocks are mandatory on every
   chapter, and `_meta/` is never hand-edited.
+
+## 0.12.0: the `.ai` folder
+
+**Additive, and nothing existing changes.** A sixth knowledge folder, `.ai`,
+records **how the project develops with AI** — which practice, agent, skill,
+hook, model, or guardrail is used at which position in the development flow,
+the concepts underneath them, and how far adoption has actually got.
+
+```
+.ai/
+  adoption-map.md       # root: the flow, the stage table, the adoption diagram
+  01-<stage>.md         # one file per stage of the development flow
+  02-<stage>.md
+  concepts.md           # cross-stage concepts and practices
+```
+
+It is organized by **flow, not by tool**. A chapter sits in the stage file for
+the position where it is used, and answers one question: at this point in how we
+work, what do we use AI for, and is that real yet?
+
+```markdown
+## Agent-Driven TDD
+
+\`\`\`meta
+status: trial
+type: practice
+depends-on: [".tech/tooling.md#claude-code"]
+\`\`\`
+
+The failing test is written with the agent before any implementation.
+
+- **Used for** — every change with a testable outcome.
+- **Adopted by** — one developer, on feature branches, since 2026-07.
+- **Evidence** — three merged pull requests; no measured cycle-time claim yet.
+- **Limits** — not used for spike branches.
+```
+
+Three decisions are worth knowing before adopting it:
+
+- **`.tech` stays the registry.** A tool with a vendor and a version is a
+  `.tech` chapter, as it always was; `.ai` never re-registers it and points at
+  it with `depends-on` instead. The test is *if it has a vendor and a version,
+  it is `.tech`* — so "we use Claude Code, version X" is `.tech`, and "at Specify
+  we draft chapters with it, `trial`" is `.ai`. The link is one-way: `.tech`
+  chapters never point back.
+- **Stage files are numbered, and the stage set is the repository's own.**
+  `01-discover.md`, `02-specify.md`, `03-build.md` — the number is what makes the
+  folder read in the order the work happens. The generator's numbered-set rule
+  already handles that, so `.ai` needed no new ordering machinery: root first,
+  stages by number, `concepts.md` after them. No flow is prescribed.
+- **The status ladder is `.tech`'s**, deliberately: `candidate`, `trial`,
+  `adopted`, `hold`, `retired`. One adoption vocabulary, applied to two
+  different subjects — `.tech` rates a technology, `.ai` rates a way of working
+  with one. A tool that is `adopted` whose use at a stage is still `trial` is
+  the normal case, and the reason the folder exists. A `retired` chapter is
+  never deleted: what was tried and dropped is the part nobody can reconstruct
+  later.
+
+`type` values are `practice`, `agent`, `skill`, `plugin`, `mcp-server`, `hook`,
+`workflow`, `model`, `concept`, and `guardrail` at chapter level, and
+`adoption-map`, `stage`, or `concepts` at file level. One folder-specific field
+is added, `stage` — a list of stage slugs, on `concepts.md` chapters that span
+the flow, omitted inside a stage file where it would only restate the filename.
+Like `roadmap` it is a plain-slug attribute and produces no graph edges.
+
+`schemaVersion` stays at 4 — `.ai` produces the same node and edge shapes every
+other folder does. To adopt: re-sync `.github/tools/knowledge-meta/` from this
+plugin, run `knowledge-base-init` (or create the folder by hand), add `.ai/**`
+to the CI workflow's `paths` filters, and route edits through `orch-ai`.
 
 ## 0.11.0: invariants as a table
 
@@ -522,6 +603,11 @@ After running `knowledge-base-init`, a repository that adopted everything has:
 .backlog/
 ├── _meta/{graph.json,index.json}
 └── <item>.md
+.ai/
+├── _meta/{graph.json,index.json}
+├── adoption-map.md
+├── <nn>-<stage>.md
+└── concepts.md
 _meta/{graph.json,index.json}          # repository-wide rollup
 build/
 └── Update-KnowledgeIndex.ps1          # on-demand index refresh

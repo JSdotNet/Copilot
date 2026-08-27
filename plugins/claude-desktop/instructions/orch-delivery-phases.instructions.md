@@ -123,7 +123,7 @@ pointless commit.
 - **Discover the repository's documentation surface.** Read the target repo's own conventions —
   `CLAUDE.md`, any repo `*.instructions.md`, and the checked-in
   knowledge/doc folders it governs (for example `.arc42/`, `.domain/`, `.tech/`, `.design/`,
-  `.backlog/`, `docs/`, and `README.md`) together with their per-chapter metadata format.
+  `.backlog/`, `.ai/`, `docs/`, and `README.md`) together with their per-chapter metadata format.
 - **Decide whether documentation is now stale.** Compare the landed change set against that surface:
   did architecture, technology, deployment, a public API/contract, configuration, dependencies, or
   user-facing behavior change in a way the governed docs should record?
