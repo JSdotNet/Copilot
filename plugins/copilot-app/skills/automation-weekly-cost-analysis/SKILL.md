@@ -1,5 +1,5 @@
 ---
-name: automation: weekly-cost-analysis
+name: automation-weekly-cost-analysis
 description: >
   Run /chronicle cost-tips to retrieve the weekly AI usage and cost summary, surface the top
   actionable cost-reduction tips, and produce a concise report.
@@ -27,7 +27,7 @@ This skill has no hard skill dependencies, but pairs well with:
 
 - **`suggestion-review`** — can be invoked on high-cost skill or agent files to propose
   prompt-trimming opportunities that reduce token consumption.
-- **`guidelines-cap-analysis`** (`automation: guidelines-cap-analysis`) — large instruction
+- **`guidelines-cap-analysis`** (`automation-guidelines-cap-analysis`) — large instruction
   files inflate every request's context; running a cap analysis after a cost spike helps
   identify instruction bloat as a root cause.
 
@@ -57,7 +57,7 @@ This skill has no hard skill dependencies, but pairs well with:
    - Are there repeated identical prompts that could be cached or batched?
 
 4. Cross-reference tips from Chronicle with repository-specific context:
-   - If instruction bloat is flagged: note that `automation: guidelines-cap-analysis` can help.
+   - If instruction bloat is flagged: note that `automation-guidelines-cap-analysis` can help.
    - If a high-cost model is used for low-complexity tasks: suggest a cheaper model tier for
      those agent files.
    - If session count is high: suggest batching issues with `start-session-from-issue` to
@@ -99,7 +99,7 @@ This skill has no hard skill dependencies, but pairs well with:
 ### Phase 4 — Follow-Up (Optional)
 
 7. Ask the user whether to act on any of the repository-specific actions:
-   - If instruction bloat is flagged: offer to invoke `automation: guidelines-cap-analysis`.
+   - If instruction bloat is flagged: offer to invoke `automation-guidelines-cap-analysis`.
    - If prompt trimming is recommended for a specific skill: offer to invoke `suggestion-review`
      on that file.
 

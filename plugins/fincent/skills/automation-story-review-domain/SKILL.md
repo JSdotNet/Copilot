@@ -1,5 +1,5 @@
 ---
-name: automation: story review — domain architect
+name: automation-story-review-domain
 description: >
   Automated domain architect story review for Fincent. Queries all stories in a given Jira
   status and runs the story-review-domain skill on each to validate ubiquitous language,

@@ -1,5 +1,5 @@
 ---
-name: automation: review
+name: automation-review
 description: >
   Run a full automated review cycle on the codebase or a specific scope: collects TODO items,
   surfaces future-improvement suggestions, and runs a structured code review. Produces a
