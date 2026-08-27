@@ -1,5 +1,5 @@
 ---
-name: automation: package-update
+name: automation-package-update
 description: >
   Update all outdated NuGet packages and Copilot plugins in a .NET solution and open a PR
   with the changes. Handles Central Package Management, Aspire integration upgrades, and

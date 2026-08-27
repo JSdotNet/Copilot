@@ -1,5 +1,5 @@
 ---
-name: automation: story review — dev
+name: automation-story-review-dev
 description: >
   Automated dev story review for Fincent. Queries all stories in a given Jira
   status, retrieves architecture documentation and ADRs, and runs the
