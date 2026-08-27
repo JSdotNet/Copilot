@@ -1,10 +1,7 @@
 ---
 name: automation: bug-fix
-description: >
-  Pick up all open GitHub issues labelled 'bug', let the user confirm the selection,
-  then start one Copilot session per issue using the orch-bug orchestration skill.
-  Use when: triaging the bug backlog, starting parallel bug-fix sessions, or running
-  a scheduled bug sweep to keep the backlog moving.
+description: 'Pick up all open GitHub issues labelled ''bug'', let the user confirm the selection, then start one Copilot session per issue using the orch-bug orchestration skill.'
+disable-model-invocation: true
 ---
 
 # Automation: Bug Fix

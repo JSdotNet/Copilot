@@ -1,12 +1,7 @@
 ---
 name: automation-whats-new
-description: >
-  Check one or more GitHub repositories for what changed since the last run: open pull
-  requests and pull requests merged since the last checkpoint. Correlates each PR with
-  related Jira tickets or GitHub issues where discoverable, and persists a per-repo
-  checkpoint so the next run only reports genuinely new activity.
-  Use when: periodic delivery check-ins, standups, release readiness reviews, or catching up
-  on multiple repositories after time away.
+description: 'Check one or more GitHub repositories for what changed since the last run: open pull requests and pull requests merged since the last checkpoint. Correlates each PR with related Jira tickets or GitHub issues where discoverable, and persists a per-repo checkpoint so the next run only reports genuinely new activity.'
+disable-model-invocation: true
 ---
 
 # Automation: What's New

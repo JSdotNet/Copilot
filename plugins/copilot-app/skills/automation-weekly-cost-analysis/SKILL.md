@@ -1,10 +1,7 @@
 ---
 name: automation: weekly-cost-analysis
-description: >
-  Run /chronicle cost-tips to retrieve the weekly AI usage and cost summary, surface the top
-  actionable cost-reduction tips, and produce a concise report.
-  Use when: scheduled weekly cost review, investigating unexpected token spend,
-  or optimising model and prompt usage.
+description: 'Run /chronicle cost-tips to retrieve the weekly AI usage and cost summary, surface the top actionable cost-reduction tips, and produce a concise report.'
+disable-model-invocation: true
 ---
 
 # Automation: Weekly Cost Analysis

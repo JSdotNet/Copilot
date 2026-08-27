@@ -1,11 +1,7 @@
 ---
 name: automation-sprint-review
-description: >
-  End-to-end sprint review automation: collects deterministic Jira datasets with
-  Get-ReleaseData.ps1 and Get-SprintData.ps1, then generates the sprint report(s) per team,
-  the release report for the resolved fixVersion, and a demo presentation as PowerPoint.
-  Orchestrates sprint-report, release-report, and demo-presentation sequentially over those
-  datasets so repeated runs on unchanged Jira data produce identical output.
+description: 'End-to-end sprint review automation: collects deterministic Jira datasets with Get-ReleaseData.ps1 and Get-SprintData.ps1, then generates the sprint report(s) per team, the release report for the resolved fixVersion, and a demo presentation as PowerPoint. Orchestrates sprint-report, release-report, and demo-presentation sequentially over those datasets so repeated runs on unchanged Jira data produce identical output.'
+disable-model-invocation: true
 ---
 
 # Automation: Sprint Review (Full Pipeline)

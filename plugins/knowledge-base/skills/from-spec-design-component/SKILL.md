@@ -1,6 +1,7 @@
 ---
-name: build-design-component
-description: 'Build direction, design-component kind: turn an agreed but unadopted component guideline in .design/component-libraries.md into a change brief plus a change category, then stop. Use when: the guideline recommends a library the product does not use, components are hand-rolled where the guideline says use the library, hard-coded values persist where tokens are agreed, adopt the component guideline we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees and never changes dependencies. DO NOT USE FOR: writing a chapter from a design-component that already exists in code (use capture-design-component), or for the building-block, deployment, or feature chapters around it (use the matching build-* skill).'
+name: from-spec-design-component
+description: 'From-spec direction (build), design-component kind: turn an agreed but unadopted component guideline in .design/component-libraries.md into a change brief plus a change category, then stop.'
+disable-model-invocation: true
 ---
 
 # Build a component guideline in code
@@ -101,7 +102,7 @@ Write them out as invariants, with the token names.
 
 5. **Reach a verdict.** Land on exactly one of the protocol's five verdicts.
    `spec-ahead` is the case this skill exists for. On `aligned`, stop and say
-   so. On `code-ahead`, stop and hand the scope to `capture-design-component`;
+   so. On `code-ahead`, stop and hand the scope to `to-spec-design-component`;
    the chapter is stale, not unbuilt. On `conflict`, stop and ask — a conflict
    never becomes a `defect` brief on this skill's own authority.
 

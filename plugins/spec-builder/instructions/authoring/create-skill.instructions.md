@@ -22,10 +22,18 @@ description: Dedicated rules for creating and refining GitHub Copilot skills.
 ## Rules
 
 - Keep one primary workflow per skill.
-- Use explicit trigger language in `description`.
 - Keep content in English.
 - Avoid embedding unrelated responsibilities.
 - Reference reusable resources instead of duplicating long guidance.
+
+## Invocation Mode
+
+Choose the mode before writing the description; it decides what the description is for.
+
+- **Model-invoked** (omit `disable-model-invocation`) — the model may fire the skill, and another skill or agent may reach it. Use explicit trigger language in `description`. The description is loaded on every turn, so it is a permanent cost.
+- **User-invoked** (`disable-model-invocation: true`) — only the human typing the name can invoke it; nothing else can reach it. Write `description` as one human-facing line and strip the trigger lists.
+
+The test: could the model usefully reach for this skill on its own, or must another skill or agent reach it? If neither, make it user-invoked and pay no context load. Never make a skill user-invoked when an agent, a hook prompt, or another skill invokes it by name.
 
 ## Dual-Host Rules
 
@@ -34,7 +42,11 @@ Skills are the most portable asset type: `skills/<name>/SKILL.md` with `name` an
 path, with no generated counterpart. Keep them that way.
 
 - Stick to `name` and `description` in frontmatter. Both hosts understand them; anything
-  else is honoured by at most one.
+  else is honoured by at most one. The one sanctioned exception is
+  `disable-model-invocation: true`: Claude Code honours it, GitHub Copilot ignores unknown
+  keys, so a user-invoked skill stays model-invocable on the Copilot side. That degrades
+  safely, and it is why a shortened description must still be accurate prose — on Copilot it
+  remains the model's only signal.
 - Do not name host-specific tools in the body (`read/readFile`, `Read`, `edit/editFiles`).
   Describe the *action* — "read the file", "search the codebase" — and let each host pick
   its own tool.
@@ -46,6 +58,8 @@ path, with no generated counterpart. Keep them that way.
 ## Validation Checklist
 
 - [ ] Skill folder and `name` are aligned.
+- [ ] Invocation mode is chosen deliberately, and the description matches it — trigger language when model-invoked, one human-facing line when user-invoked.
+- [ ] No skill reached by an agent, a hook prompt, or another skill is marked user-invoked.
 - [ ] No host-specific tool names appear in the body.
 - [ ] Description is discoverable and task-specific.
 - [ ] Workflow is actionable and complete.

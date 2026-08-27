@@ -1,6 +1,7 @@
 ---
-name: build-aggregate
-description: 'Build direction, aggregate kind: turn an agreed but unbuilt aggregate — the root plus its owned entities, value objects, and enums, and the domain events it raises — into a change brief plus a change category, then stop. Use when: the aggregate is modelled but not implemented, a sub-chapter names a type the code lacks, the chapter has invariants the code does not enforce, an agreed event is never raised, build the aggregate we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees. DO NOT USE FOR: writing a chapter from an aggregate that already exists in code (use capture-aggregate), or for the domain-service, feature, or bounded-context chapters around it (use the matching build-* skill).'
+name: from-spec-aggregate
+description: 'From-spec direction (build), aggregate kind: turn an agreed but unbuilt aggregate — the root plus its owned entities, value objects, and enums, and the domain events it raises — into a change brief plus a change category, then stop.'
+disable-model-invocation: true
 ---
 
 # Build an aggregate from its chapters
@@ -34,7 +35,7 @@ one brief covers:
 
 **Domain services are not part of this brief.** A domain service is defined by
 coordinating across boundaries rather than living in one, so it has its own
-pair: `build-domain-service`.
+pair: `from-spec-domain-service`.
 
 Read `assets/code-sync-protocol.md` before starting. It carries the counterpart
 resolution ladder, the evidence rules, the five-way drift verdict, the status
@@ -50,7 +51,7 @@ rules, and the change-brief contract — none of which are repeated here.
 
 If the chapter does not exist, there is nothing to build — the request is either
 a modelling task for `orch-domain` or, if the aggregate is already in code, a
-`capture-aggregate` pass.
+`to-spec-aggregate` pass.
 
 ## Chapter status gate
 
@@ -178,7 +179,7 @@ unsettled sub-chapter, and leave it out of the invariants list.
    **per chapter** — the root, each sub-chapter, and each event can drift
    independently. `spec-ahead` is the case this skill exists for. On `aligned`,
    stop and say so. On `code-ahead`, hand that chapter's scope to
-   `capture-aggregate`; it is stale, not unbuilt. On `conflict`, stop and ask. A
+   `to-spec-aggregate`; it is stale, not unbuilt. On `conflict`, stop and ask. A
    conflict never becomes a `defect` brief on this skill's own authority; only a
    person decides which side is wrong.
 
@@ -280,7 +281,7 @@ unsettled sub-chapter, and leave it out of the invariants list.
 - Do not choose a representation, a persistence strategy, a dispatch mechanism,
   or a project layout. The brief states what must be true, not how.
 - Do not brief a domain service alongside the aggregate. That is
-  `build-domain-service` scope.
+  `from-spec-domain-service` scope.
 - Do not extend the pass into `features.md`, `model.md`, `flow.md`, or
-  `dependencies.md` — those are `build-feature` and `build-bounded-context`
-  scope.
+  `dependencies.md` — `features.md` is `from-spec-feature` scope, and the rest are
+  out of scope for every skill in this plugin.

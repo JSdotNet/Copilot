@@ -1,10 +1,7 @@
 ---
 name: automation: performance-review
-description: >
-  Identify 10 performance improvements across the codebase, score each by impact and effort,
-  then implement and open a PR for the single highest-impact, lowest-effort finding.
-  Use when: scheduled performance hygiene, proactive optimization before a release, or
-  after profiling reveals a regression.
+description: 'Identify 10 performance improvements across the codebase, score each by impact and effort, then implement and open a PR for the single highest-impact, lowest-effort finding.'
+disable-model-invocation: true
 ---
 
 # Automation: Performance Review

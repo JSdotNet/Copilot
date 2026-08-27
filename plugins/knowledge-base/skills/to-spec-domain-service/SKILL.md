@@ -1,6 +1,6 @@
 ---
-name: capture-domain-service
-description: 'Capture direction, domain-service kind: read an implemented domain service, policy, or process manager and write or refresh its `type: domain-service` chapter in .domain/<context>/domain.md, including invocation semantics. Use when: coordinating logic exists in code with no chapter, a policy or process manager is undocumented, the chapter omits which aggregates the service coordinates, document the domain services in this context. Reads source and tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt domain-service chapter into work (use build-domain-service), or for the aggregate, feature, or bounded-context chapters around it (use the matching capture-* skill).'
+name: to-spec-domain-service
+description: 'To-spec direction (capture), domain-service kind: read an implemented domain service, policy, or process manager and write or refresh its `type: domain-service` chapter in .domain/<context>/domain.md, including invocation semantics. Use when: coordinating logic exists in code with no chapter, a policy or process manager is undocumented, the chapter omits which aggregates the service coordinates, document the domain services in this context. Reads source and tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt domain-service chapter into work (use from-spec-domain-service), or for the aggregate, feature, or bounded-context chapters around it (use the matching to-spec-* skill).'
 ---
 
 # Capture a domain service from code
@@ -55,7 +55,7 @@ carrying the `### Payload`, `### Consumers`, and `### Published language rules`
 sub-sections — those are structural sub-sections of that one chapter and carry
 no `meta` blocks of their own. Distinguish it from an **integration event**: a
 translated outward contract belongs in `dependencies.md` as a published
-language, not here. An event raised by an aggregate root is `capture-aggregate`
+language, not here. An event raised by an aggregate root is `to-spec-aggregate`
 scope — say which side raises it and leave the other alone.
 
 Invocation semantics is the field that most changes how a reader understands the
@@ -122,7 +122,7 @@ evidence either way.
 5. **Reach a verdict.** Compare what the code establishes against what the
    chapter currently says, and land on exactly one of the protocol's five
    verdicts. `code-ahead` is the case this skill exists for. On `spec-ahead`,
-   stop and hand the scope to `build-domain-service`. On `conflict`, stop and
+   stop and hand the scope to `from-spec-domain-service`. On `conflict`, stop and
    ask; never resolve it by overwriting the chapter.
 
 6. **Draft the chapter.** Write to the template in

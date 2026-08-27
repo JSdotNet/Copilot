@@ -1,10 +1,7 @@
 ---
 name: automation: week-starter
-description: >
-  Scan configured topics for updates published in the last 7 days and produce a concise
-  "What's new this week" digest. Default topics: .NET Aspire, GitHub Copilot App, and the
-  Awesome Copilot community catalog (github.com/github/awesome-copilot).
-  Use when: starting the week, catching up after a holiday, or tracking a release cadence.
+description: 'Scan configured topics for updates published in the last 7 days and produce a concise "What''s new this week" digest. Default topics: .NET Aspire, GitHub Copilot App, and the Awesome Copilot community catalog (github.com/github/awesome-copilot).'
+disable-model-invocation: true
 ---
 
 # Automation: Week Starter

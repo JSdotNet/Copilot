@@ -1,6 +1,6 @@
 ---
-name: capture-feature
-description: 'Capture direction, feature kind: read a shipped capability and write or refresh its `type: feature` or `type: sub-feature` chapter in .domain/<context>/features.md, including feature-flag and depends-on. Use when: a capability ships but features.md does not list it, the feature breakdown is stale, a feature flag has no chapter, document the features we built, capture the feature by using it. Runs the application and captures screenshots of the flow as primary evidence, alongside source and tests, then routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt feature chapter into work (use build-feature), or for the aggregate, domain-service, or bounded-context chapters around it (use the matching capture-* skill).'
+name: to-spec-feature
+description: 'To-spec direction (capture), feature kind: read a shipped capability and write or refresh its `type: feature` or `type: sub-feature` chapter in .domain/<context>/features.md, including feature-flag and depends-on. Use when: a capability ships but features.md does not list it, the feature breakdown is stale, a feature flag has no chapter, document the features we built, capture the feature by using it. Runs the application and captures screenshots of the flow as primary evidence, alongside source and tests, then routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt feature chapter into work (use from-spec-feature), or for the aggregate, domain-service, or bounded-context chapters around it (use the matching to-spec-* skill).'
 ---
 
 # Capture a feature from code
@@ -190,7 +190,7 @@ up to that point and record the rest from code and tests.
 6. **Reach a verdict.** Compare what the code establishes against what the
    chapter currently says, and land on exactly one of the protocol's five
    verdicts. `code-ahead` is the case this skill exists for. On `spec-ahead`,
-   stop and hand the scope to `build-feature`. On `conflict`, stop and ask;
+   stop and hand the scope to `from-spec-feature`. On `conflict`, stop and ask;
    never resolve it by overwriting the chapter.
 
 7. **Draft the chapter.** Write to the template in

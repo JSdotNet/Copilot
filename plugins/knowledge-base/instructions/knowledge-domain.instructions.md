@@ -215,7 +215,7 @@ instructions.
 
   `Enforced at` is the column that prose loses. An invariant is what the type
   guarantees no matter who calls it, and *where* it is guaranteed is what tells
-  a `build-*` pass whether a guard clause belongs in the constructor or in one
+  a `from-spec-*` pass whether a guard clause belongs in the constructor or in one
   transition. A rule whose enforcement point cannot be named is usually a
   caller's rule rather than an invariant — see `assets/code-sync-protocol.md`.
 
@@ -230,7 +230,7 @@ instructions.
 
   An `open` row does not stop a chapter reaching `status: active` — a model can
   be the current one and still carry a known unanswered question. It does stop
-  that one rule being *built*: a `build-*` pass names it as needing a decision
+  that one rule being *built*: a `from-spec-*` pass names it as needing a decision
   instead of briefing an implementation of a rule nobody has agreed.
 - In Domain Service chapters, state invocation semantics when it clarifies
   behavior boundaries: whether logic is command-invoked, scheduled,

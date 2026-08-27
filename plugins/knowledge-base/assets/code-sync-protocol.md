@@ -3,13 +3,17 @@
 Shared rules for the two families of bidirectional skills that connect a
 repository's knowledge folders to its running code:
 
-- **`capture-<kind>`** — something already exists in the application, the
+- **`to-spec-<kind>`** — something already exists in the application, the
   matching chapter is missing, thin, or stale, so read the implementation and
   write the chapter.
-- **`build-<kind>`** — a chapter is agreed but not built, so turn it into a
+- **`from-spec-<kind>`** — a chapter is agreed but not built, so turn it into a
   change brief and hand it off.
 
-Every `capture-*` and `build-*` skill references this file instead of restating
+Throughout this file and the skills that load it, **capture** is the `to-spec-` direction
+and **build** is the `from-spec-` direction. The names carry the endpoints; these two words
+carry the action, and both spellings mean the same pass.
+
+Every `to-spec-*` and `from-spec-*` skill references this file instead of restating
 it. The skills carry only what is specific to their kind: the spec-to-code
 mapping table, the `type` values, the target file, and the folder rules that
 apply.
@@ -24,7 +28,7 @@ and the plugin stays silent everywhere else.
 
 ## The two directions
 
-| | `capture-<kind>` | `build-<kind>` |
+| | `to-spec-<kind>` | `from-spec-<kind>` |
 |---|---|---|
 | Starting point | Implementation exists | Chapter exists and is agreed |
 | Missing thing | The chapter | The implementation |
@@ -32,8 +36,8 @@ and the plugin stays silent everywhere else.
 | Writes | The chapter, through the folder's orchestration skill | A change brief, and nothing else |
 | Never | Changes source or test code | Edits source trees, test trees, or the chapter's substance |
 
-A single request often needs both, in sequence: capture what is built, then
-build what the corrected chapter now says is missing. Run them as two passes
+A single request often needs both, in sequence: `to-spec-` what is built, then
+`from-spec-` what the corrected chapter now says is missing. Run them as two passes
 with the chapter settled in between — never interleave them, or the chapter
 becomes both the question and the answer.
 

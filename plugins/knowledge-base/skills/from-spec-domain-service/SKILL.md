@@ -1,6 +1,7 @@
 ---
-name: build-domain-service
-description: 'Build direction, domain-service kind: turn an agreed but unbuilt `type: domain-service` chapter in .domain/<context>/domain.md into a change brief plus a change category, then stop. Use when: the service or policy is modelled but not implemented, the chapter names coordination the code does not do, an event-triggered policy is agreed but nothing subscribes, build the process manager we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees. DO NOT USE FOR: writing a chapter from a domain-service that already exists in code (use capture-domain-service), or for the aggregate, feature, or bounded-context chapters around it (use the matching build-* skill).'
+name: from-spec-domain-service
+description: 'From-spec direction (build), domain-service kind: turn an agreed but unbuilt `type: domain-service` chapter in .domain/<context>/domain.md into a change brief plus a change category, then stop.'
+disable-model-invocation: true
 ---
 
 # Build a domain service from its chapter
@@ -94,7 +95,7 @@ the first thing lost when the semantics is left implicit.
 
 5. **Reach a verdict.** Land on exactly one of the protocol's five verdicts.
    `spec-ahead` is the case this skill exists for. On `aligned`, stop and say
-   so. On `code-ahead`, stop and hand the scope to `capture-domain-service`; the
+   so. On `code-ahead`, stop and hand the scope to `to-spec-domain-service`; the
    chapter is stale, not unbuilt. On `conflict`, stop and ask — a conflict never
    becomes a `defect` brief on this skill's own authority.
 

@@ -86,7 +86,7 @@ with template and metadata enforcement.
 ### Skill: `orch-backlog`
 
 Orchestrates `.backlog/` work-item chapters — Items and Sub-items grouped by
-concern — drafting through `write-epic` / `write-story` / `write-bug` and
+concern — drafting through `to-epic` / `to-story` / `to-bug` and
 publishing through `create-github-issue` / `update-github-issue`.
 
 **Trigger keywords:** `backlog item`, `add sub-item`, `work item chapter`,
@@ -110,39 +110,39 @@ repository's authoritative design source, through `ux-design:ux-designer`.
 **Trigger keywords:** `design tokens`, `color scheme`, `design guideline`,
 `interaction rule`, `accessibility guideline`, `component library`, `edit .design`
 
-### Skills: `capture-<kind>` and `build-<kind>`
+### Skills: `to-spec-<kind>` and `from-spec-<kind>`
 
-Two directions between a knowledge chapter and the code that implements it:
+Two directions between a knowledge chapter and the code that implements it. The chapter is
+the **spec**, which is what the `spec` in each name refers to — `<kind>` alone would be
+ambiguous, because an aggregate is both a chapter and a class.
 
-- **`capture-<kind>`** — something exists in the application and the
+- **`to-spec-<kind>`** — something exists in the application and the
   chapter is missing, thin, or stale, so read the implementation and write the
   chapter. Source and tests are the only evidence; comments, TODOs, and disabled
   tests are not. The write routes through the folder's own orchestration skill.
-- **`build-<kind>`** — a chapter is agreed but unbuilt, so turn it
+- **`from-spec-<kind>`** — a chapter is agreed but unbuilt, so turn it
   into a change brief (outcomes, invariants, ubiquitous language, out of scope,
   acceptance checks) plus a change category, then stop. It never edits a source
   or test tree, and never names a code-side orchestration — which delivery flow
   picks the brief up is the user's decision, made after reading it.
 
-**`build` covers both from scratch and update**, despite the name. The change
+**The `from-spec-` direction covers both from scratch and update.** The change
 category is that axis, and counterpart resolution picks between them before the
 brief is written: `new functionality` when no counterpart exists at all, `change
 to existing behaviour` when one exists and the chapter asks for more, and
 `defect` when one was believed to already satisfy an agreed chapter and does not.
-That is why a build skill reads code — not to change it, but to establish what is
+That is why a `from-spec-` skill reads code — not to change it, but to establish what is
 already there so the brief asks only for the delta, and an update brief lists
 where the current behaviour lives.
 
-Seven kinds, two directions each:
+Five kinds, two directions each:
 
 | Kind | Target | `type` value(s) | Spec-side write |
 |------|--------|-----------------|-----------------|
 | `aggregate` | `.domain/<context>/domain.md` | `aggregate`, `entity`, `value-object`, `enum`, `shared-value-objects`, `shared-enums`, `domain-event` | `orch-domain` |
 | `domain-service` | `.domain/<context>/domain.md` | `domain-service`, plus `domain-event` for events the service itself raises | `orch-domain` |
 | `feature` | `.domain/<context>/features.md` | `feature`, `sub-feature` | `orch-domain` |
-| `bounded-context` | `.domain/<context>/` — the whole folder | file-level `domain`, `features`, `model`, `flow`, `dependencies`, `naming`, plus `context-map` at the `.domain` root | `orch-domain` |
 | `building-block` | `.arc42/05-building-block-view.md` | none — `.arc42` defines no value set | `orch-arc42-content` |
-| `deployment` | `.arc42/07-deployment-view.md` | none — `.arc42` defines no value set | `orch-arc42-content` |
 | `design-component` | `.design/component-libraries.md` | none — `.design` defines no value set | `orch-design` |
 
 **The aggregate is the unit, not its parts.** One pass covers the root, every
@@ -158,7 +158,7 @@ A **domain service** is the deliberate exception: it is defined by coordinating
 across boundaries rather than living in one, so folding it into a boundary's pass
 would be backwards. It keeps its own pair, and owns the events it raises itself.
 
-**`capture-feature` runs the application.** `features.md` is the one knowledge
+**`to-spec-feature` runs the application.** `features.md` is the one knowledge
 file written from the user's point of view, so that pass starts the app, walks
 the feature, and captures a screenshot per step — reading a controller tells you
 a route exists, while using the feature tells you what the product lets someone
@@ -172,13 +172,13 @@ committing them to a knowledge folder.
 `orch-domain`, and populated incrementally by the capture passes: whenever one
 resolves a counterpart by inference rather than by an existing alias, it proposes
 a term with the discovered code name as an `alias`, which turns a one-off
-inference into a durable pairing for the next pass. A `bounded-context` capture
-creates the file as part of the context folder.
+inference into a durable pairing for the next pass. The context folder itself, including
+`naming.md`, is created by `orch-domain`.
 
 `.tech` has no pair here — `knowledge-tech-update` already covers that direction
 — and neither does `.backlog`.
 
-The shared rules live once in `assets/code-sync-protocol.md`, which all 14 skills
+The shared rules live once in `assets/code-sync-protocol.md`, which all 10 skills
 reference and none repeats: counterpart resolution, the evidence rules (including
 why unit tests are first-class evidence for capture rather than a cross-check), a
 five-way drift verdict (`aligned`, `code-ahead`, `spec-ahead`, `conflict`,
@@ -191,7 +191,7 @@ signal when it does. It goes through `naming.md` `aliases`, then the `.arc42`
 building-block view, then the observed naming convention, and reports
 `unresolved` rather than guessing.
 
-The dependency on the `orch-*` skills is one-way. A capture skill names its
+The dependency on the `orch-*` skills is one-way. A `to-spec-` skill names its
 folder's orchestration and hands over grounded input; no `orch-*` skill knows
 these skills exist.
 
@@ -261,7 +261,7 @@ for technologies that do not appear in package manifests.
 | `assets/workflows/knowledge-meta-nightly.yml` | Scheduled index refresh; opens one pull request when the output drifted, nothing when it did not |
 | `assets/build/Update-KnowledgeIndex.ps1` | On-demand index refresh, with `-Scope` and `-Check`; reports which index files moved |
 | `assets/routing-snippet.md` | Optional repository-local context-loading and routing policy, plus the `Read(_meta/**)` deny rule that keeps generated indexes out of agent context |
-| `assets/code-sync-protocol.md` | Shared rules for the `capture-*` / `build-*` skills: counterpart resolution, evidence rules including why unit tests are first-class evidence for capture, the five-way drift verdict, status rules, index regeneration, and the report table. An asset rather than an instruction, because an honest `applyTo` glob for these rules would have to cover source trees and would break the plugin's silence in non-adopting repositories |
+| `assets/code-sync-protocol.md` | Shared rules for the `to-spec-*` / `from-spec-*` skills: counterpart resolution, evidence rules including why unit tests are first-class evidence for capture, the five-way drift verdict, status rules, index regeneration, and the report table. An asset rather than an instruction, because an honest `applyTo` glob for these rules would have to cover source trees and would break the plugin's silence in non-adopting repositories |
 
 ### Hook configuration
 
@@ -297,8 +297,8 @@ An order a customer is assembling, and the consistency boundary for its lines.
 ```
 
 The rules were always the most valuable content in `.domain`, and the only
-content with no shape. `build-aggregate` already required each invariant written
-out in full with one acceptance check per rule, and `capture-aggregate` already
+content with no shape. `from-spec-aggregate` already required each invariant written
+out in full with one acceptance check per rule, and `to-spec-aggregate` already
 mined unit tests for them — both against a paragraph, which is not quotable,
 countable, or linkable. Three columns fix that:
 
@@ -315,14 +315,14 @@ An **`open`** row is the Event Storming hot spot, kept in place. The sync
 protocol already said an unsettled rule is recorded as an open question rather
 than captured as fact, but never said where it lived; now it does. An `open` row
 does not block `status: active` — a model can be current and still carry an
-unanswered question — but `build-*` reports it as a decision needed rather than
+unanswered question — but `from-spec-*` reports it as a decision needed rather than
 briefing a rule nobody agreed.
 
 Nothing to re-sync: the generator needs no change, no `type` value is added, and
 `schemaVersion` stays at 4. `### Invariants` is a structural sub-section like
 `### Payload`, so `build.mjs --check` reports the same expected "heading with no
 `meta` block" warning for it. To adopt, move an aggregate's rules out of its
-prose as you next touch it — or run `capture-aggregate`, which now writes the
+prose as you next touch it — or run `to-spec-aggregate`, which now writes the
 table directly from the guard clauses and tests it reads.
 
 ## 0.10.0: linking test cases
@@ -370,7 +370,7 @@ a warning, because nothing can offer to run it. Add one by extending
 Nothing existing breaks if you adopt none of it. To adopt: re-sync
 `.github/tools/knowledge-meta/` from this plugin, add `tests` where a chapter has
 tests worth naming, and regenerate — `graph.json` nodes and `index.json` file
-entries carry the field, and `schemaVersion` goes to 4. A `capture-*` pass now
+entries carry the field, and `schemaVersion` goes to 4. A `to-spec-*` pass now
 records the tests it read as `tests` entries, so the fastest way to populate an
 adopted repository is to capture the chapters that already have suites.
 

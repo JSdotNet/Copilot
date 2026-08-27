@@ -1,6 +1,6 @@
 ---
-name: capture-building-block
-description: 'Capture direction, building-block kind: read the implemented module and component structure and write or refresh .arc42/05-building-block-view.md, with its decomposition levels, responsibilities, interfaces, and diagram. Use when: the building block view is missing or stale, projects were added or restructured, the decomposition diagram no longer matches the solution, document the structure we built. Reads source and project structure as evidence and routes the write through orch-arc42-content. DO NOT USE FOR: turning an agreed but unbuilt building-block chapter into work (use build-building-block), or for the deployment, bounded-context, or design-component chapters around it (use the matching capture-* skill).'
+name: to-spec-building-block
+description: 'To-spec direction (capture), building-block kind: read the implemented module and component structure and write or refresh .arc42/05-building-block-view.md, with its decomposition levels, responsibilities, interfaces, and diagram. Use when: the building block view is missing or stale, projects were added or restructured, the decomposition diagram no longer matches the solution, document the structure we built. Reads source and project structure as evidence and routes the write through orch-arc42-content. DO NOT USE FOR: turning an agreed but unbuilt building-block chapter into work (use from-spec-building-block), or for the deployment, bounded-context, or design-component chapters around it (use the matching to-spec-* skill).'
 ---
 
 # Capture the building block view from code
@@ -123,7 +123,7 @@ not copy.
 5. **Reach a verdict.** Compare what the code establishes against what the
    chapter currently says, and land on exactly one of the protocol's five
    verdicts. `code-ahead` is the case this skill exists for. On `spec-ahead`,
-   stop and hand the scope to `build-building-block`. On `conflict`, stop and
+   stop and hand the scope to `from-spec-building-block`. On `conflict`, stop and
    ask; never resolve it by overwriting the chapter.
 
 6. **Draft the chapter.** Write to the template in

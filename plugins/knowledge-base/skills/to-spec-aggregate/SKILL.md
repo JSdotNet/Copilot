@@ -1,6 +1,6 @@
 ---
-name: capture-aggregate
-description: 'Capture direction, aggregate kind: read an implemented aggregate whole — the root plus every entity, value object, and enum it owns, the shared value-object and enum groupings, and the domain events it raises — and write or refresh those chapters in .domain/<context>/domain.md. Use when: an aggregate exists in code but has no chapter, the chapter is a stub, sub-chapters are missing or stale, an event is raised with no chapter, the code has grown invariants the chapter never recorded, document the aggregate we built. Reads source and unit tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt aggregate chapter into work (use build-aggregate), or for the domain-service, feature, or bounded-context chapters around it (use the matching capture-* skill).'
+name: to-spec-aggregate
+description: 'To-spec direction (capture), aggregate kind: read an implemented aggregate whole — the root plus every entity, value object, and enum it owns, the shared value-object and enum groupings, and the domain events it raises — and write or refresh those chapters in .domain/<context>/domain.md. Use when: an aggregate exists in code but has no chapter, the chapter is a stub, sub-chapters are missing or stale, an event is raised with no chapter, the code has grown invariants the chapter never recorded, document the aggregate we built. Reads source and unit tests as evidence and routes the write through orch-domain. DO NOT USE FOR: turning an agreed but unbuilt aggregate chapter into work (use from-spec-aggregate), or for the domain-service, feature, or bounded-context chapters around it (use the matching to-spec-* skill).'
 ---
 
 # Capture an aggregate from code
@@ -35,7 +35,7 @@ to decide it differently. So one pass covers:
 **Domain services are not part of this pass.** A domain service coordinates
 across aggregates or holds logic no single root owns — it is defined by *not*
 belonging to one boundary, so folding it into a boundary's pass would be
-backwards. It has its own pair: `capture-domain-service`.
+backwards. It has its own pair: `to-spec-domain-service`.
 
 Read `assets/code-sync-protocol.md` before starting. It carries the counterpart
 resolution ladder, the evidence rules, the five-way drift verdict, the status
@@ -54,9 +54,10 @@ here.
 
 If the repository has no `.domain/` folder, stop and run `knowledge-base-init`
 first for the `.domain` adoption path. If the bounded context folder does not
-exist, that is a `capture-bounded-context` pass, not this one — a context's
-`domain.md`, `features.md`, `model.md`, `dependencies.md`, and `naming.md` are
-created together, and creating only `domain.md` leaves the folder malformed.
+exist, stop — this skill does not create one. A context's `domain.md`,
+`features.md`, `model.md`, `dependencies.md`, and `naming.md` are created
+together by `orch-domain`, and creating only `domain.md` leaves the folder
+malformed.
 
 ## Spec-to-code mapping
 
@@ -145,7 +146,7 @@ Do not describe what a handler does as part of the event's meaning. The event
 says what happened; the handler's behaviour is the handler's own concern.
 
 An event may be raised by a domain service rather than by this root. When it is,
-it belongs to `capture-domain-service` — record it as out of scope and say which
+it belongs to `to-spec-domain-service` — record it as out of scope and say which
 service raises it.
 
 ## Workflow
@@ -217,7 +218,7 @@ service raises it.
    and step 4 gives you `Evidence`: the test selector that asserts the rule, or
    `untested` where a guard clause enforces a rule no test covers. Do not
    collapse several rules into one row to keep the table short. A row is the unit
-   a `build-*` pass quotes and an acceptance check is derived from, so a merged
+   a `from-spec-*` pass quotes and an acceptance check is derived from, so a merged
    row silently merges two acceptance checks into one.
 
    Both of step 4's informative absences land in this table rather than being
@@ -242,7 +243,7 @@ service raises it.
    verdicts **per chapter** — the root and each sub-chapter and event can drift
    independently, and a single verdict for the whole aggregate would hide that.
    `code-ahead` is the case this skill exists for. On `spec-ahead`, stop and
-   hand that chapter's scope to `build-aggregate`. On `conflict` — the chapter
+   hand that chapter's scope to `from-spec-aggregate`. On `conflict` — the chapter
    states an invariant the code does not enforce, or the code enforces one the
    chapter contradicts — stop and ask; never resolve it by overwriting.
 
@@ -343,9 +344,9 @@ service raises it.
 - Do not record an integration event's outward payload as the domain event's
   payload.
 - Do not capture an event raised by a domain service. That is
-  `capture-domain-service` scope.
+  `to-spec-domain-service` scope.
 - Do not add `depends-on` to a `domain.md` chapter.
 - Do not hand-edit files under `_meta/`.
 - Do not extend the pass into `features.md`, `model.md`, `flow.md`, or
-  `dependencies.md` — those are `capture-feature` and `capture-bounded-context`
-  scope.
+  `dependencies.md` — `features.md` is `to-spec-feature` scope, and the rest are
+  out of scope for every skill in this plugin.

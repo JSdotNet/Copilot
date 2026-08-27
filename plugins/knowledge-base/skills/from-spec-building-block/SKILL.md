@@ -1,6 +1,7 @@
 ---
-name: build-building-block
-description: 'Build direction, building-block kind: turn an agreed but unbuilt structure in .arc42/05-building-block-view.md into a change brief plus a change category, then stop. Use when: the building block view describes a module that does not exist, the agreed decomposition does not match the solution, a dependency direction violates the documented structure, build the structure we agreed. Emits outcomes, invariants, ubiquitous language, out-of-scope, and acceptance checks; never edits source or test trees. DO NOT USE FOR: writing a chapter from a building-block that already exists in code (use capture-building-block), or for the deployment, bounded-context, or design-component chapters around it (use the matching build-* skill).'
+name: from-spec-building-block
+description: 'From-spec direction (build), building-block kind: turn an agreed but unbuilt structure in .arc42/05-building-block-view.md into a change brief plus a change category, then stop.'
+disable-model-invocation: true
 ---
 
 # Build the building block view in code
@@ -97,7 +98,7 @@ Where the change is a move or a split rather than an addition, the category is
 
 5. **Reach a verdict.** Land on exactly one of the protocol's five verdicts.
    `spec-ahead` is the case this skill exists for. On `aligned`, stop and say
-   so. On `code-ahead`, stop and hand the scope to `capture-building-block`; the
+   so. On `code-ahead`, stop and hand the scope to `to-spec-building-block`; the
    chapter is stale, not unbuilt. On `conflict`, stop and ask — a conflict never
    becomes a `defect` brief on this skill's own authority.
 
@@ -163,6 +164,7 @@ Where the change is a move or a split rather than an addition, the category is
 - Do not brief "extract the module" without listing the current locations.
 - Do not choose the project layout, the folder names, or the refactoring order.
   The brief states the target structure and the checks.
-- Do not brief deployment topology. That is `build-deployment` scope.
+- Do not brief deployment topology. No skill in this plugin covers it; route it
+  through `orch-arc42-content`.
 - Do not brief package or version changes. Those go through the repository
   package-update workflow and are recorded in `.tech`.
