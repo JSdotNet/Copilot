@@ -14,22 +14,12 @@ Concise decision guide and troubleshooting checklist for authoring customization
 | Canvas extension | `.github/extensions/<name>/extension.mjs` | You need an interactive side-panel surface the agent can open and drive with actions | Copilot only |
 | GitHub Actions workflow | `.github/workflows/*.yml` | You need CI/CD automation triggered by repository events, schedules, or manual dispatch | n/a |
 
-## Dual-Host Cheat Sheet
+## Dual-Host Rules
 
 Plugin assets in this repository load in both GitHub Copilot and Claude Code from one copy.
-
-| Rule | Why |
-|---|---|
-| Never pin `model` in an agent | Claude refuses to load an agent whose model id it does not recognise |
-| Author `tools` as Copilot ids only | `Sync-ClaudePlugins.ps1` appends the Claude equivalents; hand-added ones are reverted |
-| Give every agent a `name` | Required by Claude, honoured by Copilot |
-| Document handoff targets in the body | Claude ignores the `handoffs` key |
-| Reference instruction files by path | Claude does not auto-apply `applyTo` |
-| Keep host-specific tool names out of skill prose | Describe the action, not the tool |
-| Hooks may only use `type: "prompt"` | The only hook type with a cross-host translation |
-| Run the sync script before committing | CI fails on drift between the two manifests |
-
-Full rules: `docs/copilot/claude-code-compatibility.md`.
+The rules, the generated-file list, and the tool translation table are in
+[Claude Code Compatibility](../../../docs/copilot/claude-code-compatibility.md), and the
+always-on summary is in this plugin's `hooks.json` `sessionStart` prompt.
 
 ## Troubleshooting: Asset Not Being Picked Up
 

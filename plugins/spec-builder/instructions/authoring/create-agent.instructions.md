@@ -10,29 +10,24 @@ description: Dedicated rules for creating and refining GitHub Copilot agent file
 - Define a consistent standard for agent authoring.
 - Ensure agent files are discoverable, maintainable, and safe.
 
-## Required Structure
+## Minimum Structure
 
-1. YAML frontmatter with `name` and `description`.
-2. Title with agent name.
-3. Purpose section.
-4. Expected behavior section.
-5. Constraints and priorities section.
-6. References section.
-7. Custom instructions section when needed.
+Required: YAML frontmatter with `name` and `description`, a title, and a purpose section.
+
+Add expected behavior, constraints, references, and custom instruction sections when the
+agent needs them. An empty or restating section is a section to delete.
 
 ## Rules
 
-- Agent files must be written in English.
-- Do not pin `model`. Agent files load in both Copilot and Claude Code, and neither host
-  accepts the other's model ids — a pin breaks the agent on one of them. Record the model
-  preference in a `## Model` section in the body instead.
-- Author `tools` as Copilot tool ids only; `scripts/Sync-ClaudePlugins.ps1` appends the
-  Claude equivalents. Hand-added Claude entries are reverted on the next run.
-- Keep scope explicit and avoid broad, ambiguous responsibilities.
-- Document every `handoffs` target in the body. Claude ignores the `handoffs` key and
-  delegates from the prose.
-- Define handoff behavior only when needed and require explicit approval.
-- Do not embed runtime application code implementation guidance.
+- Keep scope explicit and responsibilities narrow.
+- Record the model preference in a `## Model` body section; leave `model` out of frontmatter.
+- Author `tools` as Copilot tool ids only; the sync script appends the Claude equivalents.
+- Describe every `handoffs` target in the body, and require explicit approval for each.
+- Leave runtime application code guidance to the plugin that owns that code.
+- Follow [spec-conciseness.instructions.md](spec-conciseness.instructions.md) for pruning and
+  the 80-line body budget.
+- The dual-host rules behind the `model`, `tools`, and `handoffs` items above are in
+  [Claude Code Compatibility](../../../../docs/copilot/claude-code-compatibility.md).
 
 ## Validation Checklist
 
@@ -42,4 +37,4 @@ description: Dedicated rules for creating and refining GitHub Copilot agent file
 - [ ] `pwsh ./scripts/Sync-ClaudePlugins.ps1 -Check` passes.
 - [ ] Role, scope, and constraints are explicit.
 - [ ] References point to existing files.
-- [ ] No conflicting instructions are present.
+- [ ] Every line changes behavior versus the model default, and no meaning appears twice.

@@ -11,6 +11,9 @@ description: Dedicated rules for creating and refining Copilot canvas extensions
 - Ensure canvas extensions are discoverable, reloadable, and safe to run locally.
 - Keep project-wide plugin composition conventions in `create-plugin.instructions.md` instead of duplicating them here.
 
+Over the 60-line budget by design: the Copilot CLI extension API contract below is reference
+the author cannot look up in the repository.
+
 ## When To Apply
 
 - Apply when a request asks to create or evolve a canvas (an `open_canvas` / `invoke_canvas_action` surface), not a plain tool or hook extension.
@@ -72,7 +75,8 @@ a canvas cannot be made dual-host — unlike every other asset type this plugin 
 - Keep `description` fields action-oriented and specific enough for the agent to choose the right action.
 - Key all per-instance state (servers, sessions, caches) by `ctx.instanceId`, never by canvas `id` alone.
 - Always release resources in `onClose`; do not rely on process exit for cleanup.
-- Keep canvas extensions self-contained; avoid hard dependencies on other plugins' tools.
+- Keep canvas extensions self-contained, depending only on their own assets.
+- Follow [spec-conciseness.instructions.md](spec-conciseness.instructions.md) for pruning.
 
 ## Validation Checklist
 
@@ -83,4 +87,4 @@ a canvas cannot be made dual-host — unlike every other asset type this plugin 
 - [ ] No `console.log()` calls; `session.log()` used for user-facing messages.
 - [ ] Any local server binds to `127.0.0.1` with an OS-assigned port.
 - [ ] `extensions_reload` was run and `extensions_manage` (`list`/`inspect`) confirms the extension loaded successfully.
-- [ ] Documentation is fully in English.
+- [ ] Every line changes behavior versus the model default, and no meaning appears twice.
