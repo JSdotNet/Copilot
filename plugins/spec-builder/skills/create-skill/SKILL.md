@@ -1,13 +1,9 @@
 ---
 name: create-skill
-description: Create or refine a focused SKILL.md with clear trigger conditions, workflow steps, and outputs.
+description: Create or refine a focused SKILL.md with clear trigger conditions, workflow steps, and outputs. Use when authoring or reviewing a skill.
 ---
 
 # Create Skill Skill
-
-## Purpose
-
-Use this skill to create or refine reusable Copilot skills.
 
 ## Inputs
 
@@ -18,11 +14,17 @@ Use this skill to create or refine reusable Copilot skills.
 ## Workflow
 
 1. Define one primary workflow for the skill.
-2. Draft frontmatter with discoverable `name` and `description`.
-3. Add sections for purpose, inputs, workflow, and output.
-4. Remove unrelated tasks and ambiguity.
-5. Verify that skill scope is narrow and reusable.
+2. Draft frontmatter with a `name` matching the folder and a `description` that names each
+   distinct case the skill handles.
+3. Draft the workflow steps, then add inputs, outputs, and quality checks only where the
+   steps leave them unclear.
+4. Describe actions rather than host-specific tool names, so both hosts read the skill alike.
+5. Reference instruction and resource files by relative path.
+6. Prune against
+   [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md):
+   40-line budget, no rule stated twice.
 
 ## Output
 
-- A complete `skills/<skill-name>/SKILL.md` file.
+- A `skills/<skill-name>/SKILL.md` file that passes
+  [create-skill.instructions.md](../../instructions/authoring/create-skill.instructions.md).

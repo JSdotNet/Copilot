@@ -42,9 +42,10 @@ description: Dedicated rules for creating and refining GitHub Actions workflow f
 
 ## Rules
 
-- Keep workflow files in English, including comments.
 - Keep each workflow scoped to one clear purpose; split unrelated automation into separate files.
-- Do not introduce runtime application code changes as part of workflow authoring.
+- Leave runtime application code changes to the plugin that owns that code.
+- Follow [spec-conciseness.instructions.md](spec-conciseness.instructions.md) for pruning and
+  the 60-line budget.
 - Reference an approved plan before editing an existing workflow file.
 
 ## Validation Checklist
@@ -56,3 +57,4 @@ description: Dedicated rules for creating and refining GitHub Actions workflow f
 - [ ] Secrets are only referenced via `${{ secrets.* }}` and never logged.
 - [ ] `pull_request_target` usage, if present, has documented justification.
 - [ ] YAML is syntactically valid.
+- [ ] Every line changes behavior versus the model default, and no meaning appears twice.
