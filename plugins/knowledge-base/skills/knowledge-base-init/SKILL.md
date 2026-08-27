@@ -1,6 +1,6 @@
 ---
 name: knowledge-base-init
-description: 'Scaffold the .arc42/.domain/.tech/.design/.backlog knowledge-folder convention into a repository, install the knowledge-meta generator and its CI check, and generate the first derived indexes. Use when: adopting the knowledge folders, bootstrapping documentation structure, adding .arc42 or .domain to a repo. Triggers on: "knowledge base", "knowledge folders", "scaffold .arc42", "scaffold .domain", "set up .tech", "set up .design", "knowledge-meta", "adopt knowledge convention".'
+description: 'Scaffold the .arc42/.domain/.tech/.design/.backlog/.ai knowledge-folder convention into a repository, install the knowledge-meta generator and its CI check, and generate the first derived indexes. Use when: adopting the knowledge folders, bootstrapping documentation structure, adding .arc42 or .domain to a repo. Triggers on: "knowledge base", "knowledge folders", "scaffold .arc42", "scaffold .domain", "set up .tech", "set up .design", "set up .ai", "track AI adoption", "knowledge-meta", "adopt knowledge convention".'
 ---
 
 # Knowledge base init
@@ -24,6 +24,7 @@ content, only fills gaps.
 | `.tech/` | Technology graph: platforms, runtimes, frameworks, versions | The stack has layers or versions worth tracking |
 | `.design/` | UX and visual design guidelines and tokens | The product has a user interface |
 | `.backlog/` | Durable work-item chapters | Work is planned as Markdown, not only in a tracker |
+| `.ai/` | How the team develops with AI, stage by stage, with adoption status | AI is part of how the work gets done and that is worth tracking |
 
 Adopt only what the repository will actually maintain. An empty knowledge folder
 is worse than an absent one — the generator skips folders that do not exist, and
@@ -33,7 +34,7 @@ partial adoption is fully supported.
 
 1. **Confirm scope.** Ask the user which folders to adopt, defaulting to the ones
    the repository plausibly needs based on what is already in it. Do not adopt all
-   five by reflex.
+   six by reflex.
 
 2. **Create the folders.** For each adopted folder create the directory and a
    starting chapter with a valid `meta` block, following the matching instruction
@@ -43,6 +44,18 @@ partial adoption is fully supported.
    - `.tech/` → `knowledge-tech.instructions.md`
    - `.design/` → `knowledge-design.instructions.md`
    - `.backlog/` → `knowledge-backlog.instructions.md`
+   - `.ai/` → `knowledge-ai.instructions.md`
+
+   `.ai/` needs its stage set chosen before anything is written: ask which
+   positions the repository's development flow actually has, create one
+   numbered file per stage, and register them in `adoption-map.md`'s stage
+   table. Do not impose a default flow.
+
+   After creating `.ai/`, confirm git actually tracks it:
+   `git check-ignore -v .ai/adoption-map.md`. A repository that handles Adobe
+   Illustrator files often carries a `*.ai` rule, and that pattern matches the
+   folder itself — the whole knowledge area would be silently ignored. Where it
+   is, add a `!.ai/` negation next to the existing rule.
 
    Every chapter needs a `meta` block; see
    `knowledge-chapter-metadata.instructions.md` for the required fields.

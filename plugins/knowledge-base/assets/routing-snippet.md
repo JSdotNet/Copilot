@@ -19,7 +19,8 @@ policy can name them directly as the entry point for each folder.
 ## Guardrails
 
 - Treat checked-in knowledge folders such as `.arc42/`, `.domain/`, `.tech/`,
-  `.design/`, and `.backlog/` as **task-scoped context**, not baseline context.
+  `.design/`, `.backlog/`, and `.ai/` as **task-scoped context**, not baseline
+  context.
   Load only the relevant chapters after routing to the correct orchestration or
   specialist agent, or when the user explicitly asks for that knowledge.
 - Files under any `_meta/` folder are generated. Never hand-edit them; regenerate
@@ -45,6 +46,11 @@ policy can name them directly as the entry point for each folder.
 - Backlog-writing and issue-writing workflows may load `.backlog/`, but should
   load only the relevant work-item chapters. Route `.backlog/` edits through
   `orch-backlog`.
+- Workflows about how the team works with AI — adopting a tool into the flow,
+  changing a practice, reviewing adoption — may load `.ai/`, but should load
+  `adoption-map.md` plus only the stage file(s) in scope. Route `.ai/` edits
+  through `orch-ai`. Agents do not read `.ai/` to decide how to do their own
+  current task: it records a way of working, it does not instruct one.
 - Non-architecture implementation, bug-fix, package-update, documentation, and UX
   flows should not load `.arc42/` by default. Consult it only when the user
   explicitly asks for architecture context or when implementation depends on a
@@ -55,7 +61,8 @@ policy can name them directly as the entry point for each folder.
 
 ```markdown
 Checked-in knowledge folders are **task-scoped local fallbacks**, not default
-context. Load `.arc42/`, `.domain/`, `.backlog/`, `.tech/`, or `.design/` only
+context. Load `.arc42/`, `.domain/`, `.backlog/`, `.tech/`, `.design/`, or
+`.ai/` only
 when the selected orchestration or specialist agent needs that knowledge, and
 then prefer only the relevant chapter(s) over whole-folder reads.
 ```

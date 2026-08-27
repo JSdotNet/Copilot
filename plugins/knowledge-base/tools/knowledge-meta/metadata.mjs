@@ -1,7 +1,7 @@
 // metadata.mjs — parsing and validation for the chapter/file `meta` YAML
 // blocks defined in knowledge-chapter-metadata.instructions.md.
 //
-// The schema used across .domain/.arc42/.backlog/.tech/.design is intentionally small and
+// The schema used across .domain/.arc42/.backlog/.tech/.design/.ai is intentionally small and
 // flat (single-line scalars, null, or bracket lists), so we parse it with a
 // tiny hand-written reader instead of pulling in a YAML dependency.
 
@@ -11,6 +11,10 @@ const STATUS_BY_FOLDER = {
     backlog: ["draft", "ready", "in-progress", "done", "blocked"],
     tech: ["candidate", "trial", "adopted", "hold", "retired"],
     design: ["draft", "active", "deprecated"],
+    // `.ai` deliberately reuses `.tech`'s ladder: a reader learns one
+    // adoption vocabulary. What is on the ladder differs — `.tech` rates a
+    // technology, `.ai` rates a way of working with one.
+    ai: ["candidate", "trial", "adopted", "hold", "retired"],
 };
 
 // Allowed `type` values per folder, split by block level. `type` records *what
@@ -54,6 +58,21 @@ const TYPE_BY_FOLDER = {
             "format",
         ],
         file: [],
+    },
+    ai: {
+        chapter: [
+            "practice",
+            "agent",
+            "skill",
+            "plugin",
+            "mcp-server",
+            "hook",
+            "workflow",
+            "model",
+            "concept",
+            "guardrail",
+        ],
+        file: ["adoption-map", "stage", "concepts"],
     },
     arc42: { chapter: [], file: [] },
     backlog: { chapter: [], file: [] },
@@ -133,7 +152,7 @@ const TEST_RUNNERS = {
 // A `tests` entry that starts like a knowledge path is a chapter reference
 // pasted into a field that takes test identifiers. Worth its own message,
 // because the author's intent is obvious and the fix is to move it to `related`.
-const KNOWLEDGE_PATH_PREFIX = /^\.(?:domain|arc42|backlog|tech|design)\//;
+const KNOWLEDGE_PATH_PREFIX = /^\.(?:domain|arc42|backlog|tech|design|ai)\//;
 
 // Fields that steer how this document appears in the generated outline, and so
 // describe the document's place in its directory rather than a chapter inside
@@ -177,6 +196,7 @@ const FOLDER_EXTRA_FIELDS = {
     backlog: ["depends-on", "implements"],
     tech: ["kind", "version", "depends-on", "alternatives"],
     design: [],
+    ai: ["depends-on", "stage"],
 };
 
 /** Determine which knowledge folder a repo-relative path belongs to. */
@@ -187,6 +207,7 @@ export function folderKindForPath(relPath) {
     if (normalized.startsWith(".backlog/")) return "backlog";
     if (normalized.startsWith(".tech/")) return "tech";
     if (normalized.startsWith(".design/")) return "design";
+    if (normalized.startsWith(".ai/")) return "ai";
     return null;
 }
 
@@ -776,7 +797,7 @@ export function validateDocument(relPath, markdown) {
     if (!kind) {
         issues.push({
             severity: "info",
-            message: `${relPath} is not under .domain/, .arc42/, .backlog/, .tech/, or .design/ — no metadata rules apply.`,
+            message: `${relPath} is not under .domain/, .arc42/, .backlog/, .tech/, .design/, or .ai/ — no metadata rules apply.`,
         });
         return issues;
     }
@@ -861,6 +882,21 @@ export function validateDocument(relPath, markdown) {
                     severity: "error",
                     message: `${label} has \`effort\` "${Array.isArray(raw) ? raw.join(", ") : raw}" — effort is a story-point estimate and must be a single non-negative integer.`,
                 });
+            }
+        }
+
+        // `.ai` chapters outside a stage file say which stage of the flow they
+        // apply at. Like `roadmap`, the entries are slugs naming something in
+        // the consuming repository — here its own stage files — so only the
+        // shape is checked, never the vocabulary.
+        if (kind === "ai" && chapter.meta.stage != null) {
+            for (const slug of toList(chapter.meta.stage)) {
+                if (!ROADMAP_TAG_PATTERN.test(slug)) {
+                    issues.push({
+                        severity: "warning",
+                        message: `${label} has \`stage\` entry "${slug}" — a stage is a lowercase kebab-case slug naming one of this repository's \`.ai\` stage files, not a path or free text.`,
+                    });
+                }
             }
         }
 

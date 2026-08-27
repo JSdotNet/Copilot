@@ -1,7 +1,7 @@
 # Knowledge metadata tooling
 
 Derives machine-readable indexes from the `meta` blocks embedded in
-`.arc42/`, `.domain/`, `.backlog/`, `.tech/`, and `.design/`:
+`.arc42/`, `.domain/`, `.backlog/`, `.tech/`, `.design/`, and `.ai/`:
 
 - **`graph.json`** — the reference graph between chapters and files.
 - **`index.json`** — the ordered reading outline of each area.
@@ -76,6 +76,7 @@ Two artifacts per adopted scope, each co-located with what it describes:
 | `.backlog/_meta/*.json` | `.backlog` only |
 | `.tech/_meta/*.json` | `.tech` only |
 | `.design/_meta/*.json` | `.design` only |
+| `.ai/_meta/*.json` | `.ai` only |
 
 A scoped graph contains every node in its folder, plus any node **outside** it
 that an in-scope node references. Those boundary nodes are flagged
@@ -150,9 +151,9 @@ Two different questions, two different keys:
 The authored field is called `type` in Markdown but lands on the node as
 `kind`, because `type` was already the structural discriminator and renaming it
 would break every existing consumer. `.tech` nodes have always carried `kind`;
-the unification means every folder that defines a value set now populates it.
-Nodes in `.arc42`, `.backlog`, and `.design` carry no `kind`, because those
-folders deliberately define no value set.
+the unification means every folder that defines a value set now populates it —
+`.domain`, `.tech`, and `.ai`. Nodes in `.arc42`, `.backlog`, and `.design`
+carry no `kind`, because those folders deliberately define no value set.
 
 ### Node types
 
@@ -198,10 +199,10 @@ fallback does not render as `Context Map (context-map)`.
 | `implements` | The `implements` metadata field (`.backlog`). |
 
 `aliases` (`.domain`), `alternatives` (`.tech`), `feature-flag` (`.domain`),
-and `roadmap` and `tests` (every folder) are plain-string fields, not
-references, so they stay node attributes and produce no edges. `feature-flag`,
-`roadmap`, and `tests` accept a scalar or a list but are always emitted as a
-list, so a consumer never has to branch on shape. `effort` is emitted as a number rather than the authored
+`stage` (`.ai`), and `roadmap` and `tests` (every folder) are plain-string
+fields, not references, so they stay node attributes and produce no edges.
+`feature-flag`, `roadmap`, `stage`, and `tests` accept a scalar or a list but
+are always emitted as a list, so a consumer never has to branch on shape. `effort` is emitted as a number rather than the authored
 string, so a viewer can total or threshold it directly; a value that is not a
 non-negative integer is left off the node and reported as a lint error instead.
 

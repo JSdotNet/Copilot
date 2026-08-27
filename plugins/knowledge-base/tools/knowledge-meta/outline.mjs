@@ -8,10 +8,10 @@
 //   1. The directory's *root document* sorts first — the file declaring
 //      `index: root`, or failing that the entry point its folder convention
 //      names (`.domain/context-map.md`, a bounded context's `domain.md`,
-//      `.tech/technology-graph.md`, `.design/README.md`).
+//      `.tech/technology-graph.md`, `.design/README.md`, `.ai/adoption-map.md`).
 //   2. If anything left carries a **number** — from a `number` field or from a
 //      numbered filename — the directory is a numbered set (arc42 chapters,
-//      ADRs, TDRs) and sorts by that number ascending, unnumbered entries
+//      ADRs, TDRs, `.ai` stage files) and sorts by that number ascending, unnumbered entries
 //      filename-sorted after them.
 //   3. Otherwise the remaining prescribed files follow in the sequence that
 //      folder's own instructions file documents in its structure block, with
@@ -70,6 +70,10 @@ const DIRECTORY_CONVENTION = {
         last: [],
     },
     ".tech": { root: "technology-graph.md", first: ["shared.md"], last: ["tooling.md"] },
+    // `.ai` needs no `first`/`last`: its stage files are numbered, so the
+    // numbered branch orders the flow and leaves `concepts.md` filename-sorted
+    // after it — map, then the flow in order, then the ideas underneath it.
+    ".ai": { root: "adoption-map.md", first: [], last: [] },
     ".design": {
         root: "README.md",
         first: [

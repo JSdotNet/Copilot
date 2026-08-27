@@ -1,5 +1,5 @@
 // graph.mjs — derives the cross-folder knowledge graph from the `meta` blocks
-// embedded in .arc42/, .domain/, .backlog/, .tech/, and .design/.
+// embedded in .arc42/, .domain/, .backlog/, .tech/, .design/, and .ai/.
 //
 // Markdown stays canonical; this produces the *derived* index. Output shape is
 // Cytoscape.js `elements` JSON, which most graph libraries consume natively or
@@ -24,7 +24,7 @@ import {
 } from "./metadata.mjs";
 
 /** Every knowledge folder this convention recognizes. A repository adopts any subset. */
-export const KNOWLEDGE_FOLDERS = [".arc42", ".domain", ".backlog", ".tech", ".design"];
+export const KNOWLEDGE_FOLDERS = [".arc42", ".domain", ".backlog", ".tech", ".design", ".ai"];
 // Shared by both artifacts, because they ship as one release. Version 4 is
 // additive over 3: both artifacts gained an optional `tests` field carrying the
 // `<level>:<runner>:<selector>` test identifiers a chapter or file declares.
@@ -34,7 +34,7 @@ export const GENERATOR = ".github/tools/knowledge-meta/build.mjs";
 
 // Metadata fields that hold `<path>` / `<path>#<slug>` references, and the edge
 // type each one produces. Non-reference list fields (`aliases`, `alternatives`,
-// `feature-flag`, `roadmap`) are deliberately absent — they stay node attributes.
+// `feature-flag`, `roadmap`, `stage`) are deliberately absent — they stay node attributes.
 const REFERENCE_FIELDS = {
     "depends-on": "depends-on",
     related: "related",
@@ -53,8 +53,8 @@ const ATTRIBUTE_FIELDS = ["version", "issue", "aliases", "alternatives", "date"]
 //
 // `tests` is here rather than in REFERENCE_FIELDS because a test identifier
 // names something in a test project, not a chapter, so it produces no edge — the
-// same reason `feature-flag` and `roadmap` stay attributes.
-const LIST_ATTRIBUTE_FIELDS = ["feature-flag", "roadmap", "tests"];
+// same reason `feature-flag`, `roadmap`, and `.ai`'s `stage` stay attributes.
+const LIST_ATTRIBUTE_FIELDS = ["feature-flag", "roadmap", "stage", "tests"];
 
 // Fields authored as an integer scalar. The parser hands back the raw string,
 // so they are coerced here and a viewer can sum or threshold them directly.
