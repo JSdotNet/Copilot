@@ -1,7 +1,7 @@
 {
   "name": "copilot-app",
   "description": "GitHub Copilot App plugin for orchestration workflows, pull request handoff, and scheduled automation with canvas-based progress reporting.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "Job Schepers"
   },

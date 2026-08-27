@@ -1,6 +1,6 @@
 {
   "name": "fincent",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Copilot plugin for Fincent project story review, dev, domain alignment, story point estimation, PR review, PR remark resolution, sprint reporting, and demo presentation workflows.",
   "author": {
     "name": "Job Schepers"

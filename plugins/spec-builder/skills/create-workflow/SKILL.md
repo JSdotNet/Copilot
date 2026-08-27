@@ -5,10 +5,6 @@ description: Create or refine a GitHub Actions workflow file with secure, minima
 
 # Create Workflow Skill
 
-## Purpose
-
-Use this skill to create or refine `.github/workflows/*.yml` files as part of the spec plan/build/review sequence.
-
 ## Inputs
 
 - Workflow purpose and trigger events (push, pull_request, schedule, workflow_dispatch, etc.).
@@ -21,7 +17,10 @@ Use this skill to create or refine `.github/workflows/*.yml` files as part of th
 2. Draft `name`, `on`, workflow-level `permissions`, and `jobs` sections.
 3. Pin every action reference to a full commit SHA with a version comment.
 4. Add `concurrency`, `workflow_dispatch`, and `outputs` only where they serve the stated purpose.
-5. Validate the file against `../../instructions/authoring/create-workflow.instructions.md`.
+5. Validate the file against
+   [create-workflow.instructions.md](../../instructions/authoring/create-workflow.instructions.md)
+   and prune against
+   [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md).
 
 ## Output
 

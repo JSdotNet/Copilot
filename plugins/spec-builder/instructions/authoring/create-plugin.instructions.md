@@ -7,10 +7,11 @@ description: Dedicated rules for creating and refining Copilot plugin package as
 
 ## Purpose
 
-- Standardize plugin-style Copilot customization bundle composition.
-- Ensure plugins are installable via Copilot CLI and maintainable over time.
-- Keep plugin assets modular, discoverable, and maintainable.
-- Keep project-wide naming/grouping conventions in root `.github/instructions/` files instead of duplicating them here.
+- Standardize plugin bundle composition so plugins stay installable and maintainable.
+- Keep plugin assets modular and discoverable.
+
+Over the 60-line budget by design: the Copilot CLI manifest contract below is reference the
+author cannot look up in the repository.
 
 ## When To Apply
 
@@ -19,18 +20,12 @@ description: Dedicated rules for creating and refining Copilot plugin package as
 
 ## Required Plugin Composition Flow
 
-1. Define plugin intent:
-   - Name, target audience, and primary outcomes.
-2. Define asset set:
-   - Which agents, skills, hooks, and MCP/LSP configurations are required.
-3. Define resource strategy:
-   - Which reusable templates/checklists/examples should be added as resource files.
-4. Define component paths:
-   - How `plugin.json` maps `agents`, `skills`, `hooks`, and `mcpServers`.
-5. Define maintenance metadata:
-   - Ownership, update triggers, and semantic version notes.
-6. Validate installability:
-   - `copilot plugin install <local-path>` then verify with `copilot plugin list`.
+1. Define plugin intent: name, target audience, and primary outcomes.
+2. Define the asset set: which agents, skills, hooks, and MCP/LSP configurations are required.
+3. Define the resource strategy: which reusable templates and checklists become resource files.
+4. Define component paths: how `plugin.json` maps `agents`, `skills`, `hooks`, `mcpServers`.
+5. Define maintenance metadata: ownership, update triggers, and semantic version notes.
+6. Validate installability: `copilot plugin install <local-path>`, then `copilot plugin list`.
 
 ## Required Files
 
@@ -40,85 +35,48 @@ description: Dedicated rules for creating and refining Copilot plugin package as
 
 ## Mandatory Copilot CLI Requirements
 
-- A plugin must include a manifest in a GitHub-compatible location.
-- For this repository, supported manifest locations include:
-  - `plugin.json`
-  - `.plugin/plugin.json`
-  - `.github/plugin/plugin.json`
-- `plugin.json` must include:
-  - Required: `name` (kebab-case).
-  - Recommended: `description`, `version`, `author`, `license`, `keywords`.
-  - Component paths where used: `agents`, `skills`, `hooks`, `mcpServers`, `lspServers`, `commands`.
-- Component folders should follow CLI defaults unless there is a strong reason to override.
-- Reinstall local plugins after changes because CLI uses cached plugin components.
+- Place the manifest at `plugin.json`, `.plugin/plugin.json`, or `.github/plugin/plugin.json`.
+- `plugin.json` requires `name` (kebab-case) and should carry `description`, `version`,
+  `author`, `license`, and `keywords`.
+- Declare component paths where used: `agents`, `skills`, `hooks`, `mcpServers`, `lspServers`,
+  `commands`. Follow CLI defaults unless there is a strong reason to override.
+- Reinstall local plugins after changes; the CLI caches plugin components.
 
 ## Recommended Asset Layout
 
 - `plugins/<plugin-name>/.github/plugin/plugin.json`
 - `plugins/<plugin-name>/agents/*.agent.md`
 - `plugins/<plugin-name>/skills/<skill-name>/SKILL.md`
-- Optional plugin config files:
-  - `plugins/<plugin-name>/hooks.json`
-  - `plugins/<plugin-name>/.mcp.json`
-  - `plugins/<plugin-name>/lsp.json`
-- Optional marketplace:
-  - `.github/plugin/marketplace.json`
-- Optional plugin overview page:
-  - `.github/plugins/<plugin-name>.md`
-
-## Dual-Host Requirements
-
-Plugins in this repository load in both GitHub Copilot and Claude Code from a single copy of
-every file. Author the Copilot side only; `scripts/Sync-ClaudePlugins.ps1` derives the rest.
-
-- Author `.github/plugin/plugin.json` and `hooks.json`. Never hand-edit the generated
-  `.claude-plugin/plugin.json`, `hooks/hooks.json`, or the repo-root marketplace manifest.
-- Skills, instructions, prompts, resources, and agents are shared verbatim by both hosts and
-  have no generated counterpart.
-- Run `pwsh ./scripts/Sync-ClaudePlugins.ps1` after any manifest, agent, or hook change and
-  commit the regenerated files. CI fails on drift.
-- Hooks may only use `type: "prompt"`; other hook types have no cross-host translation.
-- Declare MCP servers in the Copilot manifest's `mcpServers`; the syntax is compatible and
-  the field is copied through unchanged.
-- A plugin whose core capability is a Copilot CLI canvas extension cannot load in Claude.
-  Add it to `$ExcludedPlugins` in the sync script and state the limitation in its README.
-
-See `docs/copilot/claude-code-compatibility.md` for the full translation rules.
+- Optional config: `hooks.json`, `.mcp.json`, `lsp.json`
+- Optional overview page: `.github/plugins/<plugin-name>.md`
 
 ## Rules
 
-- Use kebab-case plugin `name` and semantic `version`.
-- Keep manifest description aligned with actual scope.
-- Ensure all manifest paths map to existing directories.
-- Keep plugin scope explicit and avoid hidden capabilities.
-- Reinstall plugin after changes for local validation.
+- Use a kebab-case `name` and a semantic `version`.
+- Keep the manifest description aligned with actual scope, and ensure every manifest path
+  maps to an existing directory.
+- Author the Copilot side only — `.github/plugin/plugin.json` and `hooks.json`. The
+  `.claude-plugin/` manifest, `hooks/hooks.json`, and the repo-root marketplace entry are
+  generated by `pwsh ./scripts/Sync-ClaudePlugins.ps1`; run it after any manifest, agent, or
+  hook change, because CI fails on drift. Full rules:
+  [Claude Code Compatibility](../../../../docs/copilot/claude-code-compatibility.md).
+- Follow [spec-conciseness.instructions.md](spec-conciseness.instructions.md) for pruning and
+  the 60-line budget.
 
 ## Resource Rules
 
-- Prefer reusable resources over repeated inline guidance.
-- Keep resources focused and single-purpose.
-- Reference resources by relative path from each consuming skill or agent.
-- Keep examples realistic and safe; do not include secrets.
-- Update resources when process behavior changes.
+- Reference reusable resources by relative path from each consuming skill or agent instead of
+  repeating guidance inline.
+- Keep resources focused and single-purpose, and update them when process behavior changes.
+- Keep examples realistic and free of secrets.
 
 ## Validation Checklist
 
-- [ ] `plugin.json` contains valid JSON.
-- [ ] Required fields are present.
-- [ ] Component paths resolve correctly.
-- [ ] README scope matches manifest scope.
-- [ ] Documentation is fully in English.
+- [ ] Plugin intent and scope are explicit, and README scope matches manifest scope.
+- [ ] `plugin.json` is valid JSON with the required fields present.
+- [ ] Component paths resolve to on-disk directories.
 - [ ] Required assets are enumerated and linked.
-- [ ] Agents and skills reference resources instead of duplicating content when applicable.
-- [ ] Local install test was executed (`copilot plugin install <path>`).
-
-## Quality Checklist
-
-- [ ] Plugin intent and scope are explicit.
-- [ ] `plugin.json` exists and uses valid fields.
-- [ ] Component paths in `plugin.json` match on-disk directories.
-- [ ] Required assets are enumerated and linked.
-- [ ] Agents and skills reference resources instead of duplicating content when applicable.
+- [ ] Agents and skills reference resources instead of duplicating content.
 - [ ] Local install test was executed (`copilot plugin install <path>`).
 - [ ] `pwsh ./scripts/Sync-ClaudePlugins.ps1 -Check` passes.
-- [ ] Documentation is fully in English.
+- [ ] Every line changes behavior versus the model default, and no meaning appears twice.

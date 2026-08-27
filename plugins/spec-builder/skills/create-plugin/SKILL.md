@@ -1,48 +1,36 @@
 ---
 name: create-plugin
-description: Create or refine a Copilot plugin package with valid manifest paths, scope, and documentation.
+description: Create or refine a Copilot plugin package with valid manifest paths, scope, and documentation. Use when adding a plugin, adding components to one, or fixing its manifest.
 ---
 
 # Create Plugin Skill
 
-## Purpose
-
-Use this skill to create or refine installable Copilot plugin package assets.
-
 ## Inputs
 
 - Plugin name, version, and scope.
-- Required components (agents, skills, optional config).
+- Required components (agents, skills, hooks, optional config).
 - Packaging or install constraints.
 
 ## Workflow
 
 1. Define plugin intent and boundaries.
-2. Draft or update `.github/plugin/plugin.json`.
-3. Ensure component paths map to existing folders.
-4. Update plugin `README.md` with install/reinstall guidance.
-5. Verify metadata and scope consistency across files.
-6. Run `pwsh ./scripts/Sync-ClaudePlugins.ps1` to generate the Claude manifest and hooks,
-   then `-Check` to confirm the plugin loads in both hosts.
-
-## Dual-host packaging
-
-Plugins in this repository are authored once for Copilot and also load in Claude Code. Write
-only the Copilot side; the sync script derives the rest.
-
-| Authored | Generated |
-|---|---|
-| `.github/plugin/plugin.json` | `.claude-plugin/plugin.json` |
-| `hooks.json` | `hooks/hooks.json` |
-| — | `.claude-plugin/marketplace.json` (repo root) |
-
-Never hand-edit the generated files. Skills, instructions, prompts, resources, and agents
-are shared verbatim and have no generated counterpart.
-
-A plugin whose core capability is a Copilot CLI canvas extension cannot load in Claude; add
-it to `$ExcludedPlugins` in the sync script and say so in its README.
+2. Draft or update `.github/plugin/plugin.json`, and confirm every component path maps to an
+   existing folder.
+3. Update the plugin `README.md` with install and reinstall guidance.
+4. Verify metadata and scope consistency across the manifest, README, and components.
+5. Prune against
+   [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md):
+   state each rule once and point at its owner from everywhere else.
+6. Run `pwsh ./scripts/Sync-ClaudePlugins.ps1` to generate the Claude manifest, hooks, and
+   marketplace entry, then `-Check` to confirm the plugin loads in both hosts.
 
 ## Output
 
 - Updated plugin package metadata and Markdown documentation.
 - Regenerated Claude manifest, hooks, and marketplace entry.
+
+## References
+
+- [create-plugin.instructions.md](../../instructions/authoring/create-plugin.instructions.md)
+- [Claude Code Compatibility](../../../../docs/copilot/claude-code-compatibility.md) — which
+  files are authored, which are generated, and how a Copilot-only plugin is excluded.

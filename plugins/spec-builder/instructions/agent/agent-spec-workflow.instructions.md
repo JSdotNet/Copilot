@@ -12,27 +12,25 @@ description: Defines the single-agent authoring workflow for GitHub customizatio
 
 ## Required Sequence
 
-1. Scope — determine asset type, target files, and acceptance criteria.
-2. Plan — present ordered changes with file targets and confirm non-trivial scope.
-3. Build — apply changes using the matching `create-*` skill.
-4. Verify — check frontmatter, naming, structure, references, and instruction compliance.
-5. Report — summarize changed files, findings, and unresolved items.
+Scope, Plan, Build, Verify, Report — in that order, as expanded in the agent's `## Workflow`
+section in [spec-builder.agent.md](../../agents/spec-builder.agent.md).
 
 ## Role Boundaries
 
 - `spec-builder.agent.md` owns planning, execution, and verification.
-- Asset-specific rules stay in `instructions/authoring/*.instructions.md` and the `create-*` skills.
-- Do not add planning-only or review-only agents to this plugin.
+- Asset-specific rules stay in `instructions/authoring/*.instructions.md` and the `create-*`
+  skills.
+- Keep this plugin to one agent; route planning-only or review-only work through its phases.
 
 ## Tool Policy
 
-- The agent may include read, search, and edit tools required to author assets.
+- The agent may include the read, search, and edit tools required to author assets.
 - Canvas work requires `extensions_manage` and `extensions_reload`.
 
 ## Handoff Policy
 
-- Handoff to another plugin's agent is optional and only when the request leaves customization authoring scope.
-- Every handoff requires explicit user approval using the wording:
+- Hand off to another plugin's agent only when the request leaves customization authoring
+  scope, and only with explicit user approval using the wording:
   - "I recommend handing this off to `<agent>` because `<reason>`. Do you approve this handoff?"
 
 ## Validation Checklist
@@ -42,3 +40,4 @@ description: Defines the single-agent authoring workflow for GitHub customizatio
 - [ ] The five workflow phases are followed in order.
 - [ ] Changed file paths are reported.
 - [ ] Any cross-plugin handoff is approval-gated.
+- [ ] Every line changes behavior versus the model default, and no meaning appears twice.

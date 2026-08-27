@@ -1,5 +1,5 @@
 ---
-name: automation: story point estimation
+name: automation-story-point-estimation
 description: 'Automated story point estimation for Fincent. Queries all stories in a given Jira status and runs the story-point-estimation skill on each unestimated story. Produces a consolidated estimation report.'
 disable-model-invocation: true
 ---

@@ -1,5 +1,5 @@
 ---
-name: automation: story review — product owner
+name: automation-story-review-po
 description: 'Automated Product Owner story review for Fincent. Queries all stories in a given Jira status, applies the Fincent DOR to each, and produces a consolidated readiness report. Use before backlog refinement to surface and fix story quality issues automatically.'
 disable-model-invocation: true
 ---

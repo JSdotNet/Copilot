@@ -22,6 +22,7 @@ Claude Code from a single copy of every file.
   - `instructions/authoring/create-skill.instructions.md`
   - `instructions/authoring/create-canvas.instructions.md`
   - `instructions/authoring/create-workflow.instructions.md`
+  - `instructions/authoring/spec-conciseness.instructions.md`
 - Resources:
   - `resources/quick-reference.md`
 - Hooks:
@@ -38,28 +39,15 @@ Claude Code from a single copy of every file.
 ## Dual-Host Authoring
 
 Every asset this plugin produces is authored once and read by both GitHub Copilot and Claude
-Code. The `create-*` skills and their authoring instructions enforce the rules; the short
-version:
-
-| Rule | Why |
-|---|---|
-| Never pin `model` in an agent | Claude refuses to load an agent whose model id it does not recognise |
-| Author `tools` as Copilot ids only | `Sync-ClaudePlugins.ps1` appends the Claude equivalents |
-| Give every agent a `name` | Required by Claude, honoured by Copilot |
-| Document handoff targets in the body | Claude ignores the `handoffs` key |
-| Reference instruction files by path | Claude does not auto-apply `applyTo` |
-| Hooks may only use `type: "prompt"` | The only hook type with a cross-host translation |
-
-Edit `.github/plugin/plugin.json` and `hooks.json`; the `.claude-plugin/` and `hooks/`
-counterparts are generated. Run the sync script before committing — CI fails on drift:
+Code. Author the Copilot side; `.claude-plugin/` and `hooks/` are generated. Run the sync
+script before committing — CI fails on drift:
 
 ```bash
 pwsh ./scripts/Sync-ClaudePlugins.ps1
 ```
 
-Canvas extensions are the one Copilot-only asset type; they have no Claude counterpart.
-
-Full rules: [Claude Code Compatibility](../../docs/copilot/claude-code-compatibility.md).
+Canvas extensions are the one Copilot-only asset type. Full rules:
+[Claude Code Compatibility](../../docs/copilot/claude-code-compatibility.md).
 
 ## Install
 

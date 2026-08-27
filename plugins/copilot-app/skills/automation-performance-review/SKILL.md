@@ -1,5 +1,5 @@
 ---
-name: automation: performance-review
+name: automation-performance-review
 description: 'Identify 10 performance improvements across the codebase, score each by impact and effort, then implement and open a PR for the single highest-impact, lowest-effort finding.'
 disable-model-invocation: true
 ---
