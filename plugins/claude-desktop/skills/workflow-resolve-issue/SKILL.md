@@ -35,9 +35,11 @@ worktree you resume in one command.
 
 ## Running as a Sweep Worker
 
-`workflow-issue-sweep` spawns this skill as a worker session, one per issue. A worker session
-starts fresh with no memory of the sweep, so everything it needs arrives in its prompt: the
-repository, the issue number, the base branch, the worktree root, and the **sweep directory**.
+`workflow-issue-sweep` dispatches this skill as a worker session, one per issue — an
+independent `claude --bg` session launched the instant the issue is marked, never a scheduled
+task. A worker session starts fresh with no memory of the sweep, so everything it needs
+arrives in its prompt: the repository, the issue number, the base branch, the worktree root,
+and the **sweep directory**.
 
 When a sweep directory is given, this skill additionally writes
 `<sweep dir>/workers/<number>.json` as its last act, on **every** outcome — see the **Issue
