@@ -136,16 +136,81 @@ automatically. Naming it in the manifest too makes the plugin fail to load with
 
 ### Hooks
 
-Semantics survive intact, because Claude Code also supports `type: "prompt"` hooks. Only the
-nesting and the event casing change:
+For most events only the nesting and the event casing change, because Claude Code also
+supports `type: "prompt"` hooks:
 
 ```jsonc
 // Copilot                              // Claude Code
 {"version":1,"hooks":{                  {"hooks":{
-  "sessionStart":[                        "SessionStart":[
+  "preToolUse":[                          "PreToolUse":[
     {"type":"prompt","prompt":"..."}        {"hooks":[{"type":"prompt","prompt":"..."}]}
   ]}}                                     ]}}
 ```
+
+**`sessionStart` is the exception, and it is the important one.** A prompt hook runs by
+issuing a sub-prompt into the conversation, and at session start there is no conversation
+yet, so Claude Code refuses it:
+
+```text
+Failed to run: prompt-type hooks are not supported for SessionStart events
+(no conversation context is available). Use a command-type hook instead.
+```
+
+It is recorded as a *non-blocking* hook error. Nothing surfaces in the UI, the session starts
+normally, and the guidance is simply absent — which is how every plugin in this repository
+shipped a dead session-start hook for its whole history.
+
+So `sessionStart` translates to a **command** hook plus two generated siblings:
+
+| Generated file | Contents |
+| --- | --- |
+| `hooks/session-start-context.md` | the authored prompt text, verbatim |
+| `hooks/emit-session-context.mjs` | reads that file, prints the hook JSON envelope |
+| `hooks/hooks.json` | `{"type":"command","command":"node \"${CLAUDE_PLUGIN_ROOT}/hooks/emit-session-context.mjs\""}` |
+
+The emitter returns the text as `hookSpecificOutput.additionalContext`, which Claude injects
+into the new session. Plain stdout is injected too, but the envelope states the intent, so the
+generator uses it. Keeping the prose in a sidecar rather than inside the command string keeps
+it out of shell quoting and keeps the diff readable. Requires Node on the host; Claude Code
+already runs on it.
+
+Two consequences for authoring:
+
+- Several `sessionStart` prompts in one Copilot `hooks.json` collapse into one sidecar,
+  separated by a blank line. They are context, not separate turns, so nothing is lost.
+- Dropping the last `sessionStart` prompt deletes the sidecar and emitter as well; otherwise
+  the plugin would keep injecting guidance nobody authored any more.
+
+`sessionEnd` prompt hooks are a lesser trap: Claude runs them only in the interactive REPL and
+reports `Prompt stop hooks are not yet supported outside REPL` in a headless run. The
+generator translates them but warns. `userPromptSubmit`, `preToolUse`, `postToolUse`, and
+`stop` all accept prompt hooks and pass through unchanged.
+
+#### Which host reads which file
+
+Hook discovery differs between the hosts, and the difference is load-bearing:
+
+| File | Claude Code | Copilot CLI |
+| --- | --- | --- |
+| `plugins/<name>/hooks.json` (root) | **ignored** | loaded |
+| `plugins/<name>/hooks/hooks.json` | loaded | loaded **only if the root file is absent** |
+
+Two consequences:
+
+- The generated `hooks/` tree is invisible to Copilot for every plugin here, because each one
+  has a root `hooks.json` — which is guaranteed by construction, since the generator only
+  writes `hooks/` when the root file exists. Do not rely on Copilot being unable to *parse*
+  the Claude shape: it reads nested groups and PascalCase event names fine, and will run them
+  if it ever reaches the file. Precedence is the whole protection.
+- The split doubles as a way to target one host. A root `hooks.json` reaches Copilot only; a
+  `hooks/hooks.json` reaches Claude only. `claude-desktop` uses exactly that to warn a Copilot
+  user that the plugin is Claude-only (see its README), and the warning also suppresses
+  Copilot's fallback so it never tries to run the plugin's `${CLAUDE_PLUGIN_ROOT}` commands.
+
+Copilot also supports `command` hooks on `sessionStart`, so one shape *could* serve both
+hosts. It is not worth it: the prompt hook needs no Node and no sidecar, so the Copilot side
+keeps it. Note that Copilot fires `prompt` hooks only in new interactive sessions — never on
+resume, and never under `-p` — so a `-p` run is not a valid way to test one.
 
 ## Claude-native plugins
 
@@ -153,6 +218,10 @@ One plugin is authored for Claude only: **`claude-desktop`**, the sibling of `co
 Its manifest and hooks are hand-written, nothing under it is generated, and the sync script
 lists it in `$ClaudeNativePlugins` so it still appears in `marketplace.json`. That listing is
 the only thing the generator does for it.
+
+"Claude only" is a statement of intent, not something the hosts enforce: Copilot will load the
+plugin from `.claude-plugin/plugin.json` and surface its skills if a user points `--plugin-dir`
+at it. Its root `hooks.json` exists to say so in that case — see the file table above.
 
 It ships twice from one implementation: as a Claude Code plugin, and as a **Claude Desktop
 extension** (`.mcpb`) built by `scripts/Build-DesktopExtension.ps1`. On the Desktop side the

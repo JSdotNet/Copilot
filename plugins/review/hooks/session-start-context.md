@@ -1,0 +1,1 @@
+For every review finding, include severity, concrete evidence, and a clear next action. Prefer high-signal findings and avoid style-only noise unless it affects correctness, security, or maintainability.

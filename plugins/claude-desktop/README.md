@@ -87,9 +87,20 @@ Practical consequences:
 
 ### Hooks
 
-- `hooks/hooks.json` — a `SessionStart` prompt hook that routes governed task categories to
+- `hooks/hooks.json` — a `SessionStart` command hook that routes governed task categories to
   the matching `orch-*` skill in every session where the plugin is installed, plus the
   command hooks that feed dashboard telemetry.
+- `hooks/session-start-context.md` and `hooks/emit-session-context.mjs` — the routing text and
+  the emitter that hands it to Claude as `additionalContext`. A `prompt` hook cannot do this
+  job: Claude Code rejects prompt hooks on `SessionStart` and records the refusal as a
+  non-blocking error, so the guidance would vanish silently. See
+  [Claude Code Compatibility](../../docs/copilot/claude-code-compatibility.md).
+- `hooks.json` (plugin root) — a Copilot-only guard. Claude Code ignores a plugin's root
+  `hooks.json` and reads `hooks/hooks.json`; Copilot reads the root file and falls back to
+  `hooks/` only when it is absent. So this file reaches Copilot alone, where it says the plugin
+  is Claude-only and points at `copilot-app` instead. It also stops Copilot falling back to
+  `hooks/hooks.json`, whose `${CLAUDE_PLUGIN_ROOT}` commands would otherwise fail there
+  silently. Nothing in it is generated.
 
 ### Agent
 
@@ -253,7 +264,7 @@ personal model override lives outside the repository, and the repo-side files ar
 
 ### 1. Plugin-Global Routing and Soft Enforcement (Automatic)
 
-The `SessionStart` prompt hook tells every session which `orch-*` skill owns which task
+The `SessionStart` command hook tells every session which `orch-*` skill owns which task
 category, which specialist agent to fall back to when a skill is unavailable, and that
 choosing **not** to use an orchestration for one of those categories must be stated
 explicitly with a reason. Enforcement is deliberately **soft**: there is no blocking

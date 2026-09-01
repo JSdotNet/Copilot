@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "prompt",
+        "prompt": "The claude-desktop plugin is loaded, but it is built for Claude Code and does not work in GitHub Copilot CLI. Its orch-* and workflow-* skills drive Claude-only surfaces: the orch-dashboard MCP server addressed as mcp__plugin_claude-desktop_orch-dashboard__*, the Claude Workflow tool, and git worktree session dispatch. Do not invoke them here. Tell the user the plugin is Claude-only and point them at the copilot-app plugin, which provides the equivalent orch-* lane over the Copilot canvas extensions. Nothing else in this hook applies to Copilot."
+      }
+    ]
+  }
+}

@@ -4,8 +4,9 @@
       {
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "When creating planning artifacts, follow the .wip convention strictly: stories, epics, and bugs under .wip/work/<module>/; ideas under .wip/ideas/; proposals under .wip/proposals/. Keep file names prefixed with artifact type."
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/emit-session-context.mjs\"",
+            "timeout": 10
           }
         ]
       }
