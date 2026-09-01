@@ -21,7 +21,7 @@
       "name": "claude-desktop",
       "source": "./plugins/claude-desktop",
       "description": "Claude Code plugin for orchestration workflows, pull request delivery, and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
-      "version": "0.9.0"
+      "version": "0.10.0"
     },
     {
       "name": "csharp-coding",
@@ -33,13 +33,13 @@
       "name": "development",
       "source": "./plugins/development",
       "description": "Copilot plugin for development planning and implementation workflows across a .NET backend and a React frontend, with repository-detected frontend tooling.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     },
     {
       "name": "documentation",
       "source": "./plugins/documentation",
       "description": "Write and maintain documentation artifacts, infographics, and profile content using GitHub Copilot.",
-      "version": "0.3.0"
+      "version": "0.4.0"
     },
     {
       "name": "domain-design",
@@ -69,7 +69,7 @@
       "name": "knowledge-base",
       "source": "./plugins/knowledge-base",
       "description": "Repository knowledge-folder convention for .arc42, .domain, .tech, .design, .backlog, and .ai: parseable chapter metadata, runnable test-case links, AI adoption tracked per development-flow stage, derived _meta indexes, a reference-graph canvas, per-folder orchestration skills, bidirectional to-spec-<kind> and from-spec-<kind> skills between chapters and code, and enforcement tooling.",
-      "version": "0.13.0"
+      "version": "0.14.0"
     },
     {
       "name": "product-owner",
@@ -81,31 +81,31 @@
       "name": "qa",
       "source": "./plugins/qa",
       "description": "Copilot plugin for runtime QA validation — run Aspire-orchestrated apps, drive Playwright browser checks with recorded evidence, and monitor Aspire logs/traces during the test session.",
-      "version": "0.1.0"
+      "version": "0.2.0"
     },
     {
       "name": "review",
       "source": "./plugins/review",
       "description": "Copilot plugin providing reusable review skills for any agent — supports TODO-driven, question-driven, and improvement-driven reviews of code, stories, documentation, architecture, and more.",
-      "version": "0.3.0"
+      "version": "0.4.0"
     },
     {
       "name": "spec-builder",
       "source": "./plugins/spec-builder",
       "description": "Copilot plugin focused on GitHub customization asset authoring workflows.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     },
     {
       "name": "ux-design",
       "source": "./plugins/ux-design",
       "description": "Copilot plugin for UX design workflows — wireframes, design guidelines, user flows, and design reviews.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     },
     {
       "name": "wip-convention",
       "source": "./plugins/wip-convention",
       "description": "Encapsulates the .wip folder convention for storing work-in-progress artifacts. Provides skills and instructions to align agents with the .wip workflow.",
-      "version": "0.1.0"
+      "version": "0.2.0"
     },
     {
       "name": "worktree-parallel",

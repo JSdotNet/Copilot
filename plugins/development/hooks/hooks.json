@@ -4,8 +4,9 @@
       {
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "When producing implementation plans, include problem framing, explicit assumptions, scoped steps, acceptance criteria, risk notes, and testing strategy before moving into code changes."
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/emit-session-context.mjs\"",
+            "timeout": 10
           }
         ]
       }

@@ -1,0 +1,1 @@
+When creating planning artifacts, follow the .wip convention strictly: stories, epics, and bugs under .wip/work/<module>/; ideas under .wip/ideas/; proposals under .wip/proposals/. Keep file names prefixed with artifact type.

@@ -1,0 +1,1 @@
+When producing implementation plans, include problem framing, explicit assumptions, scoped steps, acceptance criteria, risk notes, and testing strategy before moving into code changes.
