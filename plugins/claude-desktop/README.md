@@ -190,33 +190,38 @@ holds every pull request until the user is back.
 #### Workflow Skills
 
 - `skills/workflow-issue-sweep/` — triage the backlog for relevance and for collision with
-  work in flight, propose stale issues for closure, then spawn up to five worker sessions and
-  a morning brief
+  work in flight, propose stale issues for closure, dispatch up to five worker sessions, then
+  wait for them and write the morning brief itself
 - `skills/workflow-resolve-issue/` — claim one open issue, cut it a dedicated worktree and
   branch, resolve it with the `resolve-issue.workflow.js` script, then open a pull request or
   park the worktree for validation
-- `skills/workflow-morning-brief/` — read every worker result and report what needs you
+- `skills/workflow-morning-brief/` — defines the report format `workflow-issue-sweep` follows
+  for its own brief; run it by hand to re-read a sweep later
 
-Together they form the **issue sweep**, which spans sessions that cannot see each other and
-coordinate through files on disk. `instructions/workflow-issue-sweep-contract.instructions.md`
-owns that contract — the sweep directory layout, the manifest and worker result schemas, and
-the spawn rules:
+Together they form the **issue sweep**. The routine session and its workers cannot see each
+other's conversations and coordinate through files on disk, `gh` labels, and `claude agents` —
+never a scheduled task. `instructions/workflow-issue-sweep-contract.instructions.md` owns that
+contract — the sweep directory layout, the manifest and worker result schemas, and the dispatch
+rules:
 
 ```text
 routine session (workflow-issue-sweep)
-  ├── triage → mark → spawn ──┬── worker #42 (workflow-resolve-issue) → PR, or parked
-  │                           └── ... up to maxParallel, staggered
+  ├── triage → mark → dispatch ──┬── worker #42 (workflow-resolve-issue) → PR, or parked
+  │                               └── ... up to maxParallel, each an independent `claude --bg`
   ├── closure approval  ← stays open for the user
+  ├── waits for every worker to finish (or times out)
+  ├── writes the brief itself, in workflow-morning-brief's own format
   └── ends
-
-  (later)  brief session (workflow-morning-brief) → reads every result → one report
 ```
 
-The sweep spawns its workers as **one-time scheduled tasks** (`fireAt`, never `cronExpression`),
-each becoming a fresh session with its own worktree. It spawns *before* it asks the closure
-question, so a question waiting at 06:00 does not keep the backlog idle. Scheduled tasks only
-fire while the host application is open — a sweep at 06:00 on a machine closed until 09:00
-produces its work at 09:00.
+The sweep dispatches its workers as **independent background CLI sessions**
+(`claude --bg --permission-mode auto`, one per issue, each in its own worktree) — no scheduled
+task, no task ID, nothing to notify, and this holds for the brief too now. It dispatches
+*before* it asks the closure question, so a question never keeps the backlog idle — but once
+that question is answered, the same session stays open and waits out its own workers instead of
+scheduling a second session to report on them later. A sweep run now takes as long as its
+slowest worker, not the few seconds a dispatch-and-end run took before; that is the cost of a
+brief with nowhere left to be scheduled.
 
 Each worker routes on **evidence gathered after the work**, not on the issue text: a change
 whose every acceptance criterion is proved by a test, that touched no runtime surface, took no
@@ -237,8 +242,9 @@ criteria, the verification result, the review findings left open, and every assu
 took instead of asking — read that last section first. Set `prMode: "draft"` when a pull
 request should not present itself as a merge candidate before you have looked. Each run works
 a dedicated worktree, so concurrent runs cannot corrupt each other's change sets; they can
-still contend for ports and local databases, which is what the sweep's `staggerMinutes`
-addresses — raise it, or give each run its own ports via `.claude/orch-context.md`.
+still contend for ports and local databases, which is what the sweep's `dispatchGapSeconds`
+softens by spacing out the launches — for real contention, give each run its own ports via
+`.claude/orch-context.md`, or lower `maxParallel`.
 
 ## Configuration Layers
 

@@ -10,16 +10,17 @@ disable-model-invocation: true
 
 Answer one question in one screen: **what happened overnight, and what needs me?**
 
-A sweep spans up to seven sessions that never see each other. This skill is the only place
-their results come together. It reads the sweep manifest and every worker result file, and
-writes a brief that separates what is done from what is waiting on you — with the exact
-command for each item, so acting on the brief never requires reconstructing context.
+A sweep spans up to six sessions that never see each other — the routine session and up to
+five workers. `workflow-issue-sweep` writes its own brief once its workers finish, in exactly
+the shape this skill defines: it follows this skill's Phase 1 step 4, Phase 2, and Phase 3
+directly, without invoking it. This skill is what you run **standalone**, by hand, whenever you
+want a sweep re-read — to check on one that is still mid-wait in another session, to revisit an
+old one, or to catch up after time away.
 
 ## Inputs
 
-- Sweep directory (absolute path). When spawned by `workflow-issue-sweep` it arrives in the
-  prompt. Run by hand with none given, take the most recently created sweep under
-  `${CLAUDE_ISSUE_SWEEP_DIR:-$HOME/.claude/issue-sweep}/`.
+- Sweep directory (absolute path). Run by hand with none given, take the most recently created
+  sweep under `${CLAUDE_ISSUE_SWEEP_DIR:-$HOME/.claude/issue-sweep}/`.
 - `sweeps`: how many recent sweeps to cover (default `1`). Use more after time away.
 - Output: `chat` (default), `file` (writes `brief.md` into the sweep directory), or `both`.
 
@@ -46,14 +47,23 @@ notices otherwise.
 Distinguish the two where you can:
 
 ```bash
-# via list_scheduled_tasks — a sweep-<sweepId>-<number> task that still has a future
-# nextRunAt has not fired yet; one with a past lastRunAt fired and produced nothing
+claude agents --json --all --cwd <repo root>
 ```
 
-- **Not yet fired** — most often because the host was closed at the fire time. Report it as
-  *pending*, with when it will run.
-- **Fired, no result** — report it as *failed silently*, and name its worktree path if one
-  exists, so the work is not lost.
+A worker is not a scheduled task — `workflow-issue-sweep` dispatches it the instant it is
+marked, as an independent `claude --bg` session (see the **Issue Sweep State Contract**). So
+there is no "not yet fired" state to wait out; there is only *still running* and *exited*.
+`claude agents` prunes a background session from its list once it exits — sometimes within
+seconds — so absence there does not date the exit, it only rules out "running right now":
+
+- **Still running** — the session appears with `"kind": "background"` and `"state": "working"`.
+  Report it as *in progress*, not as a problem; a brief that fires before a worker finishes is
+  early, not broken.
+- **Exited, no result** — the session no longer appears at all (or appears with
+  `"state": "done"`, in the narrow window before it is pruned) and no
+  `workers/<number>.json` exists. Report it as *failed silently*, and name its worktree path
+  (`<pickedUp[].number>-<slug>` under the sweep's worktree root) if one exists, so the work is
+  not lost.
 
 Never infer an outcome from GitHub state alone. A pull request that exists does not prove the
 worker finished cleanly, and the result file is the record.
@@ -153,7 +163,9 @@ worker finished cleanly, and the result file is the record.
 
 ## Related Skills
 
-- `workflow-issue-sweep` — the sweep that writes the manifest and spawns the workers.
+- `workflow-issue-sweep` — the sweep that writes the manifest, dispatches the workers, and
+  writes its own brief in this skill's format once they finish. Run this skill by hand only to
+  re-read a sweep later.
 - `workflow-resolve-issue` — the worker that writes each result file.
 - `pr-merge-ready` — takes the pull requests this brief lists to merge-ready, one per pass.
 - `automation-week-starter` — the weekly external-news digest, not this repository's own work.

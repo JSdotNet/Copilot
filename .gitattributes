@@ -1,0 +1,11 @@
+# Normalize line endings regardless of core.autocrlf on the checkout machine.
+# A workstation with autocrlf=true (the git-for-windows default) otherwise
+# checks text files out with CRLF, which some tools reject as control
+# characters in scripts they read directly (e.g. Workflow's scriptPath).
+* text=auto eol=lf
+
+*.js text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.ps1 text eol=lf
+*.sh text eol=lf
