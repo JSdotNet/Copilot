@@ -1,7 +1,13 @@
 ---
 name: workflow-issue-sweep
-description: 'Sweep a repository''s open issues: judge which are still relevant, propose the stale ones for closure and close the ones you approve, skip anything that would collide with work already in flight, then hand the rest to up to 5 parallel worker sessions that each resolve one issue in its own worktree, wait for them, and write a morning brief itself once every worker finishes.'
-disable-model-invocation: true
+description: >
+  Sweep a repository's open issues: judge which are still relevant, propose the stale ones for
+  closure, skip anything colliding with work in flight, dispatch up to 5 parallel worker
+  sessions that each resolve one issue in its own worktree, then wait for them and write the
+  brief. Use when: sweeping or triaging a backlog of open issues, or running a scheduled issue
+  sweep. DO NOT USE FOR: a single issue (use start-session-from-issue with a human present,
+  workflow-resolve-issue without one); never start a sweep mid-task — only a user turn or a
+  routine prompt may.
 ---
 
 # Workflow: Issue Sweep
@@ -151,8 +157,9 @@ scheduled for later. There is no later session anymore.
 
 ### Phase 2 — Triage
 
-6. Invoke the `Workflow` tool with the triage script beside this skill. Invoking this skill is
-   the explicit opt-in the tool requires:
+6. Invoke the `Workflow` tool with the triage script beside this skill. The user turn or
+   routine prompt that asked for this sweep is the explicit opt-in the tool requires — a sweep
+   nobody asked for must not reach this step:
 
    ```text
    Workflow({

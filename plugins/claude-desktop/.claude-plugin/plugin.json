@@ -1,6 +1,6 @@
 {
   "name": "claude-desktop",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Claude Code plugin for orchestration workflows, pull request delivery, and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
   "author": {
     "name": "Job Schepers"
