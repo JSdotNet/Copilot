@@ -240,7 +240,7 @@ Contribution guidelines for this repository:
 Helpful references:
 
 - [Copilot Reference](docs/copilot/copilot-reference.md)
-- [Copilot Plugins Inventory](docs/copilot/copilot-plugins.md)
+- [Copilot Plugins Inventory](copilot-plugins.md)
 - [Copilot Skills Inventory](docs/copilot/copilot-skills.md)
 
 ## License
