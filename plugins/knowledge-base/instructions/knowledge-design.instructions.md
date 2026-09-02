@@ -107,8 +107,20 @@ Allowed `status` values in `.design`:
 | Status | Meaning |
 |---|---|
 | `draft` | Written but not yet agreed, or not yet grounded in the authoritative design source. |
-| `active` | Agreed and binding for implementation. |
+| `active` | Agreed and binding for implementation. **Resting value — omit the field.** |
 | `deprecated` | Superseded; kept for history, must not be followed. |
+
+`status` is therefore **optional** here. State it only while a chapter is
+`draft` or `deprecated`; an agreed, binding guideline says so by leaving the
+field out. A design system is almost entirely agreed and binding — that is what
+makes it a system — so writing `active` on every chapter marks nothing, and the
+one `draft` colour token stops standing out. Writing `status: active` explicitly
+is reported.
+
+`.design` defines no `type` field either, so a settled chapter's block ends up
+empty. **Keep the empty `meta` fence** — it is what makes the heading an
+addressable chapter, and deleting it drops the chapter out of the derived graph
+and out of every reference pointing at it.
 
 `.design` defines no folder-specific relation fields — use `related` (and
 `issue` when tracked) only.

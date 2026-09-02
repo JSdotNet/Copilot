@@ -83,8 +83,10 @@ the existing `.design/` contents, and continue.
 
 - Add or update the file-level metadata block on every touched file and the
   chapter metadata block on every new/edited `##` chapter.
-- Set `status` from this folder's allowed values: `draft`, `active`,
-  `deprecated`.
+- Set `status` from this folder's allowed values: `draft` or `deprecated`.
+  `active` is the resting value and is written by **omitting the field**; a
+  settled chapter is left with an empty `meta` fence, which stays — it is what
+  makes the heading addressable.
 - Keep `related` entries pointing at valid `<path>#<heading-slug>` or `<path>`
   targets, and omit empty optional fields per the omit-when-empty rule.
 - If a chapter heading or file was renamed or moved, update every `related`

@@ -63,15 +63,17 @@ from the request and the repository contents, and continue.
 
 ### Stage 3: Metadata Enforcement
 
-- Add or update the chapter metadata block (`status` required; `related`,
+- Add or update the chapter metadata block (`status` optional; `related`,
   `issue`, `effort`, `roadmap` optional) on the file's top-level chapter
   heading and on any independently trackable `##` section inside it.
 - Because an `.arc42` file is always exactly one top-level chapter, that
   chapter's metadata block also serves as the file-level block — do not add
   a duplicate.
 - Set `status` from this folder's allowed values: `draft`, `proposed`,
-  `active`, `deprecated` (no `done`, and no `depends-on` field in this
-  folder — use `related` for cross-references).
+  `deprecated` (no `done`, and no `depends-on` field in this folder — use
+  `related` for cross-references). `active` is the resting value and is written
+  by **omitting the field**; a settled chapter with no relations is left with an
+  empty `meta` fence, which stays — it is what makes the heading addressable.
 - If a chapter heading or file was renamed or moved, update every `related`
   entry elsewhere that references its old `<path>#<heading-slug>` or
   `<path>`.

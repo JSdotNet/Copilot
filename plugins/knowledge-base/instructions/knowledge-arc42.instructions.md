@@ -74,9 +74,9 @@ instructions.
   views.
 - Each file's top-level chapter, and any independently trackable ## section
   inside it, must carry the metadata block described in
-  `knowledge-chapter-metadata.instructions.md` (status,
-  cross-folder tags, issue link) — required for the derived index and graph
-  tooling. There is no `depends-on` field in `.arc42` —
+  `knowledge-chapter-metadata.instructions.md` (status — optional here, see
+  below — cross-folder tags, issue link) — required for the derived index and
+  graph tooling. There is no `depends-on` field in `.arc42` —
   architecture chapters describe standing structure, not sequenced work;
   cross-references use `related` instead.
 - Because an `.arc42` file is always exactly one top-level chapter, that
@@ -86,6 +86,12 @@ instructions.
 - The metadata block's `status` field uses `draft`, `proposed`, `active`, or
   `deprecated` in this folder. Architecture documentation describes a
   standing decision/structure, not a task, so there is no `done`.
+- **`active` is this folder's resting value, so it is written by omitting the
+  field.** State `status` only while the chapter is in transition (`draft`,
+  `proposed`) or carries a standing warning (`deprecated`). A standing structure
+  is settled by definition, so `active` is where nearly every chapter here ends
+  up permanently, and stating it turns the field into noise the few moving
+  chapters hide behind. Writing `status: active` explicitly is reported.
 - **Chapters are ordered by their number, not by their filename string.** The
   `<NN>-` prefix supplies it, so `10-quality-requirements.md` sorts after
   `09-architecture-decisions.md` rather than after `01-…`. Only add an explicit
@@ -107,8 +113,6 @@ instructions.
 
 \`\`\`meta
 status: draft
-related: []
-issue: null
 \`\`\`
 
 Chapter content.
@@ -117,9 +121,12 @@ Chapter content.
 
 \`\`\`meta
 status: draft
-related: []
-issue: null
 \`\`\`
 
 Section content.
 ```
+
+`related` and `issue` are omitted above rather than written empty, per the
+omit-when-empty rule; add them when they carry a value. Once a chapter settles,
+its `status: draft` line comes out too and the fence is left empty — keep the
+fence, it is what makes the heading an addressable chapter.

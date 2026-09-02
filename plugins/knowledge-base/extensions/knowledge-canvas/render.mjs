@@ -26,6 +26,9 @@ export function renderPage() {
   .status-proposed, .status-ready { background: #9a6700; color: white; }
   .status-deprecated, .status-blocked { background: #cf222e; color: white; }
   .status-in-progress { background: #0969da; color: white; }
+  /* A resting value the file left out: the same badge, dimmed, so it reads as
+     the real state it is rather than as a second kind of unknown. */
+  .status-at-rest { opacity: 0.65; }
   .field { font-size: 0.78rem; margin: 0.25rem 0; word-break: break-word; }
   .field b { display: block; opacity: 0.7; font-weight: 600; }
   .issues { font-size: 0.8rem; }
@@ -47,8 +50,17 @@ export function renderPage() {
 <script>
 mermaid.initialize({ startOnLoad: false, securityLevel: "loose" });
 
-function statusClass(status) {
-  return "status status-" + String(status || "unknown").toLowerCase();
+// A block that omits \`status\` in .domain/.arc42/.design is at that folder's
+// resting value, so the badge shows that value — dimmed, and titled to say the
+// file did not spell it out. Only a block with no status and no resting value to
+// fall back on is genuinely unknown, and that is a lint error, not a display
+// state to normalize.
+function statusBadge(status, restingStatus) {
+  const resolved = status || restingStatus || null;
+  const atRest = !status && resolved !== null;
+  const cls = "status status-" + String(resolved || "unknown").toLowerCase() + (atRest ? " status-at-rest" : "");
+  const title = atRest ? ' title="at rest — this block states no status, so the folder&#39;s resting value applies"' : "";
+  return '<span class="' + cls + '"' + title + '>' + escapeHtml(resolved || "?") + '</span>';
 }
 
 function renderField(key, value) {
@@ -95,12 +107,12 @@ async function loadDocument() {
   const metaList = document.getElementById("meta-list");
   metaList.innerHTML = "";
   if (data.fileMeta) {
-    metaList.innerHTML += '<div class="chapter-card"><h4>File: ' + escapeHtml(data.fileTitle || "") + ' <span class="' + statusClass(data.fileMeta.status) + '">' + escapeHtml(data.fileMeta.status || "?") + '</span></h4>' +
+    metaList.innerHTML += '<div class="chapter-card"><h4>File: ' + escapeHtml(data.fileTitle || "") + ' ' + statusBadge(data.fileMeta.status, data.restingStatus) + '</h4>' +
       Object.entries(data.fileMeta).filter(([k]) => k !== "status").map(([k, v]) => renderField(k, v)).join("") + '</div>';
   }
   for (const chapter of data.chapters) {
     if (!chapter.meta || chapter.level === 1) continue;
-    metaList.innerHTML += '<div class="chapter-card"><h4>' + "#".repeat(chapter.level) + ' ' + escapeHtml(chapter.text) + ' <span class="' + statusClass(chapter.meta.status) + '">' + escapeHtml(chapter.meta.status || "?") + '</span></h4>' +
+    metaList.innerHTML += '<div class="chapter-card"><h4>' + "#".repeat(chapter.level) + ' ' + escapeHtml(chapter.text) + ' ' + statusBadge(chapter.meta.status, data.restingStatus) + '</h4>' +
       Object.entries(chapter.meta).filter(([k]) => k !== "status").map(([k, v]) => renderField(k, v)).join("") + '</div>';
   }
 

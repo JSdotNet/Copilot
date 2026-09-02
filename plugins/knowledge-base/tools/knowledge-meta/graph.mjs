@@ -14,6 +14,7 @@ import {
     parseDocument,
     folderKindForPath,
     resolveType,
+    resolveStatus,
     slugify,
     typeIssues,
     removedFieldIssues,
@@ -25,10 +26,13 @@ import {
 
 /** Every knowledge folder this convention recognizes. A repository adopts any subset. */
 export const KNOWLEDGE_FOLDERS = [".arc42", ".domain", ".backlog", ".tech", ".design", ".ai"];
-// Shared by both artifacts, because they ship as one release. Version 4 is
-// additive over 3: both artifacts gained an optional `tests` field carrying the
+// Shared by both artifacts, because they ship as one release. Version 5 is
+// additive over 4: `status` may now be resolved from the folder's resting value
+// rather than read off the block, and both artifacts gained an optional
+// `statusDeclared: false` marking the entries where that happened. Version 4
+// was additive over 3, adding the `tests` field carrying the
 // `<level>:<runner>:<selector>` test identifiers a chapter or file declares.
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 export const REPO_SCOPE = ".";
 export const GENERATOR = ".github/tools/knowledge-meta/build.mjs";
 
@@ -89,7 +93,16 @@ function asList(value) {
 
 function applyMeta(node, meta, folder) {
     if (!meta) return;
-    node.status = meta.status ?? null;
+    // An omitted status in an editorial folder means that folder's resting
+    // value, so the node carries the resolved word — a viewer that read
+    // `meta.status` straight through would badge a few hundred resting
+    // chapters as unknown and collapse `nodesByStatus`. `statusDeclared` is
+    // written only when it is false, both to keep the distinction between "at
+    // rest" and "nobody said" available and to leave every already-declared
+    // node byte-identical to what earlier versions emitted.
+    const { status, declared } = resolveStatus(folder, meta);
+    node.status = status;
+    if (!declared && status !== null) node.statusDeclared = false;
     const declaredType = resolveType(folder, meta);
     if (declaredType !== null) node.kind = declaredType;
     for (const field of ATTRIBUTE_FIELDS) {

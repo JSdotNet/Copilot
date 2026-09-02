@@ -112,9 +112,9 @@ instructions.
   sub-chapter inside an Aggregate, every Feature/Sub-feature chapter in
   `features.md`, and every Term chapter in `naming.md` must carry a
   metadata block as described in
-  `knowledge-chapter-metadata.instructions.md`. `status` and `type` are
-  required; the optional cross-folder tags (`related`) and issue link
-  (`issue`) are included only when they have a value.
+  `knowledge-chapter-metadata.instructions.md`. `type` is required; `status` is
+  optional here (see below); the optional cross-folder tags (`related`) and
+  issue link (`issue`) are included only when they have a value.
 - Every file in `.domain` — `context-map.md` and, per bounded context,
   `domain.md`, `features.md`, `model.md`, `flow.md` (when present),
   `dependencies.md`, and `naming.md` — must also carry the file-level
@@ -128,6 +128,12 @@ instructions.
   `deprecated` in this folder. Domain knowledge describes the current (or
   agreed-future) model, not a task queue, so there is no `done`: `active`
   means "this is the current model", `deprecated` means superseded.
+- **`active` is this folder's resting value, so it is written by omitting the
+  field.** State `status` only while the chapter is in transition (`draft`,
+  `proposed`) or carries a standing warning (`deprecated`); drop the line when
+  it settles. Most of a mature bounded context is the current model, and
+  restating that on every chapter says nothing while hiding the few chapters
+  that are genuinely moving. Writing `status: active` explicitly is reported.
 - The metadata block's `type` field records what kind of thing the chapter or
   file is — the classification that is **never** written into the heading. This
   folder's value sets are:
@@ -228,7 +234,7 @@ instructions.
   by guessing, and it is where `assets/code-sync-protocol.md` means a rule to go
   when it says to record it as an open question instead of capturing it as fact.
 
-  An `open` row does not stop a chapter reaching `status: active` — a model can
+  An `open` row does not stop a chapter reaching `active` — a model can
   be the current one and still carry a known unanswered question. It does stop
   that one rule being *built*: a `from-spec-*` pass names it as needing a decision
   instead of briefing an implementation of a rule nobody has agreed.
