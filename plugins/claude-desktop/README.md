@@ -193,10 +193,17 @@ concurrent runs do not collide. (Automatic fan-out is possible, but it belongs t
 `workflow-*` skills below — an `orch-*` run cannot be handed across sessions without losing
 the context its later stages depend on.)
 
-Unattended runs are the design target, not an edge case. Where a skill would normally ask the
-user to confirm its selection, a run with no user turn available proceeds on the single item it
-picked — the claim guards against a double pickup, and the Personal Validation gate still
-holds every pull request until the user is back.
+Unattended runs are the design target for the **model-invoked** skills here. Where
+`start-session-from-issue`, `azure-sre-to-github-issue`, or `pr-merge-ready` would normally ask
+the user to confirm its selection, a run with no user turn available proceeds on the single
+item it picked — the claim guards against a double pickup, and the Personal Validation gate
+still holds every pull request until the user is back.
+
+The `automation-*` skills are the exception. They are user-invoked
+(`disable-model-invocation: true`), so nothing but a human typing the name can start one — a
+routine's session would have to reach them through the Skill tool, which refuses a user-invoked
+skill. Every confirmation in their bodies is therefore unconditional, and none of them
+describes an unattended branch. See `.github/instructions/skill-invocation.instructions.md`.
 
 #### Workflow Skills
 

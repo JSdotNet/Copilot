@@ -37,7 +37,10 @@ Everything else is model-invoked, including `create-*`, `product-owner:write-*`,
 scheduled routine or a dispatched worker session is the only invoker of the last two. Neither
 an agent nor a routine can reach a user-invoked skill: only a human typing the name can.
 Before marking anything user-invoked, grep the agents, hook prompts, and dispatch prompts for
-its name, and check whether its own body documents a routine lane.
+its name, and check whether its own body documents a routine lane. A body that documents one
+must either give up the flag or give up the lane; the `automation-*` bodies gave up the lane.
+The exception is `copilot-app`, which ships to Copilot only — the flag is inert there, so its
+scheduler notes still hold.
 
 Skills that cross the specification/code boundary in both directions are named
 `to-spec-<kind>` (code becomes a chapter) and `from-spec-<kind>` (a chapter becomes a change
