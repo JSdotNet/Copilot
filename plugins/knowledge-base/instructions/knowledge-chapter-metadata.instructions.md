@@ -46,19 +46,37 @@ Place the block immediately after the heading, before any prose:
 ## <Chapter Heading>
 
 \`\`\`meta
-status: active
+status: draft
 type: aggregate
 \`\`\`
 
 Prose for this chapter starts here.
 ```
 
-`status` is always required, and `type` is required wherever the folder defines
-a value set for it. A chapter with no relations and no issue therefore carries
-just those fields. Optional fields (`related`, `issue`, `effort`, `roadmap`,
-and folder-specific fields such as `depends-on`) are included only when they
-have a value; empty collections and null values are omitted rather than written
-out.
+`type` is the only universally required field, and only in the three folders
+that define a value set for it (`.domain`, `.tech`, `.ai`). `status` is
+required per folder: mandatory in `.tech`, `.ai`, and `.backlog`, optional in
+`.domain`, `.arc42`, and `.design`, where leaving it out means the content is
+at rest — see the `status` entry under **Fields**. Optional fields (`related`,
+`issue`, `effort`, `roadmap`, and folder-specific fields such as `depends-on`)
+are included only when they have a value; empty collections and null values are
+omitted rather than written out.
+
+**The `meta` fence stays even when the block ends up empty.** In `.arc42`,
+`.backlog`, and `.design` there is no `type` field, so a resting chapter with no
+relations has nothing left to write:
+
+```markdown
+## <Chapter Heading>
+
+\`\`\`meta
+\`\`\`
+```
+
+That is correct and deliberate, not leftover punctuation. The fence is what
+marks the heading as an **addressable chapter** — the derived graph makes one
+node per heading that carries a block — so deleting it as noise silently drops
+the chapter out of `graph.json` and out of every reference that points at it.
 
 ## Headings carry the name, `type` carries the kind
 
@@ -69,7 +87,6 @@ in the `type` field, never in the heading:
 ## Order
 
 \`\`\`meta
-status: active
 type: aggregate
 \`\`\`
 ```
@@ -104,7 +121,6 @@ any blockquote summary, prose, or first chapter:
 # <File Title>
 
 \`\`\`meta
-status: active
 type: domain
 \`\`\`
 
@@ -113,10 +129,10 @@ type: domain
 Prose or the first chapter starts here.
 ```
 
-The file-level block uses the same fields as a chapter block (`status`
-required; `type` required where the folder defines a file-level value set;
-`related`, `issue`, `effort`, and `roadmap` optional) and the same
-omit-when-empty rule. Folder-specific fields defined for chapters
+The file-level block uses the same fields as a chapter block (`status` required
+or optional by folder, exactly as above; `type` required where the folder
+defines a file-level value set; `related`, `issue`, `effort`, and `roadmap`
+optional) and the same omit-when-empty rule. Folder-specific fields defined for chapters
 (`depends-on`, `implements`, `aliases`, `feature-flag`, `version`,
 `alternatives`) are chapter-scoped and are not used at file level — a file's
 overall relationships are expressed through `related` only.
@@ -162,8 +178,26 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
 
 ### Fields
 
-- **status** (required) — lifecycle state of this chapter's or file's
-  content. The allowed values are folder-specific; see the `status` section
+- **status** (required in `.tech`, `.ai`, `.backlog`; optional in `.domain`,
+  `.arc42`, `.design`) — lifecycle state of this chapter's or file's
+  content.
+
+  The three editorial folders have a **resting value**, `active`, which is
+  written by *omitting the field*. A chapter states its status only while it is
+  in transition (`draft`, `proposed`) or carries a standing warning
+  (`deprecated`); once it settles, the line comes out. Writing `active`
+  explicitly is reported, so one state does not end up with two spellings.
+
+  | Folder | `status` | Absence means |
+  |---|---|---|
+  | `.domain`, `.arc42`, `.design` | optional | `active` — settled content |
+  | `.tech`, `.ai` | **required** | nothing; the value is a *rating* on an adoption ladder, and an unrated technology is not the same as a `candidate` one |
+  | `.backlog` | **required** | nothing; every value is a real work state, and an item with no status is untracked, not `done` |
+
+  Spell the absence by leaving the field out, never as `status: null` — same
+  discipline as `issue: null`, and the reason is the same.
+
+  The allowed values are folder-specific; see the `status` section
   in `knowledge-domain.instructions.md`,
   `knowledge-arc42.instructions.md`,
   `knowledge-backlog.instructions.md`,
@@ -399,7 +433,6 @@ tests: [integration:dotnet:Ordering.Api.Tests.GuestCheckoutTests, e2e:playwright
 ## Order
 
 \`\`\`meta
-status: active
 type: aggregate
 tests: unit:dotnet:Ordering.Domain.Tests.OrderTests
 \`\`\`
@@ -450,9 +483,12 @@ chapter.
   fixed schema.
 - Optional fields are included only when they carry a value. Empty list-valued
   fields (`related: []`, `depends-on: []`, `roadmap: []`) and null values
-  (`issue: null`, `effort: null`) are omitted rather than written out, so a
-  chapter or file with no relations, no estimate, and no issue shows only
-  `status` and, where the folder defines one, `type`.
+  (`issue: null`, `effort: null`) are omitted rather than written out. The same
+  rule reaches `status` in `.domain`, `.arc42`, and `.design`, where the resting
+  value `active` is what an absent field says: a settled chapter with no
+  relations, no estimate, and no issue shows only `type` where the folder
+  defines one — and in `.arc42` and `.design`, which define none, an empty
+  fence. Keep the fence; it is what makes the heading addressable.
 
 ## Where reading order comes from
 

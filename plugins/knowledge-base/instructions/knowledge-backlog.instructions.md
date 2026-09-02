@@ -68,10 +68,6 @@ status: draft
 
 \`\`\`meta
 status: draft
-depends-on: []
-implements: []
-related: []
-issue: null
 \`\`\`
 
 Description of the item.
@@ -80,10 +76,6 @@ Description of the item.
 
 \`\`\`meta
 status: draft
-depends-on: []
-implements: []
-related: []
-issue: null
 \`\`\`
 
 Description of the sub-item.
@@ -109,6 +101,14 @@ Description of the sub-item.
   folder reflects real backlog state, not just history. This folder's
   `status` field uses `draft`, `ready`, `in-progress`, `done`, or `blocked` —
   it tracks task progress, since backlog items describe work to be executed.
+- **`status` is required on every `.backlog` block, with no resting value to
+  omit** — unlike `.domain`, `.arc42`, and `.design`, where an absent status
+  means settled content. Work has no resting state: every value here is a real
+  position in the flow, and an item that states none is untracked, not `done`.
+- `depends-on`, `implements`, `related`, and `issue` are omitted from the
+  template above rather than written empty, per the omit-when-empty rule in
+  `knowledge-chapter-metadata.instructions.md`; add each one when it carries a
+  value.
 - For end-to-end work spanning planning through implementation, route through
   the repository's feature or bug orchestration rather than working ad hoc from
   these files alone.

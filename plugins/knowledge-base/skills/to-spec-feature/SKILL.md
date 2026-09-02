@@ -254,8 +254,9 @@ up to that point and record the rest from code and tests.
   `orch-domain`.
 - Do not treat a comment, a TODO, a doc comment, or a disabled test as evidence
   of behaviour.
-- Do not set `status: active` because the implementation exists. Code existing
-  is not agreement that the code is the intended model.
+- Do not drop a chapter's `status` line because the implementation exists. An
+  omitted status means the resting value `active` — agreed — and code existing is
+  not agreement that the code is the intended model.
 - Do not resolve a `conflict` verdict by rewriting the chapter to match the
   code. Stop and put the decision to the user.
 - Do not write endpoints, controllers, components, or table names into

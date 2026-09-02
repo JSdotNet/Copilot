@@ -17,6 +17,27 @@ const STATUS_BY_FOLDER = {
     ai: ["candidate", "trial", "adopted", "hold", "retired"],
 };
 
+// The value a folder's content settles on, which is therefore *omitted* rather
+// than written. A folder listed here makes `status` optional: absence means the
+// resting value, and writing it out restates what absence already says.
+//
+// Only the three editorial folders have such a value. In `.domain`, `.arc42`,
+// and `.design` `status` records how settled the writing is, and `active` — "no
+// longer in transition" — is the state most chapters sit in forever. The other
+// three folders have no resting value to omit: in `.tech` and `.ai` the value is
+// a *rating* whose whole purpose is to be stated, so an absent status would be
+// indistinguishable from `candidate` ("nobody has rated this") and a radar built
+// from omissions renders blank; in `.backlog` every value is a real work state,
+// and an item with no status is untracked, not `done`.
+//
+// Note what is *not* resting: `deprecated` is a standing warning and stays
+// written, as do `draft` and `proposed`, which say the content is in transition.
+const RESTING_STATUS_BY_FOLDER = {
+    domain: "active",
+    arc42: "active",
+    design: "active",
+};
+
 // Allowed `type` values per folder, split by block level. `type` records *what
 // kind of thing* a chapter or file is — the classification that used to be
 // written as a heading prefix (`## Aggregate: Order`). Heading text now carries
@@ -209,6 +230,29 @@ export function folderKindForPath(relPath) {
     if (normalized.startsWith(".design/")) return "design";
     if (normalized.startsWith(".ai/")) return "ai";
     return null;
+}
+
+/**
+ * The status a folder's content rests at and therefore omits, or null when the
+ * folder has none and every block must state its status.
+ */
+export function restingStatusFor(folder) {
+    return RESTING_STATUS_BY_FOLDER[folder] ?? null;
+}
+
+/**
+ * The effective status of a block, and whether the file actually said it.
+ *
+ * Every consumer resolves through here rather than reading `meta.status`, so
+ * "at rest" and "nobody said" stay distinguishable: an omitted status in an
+ * editorial folder resolves to that folder's resting value with
+ * `declared: false`, while an omitted status anywhere else stays null — which
+ * validateDocument reports as an error, and no viewer should paper over.
+ */
+export function resolveStatus(folder, meta) {
+    const declared = meta?.status ?? null;
+    if (declared !== null) return { status: declared, declared: true };
+    return { status: restingStatusFor(folder), declared: false };
 }
 
 /**
@@ -807,6 +851,7 @@ export function validateDocument(relPath, markdown) {
         issues.push({ severity: issue.severity, message: `${relPath} ${issue.message}` });
     }
     const allowedStatus = STATUS_BY_FOLDER[kind];
+    const resting = restingStatusFor(kind);
     const optionalFields = new Set([
         ...COMMON_OPTIONAL_FIELDS,
         ...FILE_ONLY_FIELDS,
@@ -838,12 +883,35 @@ export function validateDocument(relPath, markdown) {
             continue;
         }
 
-        if (!("status" in chapter.meta) || chapter.meta.status === null) {
-            issues.push({ severity: "error", message: `${label} is missing required \`status\`.` });
+        // `status` is required only in the folders that have no resting value.
+        // Where a folder does have one, absence *is* the statement, so an
+        // omitted status is correct and the resting value written out is the
+        // thing worth reporting — otherwise the corpus ends up with two
+        // spellings of one state and neither reader knows which to expect.
+        const declaresStatus = "status" in chapter.meta;
+        if (!declaresStatus || chapter.meta.status === null) {
+            if (resting === null) {
+                issues.push({
+                    severity: "error",
+                    message: `${label} is missing required \`status\`.`,
+                });
+            } else if (declaresStatus) {
+                // An absence is spelled by leaving the field out, never by
+                // writing the word `null` — same discipline as `issue: null`.
+                issues.push({
+                    severity: "warning",
+                    message: `${label} sets \`status\` to a null value — omit the field instead to mean the resting value \`${resting}\`.`,
+                });
+            }
         } else if (!allowedStatus.includes(chapter.meta.status)) {
             issues.push({
                 severity: "error",
                 message: `${label} has status "${chapter.meta.status}", expected one of: ${allowedStatus.join(", ")}.`,
+            });
+        } else if (chapter.meta.status === resting) {
+            issues.push({
+                severity: "warning",
+                message: `${label} states \`status: ${resting}\`, which is the resting value in .${kind} — omit the field instead, per the omit-when-empty rule.`,
             });
         }
 
@@ -933,7 +1001,7 @@ export function validateDocument(relPath, markdown) {
         }
 
         for (const [key, value] of Object.entries(chapter.meta)) {
-            if (key === "status") continue;
+            if (key === "status") continue; // recognized, and fully reported above
             if (key in REMOVED_FIELDS) continue; // already reported above
             if (!optionalFields.has(key)) {
                 issues.push({

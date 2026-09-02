@@ -281,6 +281,50 @@ for technologies that do not appear in package manifests.
   context rather than baseline context, `meta` blocks are mandatory on every
   chapter, and `_meta/` is never hand-edited.
 
+## 0.15.0: `status` optional at rest
+
+**A behaviour change in three folders, and a sweep worth doing.** `status` is no
+longer required everywhere. In `.domain`, `.arc42`, and `.design` it is
+**optional**, and an absent field means the resting value `active`:
+
+```markdown
+## Order
+
+\`\`\`meta
+type: aggregate
+\`\`\`
+```
+
+`status` is written only while a chapter is in transition (`draft`, `proposed`)
+or carries a standing warning (`deprecated`). It stays **required** in `.tech`,
+`.ai`, and `.backlog`, and the asymmetry is the point: the field was doing three
+unrelated jobs, and only one of them has a resting value.
+
+| Folder | What `status` is | Resting value |
+|---|---|---|
+| `.domain`, `.arc42`, `.design` | editorial maturity — how settled the writing is | `active`, omitted |
+| `.tech`, `.ai` | a *rating* on an adoption ladder | none; an unrated technology is not a `candidate` one, and a radar built from omissions renders blank |
+| `.backlog` | a work state | none; an item with no status is untracked, not `done` |
+
+Two rules make the difference safe:
+
+- **The `meta` fence stays even when the block ends up empty.** `.arc42`,
+  `.backlog`, and `.design` define no `type`, so a settled chapter with no
+  relations has nothing left inside its fence. The fence is what marks the
+  heading as an addressable chapter — one graph node per heading that carries a
+  block — so deleting it as noise drops the chapter out of `graph.json` and out
+  of every reference pointing at it.
+- **The generator resolves an absent status rather than passing null through.**
+  Both derived artifacts carry the resolved word plus `"statusDeclared": false`
+  on the entries where that happened, so a viewer badges them correctly and a
+  consumer that cares can still tell "at rest" from "nobody said". See
+  `tools/knowledge-meta/README.md`.
+
+Stating the resting value explicitly is reported as a warning, so one state does
+not end up with two spellings. To adopt: re-sync `.github/tools/knowledge-meta/`,
+run `build.mjs`, and delete the `status: active` lines it now flags — keeping the
+fence behind them.
+
 ## 0.12.0: the `.ai` folder
 
 **Additive, and nothing existing changes.** A sixth knowledge folder, `.ai`,
@@ -360,7 +404,6 @@ prose:
 ## Order
 
 \`\`\`meta
-status: active
 type: aggregate
 tests: [unit:dotnet:Ordering.Domain.Tests.OrderTests]
 \`\`\`
@@ -395,7 +438,7 @@ countable, or linkable. Three columns fix that:
 An **`open`** row is the Event Storming hot spot, kept in place. The sync
 protocol already said an unsettled rule is recorded as an open question rather
 than captured as fact, but never said where it lived; now it does. An `open` row
-does not block `status: active` — a model can be current and still carry an
+does not block a chapter reaching `active` — a model can be current and still carry an
 unanswered question — but `from-spec-*` reports it as a decision needed rather than
 briefing a rule nobody agreed.
 
@@ -415,7 +458,6 @@ folder, records the test cases that assert what a chapter claims:
 ## Order
 
 \`\`\`meta
-status: active
 type: aggregate
 tests: [unit:dotnet:Ordering.Domain.Tests.OrderTests, e2e:playwright:tests/e2e/checkout.spec.ts#Guest checkout completes]
 \`\`\`
@@ -507,6 +549,20 @@ Worth doing on adoption: mark `.arc42/adr/README.md` and `.arc42/tdr/README.md`
 with `index: root` — neither folder has a convention root, so without it each is
 a bare numbered list — and give existing ADRs and TDRs their `date`. Both show up
 in `index.json` and on `graph.json` file nodes immediately after a regenerate.
+
+## Migrating to schema version 5
+
+Schema version 5 is **additive** over 4 in shape, with one semantic change worth
+knowing about. `status` on a `graph.json` node and on an `index.json` file entry
+is now the block's **effective** status: where `.domain`, `.arc42`, or `.design`
+omits the field, the artifacts carry the resolved resting value `active` rather
+than `null`, plus a new optional `"statusDeclared": false` marking that the file
+did not state it. Declared statuses are emitted exactly as before, so the only
+diff on an unswept corpus is the bumped `schemaVersion`.
+
+A consumer that read `status` to badge or group needs no change — it gets a real
+value where it previously would have got `null`. A consumer that needs to know
+whether a person actually chose the value reads `statusDeclared`.
 
 ## Migrating to schema version 4
 

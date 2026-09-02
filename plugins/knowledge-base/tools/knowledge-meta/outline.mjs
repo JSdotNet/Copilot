@@ -34,6 +34,7 @@ import {
     documentDigest,
     folderKindForPath,
     resolveType,
+    resolveStatus,
     documentNumber,
     fileNumberFromPath,
     indexRole,
@@ -251,7 +252,15 @@ async function readDirectory(repoRoot, relDir, problems) {
             const doc = parsed.get(name);
             // Titles are name-only, so every file in a `.domain` bounded context
             // shares one title; `kind` is what tells them apart in a viewer.
-            const fileKind = resolveType(folderKindForPath(doc.relPath), doc.meta);
+            const folder = folderKindForPath(doc.relPath);
+            const fileKind = resolveType(folder, doc.meta);
+            // Resolved, not passed through: a file that omits its status in an
+            // editorial folder is at that folder's resting value, and an index
+            // entry saying null would send a list view looking for a state the
+            // convention already answers. `statusDeclared` records that the
+            // file itself did not say it — written only when false, so no
+            // existing entry churns.
+            const { status, declared } = resolveStatus(folder, doc.meta);
             const tests = testList(doc.meta);
             outline.push({
                 type: "file",
@@ -259,7 +268,8 @@ async function readDirectory(repoRoot, relDir, problems) {
                 path: doc.relPath,
                 title: doc.title ?? path.basename(name, ".md"),
                 ...(fileKind ? { kind: fileKind } : {}),
-                status: doc.meta.status ?? null,
+                status,
+                ...(declared || status === null ? {} : { statusDeclared: false }),
                 // Omitted rather than emitted empty, so adding these fields did
                 // not churn every entry of every existing index.
                 ...(doc.number !== null ? { number: doc.number } : {}),

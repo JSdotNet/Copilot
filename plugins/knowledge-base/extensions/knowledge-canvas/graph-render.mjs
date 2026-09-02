@@ -43,6 +43,8 @@ export function renderGraphPage({ scopes = ["."], scope = "." } = {}) {
   .status-proposed, .status-ready, .status-trial, .status-hold { background: #9a6700; color: white; }
   .status-deprecated, .status-blocked, .status-retired { background: #cf222e; color: white; }
   .status-in-progress { background: #0969da; color: white; }
+  /* A resting value the block left out — the real state, dimmed. */
+  .status-at-rest { opacity: 0.65; }
   .stat { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.76rem; padding: 0.08rem 0; }
   .stat span:last-child { font-variant-numeric: tabular-nums; opacity: 0.75; }
   .muted { opacity: 0.6; }
@@ -101,6 +103,17 @@ function colorFor(node) {
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// A node whose block omitted \`status\` carries its folder's resting value with
+// \`statusDeclared: false\`. The badge shows that value — dimmed, and titled to say
+// the file never spelled it out — because it is the node's real state, not a
+// second flavour of unknown.
+function statusBadge(d) {
+  const atRest = d.statusDeclared === false;
+  const cls = "status status-" + String(d.status).toLowerCase() + (atRest ? " status-at-rest" : "");
+  const title = atRest ? " title='at rest — the block states no status, so the folder&#39;s resting value applies'" : "";
+  return '<span class="' + cls + '"' + title + '>' + escapeHtml(d.status) + "</span>";
 }
 
 // One row per test link: the level as a badge, the runner's own selector, and —
@@ -280,7 +293,7 @@ function showDetails(node) {
 
   const parts = [
     "<div class=\\"field\\"><b>label</b>" + escapeHtml(d.label) + "</div>",
-    d.status ? '<div class="field"><b>status</b><span class="status status-' + escapeHtml(String(d.status).toLowerCase()) + '">' + escapeHtml(d.status) + "</span></div>" : "",
+    d.status ? '<div class="field"><b>status</b>' + statusBadge(d) + "</div>" : "",
     d.kind ? "<div class=\\"field\\"><b>kind</b>" + escapeHtml(d.kind) + "</div>" : "",
     d.version ? "<div class=\\"field\\"><b>version</b>" + escapeHtml(d.version) + "</div>" : "",
     d.effort != null ? "<div class=\\"field\\"><b>effort</b>" + escapeHtml(String(d.effort)) + "</div>" : "",

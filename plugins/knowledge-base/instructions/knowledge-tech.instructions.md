@@ -118,6 +118,13 @@ Maturity of the technology **in this project**, on a tech-radar-style ladder:
 
 Early in a project most entries are legitimately `candidate`.
 
+**`status` is required on every `.tech` block, with no resting value to omit** —
+unlike `.domain`, `.arc42`, and `.design`, where an absent status means settled
+content. Here the value is a *rating*, and being stated is its entire purpose: a
+technology nobody has rated is not thereby `candidate`, and a radar assembled
+from omissions renders blank. `adopted` is the most common value precisely
+because it is the interesting one.
+
 ### type
 
 What kind of technology the chapter describes. Required on every technology
