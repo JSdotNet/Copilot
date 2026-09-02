@@ -18,7 +18,7 @@ Every skill is one of two things. The choice is a trade between two costs.
 - **Model-invoked** — omit `disable-model-invocation`. The model may fire the skill on its own, and another skill or an agent may reach it. The `description` is model-facing and keeps its trigger phrasing (`Use when: ...`, `DO NOT USE FOR: ...`) so auto-invocation lands on the right skill. The price is permanent context load: the description sits in the window every turn whether or not the skill fires.
 - **User-invoked** — set `disable-model-invocation: true`. Only the human typing the skill name can invoke it. The `description` becomes human-facing: one line, read by a person browsing slash commands, with trigger lists stripped. The price is cognitive load: the human has to remember the skill exists.
 
-"The human typing the skill name" is literal. A scheduled routine is not a human: its session receives a prompt and must reach the skill through the Skill tool, which refuses a user-invoked one. So is a dispatched worker session — a `claude --bg` prompt naming a skill is the model invoking it, not a person. A skill whose documented lane is a routine or a dispatch **cannot** be user-invoked; the flag makes that lane unreachable while the body still promises it.
+"The human typing the skill name" is literal. A scheduled routine is not a human: its session receives a prompt and must reach the skill through the Skill tool, which refuses a user-invoked one. So is a dispatched worker session — a `claude --bg` prompt naming a skill is the model invoking it, not a person. A skill whose documented lane is a routine or a dispatch **cannot** be user-invoked; the flag makes that lane unreachable while the body still promises it. There are two ways out and no third: make the skill model-invoked, or delete the lane from its body. A skill whose *only* invoker is a routine takes the first and pays the context cost (`workflow-issue-sweep`). A skill that already has a working interactive lane takes the second, because the alternative is an always-loaded description whose job is to tell the model not to fire it.
 
 Apply this test: **could the model usefully reach for this skill on its own, or must another skill or agent reach it?** If neither, make it user-invoked. Reuse is a reason to extract a skill, not a reason to make it model-invoked.
 
@@ -38,7 +38,7 @@ Model-invoked, and must stay so:
 
 User-invoked, with `disable-model-invocation: true`:
 
-- `automation-*` — human-started sweeps. Never fired mid-task. Their bodies still describe an unattended "scheduled routine" branch that the flag makes unreachable for the same reason as above; that is documentation debt awaiting a decision, not a supported lane.
+- `automation-*` — human-started sweeps. Never fired mid-task, and their bodies describe no unattended or scheduled branch: the interactive lane is the only lane, so the flag blocks nothing and keeps sweeps that claim issues and open pull requests from firing unasked. `copilot-app` is the exception on the body rule only — it ships to Copilot alone, where the flag is inert and the app's own scheduler can reach these skills, so its scheduler notes are accurate and stay.
 - `workflow-morning-brief` — re-reads a past sweep on request. Nothing but a human ever asks for it; `workflow-issue-sweep` writes its own brief rather than invoking it.
 - `from-spec-<kind>` in `knowledge-base` — turning an agreed chapter into a change brief is a deliberate act, and nothing else reaches it by name.
 
@@ -69,7 +69,7 @@ This is the one sanctioned exception to the "stick to `name` and `description`" 
 
 - [ ] Every `automation-*` and `knowledge-base:from-spec-*` skill sets `disable-model-invocation: true`.
 - [ ] No `orch-*`, `phase-*`, `create-*`, `product-owner:write-*`, `knowledge-base:to-spec-*`, `workflow-issue-sweep`, or `workflow-resolve-issue` skill sets it.
-- [ ] No skill that documents a scheduled-routine or dispatched-worker lane sets it.
+- [ ] No user-invoked skill body describes a scheduled, unattended, or dispatched-worker run — the flag blocks all three. Skills in a Copilot-only plugin are exempt, because the flag is inert there.
 - [ ] Every user-invoked description is one line with no `Use when:` or `DO NOT USE FOR:` clause.
 - [ ] No skill referenced by name from an agent, a hook prompt, or another skill is user-invoked.
-- [ ] Converter skills are named `to-<spec>` or `from-<spec>`, and paired halves share the `<spec>` noun.
+- [ ] Converter skills are named `to-spec-<kind>` or `from-spec-<kind>`, and paired halves share the `<kind>` noun.

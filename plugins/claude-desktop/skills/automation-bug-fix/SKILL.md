@@ -20,8 +20,8 @@ second session and never spawns an agent to run the orchestration.
 
 That is a hard constraint, not a preference. `orch-bug` runs through the `orchestrator`
 agent, which must own its session to hold the Personal Validation gate, write dashboard
-state, and ask the user a question — and a scheduled routine cannot open a second session to
-give it one. See **Session Ownership** and **Sub-Agent Constraints** in
+state, and ask the user a question — and this run cannot open a second session to give it
+one. See **Session Ownership** and **Sub-Agent Constraints** in
 `instructions/orch-execution-model.instructions.md`. Because the scope is a single issue,
 this session *is* the owner session and `orch-bug` behaves exactly as designed.
 
@@ -65,8 +65,7 @@ summary that the run went without the orchestration wrapper.
      --json number,title,body,labels,assignees,milestone,url,createdAt
    ```
 
-2. If no issues come back, report "no open bug issues" and stop. Under a schedule this is a
-   clean no-op run.
+2. If no issues come back, report "no open bug issues" and stop.
 
 ### Phase 2 — Filter Out Work Already In Flight
 
@@ -97,14 +96,8 @@ summary that the run went without the orchestration wrapper.
    filtered out and left for later runs. Name the runner-up, so the next run's pick is
    predictable.
 
-7. **Confirmation depends on whether a user is there.**
-
-   - **Interactive run:** ask the user to confirm the selected issue, or name a different
-     one. Do not proceed until they answer.
-   - **Unattended run** (scheduled routine, no user turn available): proceed without
-     confirmation. Three things make that safe — the scope is a single issue, the claim in
-     Phase 4 prevents a double pickup, and `orch-bug` still stops at Personal Validation, so
-     nothing reaches a pull request without the user.
+7. Ask the user to confirm the selected issue, or name a different one. Do not proceed until
+   they answer.
 
 ### Phase 4 — Claim and Resolve
 
@@ -200,9 +193,9 @@ contract.
 
 ## Notes
 
-- Safe to run on a schedule. A run either resolves one bug or is a clean no-op; it never
-  claims more than it works, so an interrupted run leaves at most one issue labelled
-  `in-progress` with a branch to pick back up.
+- A run either resolves one bug or is a clean no-op; it never claims more than it works, so
+  an interrupted run leaves at most one issue labelled `in-progress` with a branch to pick
+  back up.
 - The `in-progress` label is created automatically if it does not exist. Remove it when an
   issue is abandoned, or later runs will keep skipping it.
 - Severity is inferred from issue labels in this priority order:

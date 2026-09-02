@@ -58,9 +58,7 @@ This skill orchestrates the following installed skills:
    | `claude-desktop` | Claude Code plugin | `0.1.0` | `0.2.0` | plugin | Report only |
 
 5. If `update-strategy` is `major`, highlight all major bumps and ask for explicit confirmation
-   before including them. On an **unattended run** with no user turn available, drop the major
-   bumps from this run and record them as deferred rather than applying them unconfirmed.
-   Stop here if dry-run is `true`.
+   before including them. Stop here if dry-run is `true`.
 
 ### Phase 2 — Apply Updates
 
@@ -156,5 +154,5 @@ contract.
 
 - Major version bumps are opt-in; always confirm with the user before applying them.
 - Packages that break tests are skipped and flagged, not force-updated.
-- Run this automation on a fixed weekly schedule to keep dependency debt low.
+- Run this automation weekly to keep dependency debt low.
 - The Aspire phase is skipped automatically when no `.AppHost` project is present.
