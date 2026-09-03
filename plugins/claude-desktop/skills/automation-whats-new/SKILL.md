@@ -201,9 +201,9 @@ contract.
 
 ## Notes
 
-- Schedule this automation to run periodically (e.g. daily or weekly) via the app's workflow
-  scheduler, pointed at a session in the control repo that holds the state file. Running it
-  ad hoc works the same way — the checkpoint makes each run additive regardless of cadence.
+- Run this automation at whatever cadence suits the repos you track, from a session in the
+  control repo that holds the state file. The checkpoint makes each run additive, so a run
+  after a long gap reports everything since the last one rather than only the last week.
 - The state file is local to whichever repo/session runs this automation; it does not need to
   live in any of the tracked repos and should not be committed to them.
 - "Merged since last run" is driven by the `last_run_at` timestamp and the PR `mergedAt`

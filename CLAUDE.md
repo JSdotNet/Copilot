@@ -31,10 +31,16 @@ a trade between always-loaded context and the human's own memory:
 - **User-invoked** — `disable-model-invocation: true`. Only the human can fire it; nothing
   else can reach it, including the Skill tool. `description` is one human-facing line.
 
-`automation-*`, `workflow-*`, and `knowledge-base:from-spec-*` are user-invoked. Everything
-else is model-invoked, including `create-*` and `product-owner:write-*` — agents dispatch to
-those, and an agent cannot reach a user-invoked skill. Before marking anything user-invoked,
-grep the agents and hook prompts for its name.
+`automation-*`, `workflow-morning-brief`, and `knowledge-base:from-spec-*` are user-invoked.
+Everything else is model-invoked, including `create-*`, `product-owner:write-*`,
+`workflow-issue-sweep`, and `workflow-resolve-issue` — agents dispatch to the first two, and a
+scheduled routine or a dispatched worker session is the only invoker of the last two. Neither
+an agent nor a routine can reach a user-invoked skill: only a human typing the name can.
+Before marking anything user-invoked, grep the agents, hook prompts, and dispatch prompts for
+its name, and check whether its own body documents a routine lane. A body that documents one
+must either give up the flag or give up the lane; the `automation-*` bodies gave up the lane.
+The exception is `copilot-app`, which ships to Copilot only — the flag is inert there, so its
+scheduler notes still hold.
 
 Skills that cross the specification/code boundary in both directions are named
 `to-spec-<kind>` (code becomes a chapter) and `from-spec-<kind>` (a chapter becomes a change

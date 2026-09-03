@@ -148,6 +148,11 @@ learns one adoption vocabulary and applies it in both folders:
 | `hold` | Kept, but no longer expanded; avoid new usage. |
 | `retired` | No longer used. Kept because knowing what we stopped doing, and why, is the most useful record in this folder. |
 
+**`status` is required on every `.ai` block, with no resting value to omit** —
+for the same reason as `.tech`, whose ladder this is: the value is a rating, and
+a usage nobody has rated is not thereby `candidate`. It is *not* the editorial
+status that `.domain`, `.arc42`, and `.design` make optional.
+
 What is on the ladder differs between the two folders: `.tech` rates a
 **technology**, `.ai` rates a **way of working with one**. A tool can be
 `adopted` in `.tech` and its use at a given stage still be `trial` — that pairing

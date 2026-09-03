@@ -227,9 +227,14 @@ So:
   `proposed`. `ready`, `active`, and `done` mean reviewed and agreed, current, or
   built and correctly described, and none holds while a question on that chapter
   is unanswered. Otherwise one pass promotes a chapter and annotates a question
-  onto it in the same change.
+  onto it in the same change. Where `active` is the folder's resting value the
+  cap also forbids *removing* the `status` line, because absence is how `active`
+  is written.
 - Never move a chapter to `active` because the code exists. `active` means "this
-  is the current agreed model", and only a person agrees.
+  is the current agreed model", and only a person agrees. In `.domain`,
+  `.arc42`, and `.design` that move is spelled by *deleting* the `status` line,
+  since `active` is those folders' resting value — so a capture pass must leave
+  a `draft` or `proposed` line in place rather than tidying it away.
 - Never move a chapter to `deprecated` because the code was deleted. Code being
   gone may mean the model was abandoned, or may mean it regressed. Report it as
   `code-ahead` with the removal as the finding, and let the orchestration skill

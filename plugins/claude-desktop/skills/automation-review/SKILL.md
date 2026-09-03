@@ -82,10 +82,7 @@ This skill orchestrates the following installed skills:
 ### Phase 5 — Issue Creation (Optional)
 
 7. Present the findings that match the configured severity filter.
-8. Ask the user to confirm which findings should become GitHub issues. On an **unattended run**
-   with no user turn available, create issues for the findings matching the severity filter
-   without confirmation — an issue is a tracked note, reversible by closing it — and say in the
-   summary that they were created unconfirmed.
+8. Ask the user to confirm which findings should become GitHub issues.
 9. For each approved finding, use the `create-github-issue` skill to create an issue with:
    - **Title:** `[Review] <finding summary>`
    - **Body:** finding detail, file and line, layer (TODO / Suggestion / Code Review),
@@ -133,6 +130,6 @@ contract.
 
 - Each review layer can be run independently by invoking its skill directly; this automation
   runs all three in sequence and merges the output.
-- Schedule this automation weekly or before each release to maintain a healthy codebase baseline.
+- Run this automation weekly or before each release to maintain a healthy codebase baseline.
 - For non-.NET repositories, the `code-review` layer's checklist items that are .NET-specific
   (async patterns, `dotnet test`) should be adapted to the project's actual ecosystem.

@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { allowedStatuses } from "./metadata.mjs";
+import { allowedStatuses, validateDocument } from "./metadata.mjs";
 
 let failed = 0;
 const check = (ok, name, detail) => {
@@ -184,12 +184,56 @@ try {
         `got ${JSON.stringify(errorsFor(".domain/ordering/naming.md", namingDoc))}`
     );
 
-    const headingOnlyDoc = ["# Naming", "", "## Order", "", "Prose only.", ""].join("\n");
-    const headingOnlyIssues = configured.validateDocument(".domain/ordering/naming.md", headingOnlyDoc);
+    // An empty ladder switches off `status`, not the block itself: a `.domain`
+    // file-level block still carries the required `type`.
+    const noStatusDoc = ["# Naming", "", "```meta", "type: naming", "```", ""].join("\n");
+    same(errorsFor(".domain/ordering/naming.md", noStatusDoc), [], "a no-status file omits `status` and is clean");
+
+    // --- The resting value and the configured ladder compose ----------------
+    //
+    // `restingStatusFor` makes `status` optional in `.domain`/`.arc42`/`.design`;
+    // the config decides which values a given block may carry. Where a
+    // configured ladder drops `active`, the folder's resting value is not on
+    // offer any more and `status` goes back to being required.
+    const modelChapter = (status) =>
+        [
+            "# Ordering",
+            "",
+            "```meta",
+            "type: domain",
+            ...(status ? [`status: ${status}`] : []),
+            "```",
+            "",
+            "## Order",
+            "",
+            "```meta",
+            "type: aggregate",
+            ...(status ? [`status: ${status}`] : []),
+            "```",
+            "",
+        ].join("\n");
+
+    const configuredIssues = (status) =>
+        configured.validateDocument(".domain/ordering/domain.md", modelChapter(status));
     check(
-        headingOnlyIssues.length === 0,
-        "a no-status file needs no meta blocks at all",
-        `got ${JSON.stringify(headingOnlyIssues.map((i) => `${i.severity}: ${i.message}`))}`
+        configuredIssues(null).some(
+            (i) => i.severity === "error" && i.message.includes("missing required `status`")
+        ),
+        "a configured ladder without `active` makes `status` required again",
+        JSON.stringify(configuredIssues(null).map((i) => i.message))
+    );
+
+    // Unconfigured, the built-in `.domain` ladder still carries `active`, so
+    // omission means `active` and stating it is the thing worth reporting.
+    const plainIssues = (status) => validateDocument(".domain/ordering/domain.md", modelChapter(status));
+    same(plainIssues(null).map((i) => i.severity), [], "with no config, omitting `status` in .domain is clean");
+    check(
+        plainIssues("active").length > 0 &&
+            plainIssues("active").every(
+                (i) => i.severity === "warning" && i.message.includes("resting value")
+            ),
+        "with no config, stating the resting value warns",
+        JSON.stringify(plainIssues("active").map((i) => i.message))
     );
 } finally {
     rmSync(root, { recursive: true, force: true });

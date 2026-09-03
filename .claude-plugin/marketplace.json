@@ -21,7 +21,7 @@
       "name": "claude-desktop",
       "source": "./plugins/claude-desktop",
       "description": "Claude Code plugin for orchestration workflows, pull request delivery, and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
-      "version": "0.10.0"
+      "version": "0.11.0"
     },
     {
       "name": "csharp-coding",
@@ -69,7 +69,7 @@
       "name": "knowledge-base",
       "source": "./plugins/knowledge-base",
       "description": "Repository knowledge-folder convention for .arc42, .domain, .tech, .design, .backlog, and .ai: parseable chapter metadata, runnable test-case links, AI adoption tracked per development-flow stage, derived _meta indexes, a reference-graph canvas, per-folder orchestration skills, bidirectional to-spec-<kind> and from-spec-<kind> skills between chapters and code, and enforcement tooling.",
-      "version": "0.15.0"
+      "version": "0.16.0"
     },
     {
       "name": "product-owner",

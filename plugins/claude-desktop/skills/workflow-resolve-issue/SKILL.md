@@ -1,7 +1,14 @@
 ---
 name: workflow-resolve-issue
-description: 'Resolve one open GitHub issue end to end, unattended: claim it, provision a dedicated git worktree and branch for it, run the resolve-issue Workflow script (scope, TDD implementation, build and test with bounded repair, multi-lens review), then either open a pull request when the change proves itself, or park the worktree with a handoff brief when it needs a human to validate it. One issue per run, isolated from every other run.'
-disable-model-invocation: true
+description: >
+  Resolve one open GitHub issue end to end, unattended: claim it, cut it a dedicated worktree
+  and branch, run the resolve-issue Workflow script (scope, TDD implementation, build and test
+  with bounded repair, multi-lens review), then open a pull request when the change proves
+  itself or park the worktree with a handoff brief when a human must validate it. One issue per
+  run. Use when: a sweep's worker session or a scheduled routine asks for exactly one issue
+  resolved unattended. DO NOT USE FOR: work a human is sitting with (use
+  start-session-from-issue); never start it mid-task — only a user turn, a routine, or a
+  sweep's dispatch prompt may.
 ---
 
 # Workflow: Resolve GitHub Issue
@@ -189,8 +196,9 @@ delegated orchestration.
 
 ### Phase 3 — Run the Resolution Workflow
 
-9. Invoke the `Workflow` tool with the script that ships beside this skill. Invoking this
-   skill is the explicit opt-in the tool requires:
+9. Invoke the `Workflow` tool with the script that ships beside this skill. The prompt that
+   asked for this issue — a user turn, a routine, or a sweep's dispatch — is the explicit
+   opt-in the tool requires:
 
    ```text
    Workflow({

@@ -73,10 +73,6 @@ This skill orchestrates the following installed skills:
    - Proceed with implementing finding #1, or
    - Select a different finding by number.
 
-   **Unattended run** (scheduled routine, no user turn available): proceed with finding #1
-   without confirmation. Only one finding is implemented per run either way, and Phase 4 still
-   holds the pull request until the user is back.
-
 ### Phase 3 — Implement the Winning Finding
 
 9. Use the `tdd` skill to implement the fix in a Red-Green-Refactor cycle:
@@ -159,6 +155,6 @@ contract.
 
 - Only one finding is implemented per run to keep PRs focused and reviewable.
 - If the top finding was already fixed in a previous run, skip it and take the next one.
-- Schedule this automation weekly or before each release to accumulate incremental gains.
+- Run this automation weekly or before each release to accumulate incremental gains.
 - For non-.NET repositories, omit Aspire and dotnet steps; adapt the scan and build commands
   to the project's actual ecosystem.

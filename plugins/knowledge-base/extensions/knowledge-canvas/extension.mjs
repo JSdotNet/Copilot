@@ -23,6 +23,7 @@ import {
     parseDocument,
     validateDocument,
     folderKindForPath,
+    restingStatusFor,
     testCommand,
 } from "../../tools/knowledge-meta/metadata.mjs";
 
@@ -76,7 +77,11 @@ async function buildDocumentPayload(state) {
     const raw = await readFile(state.absolutePath, "utf8");
     const { fileTitle, fileMeta, chapters } = parseDocument(raw);
     const issues = validateDocument(state.relPath, raw);
-    return { path: state.relPath, raw, fileTitle, fileMeta, chapters, issues };
+    // The folder's resting status travels with the payload so the page can
+    // badge a block that omits `status` with the state it actually has. The
+    // page cannot derive it: it sees a path, not the schema.
+    const restingStatus = restingStatusFor(folderKindForPath(state.relPath));
+    return { path: state.relPath, raw, fileTitle, fileMeta, chapters, issues, restingStatus };
 }
 
 async function startServer(instanceId) {

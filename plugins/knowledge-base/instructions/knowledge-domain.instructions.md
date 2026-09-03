@@ -112,9 +112,9 @@ instructions.
   sub-chapter inside an Aggregate, every Feature/Sub-feature chapter in
   `features.md`, and every Term chapter in `naming.md` must carry a
   metadata block as described in
-  `knowledge-chapter-metadata.instructions.md`. `status` and `type` are
-  required; the optional cross-folder tags (`related`) and issue link
-  (`issue`) are included only when they have a value.
+  `knowledge-chapter-metadata.instructions.md`. `type` is required; `status` is
+  optional here (see below); the optional cross-folder tags (`related`) and
+  issue link (`issue`) are included only when they have a value.
 - A chapter may also carry `annotation` fences, which hold a question or comment
   about the block above them rather than chapter content. Read
   `knowledge-annotations.instructions.md` before writing or reading one: it
@@ -136,7 +136,17 @@ instructions.
   no `done`: `planned` means agreed to be built but not yet described, `ready`
   means reviewed and safe to build on, `changed` means it moved after it was
   ready and needs re-review, `active` means "this is the current model", and
-  `deprecated` means superseded.
+  `deprecated` means superseded. A repository narrows or extends this ladder in
+  `.github/knowledge-status.json`; see the `status` entry in
+  `knowledge-chapter-metadata.instructions.md`.
+- **`active` is this folder's resting value, so it is written by omitting the
+  field.** State `status` only while the chapter is in transition (`draft`,
+  `proposed`) or carries a standing warning (`deprecated`); drop the line when
+  it settles. Most of a mature bounded context is the current model, and
+  restating that on every chapter says nothing while hiding the few chapters
+  that are genuinely moving. Writing `status: active` explicitly is reported.
+  A configured ladder that drops `active` drops the resting value with it, and
+  `status` becomes required on the blocks that rule covers.
 - The metadata block's `type` field records what kind of thing the chapter or
   file is — the classification that is **never** written into the heading. This
   folder's value sets are:
@@ -237,7 +247,7 @@ instructions.
   by guessing, and it is where `assets/code-sync-protocol.md` means a rule to go
   when it says to record it as an open question instead of capturing it as fact.
 
-  An `open` row does not stop a chapter reaching `status: active` — a model can
+  An `open` row does not stop a chapter reaching `active` — a model can
   be the current one and still carry a known unanswered question. It does stop
   that one rule being *built*: a `from-spec-*` pass names it as needing a decision
   instead of briefing an implementation of a rule nobody has agreed.

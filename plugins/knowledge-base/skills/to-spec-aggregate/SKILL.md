@@ -324,8 +324,9 @@ service raises it.
   language are stated most precisely, and a pass that reads only production code
   will under-record both.
 - Do not record a rule found only in a disabled or skipped test as a fact.
-- Do not set `status: active` because the aggregate is implemented and shipping.
-  Code existing is not agreement that the code is the intended model.
+- Do not drop a chapter's `status` line because the aggregate is implemented and
+  shipping. An omitted status means the resting value `active` — agreed — and code
+  existing is not agreement that the code is the intended model.
 - Do not promote a rule enforced at one call site to an aggregate invariant.
 - Do not resolve a `conflict` verdict by rewriting the chapter to match the
   code. Stop and put the decision to the user.

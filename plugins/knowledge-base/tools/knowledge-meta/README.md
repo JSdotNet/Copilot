@@ -105,7 +105,7 @@ mappable to D3, vis.js, or Sigma.
 
 ```jsonc
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "generatedBy": ".github/tools/knowledge-meta/build.mjs",
   "scope": ".tech",
   "sources": [".tech"],
@@ -296,6 +296,14 @@ first and a `**/*.md` catch-all last:
 - A folder the file omits keeps its built-in ladder, so a repository can
   configure `.domain` alone.
 
+These rules decide **which** values a block may carry. Whether the field has to
+be written at all is the separate question `restingStatusFor` answers — see
+"`status` and `statusDeclared`" below. The two compose in one direction: a
+folder's resting value rests only where the block's own ladder still offers it,
+so a rule that configures `.domain` model chapters to `draft, ready, changed`
+has *replaced* `active` rather than made it implicit, and `status` is required
+again on the blocks that rule covers.
+
 Status validation runs in `validateDocument` — the `knowledge-graph` canvas and
 `knowledge-base-validate` — not in `--check`, which covers references, `type`,
 and the outline fields below. `node status-config.test.mjs` covers the rules.
@@ -356,7 +364,7 @@ sorting filenames.
 
 ```jsonc
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "generatedBy": ".github/tools/knowledge-meta/build.mjs",
   "scope": ".domain",
   "sources": [".domain"],
@@ -385,13 +393,13 @@ A numbered area carries `number` on every entry it could resolve one for, and
 ```jsonc
 "entries": [
   { "type": "file", "name": "README.md", "path": ".arc42/adr/README.md",
-    "title": "Architecture Decisions", "status": "active", "root": true },
+    "title": "Architecture Decisions", "status": "active", "statusDeclared": false, "root": true },
   { "type": "file", "name": "2-record-decisions.md", "path": ".arc42/adr/2-record-decisions.md",
-    "title": "Record Decisions", "status": "active", "number": 2, "date": "2025-11-02" },
+    "title": "Record Decisions", "status": "active", "statusDeclared": false, "number": 2, "date": "2025-11-02" },
   { "type": "file", "name": "7-use-postgres.md", "path": ".arc42/adr/7-use-postgres.md",
-    "title": "Use PostgreSQL", "status": "active", "number": 7, "date": "2026-03-04" },
+    "title": "Use PostgreSQL", "status": "active", "statusDeclared": false, "number": 7, "date": "2026-03-04" },
   { "type": "file", "name": "10-adopt-aspire.md", "path": ".arc42/adr/10-adopt-aspire.md",
-    "title": "Adopt .NET Aspire", "status": "active", "number": 10, "date": "2026-07-19" }
+    "title": "Adopt .NET Aspire", "status": "active", "statusDeclared": false, "number": 10, "date": "2026-07-19" }
 ]
 ```
 
@@ -405,6 +413,25 @@ identically-titled files of a bounded context. It is omitted for folders that
 define no value set. On an `area` entry it is the knowledge folder itself
 (`domain`, `arc42`, …), which is that entry's equivalent answer to "what kind of
 thing is this".
+
+### `status` and `statusDeclared`
+
+`status` is always the block's **effective** status, never a raw copy of the
+field. In `.domain`, `.arc42`, and `.design` the field is optional and an
+absent one means that folder's resting value, `active`, so a block that states
+nothing still lands in the right bucket of `nodesByStatus` and still badges as
+`active` in a viewer.
+
+Where that resolution happened the entry also carries `"statusDeclared": false`.
+It is written **only** when false, for two reasons: a consumer that cares can
+distinguish "settled, and the author said so by omission" from a stated value,
+and every already-declared entry stays byte-identical to what earlier schema
+versions emitted.
+
+`.tech`, `.ai`, and `.backlog` have no resting value, so an absent status there
+resolves to `null` and `validateDocument` reports it as an error. A `null`
+status in these artifacts means the corpus is broken, not that the content is at
+rest — do not paper over it in a viewer.
 
 ### `tests` on a file entry
 
