@@ -53,6 +53,13 @@ type: aggregate
 Prose for this chapter starts here.
 ```
 
+`meta` is not the only fenced block a chapter may carry. In `.domain`, an
+`annotation` fence records a question or comment about the block above it; it is
+not a metadata block, its own `status` field belongs to the note rather than to
+the chapter, and it is never validated against a folder's status ladder. The
+schema, placement, and lifecycle are in `knowledge-annotations.instructions.md`
+— do not restate them here.
+
 `type` is the only universally required field, and only in the three folders
 that define a value set for it (`.domain`, `.tech`, `.ai`). `status` is
 required per folder: mandatory in `.tech`, `.ai`, and `.backlog`, optional in
@@ -208,6 +215,20 @@ entries in `related` and in any folder-specific relation field (`depends-on`,
   the document as a whole and is set independently of its chapters' own
   `status` values (e.g. a file can be `active` overall while one chapter
   inside it is still `draft`).
+
+  Those value sets are the defaults. A repository narrows or extends them per
+  folder, per file glob, and per block level in `.github/knowledge-status.json`,
+  and a rule there may declare that a file's blocks carry no `status` at all —
+  in which case the field is omitted rather than required. The file's shape and
+  the resolution order are in `tools/knowledge-meta/README.md` under "Status
+  ladders"; read it before adding a status value a folder's instruction file
+  does not list.
+
+  The resting value and a configured ladder compose in one direction: a value
+  rests only where the block's own ladder still offers it. A repository that
+  configures `.domain` model chapters to `draft, ready, changed` has *replaced*
+  `active` rather than made it implicit, so on those chapters `status` is
+  required again and omitting it is reported.
 - **type** (required where the folder defines a value set) — what kind of thing
   this chapter or file *is*: the classification that used to be written as a
   heading prefix. Like `status`, the allowed values are folder-specific and are

@@ -72,8 +72,9 @@ the first thing lost when the semantics is left implicit.
 ## Workflow
 
 1. **Load governed context.** Read `assets/code-sync-protocol.md`,
-   `knowledge-domain.instructions.md`, and
-   `knowledge-chapter-metadata.instructions.md`. Read the target chapter, the
+   `knowledge-domain.instructions.md`,
+   `knowledge-chapter-metadata.instructions.md`, and
+   `knowledge-annotations.instructions.md`. Read the target chapter, the
    chapters of every aggregate it coordinates, the context's `naming.md`, and
    `dependencies.md` when it reaches across a context boundary.
 
@@ -119,7 +120,7 @@ the first thing lost when the semantics is left implicit.
    category per the protocol. Then stop. Do not open a source file for editing,
    do not create a test, do not name a delivery orchestration.
 
-10. **Report.** Close with the protocol's report table, one row per chapter in
+10. **Report.** Close with the protocol's report format, one board entry per chapter in
     scope, with the brief attached.
 
 ## Output expectations
@@ -142,7 +143,7 @@ the first thing lost when the semantics is left implicit.
   whether this is a new contract or a change to an already-published one. An
   event nobody handles changes nothing observable, so publication alone is not a
   complete brief.
-- The protocol's report table, with the verdict and the evidence behind it.
+- The protocol's report format, with the verdict and the evidence behind it.
 - No change to any file in the repository.
 
 ## Do not

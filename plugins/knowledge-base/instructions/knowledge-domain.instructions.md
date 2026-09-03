@@ -115,6 +115,12 @@ instructions.
   `knowledge-chapter-metadata.instructions.md`. `type` is required; `status` is
   optional here (see below); the optional cross-folder tags (`related`) and
   issue link (`issue`) are included only when they have a value.
+- A chapter may also carry `annotation` fences, which hold a question or comment
+  about the block above them rather than chapter content. Read
+  `knowledge-annotations.instructions.md` before writing or reading one: it
+  carries the schema, the placement rule, the lifecycle, the rule that an open
+  question caps the chapter's `status`, and the rule that a reader loading a
+  chapter for task context skips these fences.
 - Every file in `.domain` — `context-map.md` and, per bounded context,
   `domain.md`, `features.md`, `model.md`, `flow.md` (when present),
   `dependencies.md`, and `naming.md` — must also carry the file-level
@@ -124,16 +130,23 @@ instructions.
   `context-map.md`, `model.md`, `flow.md`, and `dependencies.md`, whose `##`
   sections do not carry their own per-chapter blocks — the file-level block
   is the only metadata those files carry.
-- The metadata block's `status` field uses `draft`, `proposed`, `active`, or
-  `deprecated` in this folder. Domain knowledge describes the current (or
-  agreed-future) model, not a task queue, so there is no `done`: `active`
-  means "this is the current model", `deprecated` means superseded.
+- The metadata block's `status` field uses `draft`, `planned`, `proposed`,
+  `ready`, `changed`, `active`, or `deprecated` in this folder. Domain knowledge
+  describes the current (or agreed-future) model, not a task queue, so there is
+  no `done`: `planned` means agreed to be built but not yet described, `ready`
+  means reviewed and safe to build on, `changed` means it moved after it was
+  ready and needs re-review, `active` means "this is the current model", and
+  `deprecated` means superseded. A repository narrows or extends this ladder in
+  `.github/knowledge-status.json`; see the `status` entry in
+  `knowledge-chapter-metadata.instructions.md`.
 - **`active` is this folder's resting value, so it is written by omitting the
   field.** State `status` only while the chapter is in transition (`draft`,
   `proposed`) or carries a standing warning (`deprecated`); drop the line when
   it settles. Most of a mature bounded context is the current model, and
   restating that on every chapter says nothing while hiding the few chapters
   that are genuinely moving. Writing `status: active` explicitly is reported.
+  A configured ladder that drops `active` drops the resting value with it, and
+  `status` becomes required on the blocks that rule covers.
 - The metadata block's `type` field records what kind of thing the chapter or
   file is — the classification that is **never** written into the heading. This
   folder's value sets are:

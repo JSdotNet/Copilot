@@ -121,7 +121,7 @@ Where the change is a move or a split rather than an addition, the category is
    category per the protocol. Then stop. Do not open a source file for editing,
    do not create a test, do not name a delivery orchestration.
 
-10. **Report.** Close with the protocol's report table, one row per chapter in
+10. **Report.** Close with the protocol's report format, one board entry per chapter in
     scope, with the brief attached.
 
 ## Output expectations
@@ -139,7 +139,7 @@ Where the change is a move or a split rather than an addition, the category is
   a move or a split.
 - An explicit statement that behaviour does not change, where the brief is
   purely structural.
-- The protocol's report table, with the verdict and the evidence behind it.
+- The protocol's report format, with the verdict and the evidence behind it.
 - No change to any file in the repository.
 
 ## Do not

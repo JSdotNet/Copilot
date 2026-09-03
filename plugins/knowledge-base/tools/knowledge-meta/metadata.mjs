@@ -5,8 +5,24 @@
 // flat (single-line scalars, null, or bracket lists), so we parse it with a
 // tiny hand-written reader instead of pulling in a YAML dependency.
 
-const STATUS_BY_FOLDER = {
-    domain: ["draft", "proposed", "active", "deprecated"],
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+// Which statuses each folder allows is repository configuration, not tool
+// knowledge: not every chapter kind has the same lifecycle, and a repository
+// that reads this table elsewhere (a status picker, a dashboard) needs one
+// declaration of it rather than a copy per consumer. The built-in table below
+// is only the fallback for a repository without the config file.
+const CONFIG_PATH = resolve(
+    dirname(fileURLToPath(import.meta.url)),
+    "..",
+    "..",
+    "knowledge-status.json"
+);
+
+const FALLBACK_STATUS_BY_FOLDER = {
+    domain: ["draft", "planned", "proposed", "ready", "changed", "active", "deprecated"],
     arc42: ["draft", "proposed", "active", "deprecated"],
     backlog: ["draft", "ready", "in-progress", "done", "blocked"],
     tech: ["candidate", "trial", "adopted", "hold", "retired"],
@@ -37,6 +53,78 @@ const RESTING_STATUS_BY_FOLDER = {
     arc42: "active",
     design: "active",
 };
+
+let statusConfig;
+
+/** Load `.github/knowledge-status.json` once; fall back to the built-in table. */
+function statusRulesForFolder(kind) {
+    if (statusConfig === undefined) {
+        try {
+            statusConfig = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+        } catch {
+            statusConfig = null;
+        }
+    }
+
+    const rules = statusConfig?.folders?.[kind]?.rules;
+    if (Array.isArray(rules) && rules.length > 0) return rules;
+
+    return [
+        {
+            id: `${kind}-fallback`,
+            files: ["**/*.md"],
+            scope: "any",
+            statuses: FALLBACK_STATUS_BY_FOLDER[kind] ?? [],
+        },
+    ];
+}
+
+/**
+ * Match a knowledge-folder-relative path against a rule pattern. `*` matches
+ * within one path segment, `**` matches across segments; a pattern without a
+ * slash matches the bare filename anywhere.
+ */
+function pathMatches(relPath, pattern) {
+    const normalized = relPath.replace(/\\/g, "/");
+    const target = pattern.includes("/") ? normalized : normalized.split("/").pop();
+    const segments = pattern.split("/");
+
+    let regex = "^";
+    segments.forEach((segment, index) => {
+        const isLast = index === segments.length - 1;
+        if (segment === "**") {
+            regex += isLast ? ".*" : "(?:[^/]+/)*";
+            return;
+        }
+        regex +=
+            segment.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^/]*") +
+            (isLast ? "" : "/");
+    });
+
+    return new RegExp(`${regex}$`).test(target);
+}
+
+/**
+ * The statuses allowed for one block. `scope` is "file" for the level-1 block
+ * and "chapter" for deeper headings. Rules are evaluated in order and the first
+ * match wins; an empty list means the block carries no `status` field at all.
+ */
+export function allowedStatuses(kind, relPath, scope) {
+    // Strip the folder prefix so rule patterns are written relative to the
+    // knowledge folder (`**/domain.md`), not to the repository root.
+    const withinFolder = relPath.replace(/\\/g, "/").replace(/^\.[^/]+\//, "");
+
+    for (const rule of statusRulesForFolder(kind)) {
+        const scopeMatches = !rule.scope || rule.scope === "any" || rule.scope === scope;
+        if (!scopeMatches) continue;
+        if (!(rule.files ?? ["**/*.md"]).some((pattern) => pathMatches(withinFolder, pattern))) {
+            continue;
+        }
+        return rule.statuses ?? [];
+    }
+
+    return [];
+}
 
 // Allowed `type` values per folder, split by block level. `type` records *what
 // kind of thing* a chapter or file is — the classification that used to be
@@ -850,8 +938,6 @@ export function validateDocument(relPath, markdown) {
     for (const issue of escapeSequenceIssues(markdown)) {
         issues.push({ severity: issue.severity, message: `${relPath} ${issue.message}` });
     }
-    const allowedStatus = STATUS_BY_FOLDER[kind];
-    const resting = restingStatusFor(kind);
     const optionalFields = new Set([
         ...COMMON_OPTIONAL_FIELDS,
         ...FILE_ONLY_FIELDS,
@@ -883,13 +969,38 @@ export function validateDocument(relPath, markdown) {
             continue;
         }
 
-        // `status` is required only in the folders that have no resting value.
-        // Where a folder does have one, absence *is* the statement, so an
-        // omitted status is correct and the resting value written out is the
-        // thing worth reporting — otherwise the corpus ends up with two
-        // spellings of one state and neither reader knows which to expect.
+        const allowedStatus = allowedStatuses(
+            kind,
+            relPath,
+            chapter.level === 1 ? "file" : "chapter"
+        );
+
+        // A folder's resting value only rests where the block's own ladder still
+        // offers it. A repository that configures `.domain` model chapters to
+        // `draft, ready, changed` has *replaced* `active`, not made it implicit,
+        // so omission there would resolve to a value the file may not carry —
+        // `status` goes back to being required.
+        const folderResting = restingStatusFor(kind);
+        const resting = allowedStatus.includes(folderResting) ? folderResting : null;
+
         const declaresStatus = "status" in chapter.meta;
-        if (!declaresStatus || chapter.meta.status === null) {
+        const hasStatus = declaresStatus && chapter.meta.status !== null;
+
+        if (allowedStatus.length === 0) {
+            // This file's blocks carry no `status` at all, so there is nothing
+            // to require and nothing to omit.
+            if (hasStatus) {
+                issues.push({
+                    severity: "error",
+                    message: `${label} has \`status\`, which this file does not use — remove the field.`,
+                });
+            }
+        } else if (!hasStatus) {
+            // `status` is required only where the block has no resting value.
+            // Where it has one, absence *is* the statement, so an omitted status
+            // is correct and the resting value written out is the thing worth
+            // reporting — otherwise the corpus ends up with two spellings of one
+            // state and neither reader knows which to expect.
             if (resting === null) {
                 issues.push({
                     severity: "error",

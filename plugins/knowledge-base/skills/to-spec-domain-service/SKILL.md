@@ -24,7 +24,7 @@ and transport. The latter is not domain knowledge and does not get a chapter.
 
 Read `assets/code-sync-protocol.md` before starting. It carries the counterpart
 resolution ladder, the evidence rules, the five-way drift verdict, the status
-rules, index regeneration, and the report table — none of which are repeated
+rules, index regeneration, and the report format — none of which are repeated
 here.
 
 ## Inputs
@@ -71,8 +71,9 @@ evidence either way.
 ## Workflow
 
 1. **Load governed context.** Read `assets/code-sync-protocol.md`,
-   `knowledge-domain.instructions.md`, and
-   `knowledge-chapter-metadata.instructions.md`. Read only the target context's
+   `knowledge-domain.instructions.md`,
+   `knowledge-chapter-metadata.instructions.md`, and
+   `knowledge-annotations.instructions.md`. Read only the target context's
    `domain.md` and `naming.md`, plus `dependencies.md` when the service reaches
    across a context boundary.
 
@@ -148,7 +149,7 @@ evidence either way.
    node .github/tools/knowledge-meta/build.mjs --scope .domain --check
    ```
 
-10. **Report.** Close with the protocol's report table, one row per chapter
+10. **Report.** Close with the protocol's report format, one board entry per chapter
     touched or checked, including the `aligned` ones.
 
 ## Output expectations
@@ -164,7 +165,7 @@ evidence either way.
 - For a process manager, where in-flight state lives — or that it does not
   persist.
 - Application services reported as findings, not given chapters.
-- The protocol's report table, with the `aligned` rows included.
+- The protocol's report format, with the `aligned` entries included.
 
 ## Do not
 

@@ -39,7 +39,7 @@ backwards. It has its own pair: `to-spec-domain-service`.
 
 Read `assets/code-sync-protocol.md` before starting. It carries the counterpart
 resolution ladder, the evidence rules, the five-way drift verdict, the status
-rules, index regeneration, and the report table — none of which are repeated
+rules, index regeneration, and the report format — none of which are repeated
 here.
 
 ## Inputs
@@ -152,8 +152,9 @@ service raises it.
 ## Workflow
 
 1. **Load governed context.** Read `assets/code-sync-protocol.md`,
-   `knowledge-domain.instructions.md`, and
-   `knowledge-chapter-metadata.instructions.md`. Then read only the target
+   `knowledge-domain.instructions.md`,
+   `knowledge-chapter-metadata.instructions.md`, and
+   `knowledge-annotations.instructions.md`. Then read only the target
    context's `domain.md` and `naming.md`, plus `.domain/context-map.md` for
    cross-context relationships and `dependencies.md` for the published-language
    entries any event consumers rely on. Do not read the whole `.domain` folder.
@@ -278,7 +279,7 @@ service raises it.
     node .github/tools/knowledge-meta/build.mjs --scope .domain --check
     ```
 
-12. **Report.** Close with the protocol's report table, one row per chapter —
+12. **Report.** Close with the protocol's report format, one board entry per chapter —
     root, each sub-chapter, each shared grouping, each event — including the
     `aligned` ones.
 
@@ -310,7 +311,7 @@ service raises it.
 - New chapters at `status: draft`; existing chapters' `status` unchanged.
 - A verdict per chapter, not one for the whole aggregate.
 - `.domain/_meta/` regenerated and `--check` clean.
-- The protocol's report table, with the `aligned` rows included.
+- The protocol's report format, with the `aligned` entries included.
 
 ## Do not
 

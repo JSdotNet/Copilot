@@ -31,7 +31,7 @@ has value well beyond the chapter itself.
 
 Read `assets/code-sync-protocol.md` before starting. It carries the counterpart
 resolution ladder, the evidence rules, the five-way drift verdict, the status
-rules, index regeneration, and the report table — none of which are repeated
+rules, index regeneration, and the report format — none of which are repeated
 here.
 
 ## Inputs
@@ -150,7 +150,7 @@ not copy.
    node .github/tools/knowledge-meta/build.mjs --scope .arc42 --check
    ```
 
-10. **Report.** Close with the protocol's report table, one row per chapter
+10. **Report.** Close with the protocol's report format, one board entry per chapter
     touched or checked, including the `aligned` ones.
 
 ## Output expectations
@@ -168,7 +168,7 @@ not copy.
   redrawn.
 - `related` references to the `.domain` bounded contexts the blocks align with.
 - `.arc42/_meta/` regenerated and `--check` clean.
-- The protocol's report table, with the `aligned` rows included.
+- The protocol's report format, with the `aligned` entries included.
 
 ## Do not
 

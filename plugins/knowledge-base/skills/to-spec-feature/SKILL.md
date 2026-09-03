@@ -25,7 +25,7 @@ Feature chapters are the only `.domain` chapters that carry `depends-on` and
 
 Read `assets/code-sync-protocol.md` before starting. It carries the counterpart
 resolution ladder, the evidence rules, the five-way drift verdict, the status
-rules, index regeneration, and the report table — none of which are repeated
+rules, index regeneration, and the report format — none of which are repeated
 here.
 
 ## Inputs
@@ -115,8 +115,9 @@ up to that point and record the rest from code and tests.
 ## Workflow
 
 1. **Load governed context.** Read `assets/code-sync-protocol.md`,
-   `knowledge-domain.instructions.md`, and
-   `knowledge-chapter-metadata.instructions.md`. Read only the target context's
+   `knowledge-domain.instructions.md`,
+   `knowledge-chapter-metadata.instructions.md`, and
+   `knowledge-annotations.instructions.md`. Read only the target context's
    `features.md` and `naming.md`, plus `domain.md` for the aggregates the
    capability exercises.
 
@@ -218,7 +219,7 @@ up to that point and record the rest from code and tests.
     node .github/tools/knowledge-meta/build.mjs --scope .domain --check
     ```
 
-11. **Report.** Close with the protocol's report table, one row per chapter
+11. **Report.** Close with the protocol's report format, one board entry per chapter
     touched or checked, including the `aligned` ones.
 
 ## Output expectations
@@ -245,7 +246,7 @@ up to that point and record the rest from code and tests.
   features.
 - `related` pointing at the `domain.md` chapters the capability exercises.
 - Business value grounded, or left as an open question rather than invented.
-- The protocol's report table, with the `aligned` rows included.
+- The protocol's report format, with the `aligned` entries included.
 
 ## Do not
 
