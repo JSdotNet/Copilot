@@ -127,7 +127,7 @@ Write them out as invariants, with the token names.
    category per the protocol. Then stop. Do not open a source file for editing,
    do not create a test, do not name a delivery orchestration.
 
-10. **Report.** Close with the protocol's report table, one row per chapter in
+10. **Report.** Close with the protocol's report format, one board entry per chapter in
     scope, with the brief attached.
 
 ## Output expectations
@@ -147,7 +147,7 @@ Write them out as invariants, with the token names.
 - Any required package named as a prerequisite, with an explicit note that the
   dependency change itself goes through the package-update workflow.
 - The single channel in scope, and the others explicitly out of it.
-- The protocol's report table, with the verdict and the evidence behind it.
+- The protocol's report format, with the verdict and the evidence behind it.
 - No change to any file in the repository.
 
 ## Do not

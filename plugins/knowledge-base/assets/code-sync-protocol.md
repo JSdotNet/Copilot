@@ -197,6 +197,11 @@ evidence, name the decision that has to be made, and wait.
 `unresolved` is likewise not a licence to guess. Report it as a finding — a
 concept nobody can pair to code is itself worth knowing about.
 
+Recording the question is not answering it. Preparing an `annotation` fence for a
+`conflict` or an `unresolved` verdict, per part 3 of "Report", writes down the
+decision that has to be made and leaves it open; it does not settle the chapter's
+substance, and it does not lift the obligation to stop and ask.
+
 ## Status rules
 
 `status` records how settled the written knowledge is. It is not a report on the
@@ -211,6 +216,18 @@ So:
 - An existing chapter's `status` is left exactly as it is. Capture changes the
   chapter's *content*; a status change is a separate, deliberate decision that
   belongs to the folder's orchestration skill and the person running it.
+- A capture pass **may propose** a status transition per chapter, as
+  `current → proposed` on the chapter board and in the handoff, and still writes
+  neither one. Proposing is how a pass says "the code now supports promoting
+  this" while leaving the promotion to the orchestration skill and the person
+  running it, which is where the rule above already puts the decision.
+- **An open question caps what may be proposed.** A chapter carrying an
+  `annotation` of `kind: question` at `status: open` — including one this pass
+  just prepared, per part 3 of "Report" — is proposed no higher than `draft` or
+  `proposed`. `ready`, `active`, and `done` mean reviewed and agreed, current, or
+  built and correctly described, and none holds while a question on that chapter
+  is unanswered. Otherwise one pass promotes a chapter and annotates a question
+  onto it in the same change.
 - Never move a chapter to `active` because the code exists. `active` means "this
   is the current agreed model", and only a person agrees.
 - Never move a chapter to `deprecated` because the code was deleted. Code being
@@ -335,28 +352,113 @@ file under `_meta/`.
 
 A build pass changes no knowledge file and therefore regenerates nothing.
 
-## Report table
+## Report
 
-Both directions close with the same table, one row per chapter or counterpart in
-scope, so a run's outcome is legible without reading the prose.
+Both directions close with the same report, covering every chapter or
+counterpart in scope. It has four parts, in this order: a chapter board, an
+evidence list, the decisions as numbered questions, and one handoff block per
+destination repository.
 
-| Chapter | Counterpart | Resolved via | Verdict | Evidence | Action |
-|---|---|---|---|---|---|
-| `.domain/order-management/domain.md#order` | `Order` in `src/Ordering.Domain/Order.cs` | `naming.md` alias | `code-ahead` | Two guard clauses and 4 passing tests assert an invariant the chapter omits | Chapter updated via `orch-domain` |
-| `.domain/order-management/domain.md#refund` | not found | — | `unresolved` | No alias, no building-block match, no comparable naming | Reported; needs a decision on whether the concept is built |
+**Publish the report as a rendered page where the host provides one; otherwise
+emit the same content inline as markdown.** Same parts, same order, same
+content either way — the format is the deliverable and the rendering is not.
 
-Column rules:
+A prose narrative is not one of the four parts. At the sizes these passes reach
+— a 22-chapter aggregate is ordinary — a paragraph per chapter is what makes a
+report unreadable, and it forces the reader to re-derive the decisions the
+verdicts already found.
 
-- **Chapter** — the `<path>#<heading-slug>` reference, or the bare `<path>` for
-  a file-level finding. Never a heading title on its own.
-- **Counterpart** — the code element and the file it lives in, or `not found`.
-- **Resolved via** — which rung of counterpart resolution matched: `naming.md`
-  alias, building-block view, observed convention, or `—`.
-- **Verdict** — one of the five, spelled exactly as above.
-- **Evidence** — what was read that settles it, specifically enough to re-check.
-  Never "reviewed the code".
-- **Action** — what was done or is being asked for. For `conflict` and
-  `unresolved`, the action is the question being put to the user.
+### 1. Chapter board
+
+One entry per chapter in scope, `aligned` ones included. Two lines per entry:
+
+```text
+.domain/order-management/domain.md#order      code-ahead   draft → ready   blocked by Q2
+    `Order` in src/Ordering.Domain/Order.cs — via `naming.md` alias
+
+.domain/order-management/domain.md#refund     unresolved   draft → —       blocked by Q3
+    not found — via —
+```
+
+- **Line 1** — the `<path>#<heading-slug>` reference (the bare `<path>` for a
+  file-level finding, never a heading title on its own), the verdict spelled
+  exactly as in "Drift verdict", the status as `current → proposed` per "Status
+  rules" (`—` as the target where the pass proposes no move), and the ids of the
+  questions blocking the chapter, or nothing where none do.
+- **Line 2** — the counterpart and how it was paired: the code element with the
+  file it lives in, or `not found`, then the rung of counterpart resolution that
+  matched — `naming.md` alias, building-block view, observed convention, or `—`.
+  This is where a rung-3 inference gets stated, with its evidence in part 2.
+
+Colour each entry by verdict and let the reader filter by status wherever the
+rendering supports it. Both are additions to a board that already reads
+correctly with no colour and no filter at all.
+
+### 2. Evidence list
+
+One labelled line per finding — never a paragraph per chapter. The label names
+what was examined; the rest of the line is what it settles:
+
+```text
+Invariants — `Order.Confirm` guard + 4 passing tests: a cancelled order cannot be confirmed
+Payload — `OrderConfirmed` carries `OrderId`, `ConfirmedAt`; the chapter also lists `Total`
+Trigger — raised at `Order.cs:88` only when the line count is non-zero
+Coverage — no test asserts the refund window; recorded from code as thinly covered
+```
+
+A reader who reads only the labels can say what the pass examined. Keep every
+line re-checkable against a file, a member, or a test name, per "Evidence
+rules".
+
+### 3. Decisions
+
+Every `conflict` and every `unresolved` verdict becomes one numbered,
+addressable question, `Q1` to `Qn`, with its options spelled out and the
+chapters it blocks named:
+
+```text
+Q2 — Does an order confirm with zero lines?
+     Chapter says it does; `Order.Confirm` throws. Both readings are defensible.
+     (a) The chapter is stale — adopt the guard as an invariant.
+     (b) The guard is a defect — keep the chapter and brief the fix.
+     Blocks: domain.md#order, domain.md#order-confirmed
+```
+
+Addressability is the point: the board cites these ids and so does the handoff,
+so each decision is stated once and referenced everywhere else. Present both
+readings with their evidence and put the question to the user — a `conflict`
+stops and asks, and `unresolved` names the evidence that would settle it.
+
+**A report closes; a question outlives it.** So a capture pass does not leave its
+questions in the report alone. Where the folder has the annotation convention —
+`.domain`, per `knowledge-annotations.instructions.md` — each `Q<n>` is also
+prepared as an `annotation` fence of `kind: question` at `status: open`, placed
+against the block it is about, carrying its `Q<n>` id and an `In code today:`
+paragraph so report and chapter cross-reference with no id field. That fence is
+spec-side content like any other: it goes in with the drafted chapter and routes
+through the folder's orchestration skill, never written directly.
+
+Two consequences follow, and neither is optional:
+
+- The question survives in the one place a reader of the chapter will meet it,
+  instead of being lost when the report closes, stated as prose where it would
+  read as model, or filed as an issue away from the text it is about.
+- A chapter carrying an open question is capped: never propose it at `ready`,
+  `active`, or `done` on the board. See "Status rules".
+
+A build pass writes no annotation, and carries none into a change brief. In a
+folder without the convention the questions stay in the report, and the pass says
+so rather than inventing a fence the folder's rules do not define.
+
+### 4. Handoff
+
+One self-contained block per destination repository, copyable as it stands. Each
+block carries what the receiving session cannot get for itself: the scope, the
+verdicts, the proposed status transitions, and the question ids with their text.
+Leave out whatever that session can read from the repository it is handed.
+
+A pass whose findings span several repositories emits one block per repository,
+each complete on its own, so a reader never has to merge two blocks.
 
 Report every chapter in scope, including the `aligned` ones. A pass that lists
 only its findings does not tell the reader what was checked and found fine, so

@@ -27,6 +27,11 @@ policy can name them directly as the entry point for each folder.
   with `node .github/tools/knowledge-meta/build.mjs`. Never read them either —
   they are tool input, and the graph is large enough to crowd out real context.
   Claude Code repositories can enforce this with the deny rule below.
+- An `annotation` fence is not chapter content. Loading a chapter for task context
+  skips every annotation fence in it: those carry open questions, and an
+  unanswered question read as settled knowledge is worse than not reading it.
+  Review-mode work — a review skill, an inbox, an approval gate — reads the
+  fences, and reads nothing else in the chapter as instruction.
 ```
 
 ## For a repository routing instructions file
@@ -39,7 +44,9 @@ policy can name them directly as the entry point for each folder.
   scope. Route direct `.arc42/` chapter edits through `orch-arc42-content`.
 - Domain modeling workflows may load `.domain/` as working context, but should
   load only the relevant bounded-context chapters. Route `.domain/` edits through
-  `orch-domain`.
+  `orch-domain`. Skip the `annotation` fences when loading a chapter as task
+  context; read them only in review mode. A chapter with an open `kind: question`
+  fence is not agreed, whatever its `status` says.
 - Design and UX workflows may load `.design/`, and stack, dependency, or upgrade
   workflows may load `.tech/` — in both cases only the relevant file(s). Route
   edits through `orch-design` and `orch-tech`.

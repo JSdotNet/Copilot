@@ -92,7 +92,7 @@ followed, so a scoped graph stays about its own folder.
 | `graph.mjs` | Graph construction, scope discovery, and scope projection. Imported by the CLI *and* by the `knowledge-graph` canvas, so the written indexes and the live view can never disagree. |
 | `outline.mjs` | Outline generation: root-document resolution (`index: root`, else the `DIRECTORY_CONVENTION` table), numbered ordering, and the per-file lede and diagram count a list view needs. |
 | `build.mjs` | CLI wrapper: writes both artifacts per scope, prints stats, exits non-zero on errors. |
-| `escape-lint.test.mjs`, `tests-field.test.mjs` | Self-contained checks — `node <file>` — over the escape-sequence lint and over `tests` parsing, its run-command mapping, and its lint. |
+| `escape-lint.test.mjs`, `tests-field.test.mjs`, `status-config.test.mjs`, `annotation-fence.test.mjs` | Self-contained checks — `node <file>` — over the escape-sequence lint, over `tests` parsing with its run-command mapping and lint, over the status ladders and their repo-level configuration, and over the inertness of `annotation` fences. |
 
 This folder is self-contained — copy it into a repository as
 `.github/tools/knowledge-meta/` and it runs with no other files installed.
@@ -240,6 +240,70 @@ keeping it means a chapter that declared four links does not silently render as
 three. `parseTestReference` and `testRunners` are exported alongside, for a consumer
 that wants the parts of one entry, or the known runners and the selector shape
 each expects, without building a command.
+
+## Status ladders
+
+Which `status` values a `meta` block may carry is repository configuration, not
+tool knowledge — not every chapter kind has the same lifecycle, and a repository
+that reads the ladder somewhere else (a status picker, a dashboard) needs one
+declaration of it rather than a copy per consumer. `metadata.mjs` exports
+`allowedStatuses(folder, relPath, scope)`, and every status check goes through
+it.
+
+With no configuration file, each folder gets a built-in ladder:
+
+| Folder | Statuses |
+|---|---|
+| `.domain` | `draft`, `planned`, `proposed`, `ready`, `changed`, `active`, `deprecated` |
+| `.arc42` | `draft`, `proposed`, `active`, `deprecated` |
+| `.backlog` | `draft`, `ready`, `in-progress`, `done`, `blocked` |
+| `.tech`, `.ai` | `candidate`, `trial`, `adopted`, `hold`, `retired` |
+| `.design` | `draft`, `active`, `deprecated` |
+
+To narrow or extend a ladder, add `.github/knowledge-status.json`. Rules are
+evaluated top to bottom and the first match wins, so put the most specific
+first and a `**/*.md` catch-all last:
+
+```json
+{
+  "version": 1,
+  "folders": {
+    "domain": {
+      "path": ".domain",
+      "rules": [
+        { "id": "containers", "files": ["**/naming.md", "**/dependencies.md"],
+          "scope": "any", "statuses": [] },
+        { "id": "model", "files": ["**/domain.md", "cross-cutting/*.md"],
+          "scope": "any", "statuses": ["draft", "ready", "changed", "deprecated"],
+          "default": "draft" },
+        { "id": "decisions", "files": ["**/decisions.md"],
+          "scope": "chapter", "statuses": ["proposed", "active", "deprecated"] }
+      ]
+    }
+  }
+}
+```
+
+- **`files`** — globs relative to the knowledge folder, not the repository root.
+  `*` matches inside one path segment, `**` across segments, and a pattern with
+  no slash matches the bare filename anywhere. Defaults to `["**/*.md"]`.
+- **`scope`** — `file` for the level-1 block, `chapter` for deeper headings,
+  `any` (the default) for both.
+- **`statuses`** — the allowed values. An **empty list means the block carries
+  no `status` field at all**: a `status` on such a file is an error, and a
+  heading there needs a `meta` block only when it has something else to say.
+- **`default`** — the value a status picker should preselect. Not read here.
+- A folder the file omits keeps its built-in ladder, so a repository can
+  configure `.domain` alone.
+
+Status validation runs in `validateDocument` — the `knowledge-graph` canvas and
+`knowledge-base-validate` — not in `--check`, which covers references, `type`,
+and the outline fields below. `node status-config.test.mjs` covers the rules.
+
+`.github/knowledge-status.json` is resolved from this folder's own location,
+which makes it the config of the repository the tooling is installed in. A
+`--root` run against a *different* repository therefore reads the local rules,
+not that repository's.
 
 ## Validation
 

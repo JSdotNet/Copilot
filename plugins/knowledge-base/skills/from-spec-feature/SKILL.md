@@ -72,8 +72,9 @@ each row's `Enforced at` point, and leave `open` rows out of the invariants list
 ## Workflow
 
 1. **Load governed context.** Read `assets/code-sync-protocol.md`,
-   `knowledge-domain.instructions.md`, and
-   `knowledge-chapter-metadata.instructions.md`. Read the target chapter, its
+   `knowledge-domain.instructions.md`,
+   `knowledge-chapter-metadata.instructions.md`, and
+   `knowledge-annotations.instructions.md`. Read the target chapter, its
    `###` sub-feature chapters, every chapter named in `depends-on`, the
    `related` `domain.md` chapters, and the context's `naming.md`.
 
@@ -120,7 +121,7 @@ each row's `Enforced at` point, and leave `open` rows out of the invariants list
    category per the protocol. Then stop. Do not open a source file for editing,
    do not create a test, do not name a delivery orchestration.
 
-10. **Report.** Close with the protocol's report table, one row per chapter in
+10. **Report.** Close with the protocol's report format, one board entry per chapter in
     scope, with the brief attached.
 
 ## Output expectations
@@ -137,7 +138,7 @@ each row's `Enforced at` point, and leave `open` rows out of the invariants list
 - Each sub-feature marked in scope or deferred, explicitly.
 - The feature flag named, with whether it must be created as part of this
   change.
-- The protocol's report table, with the verdict and the evidence behind it.
+- The protocol's report format, with the verdict and the evidence behind it.
 - No change to any file in the repository.
 
 ## Do not

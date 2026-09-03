@@ -194,7 +194,23 @@ reference and none repeats: counterpart resolution, the evidence rules (includin
 why unit tests are first-class evidence for capture rather than a cross-check), a
 five-way drift verdict (`aligned`, `code-ahead`, `spec-ahead`, `conflict`,
 `unresolved`, where `conflict` always stops and asks), the status rules, index
-regeneration, and a shared report table.
+regeneration, and a shared report format.
+
+The report has four parts — a chapter board, a labelled evidence list, the
+decisions as numbered `Q1`…`Qn` questions, and one self-contained handoff block
+per destination repository — published as a rendered page where the host
+provides one and emitted inline as markdown where it does not. A capture pass
+may propose a `current → proposed` status transition per chapter in that report;
+it never writes one, because promotion stays with the folder's orchestration
+skill and the person running it.
+
+Because a report closes and a question should not, each `Q<n>` is also prepared
+as an `annotation` fence in the chapter it is about — in `.domain`, per
+`knowledge-annotations.instructions.md`. The fence keeps the question next to the
+text it concerns instead of stating it as prose, losing it with the report, or
+filing it away from the chapter; it routes through `orch-domain` like any other
+write; and while it is open the chapter cannot be proposed at `ready`, `active`,
+or `done`.
 
 Counterpart resolution deliberately uses **no metadata field** linking a chapter
 to a code path — a path in a `meta` block rots on the first refactor and gives no
@@ -215,6 +231,7 @@ these skills exist.
 | File | Pattern | Purpose |
 |------|---------|---------|
 | `knowledge-chapter-metadata.instructions.md` | all six folders | Required `meta` block fields, `status` ladders, `type` value sets, and the `tests` test-case link format |
+| `knowledge-annotations.instructions.md` | `.domain/**` | The `annotation` fence: schema, placement, lifecycle, who may write one, the status cap an open question imposes, and the rule that task-context reads skip these fences |
 | `knowledge-domain.instructions.md` | `.domain/**` | Bounded-context structure and ubiquitous language |
 | `knowledge-arc42.instructions.md` | `.arc42/**` | arc42 chapter, ADR, and TDR structure |
 | `knowledge-tech.instructions.md` | `.tech/**` | Technology graph, versions, maturity ladder |
@@ -252,7 +269,8 @@ node .github/tools/knowledge-meta/build.mjs --root ../other-repo
 
 Output is deterministic — no timestamps — so a clean `git diff` proves the
 committed indexes are current. See `tools/knowledge-meta/README.md` for the
-output shape and for when to refresh.
+output shape, for when to refresh, and for the `status` ladders and their
+optional `.github/knowledge-status.json` override.
 
 ### Tooling: `knowledge-tech`
 
@@ -273,13 +291,68 @@ for technologies that do not appear in package manifests.
 | `assets/workflows/knowledge-meta-nightly.yml` | Scheduled index refresh; opens one pull request when the output drifted, nothing when it did not |
 | `assets/build/Update-KnowledgeIndex.ps1` | On-demand index refresh, with `-Scope` and `-Check`; reports which index files moved |
 | `assets/routing-snippet.md` | Optional repository-local context-loading and routing policy, plus the `Read(_meta/**)` deny rule that keeps generated indexes out of agent context |
-| `assets/code-sync-protocol.md` | Shared rules for the `to-spec-*` / `from-spec-*` skills: counterpart resolution, evidence rules including why unit tests are first-class evidence for capture, the five-way drift verdict, status rules, index regeneration, and the report table. An asset rather than an instruction, because an honest `applyTo` glob for these rules would have to cover source trees and would break the plugin's silence in non-adopting repositories |
+| `assets/code-sync-protocol.md` | Shared rules for the `to-spec-*` / `from-spec-*` skills: counterpart resolution, evidence rules including why unit tests are first-class evidence for capture, the five-way drift verdict, status rules, index regeneration, and the report format — including the `annotation` fences a capture pass prepares for its open questions. An asset rather than an instruction, because an honest `applyTo` glob for these rules would have to cover source trees and would break the plugin's silence in non-adopting repositories |
 
 ### Hook configuration
 
 - `hooks.json` adds a session-start guardrail: knowledge folders are task-scoped
   context rather than baseline context, `meta` blocks are mandatory on every
   chapter, and `_meta/` is never hand-edited.
+
+## 0.15.0: repo-configurable status ladders
+
+**Additive for an unconfigured repository, and one ladder gets wider.** Which
+`status` values a `meta` block may carry now comes from
+`allowedStatuses(folder, relPath, scope)` in `metadata.mjs`, which reads
+`.github/knowledge-status.json` when the repository has one and otherwise falls
+back to a built-in table. Rules are per folder, per file glob, and per block
+level; the first match wins; an empty `statuses` list means the file's blocks
+carry no `status` at all. The file's shape is in
+`tools/knowledge-meta/README.md` under "Status ladders".
+
+The built-in `.domain` ladder is widened to `draft`, `planned`, `proposed`,
+`ready`, `changed`, `active`, `deprecated`. Before this release the ladder was
+hardcoded at four rungs, so a repository adopting the plugin fresh could not put
+`ready` or `changed` on a domain chapter at all — which the `to-spec-*` report's
+status column depends on.
+
+To adopt: re-sync `.github/tools/knowledge-meta/` from this plugin. Nothing else
+is required — an unconfigured repository keeps every ladder it had, plus the
+three new `.domain` rungs. Add `.github/knowledge-status.json` only when the
+defaults are wrong for the repository.
+
+## 0.15.0: the `annotation` fence in `.domain`
+
+**Additive, and convention only.** A `.domain` chapter may carry `annotation`
+fences beside its `meta` block, each holding one question, comment, suggestion,
+or flag about the block directly above it. A capture pass writes `kind: question`
+at `status: open` and only that kind, carrying its report id (`**Q7** — …`) and
+an `In code today:` paragraph, so the question a pass found lives where the
+chapter's next reader will meet it. `from-spec-*` carries no annotation into a
+change brief. The write routes through `orch-domain`; a capture pass never edits
+the file.
+
+Two rules make it safe. A reader loading a chapter for **task context skips the
+fences** — an unanswered question read as settled knowledge is the failure mode
+this introduces — and reads them only in review mode. And a chapter carrying an
+open `kind: question` fence may not carry, or be proposed at, `status: ready`,
+`active`, or `done`.
+
+**Nothing parses these fences yet, on purpose.** No schema check, no open-question
+count, no `--check` rule, and `.github/knowledge-status.json` never sees an
+annotation's `status` — that field is the note's, not the chapter's. What is
+guaranteed and tested (`node annotation-fence.test.mjs`) is that a fence is
+*inert*: it never becomes a `meta` block, never reaches `summary`, is not counted
+as a diagram, and does not trip the escape lint. Build the parse when an unswept
+`resolved` note first survives a merge.
+
+Scoped to `.domain` deliberately, following the proposal this adopts: `.arc42`
+and `.design` wait until the convention has been used in anger. Their capture
+passes keep their questions in the report and say so.
+
+To adopt: nothing to install. `knowledge-annotations.instructions.md` ships with
+the plugin, and the reading rule is in the session-start guidance and in
+`assets/routing-snippet.md`.
 
 ## 0.12.0: the `.ai` folder
 

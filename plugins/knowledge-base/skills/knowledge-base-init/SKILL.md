@@ -63,12 +63,17 @@ partial adoption is fully supported.
 3. **Install the generator.** Copy `tools/knowledge-meta/` from the plugin root
    into the repository as `.github/tools/knowledge-meta/`. Copy the whole folder —
    it is self-contained (`build.mjs`, `graph.mjs`, `outline.mjs`, `metadata.mjs`,
-   `escape-lint.test.mjs`, `README.md`) and has no dependencies beyond Node.
+   the `*.test.mjs` checks, `README.md`) and has no dependencies beyond Node.
 
-   `escape-lint.test.mjs` is a standalone check of the escape-sequence lint;
-   run `node .github/tools/knowledge-meta/escape-lint.test.mjs` after a sync to
-   confirm the copy is intact. It is safe to omit if the repository would
-   rather not carry it.
+   The `*.test.mjs` files are standalone checks; run each one
+   (`node .github/tools/knowledge-meta/<file>`) after a sync to confirm the copy
+   is intact. They are safe to omit if the repository would rather not carry
+   them.
+
+   Each folder's `status` ladder has a built-in default, so this step needs no
+   configuration. Add `.github/knowledge-status.json` when the repository wants
+   a different ladder — the shape is in `tools/knowledge-meta/README.md` under
+   "Status ladders".
 
    Also copy `tools/knowledge-tech/` into `.github/tools/knowledge-tech/` when
    the repository adopts `.tech/`. These scripts provide deterministic .NET and

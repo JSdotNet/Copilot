@@ -150,8 +150,9 @@ unsettled sub-chapter, and leave it out of the invariants list.
 ## Workflow
 
 1. **Load governed context.** Read `assets/code-sync-protocol.md`,
-   `knowledge-domain.instructions.md`, and
-   `knowledge-chapter-metadata.instructions.md`. Read the target `##` chapter,
+   `knowledge-domain.instructions.md`,
+   `knowledge-chapter-metadata.instructions.md`, and
+   `knowledge-annotations.instructions.md`. Read the target `##` chapter,
    every `###` sub-chapter under it, every event chapter it raises, the shared
    groupings it draws from, the context's `naming.md`, and `dependencies.md` for
    the cross-context relationships and published-language entries involved. Do
@@ -212,7 +213,7 @@ unsettled sub-chapter, and leave it out of the invariants list.
    category per the protocol. Then stop. Do not open a source file for editing,
    do not create a test, do not name a delivery orchestration.
 
-10. **Report.** Close with the protocol's report table, one row per chapter in
+10. **Report.** Close with the protocol's report format, one board entry per chapter in
     scope, with the brief attached.
 
 ## Output expectations
@@ -240,7 +241,7 @@ unsettled sub-chapter, and leave it out of the invariants list.
   change to a published one, and the delivery guarantee the rules commit to.
 - Sub-chapters blocked by the status gate named as needing a decision, not
   silently built or silently dropped.
-- The protocol's report table, with the verdict and the evidence behind it.
+- The protocol's report format, with the verdict and the evidence behind it.
 - No change to any file in the repository.
 
 ## Do not
