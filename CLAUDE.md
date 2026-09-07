@@ -5,18 +5,17 @@ Claude Code customization assets as installable plugins under `plugins/*`.
 
 ## Reading These Rules
 
-The authoritative rules live in `.github/instructions/**` and are shared with GitHub Copilot,
-which applies them automatically through their `applyTo` frontmatter. Claude Code does not
-apply `applyTo`, so read the matching file yourself before editing an asset of that type:
+The authoritative rules live in `.github/instructions/**`. Copilot applies them through
+`applyTo`; Claude Code applies them through the matching pointer rules in `.claude/rules/`,
+which name the same globs in `paths` and tell you which file to read. Both are generated from
+the same intent — change the `applyTo` in an instruction file and change its rule's `paths`
+in the same commit.
 
-| Editing | Read first |
-| --- | --- |
-| Any Markdown in this repository | `.github/instructions/markdown.instructions.md` |
-| Anything under `.github/**` | `.github/instructions/customization-structure.instructions.md` |
-| `plugins/*/skills/**/SKILL.md` | `.github/instructions/skill-invocation.instructions.md` |
-| `.github/agents/**` | `.github/instructions/meta-agent.instructions.md`, `.github/instructions/agent-handoff.instructions.md` |
-| Agent-facing prose anywhere | `.github/instructions/agent-language-and-tone.instructions.md` |
-| A specific asset type | The matching `plugins/spec-builder/instructions/authoring/create-*.instructions.md` |
+Plugin-local instructions under `plugins/*/instructions/**` are the exception: a plugin
+cannot ship rules, so those reach Claude only when a skill or agent references them by
+relative path, or when they are promoted to the plugin's `sessionStart` hook. Read the
+matching `plugins/spec-builder/instructions/authoring/create-*.instructions.md` before
+authoring an asset of that type.
 
 `.github/copilot/copilot-instructions.md` is the Copilot entry point and carries the same
 priority ordering. Where the two disagree, that file wins and this one is stale — fix it.
