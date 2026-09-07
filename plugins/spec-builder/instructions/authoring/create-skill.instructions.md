@@ -42,8 +42,8 @@ still be accurate prose: on Copilot it remains the model's only signal.
   skill handles.
 - Describe the action — "read the file", "search the codebase" — so each host picks its own
   tool; skills are read verbatim by Copilot and Claude Code alike.
-- Reference instruction and resource files by relative path. Claude does not auto-apply
-  `applyTo`, so the explicit reference is what loads the guidance in both hosts.
+- Reference instruction and resource files by relative path. A plugin cannot ship
+  `.claude/rules/`, so the explicit reference is what loads the guidance in Claude.
 - Note optional MCP dependencies in the body, with a fallback for when the server is absent.
 - Follow [spec-conciseness.instructions.md](spec-conciseness.instructions.md) for pruning and
   the 40-line budget.
