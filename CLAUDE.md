@@ -5,12 +5,12 @@ Claude Code customization assets as installable plugins under `plugins/*`.
 
 ## Reading These Rules
 
-The authoritative rules live in `instructions/**`, in files that carry no frontmatter and
+The authoritative rules live in `.agents/rules/**`, in files that carry no frontmatter and
 name neither host. Each one has two thin loaders that differ only in dialect: Copilot's
 `.github/instructions/<name>.instructions.md` carries `applyTo`, Claude's
 `.claude/rules/<name>.md` carries `paths`, and both point back at the same body. Neither
 loader holds a rule — so change a glob and change both loaders in the same commit, and change
-a rule in `instructions/` only.
+a rule in `.agents/rules/` only.
 
 Plugin-local instructions under `plugins/*/instructions/**` are the exception: a plugin
 cannot ship rules or `.github/instructions/` loaders, so those reach Claude only when a skill
@@ -46,7 +46,7 @@ Skills that cross the specification/code boundary in both directions are named
 `to-spec-<kind>` (code becomes a chapter) and `from-spec-<kind>` (a chapter becomes a change
 brief). The literal `spec` carries the direction: `<kind>` alone would not, because an
 aggregate is both a chapter and a class. The full rule is in
-`instructions/skill-invocation.md`.
+`.agents/rules/skill-invocation.md`.
 
 ## Dual-Host Constraint
 

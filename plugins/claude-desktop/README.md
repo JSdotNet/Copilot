@@ -203,7 +203,7 @@ The `automation-*` skills are the exception. They are user-invoked
 (`disable-model-invocation: true`), so nothing but a human typing the name can start one — a
 routine's session would have to reach them through the Skill tool, which refuses a user-invoked
 skill. Every confirmation in their bodies is therefore unconditional, and none of them
-describes an unattended branch. See `instructions/skill-invocation.md`.
+describes an unattended branch. See `.agents/rules/skill-invocation.md`.
 
 #### Workflow Skills
 

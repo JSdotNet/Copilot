@@ -9,12 +9,12 @@
 
 ## Instruction Grouping Convention
 
-- Rule bodies live in `instructions/` and carry no frontmatter, because neither host owns
+- Rule bodies live in `.agents/rules/` and carry no frontmatter, because neither host owns
   them. Each one gets two thin loaders that only name the glob in their host's dialect:
   `.github/instructions/<name>.instructions.md` with `applyTo`, and `.claude/rules/<name>.md`
   with `paths`. Change a glob and change both in the same commit.
 - Group loaders by topic under `.github/instructions/`, and mirror the same relative path
-  under `instructions/`.
+  under `.agents/rules/`.
 - Agent-specific instruction files should be grouped in `.github/instructions/agent/`.
 - Documentation-specific instruction files should be grouped in `.github/instructions/documentation/`.
 - Profile-specific instruction files should be grouped in `.github/instructions/profile/`.
@@ -35,5 +35,5 @@
 ## Language Convention
 
 - Files under `.github/agents/**/*.md` must be written in English.
-- Files under `instructions/**/*.md` and `.github/instructions/**/*.md` must be written in
+- Files under `.agents/rules/**/*.md` and `.github/instructions/**/*.md` must be written in
   English.

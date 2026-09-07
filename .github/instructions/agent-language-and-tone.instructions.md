@@ -5,6 +5,6 @@ description: Establishes default language and tone standards for .github markdow
 
 # Agent Language and Tone Behavior Instructions (Copilot Loader)
 
-Read [instructions/agent-language-and-tone.md](../../instructions/agent-language-and-tone.md)
+Read [.agents/rules/agent-language-and-tone.md](../../.agents/rules/agent-language-and-tone.md)
 and follow it. The rules live in that file so both hosts load one shared copy;
 this file only carries the Copilot `applyTo`.

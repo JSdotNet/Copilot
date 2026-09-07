@@ -14,7 +14,7 @@ description: Pruning rules and size budgets that keep authored customization ass
 
 - State each rule in exactly one file. Everywhere else, link to that file by relative path.
 - Canonical sources: `docs/copilot/claude-code-compatibility.md` for dual-host rules, root
-  `instructions/` for repository-wide standards, and the matching
+  `.agents/rules/` for repository-wide standards, and the matching
   `instructions/authoring/create-*.instructions.md` for asset-specific rules.
 - Prefer a one-line pointer over a summary. A summary is a second copy that drifts.
 - The environment is a source of truth too: record what an author cannot find by looking —
@@ -26,7 +26,7 @@ description: Pruning rules and size budgets that keep authored customization ass
 - When it does not, delete the whole sentence rather than shortening it.
 - The test is model-relative. Settle a disagreement by running the asset, not by debate.
 - Known no-ops here: "keep content in English" (set repository-wide in
-  `instructions/agent-language-and-tone.md`), "remove ambiguity",
+  `.agents/rules/agent-language-and-tone.md`), "remove ambiguity",
   "validate consistency", "be thorough".
 
 ## Size Budgets

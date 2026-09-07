@@ -27,8 +27,8 @@ High-level architecture follows a plugin-based monorepo pattern:
   - `skills/`
   - optional `resources/`
   - `.github/plugin/plugin.json`
-- Repository-level standards are defined under `instructions/` and `.github/copilot/`. Each
-  `instructions/` body is loaded by a thin `.github/instructions/` loader for Copilot and a
+- Repository-level standards are defined under `.agents/rules/` and `.github/copilot/`. Each
+  `.agents/rules/` body is loaded by a thin `.github/instructions/` loader for Copilot and a
   `.claude/rules/` loader for Claude.
 
 Conceptual layout:
@@ -232,7 +232,7 @@ Contribution guidelines for this repository:
 
 1. Follow repository-level instructions first, especially:
    - `.github/copilot/copilot-instructions.md`
-   - `instructions/markdown.md`
+   - `.agents/rules/markdown.md`
 2. Keep changes minimal and aligned with existing plugin patterns.
 3. Reuse nearby examples when creating new assets:
    - existing plugin `agents/`, `instructions/`, and `skills/` folders are the primary exemplars.

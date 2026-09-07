@@ -24,7 +24,7 @@ not frontmatter but a UI surface Claude Code does not have. See **Claude-native 
 | `.claude-plugin/plugin.json` | **generated** | Claude |
 | `hooks/hooks.json` | **generated** | Claude |
 | `.claude-plugin/marketplace.json` (repo root) | **generated** | Claude |
-| `instructions/*.md` (repo root) | hand | both, via the two loaders below |
+| `.agents/rules/*.md` (repo root) | hand | both, via the two loaders below |
 | `.github/instructions/*.instructions.md` (repo root) | hand | Copilot |
 | `.claude/rules/*.md` (repo root) | hand | Claude |
 
@@ -281,7 +281,7 @@ separate, hand-authored plugin. See **Claude-native plugins** below.
 
 **`applyTo` is not read, but `paths` is.** Claude Code has glob-scoped instruction
 injection — `.claude/rules/*.md` with a `paths:` list, fired when Claude reads a matching
-file. It does not read `applyTo`. So a repository keeps each rule body in `instructions/`,
+file. It does not read `applyTo`. So a repository keeps each rule body in `.agents/rules/`,
 owned by neither host, and gives it two thin loaders that carry only the glob: an `applyTo`
 one in `.github/instructions/` and a `paths` one in `.claude/rules/` (see the repository
 `CLAUDE.md`). A **plugin** cannot: there is no

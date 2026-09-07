@@ -26,7 +26,7 @@ are applied.
 - Reference the file explicitly by path from every skill or agent that depends on it. A
   plugin cannot ship `.claude/rules/`, so inside a plugin `applyTo` is a Copilot
   optimisation and an unreferenced file silently does nothing in Claude. A **repository**
-  instead keeps the body in `instructions/` and gives it one loader per host — see
+  instead keeps the body in `.agents/rules/` and gives it one loader per host — see
   `docs/copilot/claude-code-compatibility.md`.
 - Promote a rule that must apply with no explicit reference to the plugin's `hooks.json`
   `sessionStart` prompt, which both hosts honour.
