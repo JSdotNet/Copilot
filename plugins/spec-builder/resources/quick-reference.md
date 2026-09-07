@@ -7,7 +7,7 @@ Concise decision guide and troubleshooting checklist for authoring customization
 | Asset | File pattern | Use when | Hosts |
 |---|---|---|---|
 | Repository instructions | `.github/copilot-instructions.md` | Repository-wide standards that apply to every conversation | Copilot |
-| Path-specific instructions | `.github/instructions/*.instructions.md` | Rules that apply only to specific file paths or asset types | Both, but `applyTo` is Copilot-only |
+| Path-specific instructions | `.agents/rules/*.md` plus a loader per host | Rules that apply only to specific file paths or asset types | Both — the body is host-neutral; `.github/instructions/*.instructions.md` carries `applyTo`, `.claude/rules/*.md` carries `paths` (repository only) |
 | Agent | `.github/agents/*.agent.md` | You need a named persona with specific tools, tone, and handoff behavior | Both |
 | Skill | `.github/skills/<skill>/SKILL.md` | You have a reusable multi-step workflow with defined inputs, steps, and outputs | Both |
 | Prompt | `.github/prompts/*.prompt.md` | You want a slash-command-style shortcut for a specific, repeatable request | Copilot |

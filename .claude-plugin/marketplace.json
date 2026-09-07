@@ -93,7 +93,7 @@
       "name": "spec-builder",
       "source": "./plugins/spec-builder",
       "description": "Copilot plugin focused on GitHub customization asset authoring workflows.",
-      "version": "0.3.0"
+      "version": "0.4.0"
     },
     {
       "name": "ux-design",

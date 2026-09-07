@@ -5,7 +5,7 @@
 When generating changes for this repository:
 
 1. Preserve compatibility with existing customization asset formats, manifest schema, and the current plugin-based monorepo structure.
-2. Follow conventions already defined in `.github/instructions/**/*.md` and established patterns in existing plugin bundles under `plugins/*`.
+2. Follow conventions already defined in `.agents/rules/**/*.md` — loaded through the `applyTo` loaders in `.github/instructions/` — and established patterns in existing plugin bundles under `plugins/*`.
 3. Prioritize maintainability, consistency, and traceability over introducing new patterns.
 
 ## Brevity And Signal
@@ -35,11 +35,11 @@ When generating or editing customization assets, use this source priority:
 
 In case of conflict, follow the Priority Guidelines over Context File Priority.
 
-1. `.github/instructions/markdown.instructions.md`
-2. `.github/instructions/customization-structure.instructions.md`
-3. `.github/instructions/skill-invocation.instructions.md` (when editing `plugins/*/skills/**/SKILL.md`)
-4. `.github/instructions/agent-language-and-tone.instructions.md`
-5. `.github/instructions/agent-handoff.instructions.md` (when editing agent files)
+1. `.agents/rules/markdown.md`
+2. `.agents/rules/customization-structure.md`
+3. `.agents/rules/skill-invocation.md` (when editing `plugins/*/skills/**/SKILL.md`)
+4. `.agents/rules/agent-language-and-tone.md`
+5. `.agents/rules/agent-handoff.md` (when editing agent files)
 6. Existing plugin-local authoring instructions, for example:
    - `plugins/spec-builder/instructions/authoring/create-agent.instructions.md`
    - `plugins/spec-builder/instructions/authoring/create-instruction.instructions.md`
@@ -97,7 +97,7 @@ For Markdown files, follow the active repository baseline:
 - Remove trailing whitespace.
 - End files with exactly one newline.
 
-Source: `.github/instructions/markdown.instructions.md`.
+Source: `.agents/rules/markdown.md`.
 
 ## Instruction Authoring Standards
 
@@ -122,15 +122,15 @@ When creating or updating `.github/agents/**/*.md`:
 
 Sources:
 
-- `.github/instructions/meta-agent.instructions.md`
-- `.github/instructions/agent-handoff.instructions.md`
+- `.agents/rules/meta-agent.md`
+- `.agents/rules/agent-handoff.md`
 
 ## Skill And Plugin Standards
 
 When authoring skills and plugins:
 
 - Keep skill definitions focused, with clear trigger intent and expected output.
-- Choose each skill's invocation mode deliberately, and name converter skills `to-<spec>` or `from-<spec>`. Source: `.github/instructions/skill-invocation.instructions.md`.
+- Choose each skill's invocation mode deliberately, and name converter skills `to-<spec>` or `from-<spec>`. Source: `.agents/rules/skill-invocation.md`.
 - Keep plugin manifests aligned to existing schema and folder pointers.
 - Keep assets in English for `.github/**` customization content.
 - Prefer standalone plugin behavior; a plugin should function when installed alone.

@@ -214,7 +214,7 @@ https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orc
 
 Choose `project`, `user`, or `session` scope depending on whether you want it
 committed to a repo, available for you across projects, or scoped to one
-session. See `.github/instructions/customization-structure.instructions.md`
+session. See `.agents/rules/customization-structure.md`
 for repository-wide customization conventions.
 
 Copilot App orchestration agents should inspect and open this dashboard with the

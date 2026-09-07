@@ -5,18 +5,18 @@ Claude Code customization assets as installable plugins under `plugins/*`.
 
 ## Reading These Rules
 
-The authoritative rules live in `.github/instructions/**` and are shared with GitHub Copilot,
-which applies them automatically through their `applyTo` frontmatter. Claude Code does not
-apply `applyTo`, so read the matching file yourself before editing an asset of that type:
+The authoritative rules live in `.agents/rules/**`, in files that carry no frontmatter and
+name neither host. Each one has two thin loaders that differ only in dialect: Copilot's
+`.github/instructions/<name>.instructions.md` carries `applyTo`, Claude's
+`.claude/rules/<name>.md` carries `paths`, and both point back at the same body. Neither
+loader holds a rule — so change a glob and change both loaders in the same commit, and change
+a rule in `.agents/rules/` only.
 
-| Editing | Read first |
-| --- | --- |
-| Any Markdown in this repository | `.github/instructions/markdown.instructions.md` |
-| Anything under `.github/**` | `.github/instructions/customization-structure.instructions.md` |
-| `plugins/*/skills/**/SKILL.md` | `.github/instructions/skill-invocation.instructions.md` |
-| `.github/agents/**` | `.github/instructions/meta-agent.instructions.md`, `.github/instructions/agent-handoff.instructions.md` |
-| Agent-facing prose anywhere | `.github/instructions/agent-language-and-tone.instructions.md` |
-| A specific asset type | The matching `plugins/spec-builder/instructions/authoring/create-*.instructions.md` |
+Plugin-local instructions under `plugins/*/instructions/**` are the exception: a plugin
+cannot ship rules or `.github/instructions/` loaders, so those reach Claude only when a skill
+or agent references them by relative path, or when they are promoted to the plugin's `sessionStart` hook. Read the
+matching `plugins/spec-builder/instructions/authoring/create-*.instructions.md` before
+authoring an asset of that type.
 
 `.github/copilot/copilot-instructions.md` is the Copilot entry point and carries the same
 priority ordering. Where the two disagree, that file wins and this one is stale — fix it.
@@ -46,7 +46,7 @@ Skills that cross the specification/code boundary in both directions are named
 `to-spec-<kind>` (code becomes a chapter) and `from-spec-<kind>` (a chapter becomes a change
 brief). The literal `spec` carries the direction: `<kind>` alone would not, because an
 aggregate is both a chapter and a class. The full rule is in
-`.github/instructions/skill-invocation.instructions.md`.
+`.agents/rules/skill-invocation.md`.
 
 ## Dual-Host Constraint
 

@@ -44,7 +44,7 @@ Track GitHub Copilot plugins used by this repository so team members can install
 | `product-owner` | `0.2.0` | `plugins/product-owner` | `copilot plugin install JSdotNet/Copilot:plugins/product-owner` | Product backlog authoring for epics, stories, and bugs as Markdown artifacts. |
 | `qa` | `0.2.0` | `plugins/qa` | `copilot plugin install JSdotNet/Copilot:plugins/qa` | Runtime QA validation with Aspire, Playwright evidence, and log/trace monitoring. |
 | `review` | `0.4.0` | `plugins/review` | `copilot plugin install JSdotNet/Copilot:plugins/review` | Reusable TODO-driven, question-driven, and improvement-driven review skills. |
-| `spec-builder` | `0.3.0` | `plugins/spec-builder` | `copilot plugin install JSdotNet/Copilot:plugins/spec-builder` | GitHub customization asset authoring for agents, instructions, plugins, and skills. |
+| `spec-builder` | `0.4.0` | `plugins/spec-builder` | `copilot plugin install JSdotNet/Copilot:plugins/spec-builder` | GitHub customization asset authoring for agents, instructions, plugins, and skills. |
 | `ux-design` | `0.3.0` | `plugins/ux-design` | `copilot plugin install JSdotNet/Copilot:plugins/ux-design` | UX wireframes, design guidelines, user flows, and design reviews. |
 | `wip-convention` | `0.2.0` | `plugins/wip-convention` | `copilot plugin install JSdotNet/Copilot:plugins/wip-convention` | Shared `.wip` work-in-progress artifact conventions. |
 | `worktree-parallel` | `0.1.0` | `plugins/worktree-parallel` | `copilot plugin install JSdotNet/Copilot:plugins/worktree-parallel` | Work decomposition across isolated git worktrees with per-worktree agent continuity. |
