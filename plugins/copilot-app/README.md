@@ -483,9 +483,9 @@ copilot plugin uninstall copilot-app
 
 Updates to skills should follow:
 
-- [Agent Language and Tone](../.github/instructions/agent-language-and-tone.instructions.md)
-- [Customization Structure](../.github/instructions/customization-structure.instructions.md)
-- [Markdown Guidelines](../.github/instructions/markdown.instructions.md)
+- [Agent Language and Tone](../../instructions/agent-language-and-tone.md)
+- [Customization Structure](../../instructions/customization-structure.md)
+- [Markdown Guidelines](../../instructions/markdown.md)
 
 ## Support
 

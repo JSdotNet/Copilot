@@ -25,8 +25,8 @@ are applied.
 - Keep each rule in the one instruction file that owns it; point at the others by path.
 - Reference the file explicitly by path from every skill or agent that depends on it. A
   plugin cannot ship `.claude/rules/`, so inside a plugin `applyTo` is a Copilot
-  optimisation and an unreferenced file silently does nothing in Claude. In a **repository**,
-  mirror the file into `.claude/rules/` with a `paths:` list instead — see
+  optimisation and an unreferenced file silently does nothing in Claude. A **repository**
+  instead keeps the body in `instructions/` and gives it one loader per host — see
   `docs/copilot/claude-code-compatibility.md`.
 - Promote a rule that must apply with no explicit reference to the plugin's `hooks.json`
   `sessionStart` prompt, which both hosts honour.

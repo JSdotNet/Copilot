@@ -53,10 +53,12 @@ Notes:
 ## Repository Conventions
 
 - Agent files: `.github/agents/*.agent.md`
-- Path-specific instructions: `.github/instructions/**/*.instructions.md`
+- Rule bodies: `instructions/**/*.md` (no frontmatter, shared by both hosts)
+- Copilot loaders: `.github/instructions/**/*.instructions.md` (`applyTo` only)
+- Claude loaders: `.claude/rules/**/*.md` (`paths` only)
 - Skills: `.github/skills/*.md`
 - Skill resources: `.github/skills/<skill>/resources/**/*.md`
-- Markdown baseline: `.github/instructions/markdown.instructions.md`
+- Markdown baseline: `instructions/markdown.md`
 - Handoff policy: `.github/instructions/agent/agent-handoff.instructions.md`
 
 ## Notes

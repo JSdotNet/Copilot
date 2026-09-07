@@ -20,7 +20,8 @@ description: Create or refine a .instructions.md file with scoped applyTo rules 
 4. Check existing instruction files for the same rule, and point at the owner instead of
    restating it.
 5. Add an explicit path reference from every skill or agent that depends on the file, since
-   a plugin cannot ship `.claude/rules/` and `applyTo` alone does not load it in Claude.
+   a plugin cannot ship `.claude/rules/` and `applyTo` alone does not load it in Claude. In a
+   repository, add a loader per host instead.
 6. Prune against
    [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md):
    60-line budget, no rule stated twice.

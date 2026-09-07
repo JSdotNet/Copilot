@@ -5,15 +5,16 @@ Claude Code customization assets as installable plugins under `plugins/*`.
 
 ## Reading These Rules
 
-The authoritative rules live in `.github/instructions/**`. Copilot applies them through
-`applyTo`; Claude Code applies them through the matching pointer rules in `.claude/rules/`,
-which name the same globs in `paths` and tell you which file to read. Both are generated from
-the same intent — change the `applyTo` in an instruction file and change its rule's `paths`
-in the same commit.
+The authoritative rules live in `instructions/**`, in files that carry no frontmatter and
+name neither host. Each one has two thin loaders that differ only in dialect: Copilot's
+`.github/instructions/<name>.instructions.md` carries `applyTo`, Claude's
+`.claude/rules/<name>.md` carries `paths`, and both point back at the same body. Neither
+loader holds a rule — so change a glob and change both loaders in the same commit, and change
+a rule in `instructions/` only.
 
 Plugin-local instructions under `plugins/*/instructions/**` are the exception: a plugin
-cannot ship rules, so those reach Claude only when a skill or agent references them by
-relative path, or when they are promoted to the plugin's `sessionStart` hook. Read the
+cannot ship rules or `.github/instructions/` loaders, so those reach Claude only when a skill
+or agent references them by relative path, or when they are promoted to the plugin's `sessionStart` hook. Read the
 matching `plugins/spec-builder/instructions/authoring/create-*.instructions.md` before
 authoring an asset of that type.
 
@@ -45,7 +46,7 @@ Skills that cross the specification/code boundary in both directions are named
 `to-spec-<kind>` (code becomes a chapter) and `from-spec-<kind>` (a chapter becomes a change
 brief). The literal `spec` carries the direction: `<kind>` alone would not, because an
 aggregate is both a chapter and a class. The full rule is in
-`.github/instructions/skill-invocation.instructions.md`.
+`instructions/skill-invocation.md`.
 
 ## Dual-Host Constraint
 

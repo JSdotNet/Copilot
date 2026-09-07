@@ -24,6 +24,8 @@ not frontmatter but a UI surface Claude Code does not have. See **Claude-native 
 | `.claude-plugin/plugin.json` | **generated** | Claude |
 | `hooks/hooks.json` | **generated** | Claude |
 | `.claude-plugin/marketplace.json` (repo root) | **generated** | Claude |
+| `instructions/*.md` (repo root) | hand | both, via the two loaders below |
+| `.github/instructions/*.instructions.md` (repo root) | hand | Copilot |
 | `.claude/rules/*.md` (repo root) | hand | Claude |
 
 Never edit anything under `.claude-plugin/` or `hooks/`. Change the Copilot source and
@@ -279,8 +281,10 @@ separate, hand-authored plugin. See **Claude-native plugins** below.
 
 **`applyTo` is not read, but `paths` is.** Claude Code has glob-scoped instruction
 injection — `.claude/rules/*.md` with a `paths:` list, fired when Claude reads a matching
-file. It does not read `applyTo`, so a repository mirrors its `.github/instructions/` set
-into `.claude/rules/` (see the repository `CLAUDE.md`). A **plugin** cannot: there is no
+file. It does not read `applyTo`. So a repository keeps each rule body in `instructions/`,
+owned by neither host, and gives it two thin loaders that carry only the glob: an `applyTo`
+one in `.github/instructions/` and a `paths` one in `.claude/rules/` (see the repository
+`CLAUDE.md`). A **plugin** cannot: there is no
 rules component and no `rules` key in `plugin.json`, and a plugin-root `CLAUDE.md` is not
 loaded ([claude-code#21163](https://github.com/anthropics/claude-code/issues/21163)). So
 plugin instruction files still reach Claude only by explicit reference — which 75 skill and
