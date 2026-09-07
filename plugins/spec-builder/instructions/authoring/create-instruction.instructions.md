@@ -23,9 +23,11 @@ are applied.
 - Write behavior rules as actionable statements, and separate mandatory rules from
   recommendations.
 - Keep each rule in the one instruction file that owns it; point at the others by path.
-- Reference the file explicitly by path from every skill or agent that depends on it.
-  `applyTo` is a Copilot optimisation, not the delivery mechanism — Claude has no
-  glob-scoped instruction injection, so an unreferenced file silently does nothing there.
+- Reference the file explicitly by path from every skill or agent that depends on it. A
+  plugin cannot ship `.claude/rules/`, so inside a plugin `applyTo` is a Copilot
+  optimisation and an unreferenced file silently does nothing in Claude. In a **repository**,
+  mirror the file into `.claude/rules/` with a `paths:` list instead — see
+  `docs/copilot/claude-code-compatibility.md`.
 - Promote a rule that must apply with no explicit reference to the plugin's `hooks.json`
   `sessionStart` prompt, which both hosts honour.
 - Follow [spec-conciseness.instructions.md](spec-conciseness.instructions.md) for pruning and
