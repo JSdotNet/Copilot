@@ -24,6 +24,7 @@ not frontmatter but a UI surface Claude Code does not have. See **Claude-native 
 | `.claude-plugin/plugin.json` | **generated** | Claude |
 | `hooks/hooks.json` | **generated** | Claude |
 | `.claude-plugin/marketplace.json` (repo root) | **generated** | Claude |
+| `.claude/rules/*.md` (repo root) | hand | Claude |
 
 Never edit anything under `.claude-plugin/` or `hooks/`. Change the Copilot source and
 regenerate. The one exception is a Claude-native plugin (`claude-desktop`), which has no Copilot
@@ -276,11 +277,14 @@ around the Copilot CLI canvas extension API (`diagram-canvas`, `markdown-canvas`
 The port could not be a translation — it needed a different transport — so it lives as a
 separate, hand-authored plugin. See **Claude-native plugins** below.
 
-**`applyTo` instructions are not auto-applied.** Claude has no glob-scoped instruction
-injection. This matters less than it looks: 75 skill and agent files already reference these
-instructions explicitly by path, and explicit references work identically under Claude. Only
-instructions relying purely on ambient glob matching lose behaviour; those need a
-`PostToolUse` hook with a `matcher`, or promotion into the plugin's `SessionStart` hook.
+**`applyTo` is not read, but `paths` is.** Claude Code has glob-scoped instruction
+injection — `.claude/rules/*.md` with a `paths:` list, fired when Claude reads a matching
+file. It does not read `applyTo`, so a repository mirrors its `.github/instructions/` set
+into `.claude/rules/` (see the repository `CLAUDE.md`). A **plugin** cannot: there is no
+rules component and no `rules` key in `plugin.json`, and a plugin-root `CLAUDE.md` is not
+loaded ([claude-code#21163](https://github.com/anthropics/claude-code/issues/21163)). So
+plugin instruction files still reach Claude only by explicit reference — which 75 skill and
+agent files already do — or by promotion into the plugin's `SessionStart` hook.
 
 **`handoffs` are invisible to Claude.** Claude ignores the key and delegates from what it
 reads in the prose, so every handoff target must be described in the agent body. The
