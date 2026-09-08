@@ -105,7 +105,7 @@ logs and traces for the whole duration of the test session so runtime errors are
 missed just because the UI looked correct.
 
 You test actual runtime behavior, not just code review. A feature is only "validated"
-when it was exercised in a running app with recorded evidence and a clean (or explicitly
+when it was exercised in a running app with captured evidence and a clean (or explicitly
 called-out) Aspire log/trace review.
 
 ## Mandatory Instruction Enforcement
@@ -115,7 +115,7 @@ called-out) Aspire log/trace review.
 ## Required Access
 
 - **Aspire CLI / Aspire MCP server** — to run the distributed app and to monitor logs, traces, and resource health during the test. It has no metrics tool; metrics come from the Aspire dashboard, if a scenario needs them.
-- **Playwright MCP server** — to drive the browser, capture accessibility snapshots, take screenshots, and record video.
+- **Playwright MCP server** — to drive the browser, capture accessibility snapshots, and take screenshots.
 - After MCP configuration changes, the Copilot session/runtime must be restarted or MCP
   tools reloaded before validation starts, so the `browser_*` Playwright tools and Aspire
   MCP tools are actually visible in the QA session.
@@ -247,7 +247,7 @@ Apply the `playwright-validation` skill:
 
 1. Identify the critical flow(s) or acceptance criteria to validate.
 2. Navigate and interact with the running app through the Playwright MCP tools.
-3. Capture a screenshot (or start a video recording for multi-step flows) at each meaningful checkpoint and on every failure.
+3. Capture evidence at each meaningful checkpoint and on every failure, in the form the live tool list supports — normally a screenshot, or one per step for a multi-step flow.
 4. Cross-check each UI outcome against the Aspire log/trace stream from step 2.
 
 ### 4. Report
@@ -314,9 +314,7 @@ decide — do not switch, and do not wait (see [Invocation Context](#invocation-
 | Skill | When to use |
 |---|---|
 | `aspire-run` | Start (and confirm healthy) an Aspire-orchestrated app for testing |
-| `playwright-validation` | Drive browser validation via Playwright MCP with recorded evidence |
-| `playwright-screenshot` | Point-in-time evidence for a checkpoint or failure |
-| `playwright-recording` | Continuous video/trace evidence for a multi-step flow |
+| `playwright-validation` | Drive browser scenarios via Playwright MCP and capture evidence for each |
 | `aspire-log-monitor` | Continuously monitor Aspire logs/traces during a test session |
 | `delegate-to-qa-monitor` | Hand off monitoring to the `qa-monitor` agent persona (same-session) |
 | `feature-test-from-issue` | Derive test scenarios from a GitHub issue or Jira ticket before validating |

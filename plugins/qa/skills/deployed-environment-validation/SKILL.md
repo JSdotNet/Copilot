@@ -66,9 +66,8 @@ after a deploy.
 
 ### 5. Validate with Playwright
 
-8. Apply `playwright-validation` (with `playwright-screenshot`/`playwright-recording`
-   for evidence) against the confirmed environment URL, exactly as for a local
-   run.
+8. Apply `playwright-validation` against the confirmed environment URL, exactly
+   as for a local run, capturing evidence per scenario as that skill describes.
 9. Prefix or tag all captured evidence and report entries with the environment
    name so results from different environments are never confused.
 
@@ -103,7 +102,6 @@ after a deploy.
 | Skill | When to use |
 |---|---|
 | `playwright-validation` | Drive the browser and capture evidence against the confirmed environment |
-| `playwright-screenshot` / `playwright-recording` | Evidence capture per scenario |
 | `aspire-log-monitor` | Monitor logs/traces/metrics if the environment exposes a reachable Aspire endpoint |
 | `feature-test-from-issue` | Derive the scenario(s) to run from a GitHub issue or Jira ticket |
 | `playwright-e2e-authoring` | Turn a scenario validated here into a durable, re-runnable test |

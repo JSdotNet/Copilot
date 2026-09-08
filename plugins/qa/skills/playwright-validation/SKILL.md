@@ -1,14 +1,14 @@
 ---
 name: playwright-validation
-description: 'Validate a feature or run extensive end-to-end testing against a running app using the Playwright MCP server, capturing screenshots or video as evidence. Use after the app under test is running (see the aspire-run skill).'
+description: 'Validate a feature or run extensive end-to-end testing against a running app using the Playwright MCP server, capturing screenshots as evidence. Use after the app under test is running (see the aspire-run skill).'
 compatibility: Requires the Playwright MCP server (`@playwright/mcp`).
 ---
 
 # Playwright Validation — Evidence-Backed Feature Testing
 
 Drive real browser interactions against the running application through the Playwright
-MCP server, and capture concrete evidence (screenshots or video) for every check. Do not
-rely on static code reading to claim a feature works — prove it by running it.
+MCP server, and capture concrete evidence for every check. Do not rely on static code
+reading to claim a feature works — prove it by running it.
 
 ## Prerequisites
 
@@ -53,10 +53,13 @@ rely on static code reading to claim a feature works — prove it by running it.
 Exact tool names depend on the installed Playwright MCP version — use `browser_snapshot`
 first on an unfamiliar page to confirm available element references before interacting.
 
-**There are no tracing/recording tools in the current server** (checked against
-`@playwright/mcp` 0.0.79): no `browser_start_tracing` / `browser_stop_tracing`. Continuous
-evidence therefore means a screenshot sequence, not a video — see `playwright-recording`, and
-never describe a screenshot sequence as video in a report.
+**Resolve the recordable form from the tool list you actually have.** `@playwright/mcp`
+0.0.79 — the version this plugin installs via `@playwright/mcp@latest` — exposes **no**
+tracing or video tools (`browser_start_tracing` / `browser_stop_tracing` do not exist) and
+**no** `--save-trace` or `--save-video` server option; only `--save-session` (a log of tool
+calls under `--output-dir`) and screenshots. Continuous evidence is therefore a numbered
+screenshot sequence unless your tool list shows tracing tools. Name the form used in the
+report, and never call a screenshot sequence a video or a trace.
 
 ## Workflow
 
@@ -68,9 +71,9 @@ Before scenario validation, prove capture works in this session:
 2. `browser_take_screenshot` and save the smoke screenshot under the scenario evidence
    folder.
 
-If navigation or screenshot capture fails, screenshot/video capture is unavailable. Stop or
+If navigation or screenshot capture fails, capture is unavailable in this session. Stop or
 mark the limitation according to the caller's validation policy, and do not claim
-Playwright screenshot/video evidence was captured.
+Playwright evidence was captured.
 
 ### 1. Define the Scenario
 
@@ -87,11 +90,13 @@ Playwright screenshot/video evidence was captured.
 ### 3. Execute the Scenario
 
 - Perform each interaction (`browser_click`, `browser_type`, etc.) in order.
-- Choose the evidence type per scenario, applying the matching skill:
-  - Single-state checkpoints or failures → apply the `playwright-screenshot` skill.
-  - Multi-step or animated flows where the sequence itself matters → apply the
-    `playwright-recording` skill (start it before the first action in the scenario).
-  - The two are complementary — a recorded flow can still have checkpoint screenshots.
+- Stabilize before every capture: `browser_wait_for` on the specific element or text you
+  expect, never a fixed sleep. A frame taken mid-transition is misleading evidence.
+- Capture per scenario, and keep each file: a single screenshot for a single-state
+  checkpoint (scoped to an element reference when only that component matters), or one
+  screenshot per state-changing step — zero-padded so the sequence reads in execution
+  order — when the sequence itself is what is being proved.
+- On failure, capture the frame **before** attempting any recovery.
 - Check `browser_console_messages` after each step for client-side JS errors.
 - Check `browser_network_requests` when validating API-backed features — confirm status
   codes and payload shape match expectations.
@@ -113,9 +118,10 @@ Playwright screenshot/video evidence was captured.
 ## Evidence Requirements
 
 - Every scenario must have at least one screenshot; multi-step flows should have a
-  screenshot per step or a video covering the full sequence.
-- Every failure must have a screenshot taken at the point of failure, plus the
-  `browser_console_messages` and `browser_network_requests` output at that moment.
+  screenshot per step, or a recording where the tool list exposes one.
+- Every failure must have a screenshot taken at the point of failure and before any
+  recovery, plus the `browser_console_messages` and `browser_network_requests` output at
+  that moment.
 - Evidence file paths must be included in the final QA report — do not describe a
   screenshot without a path the user can open.
 - Browser-canvas snapshots and smoke output can be cited only as browser-canvas fallback
@@ -128,13 +134,6 @@ Playwright screenshot/video evidence was captured.
 - Don't skip the console/network check just because the visual result looks correct.
 - Don't stop Aspire log monitoring before finishing all scenarios.
 - Don't reuse a stale snapshot reference after the page has re-rendered — re-snapshot.
-
-## Related Skills
-
-| Skill | When to use |
-|---|---|
-| `playwright-screenshot` | Point-in-time evidence for a checkpoint or failure |
-| `playwright-recording` | Continuous video/trace evidence for a multi-step flow |
 
 ## Reference
 
