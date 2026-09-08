@@ -174,7 +174,8 @@ file written from the user's point of view, so that pass starts the app, walks
 the feature, and captures a screenshot per step — reading a controller tells you
 a route exists, while using the feature tells you what the product lets someone
 do, in what order, with what wording. It prefers the repository's own runtime and
-QA workflows (`qa:aspire-run`, `qa:playwright-screenshot`) where installed, runs
+QA workflows (`qa:aspire-run`, `qa:playwright-validation`) where installed and
+degrades to a written walkthrough where no capture tooling is available, runs
 only against a local or disposable environment, never exercises a destructive
 step to document it, and keeps the screenshots as report evidence rather than
 committing them to a knowledge folder.

@@ -89,14 +89,13 @@ code only:
 
 **Use the repository's own way of starting the app.** Where the repository ships
 a runtime or QA workflow, prefer it over improvising: `qa:aspire-run` to bring
-an Aspire-orchestrated app up, `qa:playwright-screenshot` to capture screens,
-and `qa:playwright-validation` when the flow needs driving rather than just
-viewing. These are recommended, not required — if they are not installed, start
-the app the way the repository's own README or launch configuration says to and
-capture screens with whatever is available. If the application cannot be started
-at all, say so in the report, capture the chapter from code and tests, and mark
-the capability description as unconfirmed rather than silently downgrading the
-pass.
+an Aspire-orchestrated app up, and `qa:playwright-validation` to drive the flow
+and capture screens. These are recommended, not required — if they are not
+installed, start the app the way the repository's own README or launch
+configuration says to and capture screens with whatever is available. If the
+application cannot be started at all, say so in the report, capture the chapter
+from code and tests, and mark the capability description as unconfirmed rather
+than silently downgrading the pass.
 
 **Screenshots are evidence, not knowledge.** Treat them the way
 `knowledge-tech-update` treats its inventory JSON: they justify what the chapter
@@ -159,9 +158,10 @@ up to that point and record the rest from code and tests.
    way — `qa:aspire-run` for an Aspire-orchestrated app, otherwise whatever the
    README or launch configuration specifies — against a local or disposable
    environment. Then walk the feature end to end as a user would, and capture a
-   screenshot of each distinguishable step (`qa:playwright-screenshot`, or
-   `qa:playwright-validation` where the flow has to be driven rather than
-   viewed). Record:
+   screenshot of each distinguishable step. Where no capture tooling is
+   available, degrade to a written walkthrough of the same steps and say in the
+   report that the chapter rests on a described rather than a captured pass.
+   Record:
 
    - **The steps**, in the order a user meets them, and where the flow ends.
    - **The wording the interface actually uses** — this is real evidence about
