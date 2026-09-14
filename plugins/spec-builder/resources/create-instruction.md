@@ -20,8 +20,8 @@ Guidance for people working *in* this repository, scoped to a path glob:
 
 - The shared file carries `name`, `description`, and a `paths` list, and is host-neutral.
 - A wrapper is frontmatter and one sentence. It never restates the rule; a third host adds a
-  third wrapper, never a second copy. `pwsh ./scripts/Sync-ClaudePlugins.ps1 -Check` fails when
-  a wrapper's glob drifts from the shared `paths`.
+  third wrapper, never a second copy. `node tools/check-assets.mjs` fails when a wrapper's
+  glob drifts from the shared `paths`.
 - Change the rule and both wrappers in the same commit.
 
 ## A plugin contract

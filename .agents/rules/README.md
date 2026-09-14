@@ -14,9 +14,9 @@ A wrapper carries frontmatter and one sentence of body. It never restates a rule
 file declares `name`, `description`, and a `paths` list; the Claude wrapper copies `paths`
 verbatim, and the Copilot wrapper's `applyTo` is that list joined with commas. Because
 `applyTo` is exactly `paths.join(",")`, drift is machine-detectable —
-`pwsh ./scripts/Sync-ClaudePlugins.ps1 -Check` fails on a wrapper whose glob differs from the
-shared file, on a rule missing a wrapper, and on a wrapper with no rule. It checks the wrappers;
-it does not write them.
+`node tools/check-assets.mjs` fails on a wrapper whose glob differs from the shared file, on
+a rule missing a wrapper, and on a wrapper with no rule. It checks the wrappers; it does not
+write them — nothing in this repository is generated.
 
 The root file follows the same shape: `AGENTS.md` holds the standing rules, `CLAUDE.md` is an
 `@AGENTS.md` import, and `.github/copilot-instructions.md` is one sentence telling Copilot to

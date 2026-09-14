@@ -1,6 +1,6 @@
-// Hand-authored: claude-desktop is Claude-native, so nothing under it is generated. Keep this
-// file in step with the emitter scripts/Sync-ClaudePlugins.ps1 generates for the Copilot-sourced
-// plugins.
+// claude-desktop is Claude-native, so its root hooks.json is a Copilot guard rather than the
+// source of this text; the sidecar beside this file is authored on its own. Keep this emitter
+// in step with the ones the dual-host plugins carry.
 //
 // Claude Code refuses to run a prompt-type hook on SessionStart ("prompt-type hooks are not
 // supported for SessionStart events (no conversation context is available)") and records the

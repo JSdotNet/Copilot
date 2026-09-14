@@ -39,11 +39,12 @@ Claude Code from a single copy of every file.
 ## Dual-Host Authoring
 
 Every asset this plugin produces is authored once and read by both GitHub Copilot and Claude
-Code. Author the Copilot side; `.claude-plugin/` and `hooks/` are generated. Run the sync
-script before committing — CI fails on drift:
+Code. Both manifests and both hook files are hand-authored — nothing is generated — and a
+change to one host's file is a change owed to the other. Run the checker before committing;
+CI fails on drift:
 
 ```bash
-pwsh ./scripts/Sync-ClaudePlugins.ps1
+node tools/check-assets.mjs
 ```
 
 Canvas extensions are the one Copilot-only asset type. Full rules:
