@@ -1,6 +1,6 @@
 # ai-plugins
 
-The `jsdotnet-copilot` plugin marketplace for Claude Code and GitHub Copilot: the specialist
+The `jsdotnet-plugins` plugin marketplace for Claude Code and GitHub Copilot: the specialist
 agents, skills, and contracts that fill the roles a delivery flow consults — architecture,
 coding, QA, domain, UX, documentation, product, security — plus two host plugins and the issue
 trackers. Every asset is authored once and loaded by both hosts.
@@ -46,9 +46,14 @@ Versions, install strings, and change notes per plugin are in
 /plugin marketplace add JSdotNet/ai-plugins
 ```
 
-Then `/plugin install <name>@jsdotnet-copilot`. The marketplace keeps the name
-`jsdotnet-copilot`: it is a per-machine key that every installed plugin references, so the
-repository rename did not touch it.
+Then `/plugin install <name>@jsdotnet-plugins`. The marketplace name is a per-machine key
+that every installed plugin references; it was `jsdotnet-copilot` until the repository
+rename. A machine registered under the old name re-adds it and reinstalls:
+
+```bash
+/plugin marketplace remove jsdotnet-copilot
+/plugin marketplace add JSdotNet/ai-plugins
+```
 
 ### GitHub Copilot CLI
 

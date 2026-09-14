@@ -1,6 +1,6 @@
 # Copilot
 
-A plugin marketplace named `jsdotnet-copilot`: the specialist agents, skills, and contracts
+A plugin marketplace named `jsdotnet-plugins`: the specialist agents, skills, and contracts
 that fill the roles a delivery flow consults — architecture, coding, QA, domain, UX, docs,
 product, security — plus the two host plugins and the trackers. One folder per plugin under
 `plugins/`, each installable on its own.
