@@ -1,0 +1,19 @@
+{
+  "name": "react-coding",
+  "description": "React and TypeScript implementation through the `frontend` agent: components, hooks, routes, typed API clients bound to a .NET API contract, and component tests, with the build, typecheck, lint, and test commands detected from the repository rather than assumed. Fills the `implement` and `verify` services a flow runs its frontend stages through, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Job Schepers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copilot",
+    "agent",
+    "react",
+    "typescript",
+    "frontend",
+    "testing"
+  ],
+  "agents": "agents/",
+  "skills": "skills/"
+}

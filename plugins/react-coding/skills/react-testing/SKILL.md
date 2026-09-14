@@ -10,7 +10,7 @@ locks in the implementation and blocks refactoring.
 
 ## When To Use
 
-- Adding tests for new UI behavior from an approved plan.
+- Adding tests for new UI behavior from a specification.
 - Updating tests after a component or hook change.
 - Diagnosing a frontend test that fails intermittently.
 

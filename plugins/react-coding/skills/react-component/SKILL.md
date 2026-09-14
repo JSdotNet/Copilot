@@ -10,7 +10,7 @@ component is the specification for structure, naming, and typing.
 
 ## When To Use
 
-- Implementing a UI step from an approved plan.
+- Implementing a UI change from a specification.
 - Extending or restructuring an existing component.
 - Reviewing a component change for consistency with the codebase.
 

@@ -1,6 +1,6 @@
 ---
 name: api-client-contract
-description: 'Bind a React frontend to a .NET API using the approved plan API contract as the single source of truth for request, response, and error types. Use before building screens against a new or changed endpoint.'
+description: 'Bind a React frontend to a .NET API using the API contract as the single source of truth for request, response, and error types. Use before building screens against a new or changed endpoint.'
 ---
 
 # API Client From Contract
@@ -20,7 +20,7 @@ Use the first source that exists, and record which one was used.
 
 1. A generated client or generated types produced from the API's OpenAPI document.
 2. The API's OpenAPI or Swagger document, when the repository has a generation step.
-3. The `## API Contract` section of the approved plan under `.wip/implementation-plans/`.
+3. The `## API Contract` section of the specification or plan the caller hands over.
 4. The .NET request, response, and problem-detail types in the API layer, read directly.
 
 Never treat a component's existing local interface as the source of truth. If it disagrees
