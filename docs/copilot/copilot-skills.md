@@ -59,16 +59,9 @@ Track skill provenance and avoid duplicate local skills when plugin-provided ski
 | `github-issues` | Local: `.github/skills` (copied from awesome-copilot collection) | Creates and manages GitHub issues and related metadata. |
 | `import-infrastructure-as-code` | Plugin: `azure-cloud-development` | Imports existing cloud resources into IaC workflows. |
 | `java-junit` | Plugin: `testing-automation` | Helps author and improve Java tests with JUnit. |
-| `knowledge-base-init` | Plugin: `knowledge-base` | Scaffolds the `.arc42`/`.domain`/`.tech`/`.design`/`.backlog`/`.ai` knowledge folders, installs the `knowledge-meta` generator and CI check, and generates the first derived indexes. |
-| `knowledge-base-validate` | Plugin: `knowledge-base` | Runs the knowledge-metadata check and repairs broken references, malformed `meta` blocks, inconsistent reading order, and stale `_meta` indexes. |
+| `knowledge-base-moved` | Plugin: `knowledge-base` (retired, `0.17.0`) | Notice only: every former `knowledge-base` skill (`knowledge-base-init`, `knowledge-base-validate`, `knowledge-tech-update`, the per-folder `orch-*`, `to-spec-<kind>`, `from-spec-<kind>`) now ships as `devbook@jsdotnet` from [JSdotNet/ai-agent-stack](https://github.com/JSdotNet/ai-agent-stack); see `plugins/knowledge-base/README.md` for the successor table. |
 | `microsoft-code-reference` | Local: `.github/skills` (copied from awesome-copilot collection) | Finds official Microsoft API references and working code examples. |
 | `nuget-manager` | Local: `.github/skills` (copied from awesome-copilot collection) | Manages NuGet package add/update/remove workflows safely. |
-| `orch-ai` | Plugin: `knowledge-base` | Orchestrates `.ai` records of how the team develops with AI — usage per development-flow stage, concepts, and adoption status — keeping tool registration in `.tech`. |
-| `orch-arc42-content` | Plugin: `knowledge-base` | Orchestrates direct `.arc42` chapter content edits with metadata enforcement, deferring decision-record and blueprint work to the architecture orchestrations. |
-| `orch-backlog` | Plugin: `knowledge-base` | Orchestrates `.backlog` work-item chapters, including drafting quality and GitHub Issue publishing. |
-| `orch-design` | Plugin: `knowledge-base` | Orchestrates `.design` guideline, token, interaction, and accessibility changes grounded in the repository's authoritative design source. |
-| `orch-domain` | Plugin: `knowledge-base` | Orchestrates `.domain` bounded-context modeling, features, diagrams, dependencies, and naming. |
-| `orch-tech` | Plugin: `knowledge-base` | Orchestrates `.tech` technology-graph changes and keeps the graph diagram in sync with `depends-on` edges. |
 | `playwright-automation-fill-in-form` | Local: `.github/skills` (copied from awesome-copilot collection) | Automates form interactions using Playwright tooling. |
 | `playwright-explore-website` | Plugin: `testing-automation` | Explores website flows and captures Playwright automation paths. |
 | `playwright-generate-test` | Plugin: `testing-automation` | Generates Playwright test cases from observed user flows. |
