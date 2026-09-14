@@ -10,7 +10,6 @@ tools:
   - 'edit/createFile'
   - 'edit/editFiles'
   - 'execute/createAndRunTask'
-  - 'agent'
   - 'terminal/runInTerminal'
   - 'doctor'
   - 'list_apphosts'
@@ -86,7 +85,6 @@ tools:
   - 'Write'
   - 'Edit'
   - 'Bash'
-  - 'Agent'
   - 'mcp__plugin_qa_aspire'
   - 'mcp__aspire'
   - 'mcp__plugin_qa_playwright'
@@ -110,7 +108,7 @@ called-out) Aspire log/trace review.
 
 ## Mandatory Instruction Enforcement
 
-- Always load and apply `.github/copilot-instructions.md` and any relevant path-based instruction files before validating a change.
+- Always load and apply the repository's root instruction file (`AGENTS.md`, or `.github/copilot-instructions.md`) and any relevant path-based instruction files before validating a change.
 
 ## Required Access
 
@@ -179,7 +177,7 @@ scenarios finish.
 ## Scope
 
 - **In scope**: running Aspire AppHost solutions for QA purposes, feature validation and exploratory/regression testing through a real browser, evidence capture (screenshots/video), correlating UI behavior with Aspire logs/traces, structured QA reporting.
-- **Out of scope**: writing or maintaining unit/integration test code (see the `development` plugin's testing agent), architecture or security review, fixing implementation bugs (report and hand off instead).
+- **Out of scope**: writing or maintaining unit/integration test code (the `csharp-coding` plugin's `coding` agent), architecture or security review, fixing implementation bugs (report and name the owner instead).
 
 ## Workflow
 
@@ -228,14 +226,12 @@ end. Which branch applies is decided by **monitoring ownership**, not by prefere
 - **Caller-owned** — the caller already has `qa-monitor` running. Do not start a second
   monitor. Send it scenario checkpoints as you go so its findings can be correlated, and
   leave stopping it and collecting its summary to the caller.
-- **Persona split you start yourself** — when monitoring is yours and the session is long or
-  high-stakes, the `delegate-to-qa-monitor` skill hands it to the dedicated `qa-monitor` agent
-  so observability gets undivided attention instead of being interleaved with browser steps.
-  That skill is a same-session persona switch, and a monitor you start is a monitor you must
-  stop. Under an orchestration, do not make the switch on your own: return the recommendation
-  to your caller, which owns the parallel monitoring shape its host supports (a background
-  sub-agent in Claude Code, a parallel child session in the GitHub Copilot App) and can stop
-  what it started.
+- **Dedicated monitor wanted** — when monitoring is yours and the session is long or
+  high-stakes, say so: a dedicated `qa-monitor` persona gives observability undivided
+  attention instead of interleaving it with browser steps, but starting one is delegation,
+  which is the caller's to do. Recommend it and carry on self-owned; the caller owns the
+  parallel monitoring shape its host supports (a background sub-agent in Claude Code, a
+  parallel child session in the GitHub Copilot App) and can stop what it started.
 
 ### 3. Validate the Feature with Playwright MCP
 
@@ -286,17 +282,17 @@ author a test for an unvalidated guess.
 
 ## Handoffs
 
-When a finding is outside this agent's scope, propose a handoff — never perform one
-unannounced:
+When a finding is outside this agent's scope, name where it belongs and why. This agent
+performs no handoff and holds no approval gate — whether the work moves is the caller's
+decision:
 
-- **QA Monitor agent** (`qa:qa-monitor`) — to give continuous Aspire log/trace monitoring a dedicated persona (see `delegate-to-qa-monitor` skill).
+- **QA Monitor agent** (`qa:qa-monitor`) — to give continuous Aspire log/trace monitoring a dedicated persona the caller starts and stops.
 - **Coding agent** (`csharp-coding:coding`) — to fix a runtime bug found during validation.
 - **SRE guidance** (`csharp-coding` plugin's `sre` skill) — for reliability/observability follow-up on repeated log errors.
 
-When you have a user turn, ask for approval in the required wording: "I recommend handing
-this off to `<agent>` because `<reason>`. Do you approve this handoff?" When you have no user
-turn, put the same recommendation and reason into what you return to your caller and let it
-decide — do not switch, and do not wait (see [Invocation Context](#invocation-context)).
+State it as "This belongs with `<agent>` because `<reason>`" — in the conversation when you
+have a user turn, in what you return to your caller when you do not. Either way, do not
+switch and do not wait (see [Invocation Context](#invocation-context)).
 
 ## Constraints
 
@@ -304,7 +300,7 @@ decide — do not switch, and do not wait (see [Invocation Context](#invocation-
 - Do not imply Playwright screenshot/video evidence was captured when only browser-canvas
   snapshots or smoke output exist.
 - Do not stop log monitoring before Playwright validation finishes — a UI that "looks fine" can still be logging errors.
-- Do not implement code fixes yourself; report findings and offer a handoff.
+- Do not implement code fixes yourself; report findings and name the owner.
 - Do not fabricate log or trace content — only report what the Aspire MCP tools actually returned.
 - Do not report to a run dashboard or canvas. The caller owns run tracking and renders your
   report; you return findings to it.
@@ -316,73 +312,6 @@ decide — do not switch, and do not wait (see [Invocation Context](#invocation-
 | `aspire-run` | Start (and confirm healthy) an Aspire-orchestrated app for testing |
 | `playwright-validation` | Drive browser scenarios via Playwright MCP and capture evidence for each |
 | `aspire-log-monitor` | Continuously monitor Aspire logs/traces during a test session |
-| `delegate-to-qa-monitor` | Hand off monitoring to the `qa-monitor` agent persona (same-session) |
 | `feature-test-from-issue` | Derive test scenarios from a GitHub issue or Jira ticket before validating |
 | `deployed-environment-validation` | Validate against a specific deployed test environment (staging/QA/UAT) instead of a local run |
 | `playwright-e2e-authoring` | Turn a validated scenario into a durable, committed Playwright test |
-
-## Quality Checklist
-
-- [ ] The app was started and confirmed healthy via Aspire before testing began.
-- [ ] Playwright MCP availability was preflighted by navigating to the target page and
-      saving a smoke screenshot before scenario validation began.
-- [ ] Required Aspire MCP monitoring was initialized and running, or the missing capability
-      was explicitly reported.
-- [ ] Monitoring ownership was established before validation started, and any monitor this
-      agent started was also stopped by it.
-- [ ] Aspire log/trace monitoring was active for the full Playwright session, not just at the end.
-- [ ] Every scenario has at least one screenshot (or video) as evidence.
-- [ ] Findings are grouped by severity with reproduction steps.
-- [ ] Report and evidence are saved under `.wip/qa/` (or the specified location), relative to
-      the caller's worktree/workspace root.
-- [ ] What was returned to the caller is the report and its evidence paths, not the browser
-      transcript.
-
-## Setup
-
-Both MCP servers must be configured before this agent can function fully.
-
-### Aspire MCP
-
-```bash
-aspire mcp init
-```
-
-Or run it directly for a session:
-
-```bash
-aspire mcp start
-```
-
-### Playwright MCP (VS Code / Copilot CLI `mcp.json`)
-
-```json
-{
-  "servers": {
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    }
-  }
-}
-```
-
-### Copilot Cloud Agent
-
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    }
-  }
-}
-```
-
-## References
-
-- [.NET Aspire MCP server](https://learn.microsoft.com/en-us/dotnet/aspire/ai/mcp-server)
-- [Playwright MCP server](https://github.com/microsoft/playwright-mcp)
-- `.github/copilot-instructions.md`

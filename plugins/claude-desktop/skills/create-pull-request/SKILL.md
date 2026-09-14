@@ -151,7 +151,7 @@ and the right labels and reviewers — and creates the PR with `gh`.
 This skill reports progress through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`). If the server is not configured, skip the
 dashboard calls below and continue through standard chat interaction. Follow the shared
-**Dashboard Reporting Contract** in `instructions/orch-dashboard-contract.instructions.md`
+**Dashboard Reporting Contract** in `resources/orch-dashboard-contract.md`
 for the tool cadence.
 
 - Open the dashboard per the shared contract, then call `start_run` with
@@ -174,12 +174,10 @@ contract.
 
 ## Related Skills
 
-- `update-pr-branch` — bring the PR branch up to date with its base and resolve conflicts.
-- `fix-pr-checks` — diagnose and fix failing PR checks.
-- `pr-merge-ready` — score one pull request against the merge-ready checklist and clear its blockers, one PR per pass.
+- `update-pr-branch` (plugin: `delivery`) — bring the PR branch up to date with its base and resolve conflicts.
+- `fix-pr-checks` (plugin: `delivery`) — diagnose and fix failing PR checks.
+- `pr-merge-ready` (plugin: `delivery`) — score one pull request against the merge-ready checklist and clear its blockers, one PR per pass.
 - `pr-remarks-review` (plugin: `review`) — work through reviewer comments.
-- `orch-feature` / `orch-bug` — the orchestrations that stop at Personal Validation, just
-  before this skill takes over.
 
 ## Notes
 

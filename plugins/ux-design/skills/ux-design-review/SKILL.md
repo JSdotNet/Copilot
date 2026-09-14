@@ -26,13 +26,13 @@ Ask for the following when not already provided:
 - **Design guidelines path** — path to the project style guide or design guidelines document, if available
 - **Review scope** — full review or specific concern (accessibility, visual consistency, flow clarity)?
 - **Platform** — web, mobile, or desktop?
-- **Output location** — where should the review report be saved? (default: `docs/design/reviews/`)
+- **Output location** — where should the review report be saved? (default: `docs/design/reviews/`; never the design devbook folder, which is guideline-level only)
 
 ## Required Resources
 
 Load and apply before reviewing:
 
-1. `instructions/ux/ux-global-instructions.md`
+1. `resources/ux-global.md`
 2. Project design guidelines document (if available)
 3. `resources/design/design-principles.md`
 
@@ -111,12 +111,3 @@ If the `impeccable` skill is installed, invoke `/impeccable` as the first step o
 
 ---
 ```
-
-## Quality Checks
-
-- [ ] All Nielsen heuristics considered.
-- [ ] Accessibility (contrast, keyboard, labels) checked.
-- [ ] Consistency against design system verified.
-- [ ] Findings are rated by severity.
-- [ ] Each finding has a clear recommendation.
-- [ ] Report saved to the agreed location.

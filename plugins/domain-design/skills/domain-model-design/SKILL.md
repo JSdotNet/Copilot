@@ -19,7 +19,7 @@ Use when the user needs to design aggregates, entities, value objects, domain ev
 
 ## Workflow
 
-1. Apply `instructions/ddd/ddd-global-instructions.md` and `instructions/ddd/tactical-design-instructions.md`.
+1. Apply `resources/ddd-global.md` and `resources/tactical-design.md`.
 2. Identify **aggregates** within the context:
    - Determine consistency boundaries: what must be immediately consistent in a single transaction?
    - Identify the aggregate root for each aggregate.
@@ -33,19 +33,10 @@ Use when the user needs to design aggregates, entities, value objects, domain ev
 4. Validate the design against `resources/ddd-checklist.md`.
 5. Check for anti-patterns using `resources/ddd-anti-patterns.md`.
 6. Document domain services for logic that spans multiple aggregates or does not belong to a single entity.
-7. Update the bounded context file following `instructions/output/domain-documentation-structure-instructions.md`.
+7. Update the bounded context file following `resources/domain-documentation-structure.md`.
 
 ## Output
 
 - Updated bounded context file with aggregate designs, invariants, domain events, and domain services.
 - Invariant documentation table for each aggregate.
 - Flagged anti-patterns or design concerns.
-
-## Quality Checks
-
-- Each aggregate enforces at least one business invariant.
-- Aggregates reference other aggregates by ID only.
-- All state changes go through the aggregate root.
-- Value objects are immutable with constructor validation.
-- Domain events are named in past tense and carry only necessary data.
-- No aggregate is larger than needed for immediate consistency.

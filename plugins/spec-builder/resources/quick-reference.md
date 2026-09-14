@@ -6,8 +6,9 @@ Concise decision guide and troubleshooting checklist for authoring customization
 
 | Asset | File pattern | Use when | Hosts |
 |---|---|---|---|
-| Repository instructions | `.github/copilot-instructions.md` | Repository-wide standards that apply to every conversation | Copilot |
-| Path-specific instructions | `.agents/rules/*.md` plus a loader per host | Rules that apply only to specific file paths or asset types | Both — the body is host-neutral; `.github/instructions/*.instructions.md` carries `applyTo`, `.claude/rules/*.md` carries `paths` (repository only) |
+| Repository instructions | `AGENTS.md`, with `CLAUDE.md` importing it and `.github/copilot-instructions.md` pointing at it | Repository-wide standards that apply to every conversation | Both |
+| Path-specific rule | `.agents/rules/<topic>.md` plus a wrapper per host | Rules that apply only to specific file paths or asset types | Both — the body carries `paths`; `.github/instructions/<topic>.instructions.md` carries `applyTo`, `.claude/rules/<topic>.md` carries `paths` (repository only) |
+| Plugin contract | `plugins/<name>/resources/<name>.md` | Shared text a skill or agent reads by path — never a glob | Both, by explicit reference |
 | Agent | `.github/agents/*.agent.md` | You need a named persona with specific tools, tone, and handoff behavior | Both |
 | Skill | `.github/skills/<skill>/SKILL.md` | You have a reusable multi-step workflow with defined inputs, steps, and outputs | Both |
 | Prompt | `.github/prompts/*.prompt.md` | You want a slash-command-style shortcut for a specific, repeatable request | Copilot |
@@ -26,7 +27,7 @@ always-on summary is in this plugin's `hooks.json` `sessionStart` prompt.
 Work through this checklist when a customization file is not applied by Copilot:
 
 - [ ] File is in the correct location for its type (see table above).
-- [ ] File name and extension follow the required pattern (e.g. `*.agent.md`, `*.instructions.md`).
+- [ ] File name and extension follow the required pattern (e.g. `*.agent.md`, `SKILL.md`, `resources/<name>.md`).
 - [ ] Frontmatter is valid YAML with no syntax errors.
 - [ ] `applyTo` glob matches the file currently open in the editor.
 - [ ] Check Chat diagnostics (Copilot Chat → `...` menu → Show Diagnostics) to see which files were loaded.

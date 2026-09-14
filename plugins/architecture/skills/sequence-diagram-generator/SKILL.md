@@ -26,7 +26,7 @@ Use when the user asks to:
 
 ## Workflow
 
-1. Load `instructions/sequence/sequence-global-instructions.md`.
+1. Load `resources/sequence-global.md`.
 2. Confirm the scenario name, participants, and message flow with the user.
 3. Load `skills/sequence-diagram-generator/prompts/sequence-diagram.prompt.md`.
 4. Ask focused clarifying questions only for missing ordering decisions or error paths.
@@ -42,15 +42,3 @@ Use when the user asks to:
 - Prose summary of the scenario (2–4 sentences)
 - Traceability links to arc42 §6 and the relevant C4 Container or Component diagram
 - List of open questions or assumptions
-
-## Quality Checks
-
-- [ ] One scenario per diagram.
-- [ ] Participants named by role.
-- [ ] All messages labelled with a verb phrase.
-- [ ] Synchronous vs asynchronous arrows used correctly.
-- [ ] Significant error and alternative paths shown.
-- [ ] Diagram embedded in a fenced `mermaid` code block.
-- [ ] Prose summary present.
-- [ ] Traceability links to arc42 §6 and related C4 diagram present.
-- [ ] SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

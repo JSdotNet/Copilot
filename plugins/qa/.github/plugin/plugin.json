@@ -1,7 +1,7 @@
 {
   "name": "qa",
-  "description": "Copilot plugin for runtime QA validation — run Aspire-orchestrated apps, drive Playwright browser scenarios with evidence for each, and monitor Aspire logs/traces during the test session.",
-  "version": "0.3.0",
+  "description": "Copilot plugin for runtime QA validation \u2014 run Aspire-orchestrated apps, drive Playwright browser scenarios with evidence for each, and monitor Aspire logs/traces during the test session.",
+  "version": "0.4.0",
   "author": {
     "name": "Job Schepers"
   },

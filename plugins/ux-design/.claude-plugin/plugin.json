@@ -1,7 +1,7 @@
 {
   "name": "ux-design",
-  "version": "0.3.0",
-  "description": "Copilot plugin for UX design workflows — wireframes, design guidelines, user flows, and design reviews.",
+  "version": "0.4.0",
+  "description": "UX design through the `ux-designer` agent: wireframes, user flows, design guidelines, and UI reviews, as SVG or Mermaid artifacts and structured Markdown. Fills the `ux` role a flow consults, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
   "author": {
     "name": "Job Schepers"
   },

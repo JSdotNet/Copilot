@@ -1,7 +1,8 @@
 # Orchestration Dashboard (MCP Server / Desktop Extension)
 
-The MCP server that gives `claude-desktop`'s `orch-*` orchestration skills and automation skills
-a live progress and output dashboard instead of plain chat narration. It also serves the
+The MCP server that gives a staged run — a `claude-desktop` skill, or a `flow-*` skill from
+`delivery@jsdotnet` that resolved this server as its surface — a live progress and output
+dashboard instead of plain chat narration. It also serves the
 Mermaid diagram and Markdown document viewers.
 
 It has **two surfaces from one implementation**:
@@ -19,7 +20,7 @@ the URL instead.
 An MCP server cannot open that URL itself — driving a browser is the host's job — so the
 orchestration instructions tell the agent to hand `dashboardUrl` to the host's in-app
 browser (`preview_start` in Claude Code) rather than only printing it. See **Surfacing the
-Dashboard** in `instructions/orch-dashboard-contract.instructions.md`. That keeps the dashboard
+Dashboard** in `resources/orch-dashboard-contract.md`. That keeps the dashboard
 beside the conversation on hosts without MCP Apps, which is as close to the App surface as
 the HTTP one gets.
 
@@ -210,7 +211,9 @@ rename the session to.
 | `.arc42/**` | `arc42` |
 | `.tech/**` | `tech` |
 | `.design/**` | `design` |
+| `.ai/**` | `ai` |
 | `.backlog/**` | `backlog` |
+| `.devbook/<folder>/**` | the same as `.<folder>/**` — the nested devbook layout folds onto the flat one |
 | anywhere else in the worktree | `code` |
 | published as a Claude Artifact | `artifact` |
 
@@ -246,9 +249,7 @@ The orchestrating session is the **sole owner** of a run: only it calls `start_r
 sub-agents in the **same worktree** so the change set and evidence paths stay valid. Reserve
 `isolation: "worktree"` agents for genuinely concurrent work such as `qa:qa-monitor`; their
 evidence must be written into — or copied back to — the owner's worktree root, because the
-evidence endpoint refuses any path outside it. See
-`plugins/claude-desktop/instructions/orch-execution-model.instructions.md` for the full Execution
-Model.
+evidence endpoint refuses any path outside it.
 
 A run outlives its session. When the owner session ends at a context threshold, it calls
 `set_run_context` with `handoff: true` and a `handoffNote`, and the next session's
@@ -360,7 +361,7 @@ node plugins/claude-desktop/mcp/orch-dashboard/mcp-server.mjs
 | Dashboard, viewers, reports | inline as an MCP App | `127.0.0.1` in the in-app browser pane |
 | Run/stage/QA tracking | yes | yes |
 | Insight and Context panels | **no** — they are fed by hooks, which Desktop does not have | yes |
-| `orch-*` workflows that build, test and commit | **no** — no repository access | yes |
+| Flows that build, test and commit | **no** — no repository access | yes |
 
 The dashboard is fully functional in Desktop as a viewer and as a place to drive runs from;
 the parts that depend on a checkout and on hook telemetry only populate under Claude Code.

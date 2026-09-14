@@ -10,6 +10,6 @@ Use this skill to write or improve story artifacts only.
 
 ## Rules
 
-- Load `instructions/stories.instructions.md` before writing.
+- Load `resources/stories.md` before writing.
 - Keep output focused on backlog clarity and testability.
 - Keep Jira synchronization as a separate step handled by the Jira agent.

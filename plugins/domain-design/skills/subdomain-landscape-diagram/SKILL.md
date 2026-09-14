@@ -18,12 +18,12 @@ Use after `domain-exploration` has produced `domain.md` with a subdomain overvie
 
 ## Workflow
 
-1. Apply `instructions/ddd/ddd-global-instructions.md` and `instructions/diagrams/ddd-diagram-instructions.md`.
+1. Apply `resources/ddd-global.md` and `resources/ddd-diagram.md`.
 2. Read `domain.md` and extract:
    - All subdomains with their type (core, supporting, generic).
    - All bounded contexts and their owning subdomain.
    - Cross-context relationships from the context map (optional).
-3. Build a Mermaid `flowchart TD` with three labelled subgraphs following `instructions/diagrams/ddd-diagram-instructions.md`:
+3. Build a Mermaid `flowchart TD` with three labelled subgraphs following `resources/ddd-diagram.md`:
    - **🎯 Core** — competitive-advantage subdomains.
    - **🔧 Supporting** — necessary but non-differentiating subdomains.
    - **📦 Generic** — commodity subdomains.
@@ -36,12 +36,3 @@ Use after `domain-exploration` has produced `domain.md` with a subdomain overvie
 ## Output
 
 - Updated `domain.md` with an embedded Mermaid `flowchart TD` subdomain landscape diagram.
-
-## Quality Checks
-
-- All subdomains from the Subdomains table appear on the diagram.
-- All bounded contexts appear within their owning subdomain subgraph.
-- The three subdomain type subgraphs are clearly labelled.
-- The diagram is consistent with the Bounded Context Index in `domain.md`.
-- No pattern labels clutter the landscape; relationship detail belongs on the context map.
-- SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

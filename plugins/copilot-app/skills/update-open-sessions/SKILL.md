@@ -93,7 +93,7 @@ This skill reports progress through the `orch-dashboard` canvas extension
 (`plugins/copilot-app/extensions/orch-dashboard/`). If the extension is not
 installed, skip the canvas calls below and continue through standard chat
 interaction. Follow the shared **Dashboard Reporting Contract** in
-`instructions/orch-shared-phases.instructions.md` to resolve the dashboard provider;
+`resources/dashboard-contract.md` to resolve the dashboard provider;
 prefer `extensionId: "plugin:copilot-app:orch-dashboard"` when opening or inspecting the
 canvas.
 

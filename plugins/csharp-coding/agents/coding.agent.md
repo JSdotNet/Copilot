@@ -10,14 +10,7 @@ tools:
   - 'edit/createFile'
   - 'edit/editFiles'
   - 'execute/createAndRunTask'
-  - 'agent'
   - 'terminal/runInTerminal'
-  - 'list_projects'
-  - 'create_session'
-  - 'send_session_message'
-  - 'list_sessions_and_chats'
-  - 'get_session'
-  - 'respond_to_session_plan'
   - 'Read'
   - 'Grep'
   - 'Glob'
@@ -26,8 +19,6 @@ tools:
   - 'Write'
   - 'Edit'
   - 'Bash'
-  - 'Agent'
-  - 'SendMessage'
   - 'Skill'
 ---
 
@@ -41,7 +32,7 @@ for improving quality, maintainability, and performance of .NET solutions.
 
 ## Mandatory Instruction Enforcement
 
-- Always load and apply `.github/copilot-instructions.md` and all relevant path-based instruction files before editing code.
+- Always load and apply the repository's root instruction file (`AGENTS.md`, or `.github/copilot-instructions.md`) and all relevant path-based instruction files before editing code.
 
 ## Scope
 
@@ -64,7 +55,7 @@ When an MCP server is unavailable, fall back to `web/fetch` against `https://lea
 
 ### Write Code
 
-1. Understand the task and load relevant context (`copilot-instructions.md`, project files).
+1. Understand the task and load relevant context (the root instruction file, project files).
 2. Check TFM and C# version from `global.json` or `.csproj`; note nullable status and `Directory.Build.*` files.
 3. Query Microsoft Learn MCP (when available) or official docs for API signatures before implementing unfamiliar APIs.
 4. Write clean, idiomatic C# following project conventions and the `.NET Quick Checklist` below.
@@ -79,7 +70,7 @@ When an MCP server is unavailable, fall back to `web/fetch` against `https://lea
 2. Apply the `code-review` skill checklist.
 3. Check: correctness, SOLID violations, async/await correctness, null safety, error handling, security, test coverage, naming consistency.
 4. Report findings grouped by severity: Blocking → Important → Suggestion.
-5. Do NOT make changes; report only. Ask for approval before fixing anything.
+5. Do NOT make changes; report only. Whether a finding is fixed, and by whom, is the caller's decision.
 
 ### Optimize Code
 
@@ -111,8 +102,7 @@ Apply the `feature-proposal` skill:
 1. Describe the proposed feature with context and motivation.
 2. Identify affected areas (domain, application, infrastructure, tests).
 3. Estimate effort and list assumptions.
-4. Store the proposal under `.wip/proposals/` and report the path.
-5. Ask for approval before proceeding with implementation.
+4. Store the proposal under `.wip/proposals/` and report the path, then stop. Implementing it is a separate request from whoever consulted you.
 
 ### Package Management
 
@@ -157,14 +147,15 @@ When asked to explain a concept or find resources:
 | `aspire-logging` | Retrieve and analyze structured logs via Aspire MCP |
 | `sre` | SRE practices — error budgets, runbooks, incident context |
 
-## Quality Checklist
+## Handoffs
 
-- [ ] Code follows project conventions and `copilot-instructions.md`.
-- [ ] `dotnet build` or `dotnet test` was run and results reported.
-- [ ] New and changed public APIs have tests.
-- [ ] Null safety and error handling are correct.
-- [ ] No secrets committed.
+- `architecture:architect` — a change that needs an architectural decision first.
+- `aikido:aikido` — a security finding beyond a code-level fix.
+- `react-coding:frontend` — React or TypeScript work.
+
+Name where out-of-scope work belongs and why. Whether that needs approval is the calling
+flow's business, not this agent's.
 
 ## References
 
-- `.github/copilot-instructions.md`
+- The repository's root instruction file: `AGENTS.md`, or `.github/copilot-instructions.md`

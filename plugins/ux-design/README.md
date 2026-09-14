@@ -1,6 +1,6 @@
 # ux-design
 
-Installable GitHub Copilot CLI plugin for UX design workflows — wireframes, design guidelines, user flows, and design reviews.
+UX design — wireframes, design guidelines, user flows, and design reviews. Fills the `ux` role a flow consults, and is usable on its own.
 
 ## Includes
 
@@ -12,11 +12,10 @@ Installable GitHub Copilot CLI plugin for UX design workflows — wireframes, de
   - `skills/ux-design-guidelines/SKILL.md`
   - `skills/ux-user-flow/SKILL.md`
 - Instructions:
-  - `instructions/common/agent-handoff.instructions.md`
-  - `instructions/ux/ux-global-instructions.md`
-  - `instructions/ux/wireframe-instructions.md`
-  - `instructions/ux/design-guidelines-instructions.md`
-  - `instructions/ux/user-flow-instructions.md`
+  - `resources/ux-global.md`
+  - `resources/wireframe.md`
+  - `resources/design-guidelines.md`
+  - `resources/user-flow.md`
 - Resources:
   - `resources/wireframe/wireframe-patterns.md`
   - `resources/design/design-principles.md`
@@ -79,16 +78,20 @@ Invoke a specific skill to start a guided workflow:
 
 | Artifact | Default Path |
 |---|---|
+| Design guidelines | `.design/` (or `.devbook/design/`) when the repository has it, else `docs/design/` |
 | Wireframes | `docs/design/wireframes/` |
-| Design guidelines | `docs/design/design-guidelines.md` |
 | User flows | `docs/design/flows/` |
 | Design reviews | `docs/design/reviews/` |
 
+The design folder is guideline-level only. Wireframes, flows, and reviews are artifacts produced from
+those guidelines and never live there.
+
 ## Relationship to Other Plugins
 
-- **architecture** — hand off UX decisions to the `architect` agent to record them as ADRs or incorporate UX constraints into arc42 sections.
-- **documentation** — hand off design artifacts to the `documentation` agent to wrap them in How-To guides, Explanations, or Proposals.
-- **product-owner** — use the `product-owner` plugin to link wireframes and flows to epics and user stories.
+- **architecture** — the `ux-designer` agent names `architecture:architect` for recording UX decisions as ADRs or carrying UX constraints into arc42 sections.
+- **documentation** — it names `documentation:documentation` for wrapping design artifacts in How-To guides, Explanations, or Proposals.
+
+Sequencing, approval, and delegation belong to whatever consults it.
 
 ## Optional Enhancement — impeccable
 

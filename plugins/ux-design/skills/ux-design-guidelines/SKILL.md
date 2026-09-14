@@ -27,14 +27,16 @@ Ask for the following when not already provided:
 - **Brand assets** — primary brand colours, font families, logo guidelines (if available)
 - **Platform** — web, mobile, or multi-platform?
 - **Scope** — full design system, tokens only, or specific sections to add or update?
-- **Output location** — where should the document be saved? (default: `docs/design/design-guidelines.md`)
+- **Output location** — where should the guidelines be saved? (default: the repository's
+  design devbook folder — `.design/` or `.devbook/design/` — when it has one, else
+  `docs/design/design-guidelines.md`)
 
 ## Required Resources
 
 Load and apply before generating:
 
-1. `instructions/ux/ux-global-instructions.md`
-2. `instructions/ux/design-guidelines-instructions.md`
+1. `resources/ux-global.md`
+2. `resources/design-guidelines.md`
 3. `resources/design/design-principles.md`
 
 ### Optional — `/impeccable`
@@ -68,13 +70,3 @@ If the `impeccable` skill is installed, invoke `/impeccable` before drafting des
 
 - One primary `design-guidelines.md` document (or update to an existing file)
 - Short confirmation note: output path, sections covered, and any `[TODO: define]` items
-
-## Quality Checks
-
-- [ ] Colour palette with hex codes and usage rules is present.
-- [ ] Typography scale with sizes and weights is defined.
-- [ ] Spacing scale with base unit and named steps is documented.
-- [ ] At least one component pattern is fully specified with states and variants.
-- [ ] Breakpoints are named with pixel ranges.
-- [ ] Voice and tone section has at least two concrete copy examples.
-- [ ] Missing sections are marked with `[TODO: define]`, not omitted silently.

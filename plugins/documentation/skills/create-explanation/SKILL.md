@@ -20,7 +20,7 @@ behind design choices.
    - **Output location**: Where should the file be saved (default: `documents/explanations/`)?
 
 2. Load and apply the Explanation instruction file at
-   `instructions/documentation/explanations.instructions.md` before drafting.
+   `resources/explanations.md` before drafting.
 
 3. Draft the explanation using this structure:
    - `# <Title>`

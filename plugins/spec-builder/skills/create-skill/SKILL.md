@@ -23,10 +23,10 @@ description: Create or refine a focused SKILL.md with clear trigger conditions, 
 5. Describe actions rather than host-specific tool names, so both hosts read the skill alike.
 6. Reference instruction and resource files by relative path.
 7. Prune against
-   [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md):
+   [spec-conciseness.md](../../resources/spec-conciseness.md):
    40-line budget, no rule stated twice.
 
 ## Output
 
 - A `skills/<skill-name>/SKILL.md` file that passes
-  [create-skill.instructions.md](../../instructions/authoring/create-skill.instructions.md).
+  [create-skill.md](../../resources/create-skill.md).

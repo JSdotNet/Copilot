@@ -10,7 +10,6 @@ Track skill provenance and avoid duplicate local skills when plugin-provided ski
 |---|---|---|
 | `ai-prompt-engineering-safety-review` | Plugin: `security-best-practices`, Plugin: `testing-automation` | Reviews prompts for security, safety, privacy, and misuse risks. |
 | `appinsights-instrumentation` | Local: `.github/skills` (copied from awesome-copilot collection) | Adds practical telemetry instrumentation for Azure Application Insights. |
-| `architecture-blueprint-generator` | Local: `.github/skills` (copied from awesome-copilot collection) | Generates architecture blueprints from an existing codebase. |
 | `architecture-arc42-generator` | Local: `.github/skills` | Interactive arc42 architecture blueprint generator for drafting, validating, and iterating sections using reusable prompt and instruction assets. |
 | `aspire` | Local: `.github/skills` (copied from awesome-copilot collection) | Guides setup, debugging, and operations for .NET Aspire apps. |
 | `aspnet-minimal-api-openapi` | Plugin: `csharp-dotnet-development` | Builds ASP.NET Minimal APIs with OpenAPI documentation patterns. |
@@ -59,7 +58,6 @@ Track skill provenance and avoid duplicate local skills when plugin-provided ski
 | `github-issues` | Local: `.github/skills` (copied from awesome-copilot collection) | Creates and manages GitHub issues and related metadata. |
 | `import-infrastructure-as-code` | Plugin: `azure-cloud-development` | Imports existing cloud resources into IaC workflows. |
 | `java-junit` | Plugin: `testing-automation` | Helps author and improve Java tests with JUnit. |
-| `knowledge-base-moved` | Plugin: `knowledge-base` (retired, `0.17.0`) | Notice only: every former `knowledge-base` skill (`knowledge-base-init`, `knowledge-base-validate`, `knowledge-tech-update`, the per-folder `orch-*`, `to-spec-<kind>`, `from-spec-<kind>`) now ships as `devbook@jsdotnet` from [JSdotNet/ai-agent-stack](https://github.com/JSdotNet/ai-agent-stack); see `plugins/knowledge-base/README.md` for the successor table. |
 | `microsoft-code-reference` | Local: `.github/skills` (copied from awesome-copilot collection) | Finds official Microsoft API references and working code examples. |
 | `nuget-manager` | Local: `.github/skills` (copied from awesome-copilot collection) | Manages NuGet package add/update/remove workflows safely. |
 | `playwright-automation-fill-in-form` | Local: `.github/skills` (copied from awesome-copilot collection) | Automates form interactions using Playwright tooling. |

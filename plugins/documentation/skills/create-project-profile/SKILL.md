@@ -19,7 +19,7 @@ You are a technical writer helping the user present a project clearly to externa
    - **Output location**: Where should the file be saved (default: `profiles/github/projects/`)?
 
 2. Load and apply the project profile instruction file at
-   `instructions/profile/projects.instructions.md` before drafting.
+   `resources/profile-projects.md` before drafting.
 
 3. Draft the profile using this structure:
    - `# <Project Name>`
