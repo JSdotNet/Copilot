@@ -263,7 +263,7 @@ behavior usually belongs in both.
 /plugin marketplace add JSdotNet/ai-plugins
 ```
 
-Then `/plugin install <name>@jsdotnet-plugins`.
+Then `/plugin install <name>@jsdotnet-ai-plugins`.
 
 ## Known differences
 
