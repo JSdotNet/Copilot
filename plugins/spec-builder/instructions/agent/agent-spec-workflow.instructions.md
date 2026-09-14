@@ -29,9 +29,9 @@ section in [spec-builder.agent.md](../../agents/spec-builder.agent.md).
 
 ## Handoff Policy
 
-- Hand off to another plugin's agent only when the request leaves customization authoring
-  scope, and only with explicit user approval using the wording:
-  - "I recommend handing this off to `<agent>` because `<reason>`. Do you approve this handoff?"
+- When the request leaves customization authoring scope, name the plugin agent it belongs
+  to and why, then stop there. This agent holds no approval gate and performs no handoff
+  itself: sequencing, approval, and delegation belong to whatever consulted it.
 
 ## Validation Checklist
 
@@ -39,5 +39,5 @@ section in [spec-builder.agent.md](../../agents/spec-builder.agent.md).
 - [ ] The agent maps each asset type to a `create-*` skill.
 - [ ] The five workflow phases are followed in order.
 - [ ] Changed file paths are reported.
-- [ ] Any cross-plugin handoff is approval-gated.
+- [ ] Out-of-scope work is named, not handed off.
 - [ ] Every line changes behavior versus the model default, and no meaning appears twice.

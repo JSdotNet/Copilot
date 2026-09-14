@@ -85,16 +85,12 @@ Document reusable UI components with:
 
 ## File Naming and Storage
 
-- Save design guideline documents under `docs/design/` or `**/design/guidelines/`.
-- Use `design-guidelines.md` as the primary entry point.
-- Split large systems into one file per topic (e.g., `design-tokens.md`, `components.md`).
-
-## Quality Checks
-
-- [ ] Colour palette documented with hex codes and usage rules.
-- [ ] Typography scale defined with all size and weight values.
-- [ ] Spacing scale defined with a base unit.
-- [ ] Each component has states, variants, and accessibility requirements.
-- [ ] Breakpoints are named and pixel ranges are explicit.
-- [ ] Voice and tone section includes concrete examples.
-- [ ] Missing sections are marked with `[TODO: define]`.
+- When the repository has a `.design/` knowledge folder, write guidelines there as one chapter
+  per topic — `design-principles.md`, `color-scheme.md`, `typography-and-layout.md`,
+  `interaction-guidelines.md`, `accessibility.md`, `component-libraries.md` — each opening with
+  a fenced `meta` block, and `README.md` as the entry point. Follow that folder's own
+  instruction file for structure and status; do not invent a second layout beside it.
+- Otherwise ask for a path, defaulting to `docs/design/`, with `design-guidelines.md` as the
+  entry point and one file per topic for large systems.
+- Guidelines only. Wireframes, user flows, prototypes, and screenshots are artifacts produced
+  from these rules and are stored with the other deliverables, never in `.design/`.

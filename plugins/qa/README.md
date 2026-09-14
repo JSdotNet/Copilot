@@ -58,19 +58,18 @@ on it. Two options are available, at different levels:
   standard `agent` tool (`delegate-to-qa-monitor` skill). This works in any host, but the
   two personas still take turns within one session; it is not literal concurrent
   execution.
-- **App-only (used by `copilot-app` orchestration skills)** — the `copilot-app` plugin's
-  `orch-feature`, `orch-bug`, and other orchestration skills with a Local Run &
-  Monitoring / E2E validation stage reference `qa` and `qa-monitor` directly in that
-  stage. When running inside the **GitHub Copilot App**, `qa-monitor` can be run in a
+- **App-only (used by a flow's QA phase)** — a flow skill that owns a QA validation
+  phase references `qa` and `qa-monitor` directly in that phase.
+  When running inside the **GitHub Copilot App**, `qa-monitor` can be run in a
   genuinely separate, concurrent child session (`create_session` plus cross-session
-  messaging) while `qa` drives the browser in the current session. This capability is
-  specific to the GitHub Copilot App; the `copilot-app` plugin's orchestration skills
-  document it inline rather than in a separate skill.
+  messaging) while `qa` drives the browser in the current session. That capability
+  belongs to the host rather than to a plugin agent's tool set, so a flow documents
+  it inline rather than in a separate skill.
 
 ## Scope
 
 - **In scope**: runtime/E2E feature validation, exploratory and regression testing through a real browser (locally or against a deployed test environment), authoring durable Playwright E2E tests from validated scenarios, evidence-backed QA reporting.
-- **Out of scope**: writing unit/integration test code (see the `development` plugin's testing agent), architecture/security review, and implementing code fixes (the agent reports and offers a handoff instead).
+- **Out of scope**: writing unit/integration test code (the `csharp-coding` plugin's `coding` agent), architecture/security review, and implementing code fixes (the agent reports and names the owner instead).
 
 ## Install
 

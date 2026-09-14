@@ -1,96 +1,56 @@
 ---
 applyTo: '**/*.md'
-description: Defines the Markdown file structure for domain design output artifacts.
+description: Where domain design artifacts are written, and which convention owns their structure.
 ---
 
 # Domain Documentation Structure Instructions
 
 ## Purpose
 
-Define the file structure and heading conventions for domain design artifacts produced by the domain architect agent.
+Say where domain artifacts land. It does not restate their structure: when the repository has
+a `.domain/` knowledge folder, that folder's own instruction file is the single owner of the
+layout, the chapter set, and the metadata, and a second spec here would only drift from it.
 
-## File Structure
+## When The Repository Has `.domain/`
 
-Each project produces the following domain documentation structure:
+Write there, and follow `.domain`'s own rules for everything else:
 
 ```
-doc/domain/
-├── domain.md                          # Primary domain overview
-├── <bounded-context-name>.md          # One file per bounded context
-├── <bounded-context-name>.md
-└── ...
+.domain/
+  context-map.md                 # strategic view: subdomains, context map, published languages
+  <bounded-context-name>/        # kebab-case, matching the name used in code and ADRs
+    domain.md                    # one chapter per aggregate, domain service, or domain event
+    features.md                  # features and sub-features, in business language
+    model.md                     # structural model, ideally a Mermaid class diagram
+    flow.md                      # lifecycle and process flows; only when the context has them
+    dependencies.md              # outbound and inbound, with explicit DDD relationship semantics
+    naming.md                    # ubiquitous-language registry, one chapter per term
 ```
 
-## Primary Domain File — `domain.md`
+Three things follow from that convention and are the ones most often got wrong:
 
-The `domain.md` file provides the high-level domain overview. It contains:
+- One **folder** per bounded context, not one file. `model.md` is structural only — lifecycles
+  and process flows belong in `flow.md`.
+- Every file carries a fenced `meta` block under its `#` heading, and addressable chapters in
+  `domain.md`, `features.md`, and `naming.md` carry one of their own. Not YAML frontmatter.
+- `status` in this folder is `draft`, `proposed`, `active`, or `deprecated`. There is no `done`:
+  a domain model is the current agreed model, not a task queue.
 
-### Required Sections
+Read that folder's instruction file before writing, and never hand-edit anything under
+`_meta/` — it is generated.
 
-1. **Domain Overview** — one-paragraph summary of the business domain.
-2. **Subdomains** — table listing each subdomain with name, type (core, supporting, generic), purpose, and owning bounded context(s).
-3. **Bounded Context Map** — Mermaid diagram showing all bounded contexts and their relationships, with each context node colour-coded by deployment type (Service vs Module) per `instructions/ddd/strategic-design-instructions.md`.
-4. **Cross-Cutting Concerns** — domain-wide policies, shared constraints, or compliance requirements that span multiple contexts.
-5. **Bounded Context Index** — table linking each bounded context name to its dedicated file, including its deployment type (Service or Module).
+## When It Does Not
 
-### Frontmatter
+Ask for a path, defaulting to `docs/domain/`, and keep the same shape one level flatter: a
+`context-map.md` overview plus one kebab-case file per bounded context, cross-linked, each
+opening with `title`, `context`, and `last-updated` frontmatter.
 
-```yaml
----
-title: Domain Overview
-domain: <domain-name>
-last-updated: <date>
----
-```
+## Either Way
 
-## Bounded Context Files — `<bounded-context-name>.md`
-
-Each bounded context gets a separate file named using kebab-case (for example: `order-management.md`, `identity-access.md`).
-
-### Required Sections
-
-1. **Context Purpose** — one-paragraph description of this context's responsibility.
-2. **Ubiquitous Language** — glossary table with term, definition, and related terms.
-3. **Aggregates** — for each aggregate:
-   - Aggregate root name
-   - Entities and value objects within the aggregate
-   - Key invariants (business rules that must always hold)
-   - Domain events raised by this aggregate
-4. **Domain Events** — table listing all events with name, trigger, and payload summary.
-5. **Integration Contracts** — inbound and outbound contracts with other bounded contexts:
-   - Events consumed and produced
-   - Commands or queries received from or sent to other contexts
-   - Anti-corruption layer mappings (if applicable)
-6. **Open Questions** — unresolved domain decisions or assumptions needing validation.
-
-### Frontmatter
-
-```yaml
----
-title: <Bounded Context Name>
-context: <bounded-context-name>
-domain: <domain-name>
-subdomain: <subdomain-name>
-subdomain-type: core | supporting | generic
-last-updated: <date>
----
-```
-
-## Cross-Reference Rules
-
-- `domain.md` must link to each bounded context file in the Bounded Context Index.
-- Each bounded context file must link back to `domain.md` in its Integration Contracts section when referencing cross-context interactions.
-- Use relative Markdown links (for example: `[Order Management](order-management.md)`).
-
-## Naming Conventions
-
-- File names: kebab-case, no spaces, lowercase.
-- Aggregate names: PascalCase as used in ubiquitous language.
-- Domain event names: PascalCase, past tense (for example: `OrderPlaced`).
-- Glossary terms: as used in spoken language by domain experts.
-
-## Incremental Updates
-
-- When adding a new bounded context, create a new file and update the index in `domain.md`.
-- When modifying a bounded context, update only the affected file and adjust cross-references if needed.
-- Always update the `last-updated` frontmatter field when modifying a file.
+- File names kebab-case. Aggregate names PascalCase as the ubiquitous language uses them.
+  Domain events PascalCase and past tense — `OrderPlaced`.
+- Glossary terms as domain experts actually say them, with synonyms recorded as aliases rather
+  than as separate terms.
+- Adding a context adds its folder or file and updates the context map. Modifying one touches
+  only that context and the cross-references that name it.
+- Record unresolved domain decisions explicitly rather than resolving them by invention.

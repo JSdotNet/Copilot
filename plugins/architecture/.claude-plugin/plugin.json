@@ -1,7 +1,7 @@
 {
   "name": "architecture",
-  "version": "0.4.0",
-  "description": "Copilot plugin for architecture documentation, blueprints, ADRs, technical debt records, and architecture diagrams (C4, sequence, state machine, deployment).",
+  "version": "0.5.0",
+  "description": "Architecture documentation through the `architect` agent: arc42 sections, architectural decision records, technical debt records, and C4, sequence, state-machine, and deployment diagrams. Fills the `architecture` role a flow consults, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
   "author": {
     "name": "Job Schepers"
   },

@@ -14,7 +14,6 @@ Installable GitHub Copilot CLI plugin for product backlog authoring. Write epics
   - `instructions/stories.instructions.md`
   - `instructions/epics.instructions.md`
   - `instructions/bugs.instructions.md`
-  - `instructions/agent-handoff.instructions.md`
   - `instructions/markdown.instructions.md`
 
 ## Scope
@@ -28,7 +27,7 @@ Installable GitHub Copilot CLI plugin for product backlog authoring. Write epics
 
 ## Optional Integrations
 
-- Architecture handoff (`architect`) is optional and requires the `architecture` plugin to be installed.
+- Naming `architecture:architect` for architecture work is optional and requires the `architecture` plugin to be installed. The agent holds no flow control: sequencing, approval, and delegation belong to whatever consults it.
 - Jira sync requires the `jira` plugin to be installed (`copilot plugin install JSdotNet/Copilot:plugins/jira`).
 - GitHub issue sync requires the `github` plugin to be installed (`copilot plugin install JSdotNet/Copilot:plugins/github`).
 

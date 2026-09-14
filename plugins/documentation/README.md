@@ -7,8 +7,8 @@ Covers six documentation artifact types and three profile artifact types.
 
 | Asset | Path | Purpose |
 |---|---|---|
-| Agent | `agents/documentation.agent.md` | Orchestrates all six documentation artifact types |
-| Agent | `agents/profile.agent.md` | Orchestrates GitHub, project, and LinkedIn profile artifacts |
+| Agent | `agents/documentation.agent.md` | Writes all six documentation artifact types |
+| Agent | `agents/profile.agent.md` | Writes GitHub, project, and LinkedIn profile artifacts |
 | Instruction | `instructions/documentation/howto.instructions.md` | How-To writing rules |
 | Instruction | `instructions/documentation/explanations.instructions.md` | Explanation writing rules |
 | Instruction | `instructions/documentation/articles.instructions.md` | Article writing rules |

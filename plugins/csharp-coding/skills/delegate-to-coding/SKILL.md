@@ -27,8 +27,8 @@ Delegate to the `coding` agent when the current task requires:
 
 1. Save any relevant context (plans, specs, partial work) to `.wip/` and note the file path.
 2. Compose a delegation prompt using the template below.
-3. Present the prompt to the user and ask for approval before switching to the `coding` agent.
-4. Only switch after explicit user approval.
+3. Hand the prompt to the `coding` agent. Whether the switch needs approval first is the
+   calling flow's business, not this skill's: a flow holds its gates in one place.
 
 ## Delegation Prompt Template
 

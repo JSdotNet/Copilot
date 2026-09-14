@@ -1,7 +1,7 @@
 {
   "name": "documentation",
-  "version": "0.4.0",
-  "description": "Write and maintain documentation artifacts, infographics, and profile content using GitHub Copilot.",
+  "version": "0.5.0",
+  "description": "Documentation and profile artifacts through the `documentation` and `profile` agents: how-to guides, explanations, articles, proposals, ideas, and SVG infographics, plus GitHub, LinkedIn, and project profiles. Fills the `docs` role a flow consults, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
   "license": "MIT",
   "agents": [
     "./agents/documentation.agent.md",

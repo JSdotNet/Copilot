@@ -18,7 +18,6 @@ A focused, single-agent plugin for writing, reviewing, optimizing, and testing C
   - `skills/microsoft-code-reference/SKILL.md`
   - `skills/feature-proposal/SKILL.md`
   - `skills/delegate-to-coding/SKILL.md`
-  - `skills/sync/SKILL.md`
   - `skills/azure/SKILL.md`
   - `skills/aspire/SKILL.md`
   - `skills/open-telemetry/SKILL.md`
@@ -54,15 +53,12 @@ The agent works without MCP servers using `web/fetch` as a fallback.
 - **SRE** — error budgets, resilience patterns, health checks, and runbooks.
 - **Delegate to coding** — skill for other agents to hand off coding tasks here.
 
-## Optional Handoffs
+## Handoffs
 
-The coding agent can propose handoffs (with explicit user approval) to:
-
-- `architect` agent — for architectural concerns.
-- `security` agent — for security review findings.
-- `development-plan` agent — for full implementation planning from scratch.
-
-Install the `development` or `architecture` plugin to enable those agents.
+The coding agent names where out-of-scope work belongs — `architecture:architect` for
+architectural concerns, `aikido:aikido` for security findings, `react-coding:frontend` for
+React work — and says why. Whether that needs approval is the calling flow's business, not
+this agent's; used bare, it simply reports.
 
 ## Install
 

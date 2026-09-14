@@ -27,7 +27,7 @@ Ask for the following when not already provided:
 - **Starting point** — where does the flow begin?
 - **Goal** — what is the user trying to accomplish?
 - **Key decision points** — are there branching conditions or error paths to include?
-- **Output location** — where should the artifact be saved? (default: `docs/design/flows/`)
+- **Output location** — where should the artifact be saved? (default: `docs/design/flows/`; never `.design/`, which is guideline-level only)
 
 ## Required Resources
 
@@ -76,14 +76,3 @@ Load and apply before generating:
   - Brief preamble (persona, goal, scope)
   - Mermaid diagram or journey map table
   - Open questions and follow-up items
-
-## Quality Checks
-
-- [ ] Persona or user role is identified.
-- [ ] Entry point is clearly defined.
-- [ ] Happy path is complete end-to-end.
-- [ ] At least one error or edge-case branch is included.
-- [ ] Exit points (success, abandonment, error) are explicit.
-- [ ] Mermaid diagram is valid and renders correctly.
-- [ ] Journey map (if applicable) includes emotions, pain points, and opportunities.
-- [ ] Open questions are marked with `[TODO: clarify]`.
