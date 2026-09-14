@@ -19,14 +19,14 @@ Installable GitHub Copilot CLI plugin for Jira issue synchronization workflows.
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/jira
+copilot plugin install JSdotNet/ai-plugins:plugins/jira
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/jira
+copilot plugin install JSdotNet/ai-plugins:plugins/jira
 ```
 
 ## Uninstall
@@ -37,14 +37,14 @@ copilot plugin uninstall jira
 
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/jira
+copilot plugin install JSdotNet/ai-plugins:plugins/jira
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/jira
+copilot plugin install JSdotNet/ai-plugins:plugins/jira
 ```
 
 ## Uninstall

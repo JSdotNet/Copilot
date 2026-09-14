@@ -31,14 +31,14 @@ and an arc42 document already carries what a blueprint did.
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/architecture
+copilot plugin install JSdotNet/ai-plugins:plugins/architecture
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/architecture
+copilot plugin install JSdotNet/ai-plugins:plugins/architecture
 ```
 
 ## Uninstall

@@ -108,7 +108,7 @@ own, and QA evidence paths resolve against that setting.
 ### Claude Code (plugin)
 
 ```bash
-/plugin marketplace add JSdotNet/Copilot
+/plugin marketplace add JSdotNet/ai-plugins
 ```
 
 Then install the plugin:

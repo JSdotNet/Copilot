@@ -38,14 +38,14 @@ Additional GitHub-related resources available from the Awesome Copilot marketpla
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/github
+copilot plugin install JSdotNet/ai-plugins:plugins/github
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/github
+copilot plugin install JSdotNet/ai-plugins:plugins/github
 ```
 
 ## Uninstall

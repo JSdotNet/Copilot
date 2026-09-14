@@ -260,7 +260,7 @@ behavior usually belongs in both.
 ## Installing in Claude Code
 
 ```bash
-/plugin marketplace add JSdotNet/Copilot
+/plugin marketplace add JSdotNet/ai-plugins
 ```
 
 Then `/plugin install <name>@jsdotnet-copilot`.

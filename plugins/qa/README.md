@@ -72,14 +72,14 @@ on it. Two options are available, at different levels:
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/qa
+copilot plugin install JSdotNet/ai-plugins:plugins/qa
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/qa
+copilot plugin install JSdotNet/ai-plugins:plugins/qa
 ```
 
 ## Uninstall

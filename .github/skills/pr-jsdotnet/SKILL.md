@@ -28,7 +28,7 @@ If switching is not possible in the current session, stop and ask the user to re
   2. `COPILOT_GH_ACCOUNT_GITHUB_2E_COM_JSDOTNET`
   3. an existing `gh` keyring login for account `JSdotNet`
 - The feature branch must already exist locally with at least one commit ahead of the base branch.
-- Target repository can be any repo in the `JSdotNet` organization, such as `JSdotNet/Copilot`.
+- Target repository can be any repo in the `JSdotNet` organization, such as `JSdotNet/ai-plugins`.
 
 ## Key Features
 
@@ -112,7 +112,7 @@ if (-not [string]::IsNullOrWhiteSpace($resolvedToken)) {
 }
 
 gh pr create `
-  --repo JSdotNet/Copilot `
+  --repo JSdotNet/ai-plugins `
   --base main `
   --head <branch> `
   --title "<title>" `
