@@ -1,23 +1,17 @@
 {
   "name": "claude-desktop",
-  "version": "0.11.0",
-  "description": "Claude Code plugin for orchestration workflows, pull request delivery, and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
+  "version": "0.12.0",
+  "description": "Claude Code host plugin: the start, session-handoff, and create-pull-request skills plus the orch-dashboard MCP server that renders a run dashboard, Mermaid diagrams, and Markdown documents inline. The orchestration lane it used to ship continues as delivery@jsdotnet.",
   "author": {
     "name": "Job Schepers"
   },
   "license": "MIT",
   "keywords": [
     "claude-code",
-    "orchestration",
     "dashboard",
     "mcp",
-    "development",
-    "automation",
-    "qa",
-    "pull-request"
-  ],
-  "agents": [
-    "./agents/orchestrator.agent.md"
+    "pull-request",
+    "session"
   ],
   "mcpServers": {
     "orch-dashboard": {

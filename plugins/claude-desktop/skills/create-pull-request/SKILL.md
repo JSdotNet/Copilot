@@ -174,12 +174,10 @@ contract.
 
 ## Related Skills
 
-- `update-pr-branch` — bring the PR branch up to date with its base and resolve conflicts.
-- `fix-pr-checks` — diagnose and fix failing PR checks.
-- `pr-merge-ready` — score one pull request against the merge-ready checklist and clear its blockers, one PR per pass.
+- `update-pr-branch` (plugin: `delivery`) — bring the PR branch up to date with its base and resolve conflicts.
+- `fix-pr-checks` (plugin: `delivery`) — diagnose and fix failing PR checks.
+- `pr-merge-ready` (plugin: `delivery`) — score one pull request against the merge-ready checklist and clear its blockers, one PR per pass.
 - `pr-remarks-review` (plugin: `review`) — work through reviewer comments.
-- `orch-feature` / `orch-bug` — the orchestrations that stop at Personal Validation, just
-  before this skill takes over.
 
 ## Notes
 

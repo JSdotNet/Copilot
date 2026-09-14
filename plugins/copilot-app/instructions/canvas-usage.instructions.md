@@ -1,19 +1,19 @@
 ---
-applyTo: 'skills/orch-*/SKILL.md'
-description: Defines when and how orch-* orchestration skills use the diagram-canvas and markdown-canvas extensions on behalf of the content plugins they coordinate.
+applyTo: 'skills/**/SKILL.md'
+description: Defines when and how a skill that runs a staged flow uses the diagram-canvas and markdown-canvas extensions on behalf of the content plugins it coordinates.
 ---
 
-# Canvas Usage Instructions (Orchestration-Owned)
+# Canvas Usage Instructions (Flow-Owned)
 
 ## Purpose
 
 - The `architecture`, `domain-design`, `ux-design`, `documentation`, and `product-owner`
   plugins have **no dependency** on any canvas extension. Their agents and skills only
   produce Markdown/Mermaid file artifacts and never reference a canvas.
-- `copilot-app`'s `orch-*` skills own canvas usage instead: when an orchestrated stage
-  hands off to one of those plugins' agents and the stage produces a diagram or document,
-  the orchestrating skill — not the content plugin — is responsible for opening/updating
-  the matching canvas alongside the required file-based artifact.
+- The skill running the flow owns canvas usage instead: when a stage hands off to one of
+  those plugins' agents and the stage produces a diagram or document, the flow skill — not
+  the content plugin — is responsible for opening/updating the matching canvas alongside
+  the required file-based artifact.
 - Keep the file-based artifact as the source of truth; canvas rendering is always an
   additional live preview, never a replacement for it.
 

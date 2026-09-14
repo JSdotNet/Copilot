@@ -1,19 +1,19 @@
 ---
-applyTo: 'skills/orch-*/SKILL.md'
-description: Defines when and how orch-* orchestration skills use the orch-dashboard content viewers (render_diagram, render_markdown) on behalf of the content plugins they coordinate.
+applyTo: 'skills/**/SKILL.md'
+description: Defines when and how a skill that runs a staged flow uses the orch-dashboard content viewers (render_diagram, render_markdown) on behalf of the content plugins it coordinates.
 ---
 
-# Dashboard Usage Instructions (Orchestration-Owned)
+# Dashboard Usage Instructions (Flow-Owned)
 
 ## Purpose
 
 - The `architecture`, `domain-design`, `ux-design`, and `documentation`
   plugins have **no dependency** on the dashboard. Their agents and skills only produce
   Markdown/Mermaid file artifacts and never reference a viewer.
-- `claude-desktop`'s `orch-*` skills own viewer usage instead: when an orchestrated stage hands
-  off to one of those plugins' agents and the stage produces a diagram or document, the
-  orchestrating skill — not the content plugin — is responsible for rendering it alongside
-  the required file-based artifact.
+- The skill running the flow owns viewer usage instead: when a stage hands off to one of
+  those plugins' agents and the stage produces a diagram or document, the flow skill — not
+  the content plugin — is responsible for rendering it alongside the required file-based
+  artifact.
 - Keep the file-based artifact as the source of truth; a rendered view is always an
   additional live preview, never a replacement for it.
 

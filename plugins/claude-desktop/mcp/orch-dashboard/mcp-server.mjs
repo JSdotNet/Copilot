@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 // MCP server: orch-dashboard
 //
-// Live progress and output dashboard for the claude-desktop orch-* orchestration skills
-// (orch-feature, orch-bug, orch-adr, orch-arc42, orch-blueprint, orch-tdr,
-// orch-architecture, orch-project, orch-repo, orch-create-mvp, orch-update-packages,
-// orch-aspire-update, orch-structure, orch-create-module, orch-create-service) and the
-// claude-desktop automation skills.
+// Live progress and output dashboard for a staged run — a claude-desktop skill such as
+// create-pull-request, or a flow-* skill from delivery@jsdotnet that resolved this server
+// as its run surface.
 //
 // This is the Claude Code counterpart of the GitHub Copilot `orch-dashboard` canvas
 // extension. The model is identical — an orchestration run is a JSON file with named
@@ -56,7 +54,7 @@ const APP_RESOURCES = [
     {
         uri: "ui://orch-dashboard/dashboard.html",
         name: "Orchestration dashboard",
-        description: "Live run list, stage progress, QA results and reports for orch-* orchestrations.",
+        description: "Live run list, stage progress, QA results and reports for staged runs.",
         page: "dashboard",
     },
     {
@@ -596,11 +594,11 @@ const tools = [
     {
         name: "start_run",
         description:
-            "Start tracking a new orchestration run. Call once at the beginning of an orch-* skill, listing every workflow stage up front so the dashboard can show overall progress immediately. Returns `sessionTitle` once the run has been observed writing output — on a fresh run it is null and no rename is due yet.",
+            "Start tracking a new run. Call once at the beginning of a staged skill, listing every stage up front so the dashboard can show overall progress immediately. Returns `sessionTitle` once the run has been observed writing output — on a fresh run it is null and no rename is due yet.",
         inputSchema: {
             type: "object",
             properties: {
-                skillId: { type: "string", description: "Skill identifier, e.g. orch-feature, orch-bug, orch-adr." },
+                skillId: { type: "string", description: "Skill identifier, e.g. flow-feature, flow-bug, create-pull-request." },
                 title: { type: "string", description: "Short human-readable title for this run, e.g. the feature or bug name." },
                 stages: {
                     type: "array",

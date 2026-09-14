@@ -1,16 +1,17 @@
 ---
-applyTo: 'skills/orch-*/SKILL.md'
-description: Defines how an orch-* orchestration reports to the orch-dashboard MCP server — the stage reporting contract, how the dashboard is surfaced to the user, and how to read the automatically captured context and token insight.
+applyTo: 'skills/**/SKILL.md'
+description: Defines how a run reports to the orch-dashboard MCP server — the stage reporting contract, how the dashboard is surfaced to the user, and how to read the automatically captured context and token insight.
 ---
 
-# Dashboard Reporting Contract (Orchestration-Owned)
+# Dashboard Reporting Contract
 
-Part of the shared `orch-*` contract indexed by `orch-shared-phases.instructions.md`.
-Read this file once, before the first `update_stage` call.
+Read this file once, before the first `update_stage` call. Any skill that reports a run
+through the dashboard — this plugin's own, or a flow from another plugin that resolved this
+server as its surface — follows it.
 
 ## Dashboard Reporting Contract (Shared)
 
-Every `orch-*` skill reports progress through the `orch-dashboard` MCP server
+A skill that reports a run does so through the `orch-dashboard` MCP server
 (`plugins/claude-desktop/mcp/orch-dashboard/`), which this plugin registers. Its tools appear
 under the names `open_dashboard`, `start_run`, `record_prompt`, `set_run_context`,
 `update_stage`, `finish_run`, `list_runs`, `get_run`, `render_diagram`, `render_markdown`,
@@ -197,10 +198,9 @@ How to use these:
   Validation are delegated by default; a zero subtotal on either means the phase ran inline
   against its own skill's contract.
 - **Act on the run-level gauge before it forces compaction.** The telemetry hook announces
-  each threshold it crosses, and `orch-execution-model.instructions.md` defines the ladder:
-  **Delegation Order** to push the next heavy step to a sub-agent in the same worktree, and
-  **Session Handoff** to continue the run in a fresh session once delegation is no longer
-  enough. Because the gauge ignores sub-agent samples, delegating genuinely relieves the
+  each threshold it crosses; the ladder is to push the next heavy step to a sub-agent in the
+  same worktree first, and to continue the run in a fresh session with the `session-handoff`
+  skill once delegation is no longer enough. Because the gauge ignores sub-agent samples, delegating genuinely relieves the
   owner session's context rather than just relabelling the cost. Compaction and truncation
   counts rising during a run mean the mitigation came too late.
 - **Runs that predate this capture simply omit the panel and its fields** — treat their
@@ -209,6 +209,5 @@ How to use these:
 **Caveat — attribution is session-wide.** Token telemetry, like the existing tool-activity
 insight, is captured per session, not per run. Any model call made while a run is
 `in_progress` is attributed to that run and to its current stage, including unrelated work
-done in the same session. This is the reason for the **one orchestration per session** rule
-in the Execution Model (`orch-execution-model.instructions.md`); interpret the numbers as an
+done in the same session. This is the reason to run **one run per session**; interpret the numbers as an
 upper bound when other work happened alongside the run.
