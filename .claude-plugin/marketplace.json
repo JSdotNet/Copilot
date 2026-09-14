@@ -68,7 +68,7 @@
     {
       "name": "knowledge-base",
       "source": "./plugins/knowledge-base",
-      "description": "Repository knowledge-folder convention for .arc42, .domain, .tech, .design, .backlog, and .ai: parseable chapter metadata, runnable test-case links, AI adoption tracked per development-flow stage, derived _meta indexes, a reference-graph canvas, per-folder orchestration skills, bidirectional to-spec-<kind> and from-spec-<kind> skills between chapters and code, and enforcement tooling.",
+      "description": "Retired: the knowledge-folder convention and every skill this plugin shipped continue as devbook in the jsdotnet marketplace (JSdotNet/ai-agent-stack). This final release keeps one knowledge-base-moved notice skill and declares devbook as a dependency so a stale enablement pulls in the replacement.",
       "version": "0.17.0"
     },
     {

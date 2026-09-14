@@ -621,6 +621,13 @@ foreach ($dir in $pluginDirs) {
         $manifest['mcpServers'] = $source.mcpServers
     }
 
+    # 'dependencies' is copied through unchanged. Claude Code resolves each { name, marketplace,
+    # version? } entry when the plugin is enabled, which is how a retired plugin pulls in its
+    # replacement from another marketplace; Copilot ignores the key.
+    if ($source.PSObject.Properties['dependencies']) {
+        $manifest['dependencies'] = @($source.dependencies)
+    }
+
     Write-Generated -Path (Join-Path $dir.FullName '.claude-plugin/plugin.json') -Content (ConvertTo-StableJson $manifest)
 
     if (Test-Path -LiteralPath $hooksPath) {
