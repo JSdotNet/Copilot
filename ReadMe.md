@@ -65,9 +65,7 @@ JSdotNet-Copilot
 |  |- spec-builder/
 |  |- ux-design/
 |  |- wip-convention/
-|  |- knowledge-base/
-|  |  \- extensions/
-|  |     \- knowledge-canvas/
+|  |- knowledge-base/          (retired; points at devbook@jsdotnet)
 |  \- worktree-parallel/
 ```
 
@@ -129,9 +127,10 @@ provider ID `plugin:copilot-app:orch-dashboard`; if duplicate `orch-dashboard` p
 are reported, remove stale user-scope copies from `%USERPROFILE%\.copilot\extensions`
 after confirming they are not needed.
 
-The `knowledge-base` plugin additionally bundles a `knowledge-canvas` extension that renders
-the repository's knowledge-folder reference graph. It has no standalone manifest and installs
-with its parent: `copilot plugin install JSdotNet/Copilot:plugins/knowledge-base`.
+The `knowledge-base` plugin is retired at `0.17.0`: it ships one `knowledge-base-moved`
+notice skill and a `dependencies` entry on `devbook@jsdotnet`. The convention, its
+`knowledge-canvas` (now `devbook-graph`), and every skill continue in
+[JSdotNet/ai-agent-stack](https://github.com/JSdotNet/ai-agent-stack).
 
 ### Claude Desktop Extension
 
@@ -172,7 +171,7 @@ Repository organization centers on reusable Copilot plugin bundles:
     - `qa`
     - `ux-design`
     - `wip-convention`
-    - `knowledge-base`
+    - `knowledge-base` (retired; notice skill only)
     - `worktree-parallel`
     - `product-owner`
 - `docs/copilot/`

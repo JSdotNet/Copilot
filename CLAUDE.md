@@ -31,8 +31,8 @@ a trade between always-loaded context and the human's own memory:
 - **User-invoked** — `disable-model-invocation: true`. Only the human can fire it; nothing
   else can reach it, including the Skill tool. `description` is one human-facing line.
 
-`automation-*`, `workflow-morning-brief`, and `knowledge-base:from-spec-*` are user-invoked.
-Everything else is model-invoked, including `create-*`, `product-owner:write-*`,
+`automation-*` and `workflow-morning-brief` are user-invoked. Everything else is
+model-invoked, including `create-*`, `product-owner:write-*`,
 `workflow-issue-sweep`, and `workflow-resolve-issue` — agents dispatch to the first two, and a
 scheduled routine or a dispatched worker session is the only invoker of the last two. Neither
 an agent nor a routine can reach a user-invoked skill: only a human typing the name can.
@@ -45,8 +45,9 @@ scheduler notes still hold.
 Skills that cross the specification/code boundary in both directions are named
 `to-spec-<kind>` (code becomes a chapter) and `from-spec-<kind>` (a chapter becomes a change
 brief). The literal `spec` carries the direction: `<kind>` alone would not, because an
-aggregate is both a chapter and a class. The full rule is in
-`.agents/rules/skill-invocation.md`.
+aggregate is both a chapter and a class. No plugin here ships such a pair any more — they
+moved with `knowledge-base` to `devbook@jsdotnet` — but the rule still governs any new one.
+The full rule is in `.agents/rules/skill-invocation.md`.
 
 ## Dual-Host Constraint
 

@@ -25,7 +25,6 @@ Model-invoked, and must stay so:
 
 - `orch-*` — reached by the `claude-desktop:orchestrator` agent and by `orch-fallback` routing.
 - `phase-*` — invoked by the orchestrator agent between delivery stages, never by hand.
-- `to-spec-<kind>` in `knowledge-base` — reading code to write a chapter is work the model can usefully start on its own.
 - `create-*` — dispatched by the `spec-builder`, `architecture:architect`, `documentation:profile`, and `product-owner` agents. `spec-builder.agent.md` says "Apply the changes using the matching `create-*` skill"; `architect.agent.md` says "Use skill `create-architectural-decision-record`". Marking these user-invoked breaks those agents.
 - `write-*` in `product-owner` — listed under **Available Skills** in `product-owner.agent.md`, which is the agent's own core job.
 - Every unprefixed discipline skill (`tdd`, `code-review`, `refactor`, `aspire`, and their siblings) — these exist to be pulled in mid-task.
@@ -35,7 +34,6 @@ User-invoked, with `disable-model-invocation: true`:
 
 - `automation-*` — human-started sweeps. Never fired mid-task, and their bodies describe no unattended or scheduled branch: the interactive lane is the only lane, so the flag blocks nothing and keeps sweeps that claim issues and open pull requests from firing unasked. `copilot-app` is the exception on the body rule only — it ships to Copilot alone, where the flag is inert and the app's own scheduler can reach these skills, so its scheduler notes are accurate and stay.
 - `workflow-morning-brief` — re-reads a past sweep on request. Nothing but a human ever asks for it; `workflow-issue-sweep` writes its own brief rather than invoking it.
-- `from-spec-<kind>` in `knowledge-base` — turning an agreed chapter into a change brief is a deliberate act, and nothing else reaches it by name.
 
 When adding a skill to one of these families, follow the family — except `workflow-*`, which is split by invoker rather than by prefix. When adding a skill outside them, apply the test above and say which way it went in the pull request description.
 
@@ -50,7 +48,7 @@ A skill that converts between a written specification and the code implementing 
 
 The literal word `spec` is what makes the direction readable. A bare `to-<kind>` does not work, because `<kind>` names a domain concept that exists on *both* ends: an aggregate is a chapter and a class, so `to-aggregate` could mean either direction. `spec` is the endpoint; `<kind>` only says which one.
 
-In `knowledge-base` the specification is a chapter, so `spec` and "chapter" mean the same thing there. Both halves of a pair must use the same `<kind>` noun so they read as counterparts.
+Where the specification is a chapter, `spec` and "chapter" mean the same thing. Both halves of a pair must use the same `<kind>` noun so they read as counterparts. The pairs this repository used to ship (`to-spec-aggregate` … `from-spec-feature`) moved with `knowledge-base` to `devbook@jsdotnet`, where `to-spec-*` stayed model-invoked (reading code to write a chapter is work the model can usefully start) and `from-spec-*` user-invoked (turning an agreed chapter into a change brief is a deliberate act); a new pair here takes the same split.
 
 This convention applies only to skills that cross the specification/code boundary in both directions. A skill that just authors an artifact is named for what it writes — `product-owner`'s `write-story`, `write-epic`, and `write-bug` have no counterpart reading stories back out of code, so they keep the verb.
 
@@ -62,8 +60,8 @@ This is the one sanctioned exception to the "stick to `name` and `description`" 
 
 ## Validation Checklist
 
-- [ ] Every `automation-*` and `knowledge-base:from-spec-*` skill sets `disable-model-invocation: true`.
-- [ ] No `orch-*`, `phase-*`, `create-*`, `product-owner:write-*`, `knowledge-base:to-spec-*`, `workflow-issue-sweep`, or `workflow-resolve-issue` skill sets it.
+- [ ] Every `automation-*` and `from-spec-*` skill sets `disable-model-invocation: true`.
+- [ ] No `orch-*`, `phase-*`, `create-*`, `product-owner:write-*`, `to-spec-*`, `workflow-issue-sweep`, or `workflow-resolve-issue` skill sets it.
 - [ ] No user-invoked skill body describes a scheduled, unattended, or dispatched-worker run — the flag blocks all three. Skills in a Copilot-only plugin are exempt, because the flag is inert there.
 - [ ] Every user-invoked description is one line with no `Use when:` or `DO NOT USE FOR:` clause.
 - [ ] No skill referenced by name from an agent, a hook prompt, or another skill is user-invoked.

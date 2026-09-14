@@ -133,6 +133,11 @@ avoids depending on how Claude globs a folder of `*.agent.md`.
 
 `mcpServers` is copied through unchanged; the two hosts use compatible syntax.
 
+`dependencies` is copied through unchanged too. Claude Code resolves each
+`{ name, marketplace, version? }` entry when the plugin is enabled, which is how a retired
+plugin pulls in its replacement from another marketplace (`knowledge-base` → `devbook@jsdotnet`);
+Copilot ignores the key.
+
 `hooks` is omitted for the same reason as `skills` — Claude Code loads `hooks/hooks.json`
 automatically. Naming it in the manifest too makes the plugin fail to load with
 `Duplicate hooks file detected`; the field is only for hook files beyond that standard one.
