@@ -68,8 +68,7 @@ dedicated skill from another installed plugin (see [Fetching the Issue](#1-ident
 ### 4. Execute Scenarios with Playwright
 
 10. Apply the `playwright-validation` skill to execute each confirmed scenario
-    against the running app, using `playwright-screenshot` for point-in-time
-    evidence and `playwright-recording` for multi-step flows.
+    against the running app.
 11. Capture evidence per scenario and cross-check each result against the Aspire
     log/trace stream from step 9.
 
@@ -108,7 +107,6 @@ dedicated skill from another installed plugin (see [Fetching the Issue](#1-ident
 |---|---|
 | `aspire-run` | Start (and confirm healthy) the app under test |
 | `aspire-log-monitor` / `delegate-to-qa-monitor` | Continuous Aspire log/trace/metric monitoring |
-| `playwright-validation` | Execute the derived scenarios against the running app |
-| `playwright-screenshot` / `playwright-recording` | Evidence capture per scenario |
+| `playwright-validation` | Execute the derived scenarios against the running app and capture evidence |
 | A GitHub-issue skill (from an installed GitHub plugin) | Fetch or update a GitHub issue |
 | A Jira-ticket skill (from an installed Jira plugin) | Fetch or update a Jira ticket |
