@@ -39,7 +39,6 @@ Track GitHub Copilot plugins used by this repository so team members can install
 | `fincent` | `0.4.0` | `plugins/fincent` | `copilot plugin install JSdotNet/Copilot:plugins/fincent` | Fincent project story review, development, domain alignment, estimation, PR review, sprint reporting, and demo workflows. `0.4.0` points `pr-remarks-resolve` at the `delivery` pull-request lane. |
 | `github` | `0.1.0` | `plugins/github` | `copilot plugin install JSdotNet/Copilot:plugins/github` | GitHub issue sync, pull requests, GitHub Actions CI/CD, and Dependabot configuration. |
 | `jira` | `0.1.0` | `plugins/jira` | `copilot plugin install JSdotNet/Copilot:plugins/jira` | Jira issue creation and update workflows from approved Markdown backlog artifacts. |
-| `knowledge-base` | `0.17.0` | `plugins/knowledge-base` | `copilot plugin install JSdotNet/Copilot:plugins/knowledge-base` | **Retired — final release.** The knowledge-folder convention, generator, canvas, CI check, per-folder orchestration, and the `to-spec-<kind>` / `from-spec-<kind>` converters continue as `devbook@jsdotnet` from [JSdotNet/ai-agent-stack](https://github.com/JSdotNet/ai-agent-stack). `0.17.0` removes every skill but a `knowledge-base-moved` notice, drops the session-start hook, and declares `devbook@jsdotnet` as a dependency so a stale enablement pulls in the replacement once that marketplace is added. Successor table and migration notes in `plugins/knowledge-base/README.md`; the `0.16.0` README with the full history is in git. |
 | `product-owner` | `0.3.0` | `plugins/product-owner` | `copilot plugin install JSdotNet/Copilot:plugins/product-owner` | Product backlog authoring for epics, stories, and bugs as Markdown artifacts. `0.3.0` makes it a pure specialist: no session tools, no handoff gate. |
 | `qa` | `0.4.0` | `plugins/qa` | `copilot plugin install JSdotNet/Copilot:plugins/qa` | Runtime QA validation with Aspire, Playwright evidence, and log/trace monitoring. `0.4.0` makes it a pure specialist: no delegation tools, no handoff gate, and no reference to any host plugin's flows. |
 | `react-coding` | `0.1.0` | `plugins/react-coding` | `copilot plugin install JSdotNet/Copilot:plugins/react-coding` | React and TypeScript implementation through the `frontend` agent: components, hooks, typed API clients bound to a .NET contract, and component tests, with commands detected from the repository. The React lane of the retired `development` plugin; its planning and phase-gated execution agents are gone, because a flow owns sequencing. |
@@ -79,7 +78,6 @@ repo.
     `plugin:copilot-app:orch-dashboard`; remove stale user-scope copies from
     `%USERPROFILE%\.copilot\extensions` if duplicate dashboard providers are reported.
   - Used by: `copilot-app` plugin only.
-- `knowledge-canvas` — removed in `knowledge-base` `0.17.0`; its successor is the `devbook-graph` canvas inside `devbook@jsdotnet`.
 
 ## Team Commands
 

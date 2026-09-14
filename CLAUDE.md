@@ -43,7 +43,7 @@ Skills that cross the specification/code boundary in both directions are named
 `to-spec-<kind>` (code becomes a chapter) and `from-spec-<kind>` (a chapter becomes a change
 brief). The literal `spec` carries the direction: `<kind>` alone would not, because an
 aggregate is both a chapter and a class. No plugin here ships such a pair any more — they
-moved with `knowledge-base` to `devbook@jsdotnet` — but the rule still governs any new one.
+moved to `devbook@jsdotnet` — but the rule still governs any new one.
 The full rule is in `.agents/rules/skill-invocation.md`.
 
 ## Dual-Host Constraint

@@ -47,7 +47,7 @@ A skill that converts between a written specification and the code implementing 
 
 The literal word `spec` is what makes the direction readable. A bare `to-<kind>` does not work, because `<kind>` names a domain concept that exists on *both* ends: an aggregate is a chapter and a class, so `to-aggregate` could mean either direction. `spec` is the endpoint; `<kind>` only says which one.
 
-Where the specification is a chapter, `spec` and "chapter" mean the same thing. Both halves of a pair must use the same `<kind>` noun so they read as counterparts. The pairs this repository used to ship (`to-spec-aggregate` … `from-spec-feature`) moved with `knowledge-base` to `devbook@jsdotnet`, where `to-spec-*` stayed model-invoked (reading code to write a chapter is work the model can usefully start) and `from-spec-*` user-invoked (turning an agreed chapter into a change brief is a deliberate act); a new pair here takes the same split.
+Where the specification is a chapter, `spec` and "chapter" mean the same thing. Both halves of a pair must use the same `<kind>` noun so they read as counterparts. The pairs this repository used to ship (`to-spec-aggregate` … `from-spec-feature`) moved to `devbook@jsdotnet`, where `to-spec-*` stayed model-invoked (reading code to write a chapter is work the model can usefully start) and `from-spec-*` user-invoked (turning an agreed chapter into a change brief is a deliberate act); a new pair here takes the same split.
 
 This convention applies only to skills that cross the specification/code boundary in both directions. A skill that just authors an artifact is named for what it writes — `product-owner`'s `write-story`, `write-epic`, and `write-bug` have no counterpart reading stories back out of code, so they keep the verb.
 

@@ -60,12 +60,6 @@
       "version": "0.1.0"
     },
     {
-      "name": "knowledge-base",
-      "source": "./plugins/knowledge-base",
-      "description": "Retired: the knowledge-folder convention and every skill this plugin shipped continue as devbook in the jsdotnet marketplace (JSdotNet/ai-agent-stack). This final release keeps one knowledge-base-moved notice skill and declares devbook as a dependency so a stale enablement pulls in the replacement.",
-      "version": "0.17.0"
-    },
-    {
       "name": "product-owner",
       "source": "./plugins/product-owner",
       "description": "Copilot plugin for product backlog authoring — epics, stories, and bugs as Markdown artifacts.",
