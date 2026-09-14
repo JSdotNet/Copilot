@@ -109,11 +109,11 @@ copilot plugin uninstall <plugin-name>
 ## Claude Code
 
 The local plugin bundles also load in Claude Code, from a single copy of every file. Skills,
-instructions and agents are shared as-is; only the manifest and the hook shape are generated
-per host (`.claude-plugin/`, `hooks/`).
+contracts and agents are shared as-is; only the manifest and the hook shape differ per host
+(`.claude-plugin/`, `hooks/`), and both are hand-authored and checked:
 
 ```bash
-pwsh ./scripts/Sync-ClaudePlugins.ps1
+node tools/check-assets.mjs
 ```
 
 All bundles except `copilot-app` are Claude-targeted; that one depends on the Copilot CLI
@@ -126,5 +126,5 @@ for the translation rules, known differences, and install instructions.
 1. Add or remove plugin entries in the table above.
 2. Record a short note in the `Notes` column when changes are made.
 3. Keep this file aligned with team onboarding docs.
-4. Run `pwsh ./scripts/Sync-ClaudePlugins.ps1` after changing any plugin manifest, agent, or
-   hook, and commit the regenerated Claude assets.
+4. Bump with `node tools/bump-version.mjs <plugin>` so both manifests, the marketplace entry,
+   and the row here agree, and run `node tools/check-assets.mjs` before committing.

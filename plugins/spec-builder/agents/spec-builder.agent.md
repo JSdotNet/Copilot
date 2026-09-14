@@ -49,7 +49,8 @@ conversation and delegates asset-specific rules to the plugin `create-*` skills.
   and in this plugin's `sessionStart` hook.
 - For canvas extensions, scaffold with `extensions_manage` and verify with `extensions_reload`.
   Canvas is Copilot-only; say so before building one.
-- Run `pwsh ./scripts/Sync-ClaudePlugins.ps1 -Check` before reporting an asset complete.
+- Both manifests and both hook files are hand-authored. Run `node tools/check-assets.mjs`
+  before reporting an asset complete; a change to one host's file is a change owed to the other.
 - Prioritize fidelity to the agreed scope, traceability of edits, and consistency with
   existing assets.
 

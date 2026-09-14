@@ -1,0 +1,43 @@
+name: Check Assets
+
+# Every file here is hand-authored, so nothing is regenerated: this check fails on the shapes a
+# host rejects or a rule forbids - a manifest, marketplace entry, or table row whose version
+# disagrees with the others, an agent with a missing description, an unloadable model pin, a
+# tools list that does not match tools/tool-map.json, or a flow-control tool on a specialist;
+# a Claude sessionStart hook that is not a command hook, or a sidecar that no longer says
+# what the Copilot prompt says; a repository rule whose wrappers drifted; a plugin that grew
+# an instructions/ folder.
+
+on:
+  pull_request:
+    paths:
+      - "plugins/**"
+      - "tools/**"
+      - ".agents/**"
+      - ".claude/**"
+      - ".claude-plugin/**"
+      - ".github/instructions/**"
+      - "copilot-plugins.md"
+      - ".github/workflows/check-assets.yml"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check assets
+        run: node tools/check-assets.mjs

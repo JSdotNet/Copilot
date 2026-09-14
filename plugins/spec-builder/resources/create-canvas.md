@@ -25,8 +25,9 @@ Canvas extensions are **Copilot-only**. The extension API has no Claude Code cou
 a canvas cannot be made dual-host — unlike every other asset type this plugin authors.
 
 - State the limitation explicitly whenever a canvas is proposed, before building it.
-- Add the owning plugin to `$ExcludedPlugins` in `scripts/Sync-ClaudePlugins.ps1` and say so
-  in the plugin README, so it is not advertised as loadable in Claude.
+- Give the owning plugin no Claude manifest, list it under `HOST_ONLY` in
+  `tools/check-assets.mjs`, and say so in the plugin README, so it is not advertised as
+  loadable in Claude.
 - Never make a plugin's core capability depend on a canvas unless Copilot-only is acceptable.
   Prefer a canvas as an optional enhancement over a required surface.
 - The nearest Claude equivalents, if the surface must exist on both hosts, are a published

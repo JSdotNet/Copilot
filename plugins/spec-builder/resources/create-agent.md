@@ -34,7 +34,7 @@ agent needs them. An empty or restating section is a section to delete.
 - [ ] File name follows `<role>.agent.md`.
 - [ ] Frontmatter is valid YAML and `name` matches the file name.
 - [ ] No `model` pin.
-- [ ] `pwsh ./scripts/Sync-ClaudePlugins.ps1 -Check` passes.
+- [ ] `node tools/check-assets.mjs` passes.
 - [ ] Role, scope, and constraints are explicit.
 - [ ] References point to existing files.
 - [ ] Every line changes behavior versus the model default, and no meaning appears twice.

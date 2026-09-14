@@ -6,9 +6,9 @@ product, security — plus the two host plugins and the trackers. One folder per
 `plugins/`, each installable on its own.
 
 Assets are authored once and loaded by both GitHub Copilot and Claude Code — both hosts ignore
-keys they do not know, which is what lets one file serve both. Only the Claude manifest, the
-Claude hook file, and the marketplace are generated, by `pwsh ./scripts/Sync-ClaudePlugins.ps1`
-from the Copilot manifest and `hooks.json`; everything else is hand-authored.
+keys they do not know, which is what lets one file serve both. There is no generator: every
+file here is hand-authored, and `node tools/check-assets.mjs` fails when the two hosts'
+files disagree.
 
 ## What this marketplace is not
 
@@ -23,18 +23,19 @@ plugins remain: `claude-desktop` (an MCP dashboard, `start`, `session-handoff`,
 
 ## Validating a change
 
-Before committing, run the sync and its check:
+Before committing, run the checker:
 
 ```bash
-pwsh ./scripts/Sync-ClaudePlugins.ps1
-pwsh ./scripts/Sync-ClaudePlugins.ps1 -Check
+node tools/check-assets.mjs
 ```
 
-The first regenerates the Claude assets; the second fails on drift, on an agent shape a host
-rejects — a missing description, an unloadable model pin, an unmapped tool id, a flow-control
-tool on a specialist — and on a repository rule whose wrappers no longer match it.
-`.github/workflows/claude-plugin-sync-check.yml` runs the check on every pull request that
-touches `plugins/`.
+It fails on a manifest, marketplace entry, or table row whose version disagrees with the
+others; on an agent shape a host rejects — a missing description, an unloadable model pin, a
+tools list that does not match `tools/tool-map.json`, a flow-control tool on a specialist; on
+a Claude `SessionStart` hook that is not a command hook or a sidecar that no longer says what
+the Copilot prompt says; on a repository rule whose wrappers drifted; and on a plugin that
+grew an `instructions/` folder. It reports body budgets and writes nothing.
+`.github/workflows/check-assets.yml` runs it on every pull request.
 
 ## Committing
 
@@ -46,14 +47,14 @@ touches `plugins/`.
 
 ```
 plugins/<name>/
-  .github/plugin/plugin.json      Copilot manifest — authored; name, version, description
-  .claude-plugin/plugin.json      Claude manifest — generated (hand-authored for claude-desktop only)
-  agents/<role>.agent.md          frontmatter name equals <role>; Copilot tool ids, Claude ones appended
+  .github/plugin/plugin.json      Copilot manifest — same name, version, description as the Claude one
+  .claude-plugin/plugin.json      Claude manifest — agents listed explicitly, mcpServers, dependencies
+  agents/<role>.agent.md          frontmatter name equals <role>; tools as one union list, Copilot ids first
   skills/<skill>/SKILL.md
   resources/<name>.md             a contract an asset reads by path — name and description, no glob —
                                   or a template or prompt fragment, which carries no frontmatter
-  hooks.json                      Copilot hooks — authored
-  hooks/                          Claude hooks and the sessionStart sidecar — generated
+  hooks.json                      Copilot hooks (type: prompt)
+  hooks/                          Claude hooks; a sessionStart prompt's twin is a command hook plus its sidecar
   mcp/<server>/                   an MCP server, declared under mcpServers (claude-desktop)
   extensions/<name>/              a Copilot canvas extension (copilot-app)
   scripts/                        executables a skill runs from the plugin itself
@@ -62,13 +63,14 @@ plugins/<name>/
 
 There is no `instructions/` folder: no host auto-applies a glob from inside a plugin, so a
 file that needs to reach a session is a contract referenced by path, or a `sessionStart` hook.
-A new plugin also needs a row in `copilot-plugins.md`; the marketplace entry is generated.
+A new plugin also needs a marketplace entry in `.claude-plugin/marketplace.json` and a row in
+`copilot-plugins.md`.
 
 ## Versioning
 
-A plugin change bumps the version in the Copilot manifest, and the sync carries it into the
-Claude manifest and the marketplace; the `copilot-plugins.md` table is updated by hand. All
-four must agree.
+A plugin change bumps the version in both manifests, the marketplace entry, and the
+`copilot-plugins.md` row — `node tools/bump-version.mjs <plugin> [patch|minor|major]` writes
+all four. All four must agree.
 
 ## Where the rest of the rules are
 
@@ -76,12 +78,12 @@ A rule that applies to one kind of file is authored once in `.agents/rules/` and
 host: Claude loads `.claude/rules/<topic>.md` when it opens a matching file, Copilot loads
 `.github/instructions/<topic>.instructions.md`. Eight topics — `agents`, `skills`,
 `skill-invocation`, `plugin-contracts`, `manifests`, `hooks`, `agent-language-and-tone`,
-`markdown`. Change a rule and its two wrappers in the same commit; the sync check fails on
+`markdown`. Change a rule and its two wrappers in the same commit; the checker fails on
 drift. The convention is [.agents/rules/README.md](.agents/rules/README.md).
 
 Read the matching `plugins/spec-builder/resources/create-*.md` contract before authoring an
 asset of that type; `plugins/spec-builder/resources/spec-conciseness.md` holds the body
-budgets. `docs/copilot/claude-code-compatibility.md` explains what the sync generates and why.
+budgets. `docs/copilot/claude-code-compatibility.md` explains how one file serves both hosts.
 
 ## Writing
 

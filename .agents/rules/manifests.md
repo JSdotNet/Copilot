@@ -1,6 +1,6 @@
 ---
 name: manifests
-description: Which plugin manifest is authored, which is generated, and what must agree across the four places a version lives.
+description: What each plugin manifest declares, and the four places a version must agree.
 paths:
   - "plugins/*/.github/plugin/plugin.json"
   - "plugins/*/.claude-plugin/plugin.json"
@@ -9,19 +9,26 @@ paths:
 
 # Manifests
 
-Author `.github/plugin/plugin.json` — `name`, `description`, `version`, `author`, `license`,
-`keywords`, and the component pointers (`agents`, `skills`, `hooks`, `mcpServers`,
-`dependencies`). Never edit `.claude-plugin/plugin.json` or the root
-`.claude-plugin/marketplace.json`: `pwsh ./scripts/Sync-ClaudePlugins.ps1` generates both from
-the Copilot manifest, and `-Check` fails in CI when they drift. The one hand-authored Claude
-manifest is `claude-desktop`'s, which has no Copilot source; `copilot-app` has no Claude
-manifest at all.
+Both manifests are hand-authored and agree on `name`, `version`, and `description`. Nothing
+generates one from the other; `node tools/check-assets.mjs` fails on any disagreement.
 
-A version change touches four places that must agree: both manifests, the marketplace entry,
-and the `copilot-plugins.md` table. Bump when anything under the plugin changes, and write
-what a consumer would notice into the table's Notes column.
+- `.github/plugin/plugin.json` (Copilot): `name`, `description`, `version`, `author`,
+  `license`, `keywords`, and the component pointers — `agents`, `skills`, `hooks`.
+- `.claude-plugin/plugin.json` (Claude): the same identity fields; list agent files explicitly
+  under `agents` (`./agents/<role>.agent.md`) or handoffs to them dangle; omit `skills` and
+  `hooks` — Claude scans `skills/` and loads `hooks/hooks.json` already, and naming the hooks
+  file fails with "Duplicate hooks file detected"; declare MCP servers under `mcpServers`,
+  and a successor in another marketplace under `dependencies` as `{ name, marketplace }`.
+- The root `.claude-plugin/marketplace.json` lists every plugin that has a Claude manifest —
+  `name`, `source` (`./plugins/<name>`), `description`, `version` — or Claude Code will not
+  offer it. `copilot-app` ships no Claude manifest and `claude-desktop` no Copilot one; every
+  other plugin ships both.
+
+A version lives in four places — both manifests, the marketplace entry, and the
+`copilot-plugins.md` row — and all four agree. `node tools/bump-version.mjs <plugin>
+[patch|minor|major|x.y.z]` writes the same value into all four; the nightly workflow runs it
+for every plugin whose tree changed. Write what a consumer would notice into the table's
+Notes column.
 
 `description` is the first thing a host shows: say what the plugin is, which role or service
-it fills, and that it holds no flow control. A plugin that continues in another marketplace
-declares a `dependencies` entry on its successor there — `{ name, marketplace }` — which
-Claude resolves and Copilot ignores.
+it fills, and that it holds no flow control.
