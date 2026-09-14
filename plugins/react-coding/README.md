@@ -22,14 +22,14 @@ neither sequences stages, holds a gate, or delegates.
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/react-coding
+copilot plugin install JSdotNet/ai-plugins:plugins/react-coding
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/react-coding
+copilot plugin install JSdotNet/ai-plugins:plugins/react-coding
 ```
 
 ## Uninstall

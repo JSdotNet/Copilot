@@ -61,14 +61,14 @@ this agent's; used bare, it simply reports.
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/csharp-coding
+copilot plugin install JSdotNet/ai-plugins:plugins/csharp-coding
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/csharp-coding
+copilot plugin install JSdotNet/ai-plugins:plugins/csharp-coding
 ```
 
 ## Uninstall

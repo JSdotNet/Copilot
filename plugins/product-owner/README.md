@@ -28,8 +28,8 @@ Installable GitHub Copilot CLI plugin for product backlog authoring. Write epics
 ## Optional Integrations
 
 - Naming `architecture:architect` for architecture work is optional and requires the `architecture` plugin to be installed. The agent holds no flow control: sequencing, approval, and delegation belong to whatever consults it.
-- Jira sync requires the `jira` plugin to be installed (`copilot plugin install JSdotNet/Copilot:plugins/jira`).
-- GitHub issue sync requires the `github` plugin to be installed (`copilot plugin install JSdotNet/Copilot:plugins/github`).
+- Jira sync requires the `jira` plugin to be installed (`copilot plugin install JSdotNet/ai-plugins:plugins/jira`).
+- GitHub issue sync requires the `github` plugin to be installed (`copilot plugin install JSdotNet/ai-plugins:plugins/github`).
 
 ## Resources
 
@@ -42,14 +42,14 @@ Installable GitHub Copilot CLI plugin for product backlog authoring. Write epics
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/product-owner
+copilot plugin install JSdotNet/ai-plugins:plugins/product-owner
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/product-owner
+copilot plugin install JSdotNet/ai-plugins:plugins/product-owner
 ```
 
 ## Uninstall

@@ -1,4 +1,4 @@
-# GitHub Copilot App configuration for JSdotNet/Copilot
+# GitHub Copilot App configuration for JSdotNet/ai-plugins
 #
 # Global repository instructions live in .github/copilot-instructions.md and apply to
 # ALL Copilot surfaces (VS Code, GitHub.com, CLI, this App). This file adds behaviour
@@ -29,7 +29,7 @@ instructions: |-
   and API operations, and switch to that account before creating the pull request when it
   is available locally.
   Prefer same-repository branches over fork creation when the branch is already pushed to
-  `JSdotNet/Copilot`.
+  `JSdotNet/ai-plugins`.
   If the required organisation authorisation is unavailable, stop and ask the user.
 
 automation:

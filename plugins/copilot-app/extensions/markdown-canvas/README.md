@@ -19,14 +19,14 @@ This folder is a standalone plugin (it has its own `.github/plugin/plugin.json` 
 `extensions` mapping), so install it the same way as any other plugin in this repo:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas
+copilot plugin install JSdotNet/ai-plugins:plugins/copilot-app/extensions/markdown-canvas
 copilot plugin list
 ```
 
 Reinstall after changes:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/copilot-app/extensions/markdown-canvas
+copilot plugin install JSdotNet/ai-plugins:plugins/copilot-app/extensions/markdown-canvas
 ```
 
 Uninstall:
@@ -42,7 +42,7 @@ copilot --plugin-dir plugins/copilot-app/extensions/markdown-canvas
 ```
 
 Alternatively, use the `install_extension` tool from within a Copilot CLI/App session with
-`url: https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/markdown-canvas`
+`url: https://github.com/JSdotNet/ai-plugins/tree/main/plugins/copilot-app/extensions/markdown-canvas`
 for a user- or session-scoped install without going through `copilot plugin install`.
 
 ## Agent Usage

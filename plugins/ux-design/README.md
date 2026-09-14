@@ -25,14 +25,14 @@ UX design — wireframes, design guidelines, user flows, and design reviews. Fil
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/ux-design
+copilot plugin install JSdotNet/ai-plugins:plugins/ux-design
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/ux-design
+copilot plugin install JSdotNet/ai-plugins:plugins/ux-design
 ```
 
 ## Uninstall

@@ -34,13 +34,13 @@ Covers six documentation artifact types and three profile artifact types.
 Install from GitHub using the Copilot CLI:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/documentation
+copilot plugin install JSdotNet/ai-plugins:plugins/documentation
 ```
 
 Re-install after any changes to pick up updates:
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/documentation
+copilot plugin install JSdotNet/ai-plugins:plugins/documentation
 ```
 
 ## Usage
@@ -116,5 +116,5 @@ the skill that writes the artifact loads the contract by path:
 ## Updating
 
 1. Edit the relevant agent, instruction, or skill file.
-2. Re-install the plugin: `copilot plugin install JSdotNet/Copilot:plugins/documentation`
+2. Re-install the plugin: `copilot plugin install JSdotNet/ai-plugins:plugins/documentation`
 3. Test with a sample request to confirm the change takes effect.

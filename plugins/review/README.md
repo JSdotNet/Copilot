@@ -37,14 +37,14 @@ These skills work with any review target:
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/review
+copilot plugin install JSdotNet/ai-plugins:plugins/review
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/review
+copilot plugin install JSdotNet/ai-plugins:plugins/review
 ```
 
 ## Uninstall

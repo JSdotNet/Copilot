@@ -130,14 +130,14 @@ exclusively through `scripts/Get-SprintData.ps1` and `scripts/Get-ReleaseData.ps
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/fincent
+copilot plugin install JSdotNet/ai-plugins:plugins/fincent
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/fincent
+copilot plugin install JSdotNet/ai-plugins:plugins/fincent
 ```
 
 ## Uninstall

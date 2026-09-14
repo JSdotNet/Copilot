@@ -116,14 +116,14 @@ security workflows:
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/aikido
+copilot plugin install JSdotNet/ai-plugins:plugins/aikido
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/aikido
+copilot plugin install JSdotNet/ai-plugins:plugins/aikido
 ```
 
 ## Uninstall

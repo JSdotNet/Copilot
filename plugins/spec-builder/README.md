@@ -52,14 +52,14 @@ Canvas extensions are the one Copilot-only asset type. Full rules:
 ## Install
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/spec-builder
+copilot plugin install JSdotNet/ai-plugins:plugins/spec-builder
 copilot plugin list
 ```
 
 ## Reinstall After Changes
 
 ```bash
-copilot plugin install JSdotNet/Copilot:plugins/spec-builder
+copilot plugin install JSdotNet/ai-plugins:plugins/spec-builder
 ```
 
 ## Uninstall

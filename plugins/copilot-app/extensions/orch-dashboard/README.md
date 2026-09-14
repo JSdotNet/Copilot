@@ -202,7 +202,7 @@ This extension can be installed from this repo folder using the
 sharing it):
 
 ```text
-https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orch-dashboard
+https://github.com/JSdotNet/ai-plugins/tree/main/plugins/copilot-app/extensions/orch-dashboard
 ```
 
 Choose `project`, `user`, or `session` scope depending on whether you want it
