@@ -27,7 +27,7 @@ Use when the user asks to:
 
 ## Workflow
 
-1. Load `instructions/deployment/deployment-global-instructions.md`.
+1. Load `resources/deployment-global.md`.
 2. Confirm environment, cloud provider, and key infrastructure nodes with the user.
 3. Load `skills/deployment-diagram-generator/prompts/deployment-diagram.prompt.md`.
 4. Ask focused clarifying questions only for missing network zones, protocols, or scaling details.
@@ -45,15 +45,3 @@ Use when the user asks to:
 - Traceability links to arc42 §7 and the C4 Level 2 Container diagram
 - ADR references for cloud provider, region, and scaling decisions
 - List of open questions or assumptions
-
-## Quality Checks
-
-- [ ] Environment and cloud provider clearly labelled.
-- [ ] Infrastructure nodes named with role and technology.
-- [ ] Logical groups (VPCs, subnets, clusters) shown as boundaries.
-- [ ] Relationships labelled with protocol and port where relevant.
-- [ ] Diagram type appropriate for the target Mermaid renderer version.
-- [ ] Diagram embedded in a fenced `mermaid` code block.
-- [ ] Prose summary present.
-- [ ] Traceability links to arc42 §7, C4 Container diagram, and relevant ADRs present.
-- [ ] SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

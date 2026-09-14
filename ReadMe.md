@@ -23,23 +23,23 @@ High-level architecture follows a plugin-based monorepo pattern:
 - Each plugin is self-contained under `plugins/<plugin-name>/`.
 - Typical plugin composition includes:
   - `agents/`
-  - `instructions/`
   - `skills/`
-  - optional `resources/`
+  - `resources/` — contracts a skill or agent reads by path (no plugin ships an `instructions/` folder)
   - `.github/plugin/plugin.json`
-- Repository-level standards are defined under `.agents/rules/` and `.github/copilot/`. Each
-  `.agents/rules/` body is loaded by a thin `.github/instructions/` loader for Copilot and a
-  `.claude/rules/` loader for Claude.
+- Repository-level standards live in `AGENTS.md` (imported by `CLAUDE.md`, pointed at by
+  `.github/copilot-instructions.md`) and in `.agents/rules/`, where each rule carries its `paths`
+  and is wrapped once per host — `.github/instructions/` for Copilot, `.claude/rules/` for Claude.
 
 Conceptual layout:
 
 ```text
 JSdotNet-Copilot
+|- AGENTS.md                    (the standing rules; CLAUDE.md imports it)
+|- .agents/rules/               (path-scoped rules, one copy each)
+|- .claude/rules/               (Claude wrappers)
 |- .github/
-|  |- copilot/
-|  |  \- copilot-instructions.md
-|  |- instructions/
-|  |- agents/
+|  |- copilot-instructions.md   (Copilot wrapper)
+|  |- instructions/             (Copilot wrappers)
 |  \- skills/
 |- plugins/
 |  |- aikido/
@@ -53,7 +53,6 @@ JSdotNet-Copilot
 |  |     |- markdown-canvas/
 |  |     \- orch-dashboard/
 |  |- csharp-coding/
-|  |- development/
 |  |- documentation/
 |  |- domain-design/
 |  |- fincent/
@@ -61,12 +60,11 @@ JSdotNet-Copilot
 |  |- jira/
 |  |- product-owner/
 |  |- qa/
+|  |- react-coding/
 |  |- review/
 |  |- spec-builder/
 |  |- ux-design/
-|  |- wip-convention/
-|  |- knowledge-base/          (retired; points at devbook@jsdotnet)
-|  \- worktree-parallel/
+|  \- wip-convention/
 ```
 
 ## Getting Started
@@ -85,7 +83,7 @@ JSdotNet-Copilot
 ```bash
 copilot plugin install JSdotNet/Copilot:plugins/architecture
 copilot plugin install JSdotNet/Copilot:plugins/copilot-app
-copilot plugin install JSdotNet/Copilot:plugins/development
+copilot plugin install JSdotNet/Copilot:plugins/csharp-coding
 ```
 
 Update an already installed plugin by name:
@@ -106,12 +104,12 @@ Unlike plugins (skills, agents, instructions), canvas extensions add interactive
 surfaces the agent can open in a side panel. This repository ships canvas
 extensions inside `plugins/copilot-app/extensions/`: `diagram-canvas` (Mermaid
 diagram viewer), `markdown-canvas` (Markdown document preview), and
-`orch-dashboard` (orchestration progress dashboard). Only `copilot-app`'s
-`orch-*` orchestration skills open/update these canvases directly, on behalf of
-the `architecture`, `domain-design`, `ux-design`, `documentation`, and
-`product-owner` agents they coordinate — those content plugins have no direct
+`orch-dashboard` (run progress dashboard). A flow skill opens/updates these canvases
+on behalf of the `architecture`, `domain-design`, `ux-design`, `documentation`, and
+`product-owner` agents it coordinates — those content plugins have no direct
 dependency on these extensions and work identically with or without them
-installed.
+installed. The flows themselves ship from `delivery@jsdotnet`
+([JSdotNet/ai-agent-stack](https://github.com/JSdotNet/ai-agent-stack)).
 `diagram-canvas` and `markdown-canvas` ship inside `copilot-app` but install and
 run independently of it and of each other — install either one on its own. Each
 is packaged like any other plugin (its own `.github/plugin/plugin.json`), so
@@ -127,10 +125,9 @@ provider ID `plugin:copilot-app:orch-dashboard`; if duplicate `orch-dashboard` p
 are reported, remove stale user-scope copies from `%USERPROFILE%\.copilot\extensions`
 after confirming they are not needed.
 
-The `knowledge-base` plugin is retired at `0.17.0`: it ships one `knowledge-base-moved`
-notice skill and a `dependencies` entry on `devbook@jsdotnet`. The convention, its
-`knowledge-canvas` (now `devbook-graph`), and every skill continue in
-[JSdotNet/ai-agent-stack](https://github.com/JSdotNet/ai-agent-stack).
+The knowledge-folder convention that used to ship here as `knowledge-base` continues as
+`devbook@jsdotnet` in [JSdotNet/ai-agent-stack](https://github.com/JSdotNet/ai-agent-stack);
+the plugin itself is gone from this marketplace.
 
 ### Claude Desktop Extension
 
@@ -156,7 +153,6 @@ Repository organization centers on reusable Copilot plugin bundles:
 - `plugins/`
   - Installable plugin bundles for specific domains:
     - `architecture`
-    - `development`
     - `documentation`
     - `review`
     - `spec-builder`
@@ -171,9 +167,8 @@ Repository organization centers on reusable Copilot plugin bundles:
     - `qa`
     - `ux-design`
     - `wip-convention`
-    - `knowledge-base` (retired; notice skill only)
-    - `worktree-parallel`
     - `product-owner`
+    - `react-coding`
 - `docs/copilot/`
   - Plugin inventory/reference docs.
 
@@ -185,7 +180,6 @@ Repository organization centers on reusable Copilot plugin bundles:
 - Spec-driven asset authoring with `spec-builder`.
 - GitHub, Jira, QA, UX, domain design, and security-focused workflow plugins.
 - Work-in-progress artifact conventions via `wip-convention`.
-- Parallel task decomposition patterns via `worktree-parallel`.
 
 ## Development Workflow
 
@@ -199,7 +193,7 @@ Current workflow pattern inferred from repository assets:
 Branching strategy:
 
 - A formal branching policy is not explicitly documented in the scanned source set.
-- The `worktree-parallel` plugin promotes isolated feature branches/worktrees per task slice.
+- Cross-session fan-out over worktrees belongs to `fleet@jsdotnet`, not to a plugin here.
 
 ## Coding Standards
 
@@ -230,7 +224,7 @@ A dedicated runtime unit-test framework document (for example a separate `Unit_T
 Contribution guidelines for this repository:
 
 1. Follow repository-level instructions first, especially:
-   - `.github/copilot/copilot-instructions.md`
+   - `AGENTS.md`
    - `.agents/rules/markdown.md`
 2. Keep changes minimal and aligned with existing plugin patterns.
 3. Reuse nearby examples when creating new assets:
@@ -249,7 +243,6 @@ Helpful references:
 License metadata is plugin-specific in current manifests:
 
 - Most local plugins declare `UNLICENSED`.
-- `plugins/wip-convention/.github/plugin/plugin.json` and
-  `plugins/knowledge-base/.github/plugin/plugin.json` declare `MIT`.
+- `plugins/wip-convention/.github/plugin/plugin.json` declares `MIT`.
 
 No single top-level repository license file was identified in the scanned sources.

@@ -1,10 +1,6 @@
 ---
-applyTo: '.github/**/*.md'
-description: Establishes default language and tone standards for .github markdown assets.
+applyTo: 'plugins/*/agents/**/*.agent.md,plugins/*/skills/**/SKILL.md'
+description: The output language and tone every plugin agent and skill holds to.
 ---
 
-# Agent Language and Tone Behavior Instructions (Copilot Loader)
-
-Read [.agents/rules/agent-language-and-tone.md](../../.agents/rules/agent-language-and-tone.md)
-and follow it. The rules live in that file so both hosts load one shared copy;
-this file only carries the Copilot `applyTo`.
+Read `.agents/rules/agent-language-and-tone.md` and follow it before editing this file.

@@ -19,7 +19,7 @@ step-by-step How-To guides that developers can follow without ambiguity.
    - **Output location**: Where should the file be saved (default: `documents/howto/`)?
 
 2. Load and apply the How-To instruction file at
-   `instructions/documentation/howto.instructions.md` before drafting.
+   `resources/howto.md` before drafting.
 
 3. Draft the guide using this structure:
    - `# <Title>`

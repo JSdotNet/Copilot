@@ -70,8 +70,7 @@ for a user- or session-scoped install without going through `copilot plugin inst
   (`UpdateElementStyle`) instead to convey information visually, and `push`/`replace` mode
   with the Back button for drill-down navigation between separate C4 diagrams.
 
-See each plugin's `instructions/common/canvas-usage.instructions.md` (or
-`instructions/canvas-usage.instructions.md` where the plugin has no `common/` folder) for
+See `plugins/copilot-app/resources/canvas-usage.md` for
 the policy on when skills should prefer opening a canvas over emitting Markdown-only
 output.
 

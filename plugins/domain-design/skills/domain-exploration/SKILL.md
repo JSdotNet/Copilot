@@ -18,7 +18,7 @@ Use when the user wants to explore a business domain, identify key domain concep
 
 ## Workflow
 
-1. Apply `instructions/ddd/ddd-global-instructions.md`.
+1. Apply `resources/ddd-global.md`.
 2. Confirm input sources with the user (business docs, verbal requirements, existing systems).
 3. Run **Big Picture** exploration:
    - Identify all significant domain events (past tense: `OrderPlaced`, `PaymentReceived`).
@@ -35,7 +35,7 @@ Use when the user wants to explore a business domain, identify key domain concep
 6. Build **Ubiquitous Language Glossary**:
    - For each discovered term, capture: name, definition, context, and related terms.
    - Flag terms that mean different things in different areas of the business.
-7. Produce structured output following `instructions/output/domain-documentation-structure-instructions.md`.
+7. Produce structured output following `resources/domain-documentation-structure.md`.
 
 ## Output
 

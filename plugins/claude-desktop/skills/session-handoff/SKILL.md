@@ -47,9 +47,7 @@ compaction.
 
 - **Never start the next session yourself, and never spawn an agent to run the handoff.** A
   handed-off session must be able to ask what is ambiguous, hold the Personal Validation
-  gate, and own its dashboard run — none of which a sub-agent can do. See **Session
-  Ownership** and **Sub-Agent Constraints** in
-  `instructions/orch-execution-model.instructions.md`.
+  gate, and own its dashboard run — none of which a sub-agent can do.
 - **Never mark the stage in flight `done`** to leave things tidy. A resumed run continues
   from the first stage that is not `done`, so a stage rounded up is a stage the next session
   skips.
@@ -139,9 +137,9 @@ Write it into the repository instead — `.wip/handoffs/handoff-<slug>.md`, per 
 convention — only when the user wants the brief shared with the team or committed. Never
 write it there when the target is another repository.
 
-### 5 — Mark the orchestration run, when there is one
+### 5 — Mark the dashboard run, when there is one
 
-Skip this step entirely when the session was not running an `orch-*` orchestration, or when
+Skip this step entirely when the session was not reporting a run to the dashboard, or when
 the `orch-dashboard` MCP server is not configured. Otherwise, for a **same-repo** target:
 
 1. `set_run_context` with `changeKind`, and `approval` plus the user's wording when Personal
@@ -230,19 +228,16 @@ session.
 
 ## Related Skills
 
-- `start-session-from-issue` — starts a session's work from a single GitHub issue, where
-  this skill continues work already in progress.
-- `automation-bug-fix` — claims the single highest-priority open bug and runs `orch-bug` on
-  it in its own session.
-- `push-branch` — get the commits onto the remote first when the next session will work from
-  a clone rather than from this worktree.
+- `push-branch` (plugin: `delivery`) — get the commits onto the remote first when the next
+  session will work from a clone rather than from this worktree.
 - `start` — how the next session brings the application back up.
 
 ## Notes
 
-- `instructions/orch-execution-model.instructions.md` (**Session Handoff**, **Run State and
-  Resume**) is the authority for run markers and resume behavior. This skill is the procedure
-  around it, and also covers sessions with no run at all.
+- The server README (`mcp/orch-dashboard/README.md`, `set_run_context` and the context-gauge
+  ladder) is the
+  authority for run markers and resume behavior. This skill is the procedure around it, and
+  also covers sessions with no run at all.
 - The 60% / 75% / 85% context-gauge warnings come from the plugin's telemetry hook. 75% means
   prepare — persist decisions, start nothing heavy. 85% means run this skill.
 - This skill reports through normal chat and opens no dashboard run of its own: a handoff is

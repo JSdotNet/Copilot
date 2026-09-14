@@ -27,7 +27,7 @@ Use when the user asks to:
 
 ## Workflow
 
-1. Load `instructions/state/state-global-instructions.md`.
+1. Load `resources/state-global.md`.
 2. Confirm the entity name, states, and key transitions with the user.
 3. Load `skills/state-diagram-generator/prompts/state-diagram.prompt.md`.
 4. Ask focused clarifying questions only for missing guards, terminal states, or sub-state structure.
@@ -42,15 +42,3 @@ Use when the user asks to:
 - Prose summary of the lifecycle (2–4 sentences)
 - Traceability links to arc42 §6 (scenario) or §8 (crosscutting pattern) and the related domain definition
 - List of open questions or assumptions
-
-## Quality Checks
-
-- [ ] One entity or protocol per diagram.
-- [ ] States named using domain language.
-- [ ] Every transition labelled with event; guards and actions included where relevant.
-- [ ] Initial and terminal states explicit.
-- [ ] Composite states used appropriately for nested lifecycles.
-- [ ] Diagram embedded in a fenced `mermaid` code block.
-- [ ] Prose summary present.
-- [ ] Traceability links to arc42 §6 or §8 and related domain artifacts present.
-- [ ] SVG file generated in `diagrams/` alongside the Markdown output using `scripts/generate-diagram-svgs.ps1`.

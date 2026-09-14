@@ -1,14 +1,7 @@
 // Extension: orch-dashboard
-// Live progress and output dashboard for copilot-app orch-* orchestration
-// skills (orch-feature, orch-bug, orch-adr, orch-arc42, orch-blueprint,
-// orch-tdr, orch-architecture, orch-project, orch-repo, orch-create-mvp,
-// orch-update-packages, orch-aspire-update, orch-create-module,
-// orch-create-service) and the copilot-app automation skills
-// (automation-bug-fix, automation-package-update,
-// automation-performance-review, automation-review, automation-week-starter,
-// automation-weekly-cost-analysis, automation-whats-new,
-// azure-sre-to-github-issue, start-session-from-issue,
-// update-open-sessions).
+// Live progress and output dashboard for a staged run — the copilot-app
+// update-open-sessions skill, or a flow-* skill from delivery@jsdotnet that
+// resolved this canvas as its run surface.
 //
 // Model: an orchestration run is a JSON file (see store.mjs) with a list of
 // named stages, each carrying a status (pending/in_progress/done/blocked/
@@ -425,7 +418,7 @@ const session = await joinSession({
             id: "orch-dashboard",
             displayName: "Orchestration dashboard",
             description:
-                "Live progress and output dashboard for copilot-app orch-* orchestration skills (orch-feature, orch-bug, orch-adr, orch-arc42, orch-blueprint, orch-tdr, orch-architecture, orch-project, orch-repo, orch-create-mvp, orch-update-packages, orch-aspire-update, orch-create-module, orch-create-service) and the copilot-app automation skills (automation-bug-fix, automation-package-update, automation-performance-review, automation-review, automation-week-starter, automation-weekly-cost-analysis, automation-whats-new, azure-sre-to-github-issue, start-session-from-issue, update-open-sessions). Open once per session; drive it with start_run/update_stage/set_run_context/finish_run as a workflow progresses.",
+                "Live progress and output dashboard for a staged run: the copilot-app update-open-sessions skill, or a flow skill that resolved this canvas as its run surface. Open once per session; drive it with start_run/update_stage/set_run_context/finish_run as a workflow progresses.",
             inputSchema: {
                 type: "object",
                 properties: {
@@ -436,11 +429,11 @@ const session = await joinSession({
                 {
                     name: "start_run",
                     description:
-                        "Start tracking a new orchestration run. Call once at the beginning of an orch-* skill, listing every workflow stage up front so the dashboard can show overall progress immediately.",
+                        "Start tracking a new run. Call once at the beginning of a staged skill, listing every stage up front so the dashboard can show overall progress immediately.",
                     inputSchema: {
                         type: "object",
                         properties: {
-                            skillId: { type: "string", description: "Skill identifier, e.g. orch-feature, orch-bug, orch-adr." },
+                            skillId: { type: "string", description: "Skill identifier, e.g. flow-feature, flow-bug, update-open-sessions." },
                             title: { type: "string", description: "Short human-readable title for this run, e.g. the feature or bug name." },
                             stages: {
                                 type: "array",

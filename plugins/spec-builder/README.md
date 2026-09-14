@@ -14,15 +14,15 @@ Claude Code from a single copy of every file.
   - `skills/create-skill/SKILL.md`
   - `skills/create-workflow/SKILL.md`
 - Instructions:
-  - `instructions/agent/agent-naming.instructions.md`
-  - `instructions/agent/agent-spec-workflow.instructions.md`
-  - `instructions/authoring/create-agent.instructions.md`
-  - `instructions/authoring/create-instruction.instructions.md`
-  - `instructions/authoring/create-plugin.instructions.md`
-  - `instructions/authoring/create-skill.instructions.md`
-  - `instructions/authoring/create-canvas.instructions.md`
-  - `instructions/authoring/create-workflow.instructions.md`
-  - `instructions/authoring/spec-conciseness.instructions.md`
+  - `resources/agent-naming.md`
+  - `resources/agent-spec-workflow.md`
+  - `resources/create-agent.md`
+  - `resources/create-instruction.md`
+  - `resources/create-plugin.md`
+  - `resources/create-skill.md`
+  - `resources/create-canvas.md`
+  - `resources/create-workflow.md`
+  - `resources/spec-conciseness.md`
 - Resources:
   - `resources/quick-reference.md`
 - Hooks:
@@ -39,11 +39,12 @@ Claude Code from a single copy of every file.
 ## Dual-Host Authoring
 
 Every asset this plugin produces is authored once and read by both GitHub Copilot and Claude
-Code. Author the Copilot side; `.claude-plugin/` and `hooks/` are generated. Run the sync
-script before committing — CI fails on drift:
+Code. Both manifests and both hook files are hand-authored — nothing is generated — and a
+change to one host's file is a change owed to the other. Run the checker before committing;
+CI fails on drift:
 
 ```bash
-pwsh ./scripts/Sync-ClaudePlugins.ps1
+node tools/check-assets.mjs
 ```
 
 Canvas extensions are the one Copilot-only asset type. Full rules:
@@ -78,7 +79,7 @@ copilot plugin uninstall spec-builder
 ## Future Upgrades
 
 - **Review create naming**
-- **Prompt authoring skill** — add a `create-prompt` skill and matching `instructions/authoring/create-prompt.instructions.md` to cover `.prompt.md` assets.
+- **Prompt authoring skill** — add a `create-prompt` skill and matching `resources/create-prompt.md` to cover `.prompt.md` assets.
 - **Multi-action canvas templates** — add reusable canvas renderer templates (static-file server, Vite dev server wiring) to `resources/` referenced by the `create-canvas` instructions.
 - **Spec authoring skill** — add a `create-spec` skill for structured specification documents that drive multi-step agent workflows.
 - **`plugin.json` schema validation** — add a `validate-plugin` skill that checks manifest completeness and path integrity before install.

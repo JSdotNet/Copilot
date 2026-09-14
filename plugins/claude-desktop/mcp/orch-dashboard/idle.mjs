@@ -66,8 +66,7 @@ export function markIdle(run, at = new Date().toISOString()) {
 
 // A **handoff** is the deliberate counterpart to idleness: the owner session ended on
 // purpose, at a context threshold, with the intent that another session pick the run up
-// from where it stopped (see **Session Handoff** in
-// `instructions/orch-execution-model.instructions.md`).
+// from where it stopped (see the `session-handoff` skill).
 //
 // Both look identical to `isIdle` — session ended, nothing advancing — so the marker is
 // what separates "waiting to be continued" from "abandoned at a gate". Without it,

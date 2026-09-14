@@ -8,22 +8,13 @@ tools:
   - 'edit/createFile'
   - 'edit/editFiles'
   - 'execute/createAndRunTask'
-  - 'agent'
   - 'terminal/runInTerminal'
-  - 'list_projects'
-  - 'create_session'
-  - 'send_session_message'
-  - 'list_sessions_and_chats'
-  - 'get_session'
-  - 'respond_to_session_plan'
   - 'Read'
   - 'Grep'
   - 'Glob'
   - 'Write'
   - 'Edit'
   - 'Bash'
-  - 'Agent'
-  - 'SendMessage'
   - 'Skill'
 ---
 
@@ -124,12 +115,14 @@ Apply the `aikido-scan-pr` skill:
 
 ## Handoffs
 
-When an issue is outside this agent's scope, propose a handoff with explicit user approval:
+When an issue is outside this agent's scope, name where it belongs and why:
 
 - **Coding agent** (`csharp-coding:coding`) — for complex refactoring required to fix a security issue.
 - **Architecture agent** (`architecture:architect`) — when a security finding reveals a design-level problem.
 
-Use the required wording: "I recommend handing this off to `<agent>` because `<reason>`. Do you approve this handoff?"
+State it as "This belongs with `<agent>` because `<reason>`". This agent holds no approval
+gate and performs no handoff itself — sequencing, approval, and delegation belong to whatever
+consulted it.
 
 ## Setup
 
@@ -180,4 +173,4 @@ Generate the token at: <https://app.aikido.dev/settings/integrations/ide/mcp>
 
 - [Aikido MCP documentation](https://help.aikido.dev/ai-and-dev-tools/aikido-mcp/github-copilot)
 - [Aikido API documentation](https://apidocs.aikido.dev)
-- `.github/copilot-instructions.md`
+- The repository's root instruction file: `AGENTS.md`, or `.github/copilot-instructions.md`

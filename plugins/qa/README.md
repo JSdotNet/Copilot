@@ -19,7 +19,6 @@ Two agent personas are included: `qa` drives the browser and produces the report
   - `skills/aspire-run/SKILL.md` — start and confirm health of the app under test via Aspire
   - `skills/playwright-validation/SKILL.md` — drive browser scenarios via Playwright MCP and capture evidence for each
   - `skills/aspire-log-monitor/SKILL.md` — continuously monitor Aspire logs/traces during testing
-  - `skills/delegate-to-qa-monitor/SKILL.md` — hand off monitoring to the `qa-monitor` agent persona
   - `skills/feature-test-from-issue/SKILL.md` — derive test scenarios from a GitHub issue or Jira ticket (delegates fetching/updating to a GitHub or Jira skill; no GitHub/Jira-specific content here)
   - `skills/deployed-environment-validation/SKILL.md` — validate against a specific already-deployed test environment (staging/QA/UAT) instead of a local Aspire run
   - `skills/playwright-e2e-authoring/SKILL.md` — turn a validated scenario into a durable, committed Playwright test
@@ -54,23 +53,21 @@ Copilot App) cannot spawn a separate, truly parallel session — that capability
 part of the documented custom-agent tool surface, and no plugin in this repository relies
 on it. Two options are available, at different levels:
 
-- **Portable (this plugin)** — `qa` optionally hands off to `qa-monitor` via the
-  standard `agent` tool (`delegate-to-qa-monitor` skill). This works in any host, but the
-  two personas still take turns within one session; it is not literal concurrent
-  execution.
-- **App-only (used by `copilot-app` orchestration skills)** — the `copilot-app` plugin's
-  `orch-feature`, `orch-bug`, and other orchestration skills with a Local Run &
-  Monitoring / E2E validation stage reference `qa` and `qa-monitor` directly in that
-  stage. When running inside the **GitHub Copilot App**, `qa-monitor` can be run in a
+- **Self-owned (this plugin)** — `qa` applies the `aspire-log-monitor` skill inline and
+  takes turns between monitoring and browser steps. It never starts `qa-monitor` itself:
+  a specialist holds no delegation tool, so the persona split is the caller's to make.
+- **App-only (used by a flow's QA phase)** — a flow skill that owns a QA validation
+  phase references `qa` and `qa-monitor` directly in that phase.
+  When running inside the **GitHub Copilot App**, `qa-monitor` can be run in a
   genuinely separate, concurrent child session (`create_session` plus cross-session
-  messaging) while `qa` drives the browser in the current session. This capability is
-  specific to the GitHub Copilot App; the `copilot-app` plugin's orchestration skills
-  document it inline rather than in a separate skill.
+  messaging) while `qa` drives the browser in the current session. That capability
+  belongs to the host rather than to a plugin agent's tool set, so a flow documents
+  it inline rather than in a separate skill.
 
 ## Scope
 
 - **In scope**: runtime/E2E feature validation, exploratory and regression testing through a real browser (locally or against a deployed test environment), authoring durable Playwright E2E tests from validated scenarios, evidence-backed QA reporting.
-- **Out of scope**: writing unit/integration test code (see the `development` plugin's testing agent), architecture/security review, and implementing code fixes (the agent reports and offers a handoff instead).
+- **Out of scope**: writing unit/integration test code (the `csharp-coding` plugin's `coding` agent), architecture/security review, and implementing code fixes (the agent reports and names the owner instead).
 
 ## Install
 

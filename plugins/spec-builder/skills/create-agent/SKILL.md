@@ -22,13 +22,14 @@ description: Create or refine an agent file with correct frontmatter, scope, too
 5. Describe every handoff target in the body, since the `handoffs` key alone does not carry
    it to both hosts.
 6. Prune against
-   [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md):
+   [spec-conciseness.md](../../resources/spec-conciseness.md):
    80-line body budget, no rule stated twice.
-7. Run `pwsh ./scripts/Sync-ClaudePlugins.ps1` to add the Claude tool equivalents, then
-   `-Check` to confirm the agent is valid for both hosts.
+7. Append the Claude tool names `tools/tool-map.json` derives from the Copilot ids, list
+   the agent under `agents` in the Claude manifest, then run `node tools/check-assets.mjs`
+   to confirm the agent is valid for both hosts.
 
 ## References
 
-- [create-agent.instructions.md](../../instructions/authoring/create-agent.instructions.md)
+- [create-agent.md](../../resources/create-agent.md)
 - [Claude Code Compatibility](../../../../docs/copilot/claude-code-compatibility.md) — why
   `model`, `tools`, and `handoffs` are handled the way step 3 and step 5 require.

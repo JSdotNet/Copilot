@@ -18,6 +18,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Bump changed plugin versions
         id: bump-plugin-versions
         shell: pwsh
@@ -40,56 +45,32 @@ jobs:
               exit 0
           }
 
-          $pluginPaths = @{}
+          $plugins = @{}
           foreach ($file in $changedFiles) {
               if ($file -match '^plugins/([^/]+)/') {
-                  $pluginName = $Matches[1]
-                  $manifestPath = "plugins/$pluginName/.github/plugin/plugin.json"
-                  if (Test-Path -LiteralPath $manifestPath) {
-                      $pluginPaths[$manifestPath] = $true
+                  $name = $Matches[1]
+                  if ((Test-Path -LiteralPath "plugins/$name/.github/plugin/plugin.json") -or (Test-Path -LiteralPath "plugins/$name/.claude-plugin/plugin.json")) {
+                      $plugins[$name] = $true
                   }
               }
           }
 
-          if ($pluginPaths.Count -eq 0) {
+          if ($plugins.Count -eq 0) {
               Write-Host "No plugin manifests to update."
               "updated=false" >> $env:GITHUB_OUTPUT
               exit 0
           }
 
-          $updatedManifests = @()
-          foreach ($manifestPath in $pluginPaths.Keys) {
-              $raw = Get-Content -LiteralPath $manifestPath -Raw
-              $json = $raw | ConvertFrom-Json
-              $versionParts = $json.version -split '\.'
-              if ($versionParts.Count -ne 3) {
-                  throw "Invalid semver '$($json.version)' in $manifestPath"
-              }
-
-              $major = [int]$versionParts[0]
-              $minor = [int]$versionParts[1]
-              $patch = [int]$versionParts[2] + 1
-              $json.version = "$major.$minor.$patch"
-
-              $json | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -Encoding utf8NoBOM
-              $updatedManifests += $manifestPath
+          # A version lives in four places - both manifests, the marketplace entry, and the
+          # copilot-plugins.md row - and nothing generates one from another. bump-version.mjs
+          # writes the same value into all four; check-assets.mjs then fails if any disagree.
+          foreach ($name in ($plugins.Keys | Sort-Object)) {
+              node tools/bump-version.mjs $name patch
+              if ($LASTEXITCODE -ne 0) { throw "bump failed for $name" }
           }
-
-          if ($updatedManifests.Count -eq 0) {
-              "updated=false" >> $env:GITHUB_OUTPUT
-              exit 0
-          }
-
-          Write-Host "Updated manifests:"
-          $updatedManifests | ForEach-Object { Write-Host "- $_" }
+          node tools/check-assets.mjs
+          if ($LASTEXITCODE -ne 0) { throw "check-assets failed after the bump" }
           "updated=true" >> $env:GITHUB_OUTPUT
-
-      # The Claude manifests mirror the Copilot version field, so they drift the moment a
-      # bump lands. Regenerate before opening the PR rather than leaving CI red afterwards.
-      - name: Sync Claude plugin assets
-        if: steps.bump-plugin-versions.outputs.updated == 'true'
-        shell: pwsh
-        run: ./scripts/Sync-ClaudePlugins.ps1
 
       - name: Create pull request
         if: steps.bump-plugin-versions.outputs.updated == 'true'
@@ -100,6 +81,6 @@ jobs:
           body: |
             Automated nightly plugin version bump.
 
-            This PR increments patch versions for plugin manifests where files changed under the corresponding `plugins/<name>/` tree.
+            This PR increments the patch version - in both manifests, the marketplace entry, and the `copilot-plugins.md` row - of every plugin whose `plugins/<name>/` tree changed.
           branch: chore/nightly-plugin-version-bump
           delete-branch: true

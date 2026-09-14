@@ -1,3 +1,10 @@
+---
+name: markdown
+description: Baseline Markdown formatting and lint-safety rules for every Markdown file in the repository.
+paths:
+  - "**/*.md"
+---
+
 # Global Markdown Rules
 
 ## Purpose

@@ -7,7 +7,8 @@ There is **one copy of every file** — no parallel Claude tree. This works beca
 ignore frontmatter they do not understand, and both silently drop tool names they cannot
 resolve, so a single agent file can carry the vocabulary of both.
 
-Only the manifest location and the hook shape genuinely differ, and those are generated.
+Only the manifest location and the hook shape genuinely differ. Both are hand-authored —
+there is no generator — and `node tools/check-assets.mjs` fails when the two sides disagree.
 
 The single exception is the `copilot-app` / `claude-desktop` pair, where the host difference is
 not frontmatter but a UI surface Claude Code does not have. See **Claude-native plugins**.
@@ -17,35 +18,33 @@ not frontmatter but a UI surface Claude Code does not have. See **Claude-native 
 | Path | Authored by | Read by |
 | --- | --- | --- |
 | `skills/<name>/SKILL.md` | hand | both |
-| `instructions/`, `prompts/`, `resources/` | hand | both |
-| `agents/<role>.agent.md` | hand, except `name` + `tools` | both |
+| `resources/`, `prompts/` | hand | both, by explicit path reference |
+| `agents/<role>.agent.md` | hand, tools as one union list | both |
 | `.github/plugin/plugin.json` | hand | Copilot |
 | `hooks.json` | hand | Copilot |
-| `.claude-plugin/plugin.json` | **generated** | Claude |
-| `hooks/hooks.json` | **generated** | Claude |
-| `.claude-plugin/marketplace.json` (repo root) | **generated** | Claude |
-| `.agents/rules/*.md` (repo root) | hand | both, via the two loaders below |
-| `.github/instructions/*.instructions.md` (repo root) | hand | Copilot |
-| `.claude/rules/*.md` (repo root) | hand | Claude |
+| `.claude-plugin/plugin.json` | hand, checked against the Copilot manifest | Claude |
+| `hooks/hooks.json`, `hooks/session-start-context.md`, `hooks/emit-session-context.mjs` | hand, checked against `hooks.json` | Claude |
+| `.claude-plugin/marketplace.json` (repo root) | hand, checked | Claude |
+| `AGENTS.md` (repo root) | hand | both — `CLAUDE.md` imports it, `.github/copilot-instructions.md` points at it |
+| `.agents/rules/<topic>.md` (repo root) | hand | both, via the two wrappers below |
+| `.github/instructions/<topic>.instructions.md` (repo root) | hand, checked | Copilot |
+| `.claude/rules/<topic>.md` (repo root) | hand, checked | Claude |
 
-Never edit anything under `.claude-plugin/` or `hooks/`. Change the Copilot source and
-regenerate. The one exception is a Claude-native plugin (`claude-desktop`), which has no Copilot
-source to generate from and is hand-authored throughout — see **Claude-native plugins**.
+A change to one side is a change owed to the other: a version bump touches both manifests,
+the marketplace entry, and the `copilot-plugins.md` row (`node tools/bump-version.mjs <plugin>`
+does all four); a reworded `sessionStart` prompt is reworded in the sidecar too.
 
-## Regenerating
-
-```bash
-pwsh ./scripts/Sync-ClaudePlugins.ps1
-```
-
-Check mode reports drift and exits non-zero without writing. This is what CI runs:
+## Checking
 
 ```bash
-pwsh ./scripts/Sync-ClaudePlugins.ps1 -Check
+node tools/check-assets.mjs
 ```
 
-`Claude Plugin Sync Check` runs on every pull request touching `plugins/`, and the nightly
-version-bump workflow regenerates after bumping so the mirrored `version` stays true.
+It reports, exits non-zero on any error, and writes nothing. `Check Assets` runs it on every
+pull request; the nightly version-bump workflow runs `tools/bump-version.mjs` for each changed
+plugin and then the checker, so the four copies of a version stay true. A generator that
+derived the Claude side from the Copilot side was used until 2026-09-14 and dropped: it made
+every Claude manifest a file nobody was allowed to edit, and what it linted the checker lints.
 
 ## How one agent file serves both hosts
 
@@ -72,15 +71,15 @@ tools:
 Each host filters the list to what it recognises. Claude only refuses to launch an agent
 when *nothing* in the list resolves, which cannot happen here.
 
-`scripts/Sync-ClaudePlugins.ps1` maintains the `name` and `tools` lines in place. Author the
-Copilot tool ids; the script appends the Claude equivalents and rebuilds the list from the
-Copilot ids alone, so the output is a pure function of the authored intent and hand-edits to
-the Claude half are reverted. Everything else in the file is yours.
+Author the Copilot tool ids first and their Claude equivalents after them, per the table
+below. The checker derives the Claude half from the Copilot ids and fails on a Claude entry
+the map does not produce or on one it produces that is missing, so the list stays a pure
+function of the authored intent without a script owning it.
 
 ### Tool translation
 
-`scripts/claude-sync/tool-map.json` holds the table. The generator **fails** on an unmapped
-tool id rather than guessing, so a new Copilot tool surfaces as a build error.
+`tools/tool-map.json` holds the table. The checker **fails** on an unmapped tool id rather
+than guessing, so a new Copilot tool surfaces as a build error.
 
 | Copilot | Claude Code |
 | --- | --- |
@@ -119,8 +118,8 @@ hypothetical — Aspire's `get_*` query tools became `list_*` and its metrics to
 
 The cost is granularity: Claude cannot allow a subset of one server's tools this way, so an
 agent meant to use a server read-only (`qa-monitor`) carries that intent in its prose
-constraints instead of in the allowlist. The generator fails if an agent declares an MCP tool
-id whose server the plugin's own manifest does not declare, since the emitted pattern would
+constraints instead of in the allowlist. The checker fails if an agent declares an MCP tool
+id whose server the plugin's own Claude manifest does not declare, since the pattern would
 name a server that never surfaces.
 
 ### Manifest
@@ -135,8 +134,7 @@ avoids depending on how Claude globs a folder of `*.agent.md`.
 
 `dependencies` is copied through unchanged too. Claude Code resolves each
 `{ name, marketplace, version? }` entry when the plugin is enabled, which is how a retired
-plugin pulls in its replacement from another marketplace (`knowledge-base` → `devbook@jsdotnet`);
-Copilot ignores the key.
+plugin can pull in its replacement from another marketplace; Copilot ignores the key.
 
 `hooks` is omitted for the same reason as `skills` — Claude Code loads `hooks/hooks.json`
 automatically. Naming it in the manifest too makes the plugin fail to load with
@@ -168,31 +166,31 @@ It is recorded as a *non-blocking* hook error. Nothing surfaces in the UI, the s
 normally, and the guidance is simply absent — which is how every plugin in this repository
 shipped a dead session-start hook for its whole history.
 
-So `sessionStart` translates to a **command** hook plus two generated siblings:
+So `sessionStart` has a Claude twin: a **command** hook plus two siblings, all hand-authored:
 
-| Generated file | Contents |
+| File | Contents |
 | --- | --- |
 | `hooks/session-start-context.md` | the authored prompt text, verbatim |
 | `hooks/emit-session-context.mjs` | reads that file, prints the hook JSON envelope |
 | `hooks/hooks.json` | `{"type":"command","command":"node \"${CLAUDE_PLUGIN_ROOT}/hooks/emit-session-context.mjs\""}` |
 
 The emitter returns the text as `hookSpecificOutput.additionalContext`, which Claude injects
-into the new session. Plain stdout is injected too, but the envelope states the intent, so the
-generator uses it. Keeping the prose in a sidecar rather than inside the command string keeps
-it out of shell quoting and keeps the diff readable. Requires Node on the host; Claude Code
-already runs on it.
+into the new session. Plain stdout is injected too, but the envelope states the intent.
+Keeping the prose in a sidecar rather than inside the command string keeps it out of shell
+quoting and keeps the diff readable. Requires Node on the host; Claude Code already runs on it.
 
 Two consequences for authoring:
 
-- Several `sessionStart` prompts in one Copilot `hooks.json` collapse into one sidecar,
-  separated by a blank line. They are context, not separate turns, so nothing is lost.
-- Dropping the last `sessionStart` prompt deletes the sidecar and emitter as well; otherwise
-  the plugin would keep injecting guidance nobody authored any more.
+- Several `sessionStart` prompts in one Copilot `hooks.json` go into one sidecar, separated
+  by a blank line. They are context, not separate turns, so nothing is lost. The checker
+  fails when the sidecar and the prompts stop saying the same thing.
+- Dropping the last `sessionStart` prompt means deleting the sidecar and emitter as well;
+  otherwise the plugin keeps injecting guidance nobody authored any more.
 
 `sessionEnd` prompt hooks are a lesser trap: Claude runs them only in the interactive REPL and
-reports `Prompt stop hooks are not yet supported outside REPL` in a headless run. The
-generator translates them but warns. `userPromptSubmit`, `preToolUse`, `postToolUse`, and
-`stop` all accept prompt hooks and pass through unchanged.
+reports `Prompt stop hooks are not yet supported outside REPL` in a headless run.
+`userPromptSubmit`, `preToolUse`, `postToolUse`, and `stop` all accept prompt hooks and take
+the same shape on both sides.
 
 #### Which host reads which file
 
@@ -205,9 +203,8 @@ Hook discovery differs between the hosts, and the difference is load-bearing:
 
 Two consequences:
 
-- The generated `hooks/` tree is invisible to Copilot for every plugin here, because each one
-  has a root `hooks.json` — which is guaranteed by construction, since the generator only
-  writes `hooks/` when the root file exists. Do not rely on Copilot being unable to *parse*
+- The `hooks/` tree is invisible to Copilot for every plugin here, because each one that has
+  a `hooks/` folder also has a root `hooks.json`. Keep it that way. Do not rely on Copilot being unable to *parse*
   the Claude shape: it reads nested groups and PascalCase event names fine, and will run them
   if it ever reaches the file. Precedence is the whole protection.
 - The split doubles as a way to target one host. A root `hooks.json` reaches Copilot only; a
@@ -223,9 +220,9 @@ resume, and never under `-p` — so a `-p` run is not a valid way to test one.
 ## Claude-native plugins
 
 One plugin is authored for Claude only: **`claude-desktop`**, the sibling of `copilot-app`.
-Its manifest and hooks are hand-written, nothing under it is generated, and the sync script
-lists it in `$ClaudeNativePlugins` so it still appears in `marketplace.json`. That listing is
-the only thing the generator does for it.
+It ships a Claude manifest and no Copilot one, and its root `hooks.json` is a Copilot guard
+rather than the source of its Claude sidecar; the checker knows both host-only plugins by
+name and skips the cross-host agreement checks for them.
 
 "Claude only" is a statement of intent, not something the hosts enforce: Copilot will load the
 plugin from `.claude-plugin/plugin.json` and surface its skills if a user points `--plugin-dir`
@@ -251,8 +248,7 @@ transport:
 | `diagram-canvas`, `markdown-canvas` extensions | `/mermaid` and `/markdown` routes on the same server, driven by `render_diagram` / `render_markdown` |
 | host session telemetry events | `PreToolUse`/`PostToolUse`/`SubagentStop`/`PreCompact`/`Stop` hooks plus the session transcript |
 | (no equivalent) | `SessionEnd` hook, which stamps an unfinished run idle so an abandoned gate stops accruing elapsed time |
-| `.github/copilot-orch-context.md`, `.github/copilot-model-selection.md` | `.claude/orch-context.md`, `.claude/model-selection.md` |
-| Copilot model families in the selection table | `opus` / `sonnet` / `haiku` aliases |
+| `.github/copilot-orch-context.md` | `.claude/orch-context.md` |
 | child sessions for concurrent work | background sub-agents, `isolation: "worktree"` when a separate checkout is needed |
 
 What is genuinely shared is the interesting part: `render.mjs` and `report.mjs` are
@@ -273,31 +269,35 @@ Then `/plugin install <name>@jsdotnet-copilot`.
 
 **No `model` pins.** Claude Code refuses to load an agent whose `model` it does not
 recognise — it does not fall back. Since both hosts read the same key and neither accepts
-the other's model ids, pins were removed from the six `development/agents-internal/` agents
-and the intent recorded in a `## Model` section in each body. Each host now applies its own
-default. The generator rejects any pin that is not a Claude-valid value, so this cannot
+the other's model ids, pins were removed from every agent and the intent recorded in a
+`## Model` section in each body that had one (`react-coding/agents/frontend.agent.md` keeps
+the example). Each host now applies its own
+default. The checker rejects any pin that is not a Claude-valid value, so this cannot
 regress silently.
 
 **`copilot-app` is Copilot-only; `claude-desktop` is its Claude sibling.** `copilot-app` is built
 around the Copilot CLI canvas extension API (`diagram-canvas`, `markdown-canvas`,
-`orch-dashboard`), which has no Claude counterpart, so it stays excluded from generation.
+`orch-dashboard`), which has no Claude counterpart, so it ships no Claude manifest.
 The port could not be a translation — it needed a different transport — so it lives as a
 separate, hand-authored plugin. See **Claude-native plugins** below.
 
-**`applyTo` is not read, but `paths` is.** Claude Code has glob-scoped instruction
-injection — `.claude/rules/*.md` with a `paths:` list, fired when Claude reads a matching
-file. It does not read `applyTo`. So a repository keeps each rule body in `.agents/rules/`,
-owned by neither host, and gives it two thin loaders that carry only the glob: an `applyTo`
-one in `.github/instructions/` and a `paths` one in `.claude/rules/` (see the repository
-`CLAUDE.md`). A **plugin** cannot: there is no
-rules component and no `rules` key in `plugin.json`, and a plugin-root `CLAUDE.md` is not
-loaded ([claude-code#21163](https://github.com/anthropics/claude-code/issues/21163)). So
-plugin instruction files still reach Claude only by explicit reference — which 75 skill and
-agent files already do — or by promotion into the plugin's `SessionStart` hook.
+**Neither host applies a glob from inside a plugin.** Claude Code has glob-scoped
+instruction injection — `.claude/rules/<topic>.md` with a `paths:` list — and Copilot has
+`.github/instructions/<topic>.instructions.md` with `applyTo`, but both only at the repository
+level: there is no rules component and no `instructions` key in either manifest, and a
+plugin-root `CLAUDE.md` is not loaded
+([claude-code#21163](https://github.com/anthropics/claude-code/issues/21163)). So a repository
+keeps each rule body in `.agents/rules/<topic>.md` with `name`, `description`, and `paths`, and
+gives it one wrapper per host that carries only the glob; the sync's `-Check` fails when a
+wrapper drifts from its rule. A **plugin** ships no `instructions/` folder at all: shared text
+a skill or agent needs is a contract in `resources/<name>.md` (`name` + `description`, never a
+glob) reached by an explicit path reference — which is what loads it in both hosts — or
+promoted into the plugin's `sessionStart` hook. The convention is
+[.agents/rules/README.md](../../.agents/rules/README.md).
 
 **`handoffs` are invisible to Claude.** Claude ignores the key and delegates from what it
 reads in the prose, so every handoff target must be described in the agent body. The
-generator warns when a declared target is never mentioned there.
+checker fails when a declared target is never mentioned there.
 
 **Internal agents are visible in Claude.** There is no equivalent of Copilot's
 "`agents-internal/` is not exposed directly" convention. Those agents are listed in the
@@ -309,17 +309,19 @@ agents translated from `vscode/askQuestions` cannot prompt when run in the backg
 
 ## Linting
 
-Beyond generating, the script fails the build on problems a script must not fix by itself:
+`node tools/check-assets.mjs` fails on problems a script must not fix by itself:
 
-- an agent with no `description`
-- a `model` value Claude would reject
-- a tools list that resolves to nothing for either host
-- an unmapped Copilot tool id
+- name, version, or description disagreeing across a plugin's manifests, its marketplace
+  entry, and its `copilot-plugins.md` row
+- an agent with no `description`, a `model` value Claude would reject, a tools list missing
+  `Skill`, a Claude tool the map does not derive or one it derives that is absent, an unmapped
+  Copilot tool id, a handoff target the body never names, or a flow-control tool on a
+  specialist
+- a Claude `SessionStart` hook of type `prompt`, or a sidecar that differs from the Copilot
+  `sessionStart` prompt
+- a repository rule whose wrappers drifted, or a wrapper with no rule behind it
+- a `resources/` contract with `applyTo` or `paths`, or a plugin with an `instructions/` folder
 
-and warns on:
-
-- a handoff target the agent body never mentions
-- Copilot tool ids left in agent **prose**, which it never rewrites. Currently two:
-  `plugins/csharp-coding/agents/coding.agent.md` (`web/fetch`) and
-  `plugins/development/agents-internal/development-plan.agent.md` (`vscode/askQuestions`,
-  `edit/createFile`).
+and reports, without failing, every asset over its body budget (`--budgets` lists them).
+Copilot tool ids left in agent **prose** are not checked — currently one:
+`plugins/csharp-coding/agents/coding.agent.md` (`web/fetch`).

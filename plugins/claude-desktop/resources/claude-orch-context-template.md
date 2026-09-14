@@ -5,7 +5,6 @@ Copy this file to `.claude/orch-context.md` in your repository and fill it in.
 The file is optional; delete any section that does not apply.
 Never put actual secrets here — `## Test Credentials` takes a pointer only.
 Never pin a model here — model choice is personal and never comes from the repository.
-Convention: plugins/claude-desktop/instructions/orch-repo-context.instructions.md
 -->
 
 ## Application
@@ -61,7 +60,7 @@ aspire start
 
 ## Repo-Native Orchestration Skills
 
-<!-- Optional. Omit this section when the repo defines no orch-* skills of its own. -->
+<!-- Optional. Omit this section when the repo defines no flow skills of its own. -->
 
 - `orch-backlog` — backlog and work-item orchestration for this repo.
 - `orch-domain` — domain model and ubiquitous language changes.

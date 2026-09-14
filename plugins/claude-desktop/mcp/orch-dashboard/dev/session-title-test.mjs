@@ -32,6 +32,8 @@ const edit = (file_path) => ({ toolName: "Edit", input: { file_path } });
 console.log("— destination to prefix —");
 check("knowledge folder wins its own prefix", await titleFor("Add Fulfilment aggregate", [write(".domain/order-management/domain.md")]), "domain:order-management — Add Fulfilment aggregate");
 check("arc42", await titleFor("Runtime view refresh", [write(".arc42/06-runtime-view.md")]), "arc42 — Runtime view refresh");
+check("nested devbook layout folds onto the flat one", await titleFor("Runtime view refresh", [write(".devbook/arc42/06-runtime-view.md")]), "arc42 — Runtime view refresh");
+check("nested devbook domain names its context", await titleFor("Add Fulfilment aggregate", [write(".devbook/domain/order-management/domain.md")]), "domain:order-management — Add Fulfilment aggregate");
 check("tech", await titleFor("Pin Aspire 9", [edit(".tech/backend.md")]), "tech — Pin Aspire 9");
 check("design", await titleFor("Dense table tokens", [edit(".design/color-scheme.md")]), "design — Dense table tokens");
 check("backlog", await titleFor("Split checkout epic", [edit(".backlog/epic-checkout.md")]), "backlog — Split checkout epic");

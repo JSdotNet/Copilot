@@ -51,8 +51,7 @@ for a user- or session-scoped install without going through `copilot plugin inst
   also accepts `content`/`title` directly to render on first open in a single call.
 - `get_state` and `clear` are also available.
 
-See each plugin's `instructions/common/canvas-usage.instructions.md` (or
-`instructions/canvas-usage.instructions.md` where the plugin has no `common/` folder) for
+See `plugins/copilot-app/resources/canvas-usage.md` for
 the policy on when skills should prefer opening a canvas over emitting Markdown-only
 output.
 

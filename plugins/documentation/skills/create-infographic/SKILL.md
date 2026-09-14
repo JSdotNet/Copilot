@@ -38,7 +38,7 @@ Ask for the following when not already provided:
 
 Load and apply these files before generating the infographic:
 
-1. `instructions/documentation/infographics.instructions.md`
+1. `resources/infographics.md`
 2. `resources/infographics/svg-style-guide.md`
 3. `resources/infographics/renderer-and-layout-guide.md`
 
@@ -107,11 +107,3 @@ Load and apply these files before generating the infographic:
   - selected layout pattern
   - any missing facts captured as TODOs
   - whether motion was included
-
-## Quality Checks
-
-- The infographic has one clear primary message.
-- Facts and labels stay faithful to the source.
-- The SVG is self-contained and accessible.
-- Style-guide rules or fallback style tokens are applied consistently.
-- Motion, if used, is subtle and non-essential.

@@ -19,7 +19,7 @@ Use when the user needs to define integration contracts, design event flows betw
 
 ## Workflow
 
-1. Apply `instructions/ddd/ddd-global-instructions.md` and `instructions/ddd/strategic-design-instructions.md`.
+1. Apply `resources/ddd-global.md` and `resources/strategic-design.md`.
 2. For each relationship on the context map, design the interaction:
    - **Shared Kernel** — document the shared model subset, ownership rules, and change protocol.
    - **Customer-Supplier** — define the upstream API contract, downstream expectations, and negotiation process.
@@ -34,18 +34,10 @@ Use when the user needs to define integration contracts, design event flows betw
    - **Data contract** — what data crosses the boundary and in what shape.
    - **Failure handling** — what happens when the interaction fails (retry, compensating action, circuit breaker).
 4. Produce interaction diagrams using Mermaid sequence or flowchart syntax. Use skill `domain-interaction-diagram` for detailed diagram generation.
-5. Update bounded context files with integration contracts following `instructions/output/domain-documentation-structure-instructions.md`.
+5. Update bounded context files with integration contracts following `resources/domain-documentation-structure.md`.
 
 ## Output
 
 - Updated bounded context files with Integration Contracts sections.
 - Interaction diagrams (Mermaid) produced by skill `domain-interaction-diagram`.
 - Anti-corruption layer mapping tables where applicable.
-
-## Quality Checks
-
-- Every cross-context interaction has a defined direction, mechanism, and failure handling.
-- Anti-corruption layers have explicit translation mappings.
-- No bounded context exposes its internal model directly to another context.
-- Integration events use past-tense naming and carry only necessary data.
-- Communication patterns are appropriate for the consistency requirements (synchronous for immediate consistency, asynchronous for eventual consistency).

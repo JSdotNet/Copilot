@@ -255,8 +255,8 @@ settled.
 - `pr-review-architecture`, `pr-review-domain`, `pr-review-story` — produce the remarks this
   skill answers.
 - `pr-remarks-review` (plugin: `review`) — triage-and-draft only; no push, no reply.
-- `fix-pr-checks` (plugin: `claude-desktop`) — failing checks rather than review remarks.
-- `update-pr-branch` (plugin: `claude-desktop`) — conflicts or an out-of-date base.
+- `fix-pr-checks` (plugin: `delivery`, from the `jsdotnet` marketplace) — failing checks rather than review remarks.
+- `update-pr-branch` (plugin: `delivery`, from the `jsdotnet` marketplace) — conflicts or an out-of-date base.
 
 ## Notes
 

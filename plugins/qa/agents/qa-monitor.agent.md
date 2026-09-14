@@ -56,7 +56,7 @@ checkpoints to be communicated to it (see [Coordination](#coordination)).
 
 ## Mandatory Instruction Enforcement
 
-- Always load and apply `.github/copilot-instructions.md` and any relevant path-based instruction files.
+- Always load and apply the repository's root instruction file (`AGENTS.md`, or `.github/copilot-instructions.md`) and any relevant path-based instruction files.
 
 ## Required Access
 
@@ -159,5 +159,5 @@ Produce a summary containing:
 
 ## References
 
-- `.github/copilot-instructions.md`
+- The repository's root instruction file: `AGENTS.md`, or `.github/copilot-instructions.md`
 - `plugins/qa/skills/aspire-log-monitor/SKILL.md`

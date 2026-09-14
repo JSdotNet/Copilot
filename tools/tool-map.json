@@ -1,0 +1,156 @@
+{
+  "$comment": [
+    "Translation table node tools/check-assets.mjs uses to verify an agent's tools list: the",
+    "Copilot tool ids the author wrote, followed by the Claude Code names they translate to.",
+    "The list is hand-authored; the checker fails on a Claude entry the map does not derive",
+    "from the Copilot ids, or on one it derives that is missing.",
+    "",
+    "'tools' maps a Copilot/VS Code tool id to zero or more Claude Code tool names. An empty",
+    "array means the capability has no Claude equivalent; the reason is in 'dropReasons'.",
+    "",
+    "'mcpPrefixes' matches tool ids by prefix and maps them to the MCP server that provides",
+    "them. The server must be declared in the plugin's own Claude manifest. An agent grants",
+    "the whole server, in both spellings:",
+    "  mcp__plugin_<plugin>_<server>   the plugin-provided server, namespaced by its plugin",
+    "  mcp__<server>                   the same server registered directly in a .mcp.json",
+    "Both are listed because the prefix depends on how the server was registered, and a",
+    "'tools' allowlist is matched against the exact runtime names. Granting the server rather",
+    "than a list of tool names also keeps the allowlist working when the server renames its",
+    "tools - which is not hypothetical: the Aspire MCP server's get_* tools became list_*.",
+    "",
+    "This file is hand-maintained. When a new Copilot tool id appears in an agent, the",
+    "checker fails with 'not in tools/tool-map.json' rather than guessing - add the mapping here."
+  ],
+  "alwaysInclude": [
+    "Skill"
+  ],
+  "$alwaysIncludeComment": "Copilot exposes plugin skills to agents implicitly; Claude requires the Skill tool to be listed.",
+  "tools": {
+    "read/readFile": [
+      "Read"
+    ],
+    "vscode/openFile": [
+      "Read"
+    ],
+    "search": [
+      "Grep",
+      "Glob"
+    ],
+    "search/codebase": [
+      "Grep",
+      "Glob"
+    ],
+    "search/textSearch": [
+      "Grep"
+    ],
+    "search/searchResults": [
+      "Grep"
+    ],
+    "search/usages": [
+      "Grep"
+    ],
+    "search/fileSearch": [
+      "Glob"
+    ],
+    "search/findTestFiles": [
+      "Glob"
+    ],
+    "search/listDirectory": [
+      "Glob"
+    ],
+    "search/changes": [
+      "Bash"
+    ],
+    "edit/createFile": [
+      "Write"
+    ],
+    "edit/editFiles": [
+      "Edit"
+    ],
+    "terminal/runInTerminal": [
+      "Bash"
+    ],
+    "execute/createAndRunTask": [
+      "Bash"
+    ],
+    "web/fetch": [
+      "WebFetch",
+      "WebSearch"
+    ],
+    "agent": [
+      "Agent"
+    ],
+    "vscode/askQuestions": [
+      "AskUserQuestion"
+    ],
+    "vscode/memory": [],
+    "extensions_manage": [],
+    "extensions_reload": [],
+    "list_canvas_capabilities": [],
+    "open_canvas": [],
+    "invoke_canvas_action": [],
+    "list_projects": [
+      "Agent"
+    ],
+    "create_session": [
+      "Agent"
+    ],
+    "send_session_message": [
+      "SendMessage"
+    ],
+    "list_sessions_and_chats": [
+      "Agent"
+    ],
+    "get_session": [
+      "SendMessage"
+    ],
+    "respond_to_session_plan": [
+      "SendMessage"
+    ]
+  },
+  "mcpPrefixes": {
+    "aspire_": "aspire",
+    "doctor": "aspire",
+    "list_apphosts": "aspire",
+    "select_apphost": "aspire",
+    "list_resources": "aspire",
+    "list_console_logs": "aspire",
+    "list_structured_logs": "aspire",
+    "list_traces": "aspire",
+    "list_trace_structured_logs": "aspire",
+    "execute_resource_command": "aspire",
+    "get_resources": "aspire",
+    "get_resource_logs": "aspire",
+    "get_traces": "aspire",
+    "get_metrics": "aspire",
+    "get_console_logs": "aspire",
+    "browser_": "playwright",
+    "playwright-browser_": "playwright"
+  },
+  "$mcpPrefixesComment": [
+    "The Aspire MCP server renamed its query tools from get_* to list_* (and dropped metrics",
+    "entirely). Both spellings are mapped: the current list_* names, and the get_* names that",
+    "an older Aspire CLI still exposes. Neither host errors on an id it cannot resolve, so an",
+    "agent may declare both and keep working across CLI versions."
+  ],
+  "dropReasons": {
+    "vscode/memory": "VS Code workspace memory has no Claude Code equivalent; Claude uses CLAUDE.md and the memory directory instead.",
+    "extensions_manage": "Copilot CLI extension management API; no Claude Code equivalent.",
+    "extensions_reload": "Copilot CLI extension management API; no Claude Code equivalent.",
+    "list_canvas_capabilities": "Copilot canvas extension API; no Claude Code equivalent (nearest analogue is Artifact).",
+    "open_canvas": "Copilot canvas extension API; no Claude Code equivalent (nearest analogue is Artifact).",
+    "invoke_canvas_action": "Copilot canvas extension API; no Claude Code equivalent (nearest analogue is Artifact)."
+  },
+  "models": {
+    "GPT-5.3-Codex": "opus",
+    "claude-haiku-4.5": "haiku",
+    "claude-sonnet-4.5": "sonnet",
+    "claude-opus-4.5": "opus"
+  },
+  "$modelsComment": [
+    "Copilot pins concrete model names; Claude Code takes an alias (opus/sonnet/haiku/fable),",
+    "a full model id, or 'inherit'. GPT-5.3-Codex was chosen in the Copilot agents as the",
+    "strong coding model, so it maps to 'opus'. Agents with no model pin get no model field,",
+    "which defaults to 'inherit'."
+  ]
+}
