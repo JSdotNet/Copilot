@@ -51,13 +51,13 @@
       "name": "github",
       "source": "./plugins/github",
       "description": "Copilot plugin for GitHub platform workflows — issue sync, pull requests, GitHub Actions CI/CD, and Dependabot configuration.",
-      "version": "0.1.0"
+      "version": "0.2.0"
     },
     {
       "name": "jira",
       "source": "./plugins/jira",
       "description": "Copilot plugin for Jira issue synchronization workflows. Creates and updates Jira issues from approved Markdown backlog artifacts.",
-      "version": "0.1.0"
+      "version": "0.2.0"
     },
     {
       "name": "product-owner",
@@ -99,7 +99,7 @@
       "name": "wip-convention",
       "source": "./plugins/wip-convention",
       "description": "Encapsulates the .wip folder convention for storing work-in-progress artifacts. Provides skills and instructions to align agents with the .wip workflow.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     }
   ]
 }
