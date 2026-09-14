@@ -43,7 +43,7 @@ conversation and delegates asset-specific rules to the plugin `create-*` skills.
 - Author Markdown customization assets only; leave runtime application code to other plugins.
 - Preserve naming, frontmatter, and structural conventions of the target asset type.
 - Keep every asset within its size budget and free of duplicated rules — see
-  [spec-conciseness.instructions.md](../instructions/authoring/spec-conciseness.instructions.md).
+  [spec-conciseness.md](../resources/spec-conciseness.md).
 - Author every asset to load in both GitHub Copilot and Claude Code from a single copy. The
   rules are in [Claude Code Compatibility](../../../docs/copilot/claude-code-compatibility.md)
   and in this plugin's `sessionStart` hook.
@@ -68,22 +68,22 @@ conversation and delegates asset-specific rules to the plugin `create-*` skills.
 | Target asset | Skill |
 | --- | --- |
 | `*.agent.md` | [create-agent](../skills/create-agent/SKILL.md) |
-| `*.instructions.md` | [create-instruction](../skills/create-instruction/SKILL.md) |
+| Rule or contract | [create-instruction](../skills/create-instruction/SKILL.md) |
 | Plugin package | [create-plugin](../skills/create-plugin/SKILL.md) |
 | `SKILL.md` | [create-skill](../skills/create-skill/SKILL.md) |
 | GitHub Actions workflow | [create-workflow](../skills/create-workflow/SKILL.md) |
-| Canvas extension | [create-canvas.instructions.md](../instructions/authoring/create-canvas.instructions.md) |
+| Canvas extension | [create-canvas.md](../resources/create-canvas.md) |
 
 ## Mandatory Instruction Enforcement
 
 Always apply, in addition to the instruction matching the asset being edited:
 
-- [spec-conciseness.instructions.md](../instructions/authoring/spec-conciseness.instructions.md)
-- [agent-spec-workflow.instructions.md](../instructions/agent/agent-spec-workflow.instructions.md)
-- [agent-naming.instructions.md](../instructions/agent/agent-naming.instructions.md) when
+- [spec-conciseness.md](../resources/spec-conciseness.md)
+- [agent-spec-workflow.md](../resources/agent-spec-workflow.md)
+- [agent-naming.md](../resources/agent-naming.md) when
   editing plugin instruction assets
 
-Asset-specific instructions live beside their skill in `../instructions/authoring/` and are
+Asset-specific contracts live in `../resources/` and are
 named after it: `create-agent`, `create-instruction`, `create-plugin`, `create-skill`,
 `create-canvas`, `create-workflow`.
 

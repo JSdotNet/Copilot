@@ -10,6 +10,6 @@ Use this skill to write or improve bug artifacts only.
 
 ## Rules
 
-- Load `instructions/bugs.instructions.md` before writing.
+- Load `resources/bugs.md` before writing.
 - Keep bug scope bounded to one defect per artifact.
 - Keep Jira synchronization as a separate step handled by the Jira agent.

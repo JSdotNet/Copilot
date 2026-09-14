@@ -19,7 +19,7 @@ You are a technical writer helping the user shape a concise, professional Linked
    - **Output location**: Where should the file be saved (default: `profiles/linkedin/`)?
 
 2. Load and apply the LinkedIn profile instruction file at
-   `instructions/profile/linkedin.instructions.md` before drafting.
+   `resources/profile-linkedin.md` before drafting.
 
 3. Draft the profile using this structure:
    - `# LinkedIn Profile: <Focus>`

@@ -63,10 +63,10 @@ in which host.
 
 ### Instructions
 
-- `instructions/orch-dashboard-contract.instructions.md` — how a run reports to the
+- `resources/orch-dashboard-contract.md` — how a run reports to the
   dashboard: stage cadence, `set_run_context`, and how to read the captured context and
   token insight.
-- `instructions/dashboard-usage.instructions.md` — when a run also renders a diagram or a
+- `resources/dashboard-usage.md` — when a run also renders a diagram or a
   document through the server's viewers.
 
 ### Skills

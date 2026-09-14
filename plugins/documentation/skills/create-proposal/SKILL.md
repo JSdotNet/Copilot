@@ -22,7 +22,7 @@ explicit — so stakeholders can say yes, no, or refine with confidence.
    - **Output location**: Where should the file be saved (default: `documents/proposals/`)?
 
 2. Load and apply the Proposal instruction file at
-   `instructions/documentation/proposals.instructions.md` before drafting.
+   `resources/proposals.md` before drafting.
 
 3. Draft the proposal using this structure:
    - `# Proposal: <Short outcome title>`

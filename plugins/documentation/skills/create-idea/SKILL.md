@@ -20,7 +20,7 @@ just enough structure to evaluate and refine them — without over-engineering t
    - **Output location**: Where should the file be saved (default: `documents/ideas/`)?
 
 2. Load and apply the Idea instruction file at
-   `instructions/documentation/ideas.instructions.md` before drafting.
+   `resources/ideas.md` before drafting.
 
 3. Draft the idea using this structure:
    - `# Idea: <Working title>`

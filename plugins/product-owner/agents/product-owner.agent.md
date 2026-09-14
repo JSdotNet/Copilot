@@ -55,10 +55,10 @@ If a request involves GitHub issue creation, GitHub issue updates, or GitHub iss
 use the `create-github-issue` or `update-github-issue` skills from the `github` plugin when installed.
 
 ### Available Instruction Files
-- [Story instructions](../instructions/stories.instructions.md)
-- [Epic instructions](../instructions/epics.instructions.md)
-- [Bug instructions](../instructions/bugs.instructions.md)
-- [Markdown instructions](../instructions/markdown.instructions.md)
+- [Story instructions](../resources/stories.md)
+- [Epic instructions](../resources/epics.md)
+- [Bug instructions](../resources/bugs.md)
+- [Markdown instructions](../resources/markdown.md)
 
 ### Available Skills
 - [Write Story](../skills/write-story/SKILL.md)

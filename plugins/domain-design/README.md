@@ -2,7 +2,7 @@
 
 Domain-Driven Design: bounded contexts, ubiquitous language, domain models, and context maps. Fills the `domain` role a flow consults, and is usable on its own.
 
-Writes to the repository's `.domain/` knowledge folder when it has one, following that folder's own structure and metadata rules; otherwise it follows `instructions/output/domain-documentation-structure-instructions.md`.
+Writes to the repository's domain devbook folder when it has one — `.domain/` at the root, or `.devbook/domain/` — following that folder's own structure and metadata rules; otherwise it follows `resources/domain-documentation-structure.md`.
 
 ## Includes
 
@@ -18,11 +18,11 @@ Writes to the repository's `.domain/` knowledge folder when it has one, followin
   - `skills/domain-interaction-diagram/SKILL.md`
   - `skills/subdomain-landscape-diagram/SKILL.md`
 - Instructions:
-  - `instructions/ddd/ddd-global-instructions.md`
-  - `instructions/ddd/strategic-design-instructions.md`
-  - `instructions/ddd/tactical-design-instructions.md`
-  - `instructions/diagrams/ddd-diagram-instructions.md`
-  - `instructions/output/domain-documentation-structure-instructions.md`
+  - `resources/ddd-global.md`
+  - `resources/strategic-design.md`
+  - `resources/tactical-design.md`
+  - `resources/ddd-diagram.md`
+  - `resources/domain-documentation-structure.md`
 - Resources:
   - `resources/ddd-checklist.md`
   - `resources/ddd-anti-patterns.md`

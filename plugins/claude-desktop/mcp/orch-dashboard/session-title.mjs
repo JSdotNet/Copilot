@@ -23,8 +23,20 @@ const FOLDER_PREFIXES = [
     [".arc42", "arc42"],
     [".tech", "tech"],
     [".design", "design"],
+    [".ai", "ai"],
     [".backlog", "backlog"],
 ];
+
+// The devbook convention keeps its folders either flat at the root (`.arc42/`) or nested under
+// `.devbook/` (`.devbook/arc42/`). Both spell the same folder, so the nested form is folded
+// onto the flat one before any prefix or boundary lookup.
+const DEVBOOK_ROOT = ".devbook";
+function foldDevbook(segments) {
+    if (segments.length > 1 && segments[0] === DEVBOOK_ROOT) {
+        return [`.${segments[1]}`, ...segments.slice(2)];
+    }
+    return segments;
+}
 
 const DOMAIN_PREFIX = "domain";
 const CODE_PREFIX = "code";
@@ -64,7 +76,7 @@ function toSegments(filePath, cwd) {
             return null;
         }
     }
-    const segments = normalized.split("/").filter((s) => s && s !== ".");
+    const segments = foldDevbook(normalized.split("/").filter((s) => s && s !== "."));
     return segments.length ? segments : null;
 }
 
@@ -110,12 +122,15 @@ async function knownContexts(run, cwd) {
     if (Array.isArray(destinations.contexts)) return destinations.contexts;
     let contexts = [];
     if (typeof cwd === "string" && cwd) {
-        try {
-            const entries = await readdir(path.join(cwd, ".domain"), { withFileTypes: true });
-            contexts = entries.filter((e) => e.isDirectory() && !e.name.startsWith("_")).map((e) => e.name);
-        } catch {
-            // No `.domain` folder, or unreadable. Boundaries simply stay unresolved.
-            contexts = [];
+        for (const folder of [".domain", path.join(DEVBOOK_ROOT, "domain")]) {
+            try {
+                const entries = await readdir(path.join(cwd, folder), { withFileTypes: true });
+                contexts = entries.filter((e) => e.isDirectory() && !e.name.startsWith("_")).map((e) => e.name);
+                break;
+            } catch {
+                // Not this spelling, or unreadable. Try the other; boundaries stay unresolved otherwise.
+                contexts = [];
+            }
         }
     }
     destinations.contexts = contexts;

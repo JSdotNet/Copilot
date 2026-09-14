@@ -26,7 +26,7 @@ Use when the user asks to:
 
 ## Workflow
 
-1. Load `instructions/sequence/sequence-global-instructions.md`.
+1. Load `resources/sequence-global.md`.
 2. Confirm the scenario name, participants, and message flow with the user.
 3. Load `skills/sequence-diagram-generator/prompts/sequence-diagram.prompt.md`.
 4. Ask focused clarifying questions only for missing ordering decisions or error paths.

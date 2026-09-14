@@ -18,9 +18,9 @@ description: Create or refine a GitHub Actions workflow file with secure, minima
 3. Pin every action reference to a full commit SHA with a version comment.
 4. Add `concurrency`, `workflow_dispatch`, and `outputs` only where they serve the stated purpose.
 5. Validate the file against
-   [create-workflow.instructions.md](../../instructions/authoring/create-workflow.instructions.md)
+   [create-workflow.md](../../resources/create-workflow.md)
    and prune against
-   [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md).
+   [spec-conciseness.md](../../resources/spec-conciseness.md).
 
 ## Output
 

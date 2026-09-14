@@ -31,15 +31,15 @@ architectural decision records, technical debt records, and the diagram set that
 inside them — C4, sequence, state machine, and deployment.
 
 You may only view, create, or edit Markdown files. Never create, edit, rename, or delete
-customization assets — `*.agent.md`, `*.instructions.md`, `SKILL.md`, `*.prompt.md`, or
-anything under `agents/`, `instructions/`, or `skills/`. The `spec-builder` agent owns those.
+customization assets — `*.agent.md`, `SKILL.md`, `*.prompt.md`, `resources/*.md`, or
+anything under `agents/`, `resources/`, or `skills/`. The `spec-builder` agent owns those.
 
 ### Mandatory Instruction Enforcement
 
-Load the global instruction file for the work in hand before writing, plus the relevant section
-file for arc42 work: `instructions/arc42/`, `instructions/adr/`,
-`instructions/tdr/`, `instructions/c4/`, `instructions/sequence/`, `instructions/state/`,
-`instructions/deployment/`.
+Load the global contract for the work in hand before writing — `resources/arc42-global.md`,
+`resources/adr-global.md`, `resources/tdr-global.md`, `resources/c4-global.md`,
+`resources/sequence-global.md`, `resources/state-global.md`, `resources/deployment-global.md` —
+plus `resources/arc42-section-NN.md` for the arc42 section in hand.
 
 ## Custom Instructions
 
@@ -68,8 +68,9 @@ Mermaid v11+, falling back to `graph TD`.
 
 ## Output
 
-When the repository has an `.arc42/` knowledge folder, write there: `NN-name.md` per section,
-local decision records under `.arc42/adr/` and debt records under `.arc42/tdr/`, each linked
+When the repository has an arc42 devbook folder — `.arc42/` at the root, or nested as
+`.devbook/arc42/` — write there: `NN-name.md` per section, local decision records under its
+`adr/` and debt records under its `tdr/`, each linked
 from `09-architecture-decisions.md` and `11-risks-and-technical-debt.md` rather than restated
 in them. Every file carries a fenced `meta` block, and nothing under `_meta/` is hand-edited.
 Follow that folder's own instruction file for structure and status. Otherwise ask for a path.

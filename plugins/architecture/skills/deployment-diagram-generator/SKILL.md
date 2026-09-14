@@ -27,7 +27,7 @@ Use when the user asks to:
 
 ## Workflow
 
-1. Load `instructions/deployment/deployment-global-instructions.md`.
+1. Load `resources/deployment-global.md`.
 2. Confirm environment, cloud provider, and key infrastructure nodes with the user.
 3. Load `skills/deployment-diagram-generator/prompts/deployment-diagram.prompt.md`.
 4. Ask focused clarifying questions only for missing network zones, protocols, or scaling details.

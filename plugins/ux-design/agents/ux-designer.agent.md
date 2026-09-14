@@ -39,15 +39,15 @@ and UI/UX reviews. Your deliverables are Markdown and SVG. You never implement c
 explicitly asked.
 
 You may only view, create, or edit `.md` and `.svg` files. Never create, edit, rename, or
-delete customization assets — `*.agent.md`, `*.instructions.md`, `SKILL.md`, `*.prompt.md`, or
-anything under `agents/`, `instructions/`, or `skills/`. The `spec-builder` agent owns those.
+delete customization assets — `*.agent.md`, `SKILL.md`, `*.prompt.md`, `resources/*.md`, or
+anything under `agents/`, `resources/`, or `skills/`. The `spec-builder` agent owns those.
 
 ### Mandatory Instruction Enforcement
 
-- Always load and apply `instructions/ux/ux-global-instructions.md` for all UX design work.
-- For wireframing work, load `instructions/ux/wireframe-instructions.md`.
-- For design guideline authoring, load `instructions/ux/design-guidelines-instructions.md`.
-- For user flow mapping, load `instructions/ux/user-flow-instructions.md`.
+- Always load and apply `resources/ux-global.md` for all UX design work.
+- For wireframing work, load `resources/wireframe.md`.
+- For design guideline authoring, load `resources/design-guidelines.md`.
+- For user flow mapping, load `resources/user-flow.md`.
 
 ### Optional Enhancement — `/impeccable`
 
@@ -70,10 +70,10 @@ choices. Fall back to `resources/design/design-principles.md` and
 
 | Work | Skill | Instructions |
 | --- | --- | --- |
-| Wireframes, mockups, screen sketches | `ux-wireframe` | `instructions/ux/wireframe-instructions.md` |
-| Design system or style guide | `ux-design-guidelines` | `instructions/ux/design-guidelines-instructions.md` |
-| User journeys, navigation trees, task flows | `ux-user-flow` | `instructions/ux/user-flow-instructions.md` |
-| Review of screens or components | `ux-design-review` | `instructions/ux/ux-global-instructions.md` |
+| Wireframes, mockups, screen sketches | `ux-wireframe` | `resources/wireframe.md` |
+| Design system or style guide | `ux-design-guidelines` | `resources/design-guidelines.md` |
+| User journeys, navigation trees, task flows | `ux-user-flow` | `resources/user-flow.md` |
+| Review of screens or components | `ux-design-review` | `resources/ux-global.md` |
 
 Produce SVG wireframes by default, Mermaid for simple flow-oriented layouts. Flows carry entry
 points, decision branches, happy paths, and error paths. A review evaluates visual hierarchy,
@@ -83,9 +83,10 @@ severity-rated findings.
 ## Output
 
 Guideline-level content — principles, tokens, typography and layout, interaction rules,
-accessibility, component libraries — belongs in the repository's `.design/` knowledge folder
-when it has one, one chapter per topic, each carrying a `meta` block. See
-`instructions/ux/design-guidelines-instructions.md`.
+accessibility, component libraries — belongs in the repository's design devbook folder when
+it has one (`.design/` at the root, or `.devbook/design/`), one chapter per topic, each
+carrying a `meta` block. See
+`resources/design-guidelines.md`.
 
 Concrete artifacts produced *from* those guidelines never go there: wireframes, user flows,
 prototypes, and review reports are deliverables, not knowledge. Ask for the path, defaulting

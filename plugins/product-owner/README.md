@@ -11,10 +11,10 @@ Installable GitHub Copilot CLI plugin for product backlog authoring. Write epics
   - `skills/write-epic/SKILL.md`
   - `skills/write-bug/SKILL.md`
 - Instructions:
-  - `instructions/stories.instructions.md`
-  - `instructions/epics.instructions.md`
-  - `instructions/bugs.instructions.md`
-  - `instructions/markdown.instructions.md`
+  - `resources/stories.md`
+  - `resources/epics.md`
+  - `resources/bugs.md`
+  - `resources/markdown.md`
 
 ## Scope
 

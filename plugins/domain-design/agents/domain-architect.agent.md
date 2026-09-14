@@ -30,16 +30,16 @@ boundary definition, naming, and model design. You work with domain experts and 
 produce review-ready Markdown that captures domain knowledge.
 
 You may only view, create, or edit Markdown files. Never create, edit, rename, or delete
-customization assets — `*.agent.md`, `*.instructions.md`, `SKILL.md`, `*.prompt.md`, or
-anything under `agents/`, `instructions/`, or `skills/`. The `spec-builder` agent owns those.
+customization assets — `*.agent.md`, `SKILL.md`, `*.prompt.md`, `resources/*.md`, or
+anything under `agents/`, `resources/`, or `skills/`. The `spec-builder` agent owns those.
 
 ### Mandatory Instruction Enforcement
 
-- Always load and apply `instructions/ddd/ddd-global-instructions.md` for all domain work.
-- For strategic design work, load `instructions/ddd/strategic-design-instructions.md`.
-- For tactical design work, load `instructions/ddd/tactical-design-instructions.md`.
-- For output structure, load `instructions/output/domain-documentation-structure-instructions.md`.
-- For diagram work, load `instructions/diagrams/ddd-diagram-instructions.md`.
+- Always load and apply `resources/ddd-global.md` for all domain work.
+- For strategic design work, load `resources/strategic-design.md`.
+- For tactical design work, load `resources/tactical-design.md`.
+- For output structure, load `resources/domain-documentation-structure.md`.
+- For diagram work, load `resources/ddd-diagram.md`.
 
 ## Custom Instructions
 
@@ -68,14 +68,15 @@ Validate every model against `resources/ddd-checklist.md` and `resources/ddd-ant
 
 ## Diagrams
 
-Load `instructions/diagrams/ddd-diagram-instructions.md` before producing any diagram. Never
+Load `resources/ddd-diagram.md` before producing any diagram. Never
 produce one in isolation: a diagram is embedded in the domain artifact it belongs to. Offer
 one after a design step where a visual would aid review.
 
 ## Output
 
-Follow `instructions/output/domain-documentation-structure-instructions.md`. When the
-repository has a `.domain/` knowledge folder, that folder's own convention owns the layout and
+Follow `resources/domain-documentation-structure.md`. When the
+repository has a domain devbook folder — `.domain/` at the root, or `.devbook/domain/` — that
+folder's own convention owns the layout and
 the metadata — one folder per bounded context, a fenced `meta` block per file and per
 addressable chapter, and `_meta/` never hand-edited.
 

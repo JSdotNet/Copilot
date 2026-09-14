@@ -9,15 +9,15 @@ Covers six documentation artifact types and three profile artifact types.
 |---|---|---|
 | Agent | `agents/documentation.agent.md` | Writes all six documentation artifact types |
 | Agent | `agents/profile.agent.md` | Writes GitHub, project, and LinkedIn profile artifacts |
-| Instruction | `instructions/documentation/howto.instructions.md` | How-To writing rules |
-| Instruction | `instructions/documentation/explanations.instructions.md` | Explanation writing rules |
-| Instruction | `instructions/documentation/articles.instructions.md` | Article writing rules |
-| Instruction | `instructions/documentation/ideas.instructions.md` | Idea writing rules |
-| Instruction | `instructions/documentation/proposals.instructions.md` | Proposal writing rules |
-| Instruction | `instructions/documentation/infographics.instructions.md` | SVG infographic authoring rules |
-| Instruction | `instructions/profile/github.instructions.md` | GitHub profile writing rules |
-| Instruction | `instructions/profile/projects.instructions.md` | GitHub project profile writing rules |
-| Instruction | `instructions/profile/linkedin.instructions.md` | LinkedIn profile writing rules |
+| Instruction | `resources/howto.md` | How-To writing rules |
+| Instruction | `resources/explanations.md` | Explanation writing rules |
+| Instruction | `resources/articles.md` | Article writing rules |
+| Instruction | `resources/ideas.md` | Idea writing rules |
+| Instruction | `resources/proposals.md` | Proposal writing rules |
+| Instruction | `resources/infographics.md` | SVG infographic authoring rules |
+| Instruction | `resources/profile-github.md` | GitHub profile writing rules |
+| Instruction | `resources/profile-projects.md` | GitHub project profile writing rules |
+| Instruction | `resources/profile-linkedin.md` | LinkedIn profile writing rules |
 | Skill | `skills/create-howto` | Guided how-to creation workflow |
 | Skill | `skills/create-explanation` | Guided explanation creation workflow |
 | Skill | `skills/create-article` | Guided article creation workflow |
@@ -98,9 +98,10 @@ Each skill asks targeted clarifying questions and then drafts the artifact to yo
 | Project Profile | `profiles/github/projects/` | Project showcase or portfolio-style GitHub project summaries |
 | LinkedIn Profile | `profiles/linkedin/` | LinkedIn headline, about, or profile refresh artifacts |
 
-## Instruction file scope
+## Contract scope
 
-All instruction files use generic `applyTo` globs so they work in any repository layout:
+Each contract in `resources/` governs one artifact family, wherever a repository keeps it —
+the skill that writes the artifact loads the contract by path:
 
 - `**/howto/*.md`
 - `**/explanations/*.md`

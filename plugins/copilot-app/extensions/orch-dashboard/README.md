@@ -192,7 +192,7 @@ worktree** so the change set and evidence paths stay valid. A child session
 genuinely concurrent work such as `qa:qa-monitor`; its evidence must be written
 into — or copied back to — the owner session's **worktree root**, because the
 evidence endpoint refuses any path that resolves outside it. See
-`plugins/copilot-app/instructions/dashboard-contract.instructions.md` for the
+`plugins/copilot-app/resources/dashboard-contract.md` for the
 dashboard reporting contract.
 
 ## Install
@@ -207,8 +207,7 @@ https://github.com/JSdotNet/Copilot/tree/main/plugins/copilot-app/extensions/orc
 
 Choose `project`, `user`, or `session` scope depending on whether you want it
 committed to a repo, available for you across projects, or scoped to one
-session. See `.agents/rules/customization-structure.md`
-for repository-wide customization conventions.
+session. See `.agents/rules/README.md` for repository-wide customization conventions.
 
 Copilot App orchestration agents should inspect and open this dashboard with the
 full plugin provider ID `plugin:copilot-app:orch-dashboard`. Do not use shortened

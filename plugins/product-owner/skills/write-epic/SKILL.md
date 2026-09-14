@@ -10,6 +10,6 @@ Use this skill to write or improve epic artifacts only.
 
 ## Rules
 
-- Load `instructions/epics.instructions.md` before writing.
+- Load `resources/epics.md` before writing.
 - Keep epics outcome-oriented and decomposable into stories.
 - Keep Jira synchronization as a separate step handled by the Jira agent.

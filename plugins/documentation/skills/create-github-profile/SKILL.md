@@ -18,7 +18,7 @@ You are a technical writer helping the user shape a public-facing GitHub profile
    - **Output location**: Where should the file be saved (default: `profiles/github/`)?
 
 2. Load and apply the GitHub profile instruction file at
-   `instructions/profile/github.instructions.md` before drafting.
+   `resources/profile-github.md` before drafting.
 
 3. Draft the profile using this structure:
    - `# <Title>`

@@ -18,7 +18,7 @@ Use after `domain-exploration` or `domain-model-design` has identified commands,
 
 ## Workflow
 
-1. Apply `instructions/ddd/ddd-global-instructions.md` and `instructions/diagrams/ddd-diagram-instructions.md`.
+1. Apply `resources/ddd-global.md` and `resources/ddd-diagram.md`.
 2. Confirm scope with the user:
    - **Single process** — one end-to-end business process (e.g., "Place Order").
    - **Cross-context flow** — events crossing one or more bounded context boundaries.
@@ -27,7 +27,7 @@ Use after `domain-exploration` or `domain-model-design` has identified commands,
    - Identify the actor or external trigger.
    - Trace the chain: actor → command → aggregate → domain event → policy → next command.
    - Mark every bounded context transition with a `Note over` separator.
-4. Produce a Mermaid `sequenceDiagram` per process following `instructions/diagrams/ddd-diagram-instructions.md`:
+4. Produce a Mermaid `sequenceDiagram` per process following `resources/ddd-diagram.md`:
    - Participants: actors, `ContextName::AggregateName` pairs, and named policies.
    - Commands: solid arrows (`->>`).
    - Domain events: dashed arrows (`-->>`).

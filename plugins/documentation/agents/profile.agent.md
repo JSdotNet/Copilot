@@ -31,7 +31,7 @@ handoffs:
 ## Description
 
 This agent partners with the user to craft, refine, and maintain profile content.
-Artifact-specific rules live in `../instructions/profile/*.instructions.md`; always consult the
+Artifact-specific rules live in `../resources/profile-*.md`; always consult the
 relevant file before drafting so structure, tone, and publication guidance stay compliant.
 
 This agent is intentionally scoped to profile content only. If a request falls outside
@@ -60,9 +60,9 @@ caller's decision.
 
 ### Available Instruction Files
 
-- [GitHub profile instructions](../instructions/profile/github.instructions.md)
-- [GitHub project profile instructions](../instructions/profile/projects.instructions.md)
-- [LinkedIn profile instructions](../instructions/profile/linkedin.instructions.md)
+- [GitHub profile instructions](../resources/profile-github.md)
+- [GitHub project profile instructions](../resources/profile-projects.md)
+- [LinkedIn profile instructions](../resources/profile-linkedin.md)
 
 ### Available Skills
 

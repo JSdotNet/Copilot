@@ -16,8 +16,8 @@ Use this skill for iterative arc42 architecture documentation workflows.
 
 ## Workflow
 
-1. Load `instructions/arc42/arc42-global-instructions.md`.
-2. For each target section, load `instructions/arc42/arc42-section-XX-instructions.md`.
+1. Load `resources/arc42-global.md`.
+2. For each target section, load `resources/arc42-section-XX.md`.
 3. Use section prompts from `skills/architecture-arc42-generator/prompts/`.
 4. Draft or update section content with explicit assumptions and decision traceability.
 5. Reconcile cross-section consistency for scope, constraints, risks, and quality goals.

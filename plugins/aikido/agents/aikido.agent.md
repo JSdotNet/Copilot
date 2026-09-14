@@ -173,4 +173,4 @@ Generate the token at: <https://app.aikido.dev/settings/integrations/ide/mcp>
 
 - [Aikido MCP documentation](https://help.aikido.dev/ai-and-dev-tools/aikido-mcp/github-copilot)
 - [Aikido API documentation](https://apidocs.aikido.dev)
-- `.github/copilot-instructions.md`
+- The repository's root instruction file: `AGENTS.md`, or `.github/copilot-instructions.md`

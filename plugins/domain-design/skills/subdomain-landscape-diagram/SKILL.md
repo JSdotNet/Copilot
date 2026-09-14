@@ -18,12 +18,12 @@ Use after `domain-exploration` has produced `domain.md` with a subdomain overvie
 
 ## Workflow
 
-1. Apply `instructions/ddd/ddd-global-instructions.md` and `instructions/diagrams/ddd-diagram-instructions.md`.
+1. Apply `resources/ddd-global.md` and `resources/ddd-diagram.md`.
 2. Read `domain.md` and extract:
    - All subdomains with their type (core, supporting, generic).
    - All bounded contexts and their owning subdomain.
    - Cross-context relationships from the context map (optional).
-3. Build a Mermaid `flowchart TD` with three labelled subgraphs following `instructions/diagrams/ddd-diagram-instructions.md`:
+3. Build a Mermaid `flowchart TD` with three labelled subgraphs following `resources/ddd-diagram.md`:
    - **🎯 Core** — competitive-advantage subdomains.
    - **🔧 Supporting** — necessary but non-differentiating subdomains.
    - **📦 Generic** — commodity subdomains.

@@ -28,14 +28,14 @@ Ask for the following when not already provided:
 - **User goal** — what task is the user completing on this screen?
 - **Key elements** — what UI regions or components must appear?
 - **Design tokens / style guide** — path to project guidelines, if available
-- **Output location** — where should the SVG be saved? (default: `docs/design/wireframes/`; never `.design/`, which is guideline-level only)
+- **Output location** — where should the SVG be saved? (default: `docs/design/wireframes/`; never the design devbook folder, which is guideline-level only)
 
 ## Required Resources
 
 Load and apply before generating:
 
-1. `instructions/ux/ux-global-instructions.md`
-2. `instructions/ux/wireframe-instructions.md`
+1. `resources/ux-global.md`
+2. `resources/wireframe.md`
 3. `resources/wireframe/wireframe-patterns.md`
 
 If a project style guide or design guidelines document exists, load that too.

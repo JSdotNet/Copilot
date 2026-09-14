@@ -32,7 +32,7 @@ for improving quality, maintainability, and performance of .NET solutions.
 
 ## Mandatory Instruction Enforcement
 
-- Always load and apply `.github/copilot-instructions.md` and all relevant path-based instruction files before editing code.
+- Always load and apply the repository's root instruction file (`AGENTS.md`, or `.github/copilot-instructions.md`) and all relevant path-based instruction files before editing code.
 
 ## Scope
 
@@ -55,7 +55,7 @@ When an MCP server is unavailable, fall back to `web/fetch` against `https://lea
 
 ### Write Code
 
-1. Understand the task and load relevant context (`copilot-instructions.md`, project files).
+1. Understand the task and load relevant context (the root instruction file, project files).
 2. Check TFM and C# version from `global.json` or `.csproj`; note nullable status and `Directory.Build.*` files.
 3. Query Microsoft Learn MCP (when available) or official docs for API signatures before implementing unfamiliar APIs.
 4. Write clean, idiomatic C# following project conventions and the `.NET Quick Checklist` below.
@@ -158,4 +158,4 @@ flow's business, not this agent's.
 
 ## References
 
-- `.github/copilot-instructions.md`
+- The repository's root instruction file: `AGENTS.md`, or `.github/copilot-instructions.md`

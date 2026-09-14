@@ -19,14 +19,14 @@ and an arc42 document already carries what a blueprint did.
   - `skills/state-diagram-generator/SKILL.md`
   - `skills/deployment-diagram-generator/SKILL.md`
 - Instructions:
-  - `instructions/adr/adr-global-instructions.md`
-  - `instructions/tdr/tdr-global-instructions.md`
-  - `instructions/c4/c4-global-instructions.md`
-  - `instructions/sequence/sequence-global-instructions.md`
-  - `instructions/state/state-global-instructions.md`
-  - `instructions/deployment/deployment-global-instructions.md`
-  - `instructions/arc42/arc42-global-instructions.md`
-  - `instructions/arc42/arc42-section-01-instructions.md` … `arc42-section-12-instructions.md`
+  - `resources/adr-global.md`
+  - `resources/tdr-global.md`
+  - `resources/c4-global.md`
+  - `resources/sequence-global.md`
+  - `resources/state-global.md`
+  - `resources/deployment-global.md`
+  - `resources/arc42-global.md`
+  - `resources/arc42-section-01.md` … `arc42-section-12-instructions.md`
 
 ## Install
 
@@ -49,9 +49,9 @@ copilot plugin uninstall architecture
 
 ## Output
 
-Writes to the repository's `.arc42/` knowledge folder when it has one — `NN-name.md` per
-section, `.arc42/adr/` and `.arc42/tdr/` for local records — following that folder's own
-structure and metadata rules. Otherwise it asks for a path.
+Writes to the repository's arc42 devbook folder when it has one — `.arc42/` at the root, or
+`.devbook/arc42/` — as `NN-name.md` per section with `adr/` and `tdr/` for local records,
+following that folder's own structure and metadata rules. Otherwise it asks for a path.
 
 ## Relationship To Other Plugins
 

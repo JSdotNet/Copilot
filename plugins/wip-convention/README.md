@@ -29,16 +29,21 @@ Directs agents to use the `.wip` folder convention correctly.
 - Naming conventions
 - Quick reference examples
 
-### Instructions (auto-applied)
+### Quality contracts (`resources/`)
 
-| File | Pattern | Purpose |
+Read by path from the `wip-align` skill. Neither host auto-applies a file from inside a
+plugin, so the skill names the contract for the artifact type it is placing; a repository that
+wants them applied on every matching read copies them into `.agents/rules/` with a wrapper
+per host.
+
+| File | Governs | Purpose |
 |------|---------|---------|
-| `wip-stories.instructions.md` | `.wip/work/*/story-*.md` | Story quality standards |
-| `wip-epics.instructions.md` | `.wip/work/*/epic-*.md` | Epic quality standards |
-| `wip-bugs.instructions.md` | `.wip/work/*/bug-*.md` | Bug quality standards |
-| `wip-ideas.instructions.md` | `.wip/ideas/*.md` | Idea quality standards |
-| `wip-proposals.instructions.md` | `.wip/proposals/*.md` | Proposal quality standards |
-| `wip-confidence.instructions.md` | `.wip/work/**/*.md` | 97% confidence threshold |
+| `wip-stories.md` | `.wip/work/*/story-*.md` | Story quality standards |
+| `wip-epics.md` | `.wip/work/*/epic-*.md` | Epic quality standards |
+| `wip-bugs.md` | `.wip/work/*/bug-*.md` | Bug quality standards |
+| `wip-ideas.md` | `.wip/ideas/*.md` | Idea quality standards |
+| `wip-proposals.md` | `.wip/proposals/*.md` | Proposal quality standards |
+| `wip-confidence.md` | `.wip/work/**/*.md` | 97% confidence threshold |
 
 ### Hook configuration
 
@@ -77,7 +82,7 @@ Or simply mention `.wip` in your request:
 
 ### Create Artifacts
 
-The instructions auto-apply when you create or edit files matching the patterns:
+The `wip-align` skill loads the matching contract when you create or edit files at these paths:
 
 ```bash
 # Stories

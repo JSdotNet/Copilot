@@ -20,7 +20,7 @@ readers with a clear narrative, grounded examples, and actionable takeaways.
    - **Output location**: Where should the file be saved (default: `documents/articles/`)?
 
 2. Load and apply the Article instruction file at
-   `instructions/documentation/articles.instructions.md` before drafting.
+   `resources/articles.md` before drafting.
 
 3. Draft the article using this structure:
    - `# <Title>`

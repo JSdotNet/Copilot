@@ -1,32 +1,33 @@
 ---
 name: create-instruction
-description: Create or refine a .instructions.md file with scoped applyTo rules and actionable standards. Use when authoring or reviewing an instruction file.
+description: Create or refine a rule — a repository rule with one wrapper per host, or a plugin contract in resources/. Use when authoring or reviewing an instruction, rule, or contract file.
 ---
 
 # Create Instruction Skill
 
 ## Inputs
 
-- Target file scope (`applyTo`).
+- Whether the rule serves this repository (path-scoped) or ships inside a plugin (read by path).
 - Desired behavior rules and quality checks.
 - Existing conventions that must be preserved.
 
 ## Workflow
 
-1. Identify the narrowest scope where the instruction should apply.
-2. Draft frontmatter with a specific `applyTo` and `description`.
-3. Draft the rules, then add purpose, examples, and a validation checklist where they change
+1. Decide the home: a repository rule goes to `.agents/rules/<topic>.md` with a `paths` list
+   and a wrapper per host; a plugin contract goes to `resources/<name>.md` with `name` and
+   `description` only. [create-instruction.md](../../resources/create-instruction.md) has both
+   shapes.
+2. Draft the rules, then add purpose, examples, and a validation checklist where they change
    how the rules are applied.
-4. Check existing instruction files for the same rule, and point at the owner instead of
+3. Check existing rules and contracts for the same rule, and point at the owner instead of
    restating it.
-5. Add an explicit path reference from every skill or agent that depends on the file, since
-   a plugin cannot ship `.claude/rules/` and `applyTo` alone does not load it in Claude. In a
-   repository, add a loader per host instead.
-6. Prune against
-   [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md):
-   60-line budget, no rule stated twice.
+4. For a repository rule, write both wrappers with the same globs. For a plugin contract, add
+   an explicit path reference from every skill or agent that depends on it.
+5. Prune against [spec-conciseness.md](../../resources/spec-conciseness.md): 60-line budget,
+   no rule stated twice.
 
 ## Output
 
-- An `.instructions.md` file that passes
-  [create-instruction.instructions.md](../../instructions/authoring/create-instruction.instructions.md).
+- A rule or contract that passes
+  [create-instruction.md](../../resources/create-instruction.md), with its wrappers or its
+  references in the same change.

@@ -108,7 +108,7 @@ called-out) Aspire log/trace review.
 
 ## Mandatory Instruction Enforcement
 
-- Always load and apply `.github/copilot-instructions.md` and any relevant path-based instruction files before validating a change.
+- Always load and apply the repository's root instruction file (`AGENTS.md`, or `.github/copilot-instructions.md`) and any relevant path-based instruction files before validating a change.
 
 ## Required Access
 

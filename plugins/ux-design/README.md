@@ -12,10 +12,10 @@ UX design — wireframes, design guidelines, user flows, and design reviews. Fil
   - `skills/ux-design-guidelines/SKILL.md`
   - `skills/ux-user-flow/SKILL.md`
 - Instructions:
-  - `instructions/ux/ux-global-instructions.md`
-  - `instructions/ux/wireframe-instructions.md`
-  - `instructions/ux/design-guidelines-instructions.md`
-  - `instructions/ux/user-flow-instructions.md`
+  - `resources/ux-global.md`
+  - `resources/wireframe.md`
+  - `resources/design-guidelines.md`
+  - `resources/user-flow.md`
 - Resources:
   - `resources/wireframe/wireframe-patterns.md`
   - `resources/design/design-principles.md`
@@ -78,12 +78,12 @@ Invoke a specific skill to start a guided workflow:
 
 | Artifact | Default Path |
 |---|---|
-| Design guidelines | `.design/` when the repository has it, else `docs/design/` |
+| Design guidelines | `.design/` (or `.devbook/design/`) when the repository has it, else `docs/design/` |
 | Wireframes | `docs/design/wireframes/` |
 | User flows | `docs/design/flows/` |
 | Design reviews | `docs/design/reviews/` |
 
-`.design/` is guideline-level only. Wireframes, flows, and reviews are artifacts produced from
+The design folder is guideline-level only. Wireframes, flows, and reviews are artifacts produced from
 those guidelines and never live there.
 
 ## Relationship to Other Plugins

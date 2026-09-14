@@ -38,7 +38,7 @@ Ask for the following when not already provided:
 
 Load and apply these files before generating the infographic:
 
-1. `instructions/documentation/infographics.instructions.md`
+1. `resources/infographics.md`
 2. `resources/infographics/svg-style-guide.md`
 3. `resources/infographics/renderer-and-layout-guide.md`
 

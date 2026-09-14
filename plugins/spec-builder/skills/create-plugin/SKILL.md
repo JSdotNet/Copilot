@@ -19,7 +19,7 @@ description: Create or refine a Copilot plugin package with valid manifest paths
 3. Update the plugin `README.md` with install and reinstall guidance.
 4. Verify metadata and scope consistency across the manifest, README, and components.
 5. Prune against
-   [spec-conciseness.instructions.md](../../instructions/authoring/spec-conciseness.instructions.md):
+   [spec-conciseness.md](../../resources/spec-conciseness.md):
    state each rule once and point at its owner from everywhere else.
 6. Run `pwsh ./scripts/Sync-ClaudePlugins.ps1` to generate the Claude manifest, hooks, and
    marketplace entry, then `-Check` to confirm the plugin loads in both hosts.
@@ -31,6 +31,6 @@ description: Create or refine a Copilot plugin package with valid manifest paths
 
 ## References
 
-- [create-plugin.instructions.md](../../instructions/authoring/create-plugin.instructions.md)
+- [create-plugin.md](../../resources/create-plugin.md)
 - [Claude Code Compatibility](../../../../docs/copilot/claude-code-compatibility.md) — which
   files are authored, which are generated, and how a Copilot-only plugin is excluded.

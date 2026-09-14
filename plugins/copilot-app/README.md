@@ -23,7 +23,7 @@ marketplace.
 
 - `extensions/orch-dashboard/` - Live progress and output dashboard. See
   `extensions/orch-dashboard/README.md` for the canvas action contract and install
-  instructions; `instructions/dashboard-contract.instructions.md` resolves the provider and
+  instructions; `resources/dashboard-contract.md` resolves the provider and
   sets the reporting cadence a skill follows.
 - `extensions/diagram-canvas/` - Mermaid diagram viewer canvas (`mermaid-diagram`). Installs
   and runs independently of `copilot-app` — see `extensions/diagram-canvas/README.md`.
@@ -31,7 +31,7 @@ marketplace.
   Installs and runs independently of `copilot-app` — see
   `extensions/markdown-canvas/README.md`.
 
-`instructions/canvas-usage.instructions.md` says when a skill opens the content-preview
+`resources/canvas-usage.md` says when a skill opens the content-preview
 canvases alongside the dashboard.
 
 ## Install
@@ -71,8 +71,8 @@ copilot plugin uninstall copilot-app
 
 Updates to skills should follow:
 
+- [Skills](../../.agents/rules/skills.md)
 - [Agent Language and Tone](../../.agents/rules/agent-language-and-tone.md)
-- [Customization Structure](../../.agents/rules/customization-structure.md)
 - [Markdown Guidelines](../../.agents/rules/markdown.md)
 
 ## License

@@ -32,7 +32,7 @@ handoffs:
 
 This agent partners with the user to craft, refine, and maintain documentation content and
 supporting infographic assets. Artifact-specific rules live in
-`instructions/documentation/*.md`; always consult the relevant file before drafting so
+`resources/*.md`; always consult the relevant file before drafting so
 structure, tone, formatting, and visual guidance stay compliant.
 
 This agent is scoped to documentation content only. If a request falls outside the six
@@ -65,12 +65,12 @@ there: whether to hand off is the caller's decision.
 
 ### Available Instruction Files
 
-- [HowTo instructions](../instructions/documentation/howto.instructions.md)
-- [Explanation instructions](../instructions/documentation/explanations.instructions.md)
-- [Article instructions](../instructions/documentation/articles.instructions.md)
-- [Idea instructions](../instructions/documentation/ideas.instructions.md)
-- [Proposal instructions](../instructions/documentation/proposals.instructions.md)
-- [Infographic instructions](../instructions/documentation/infographics.instructions.md)
+- [HowTo instructions](../resources/howto.md)
+- [Explanation instructions](../resources/explanations.md)
+- [Article instructions](../resources/articles.md)
+- [Idea instructions](../resources/ideas.md)
+- [Proposal instructions](../resources/proposals.md)
+- [Infographic instructions](../resources/infographics.md)
 
 ### Available Handoffs
 

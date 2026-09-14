@@ -26,11 +26,11 @@ Use when the user asks to:
 
 ## Workflow
 
-1. Load `instructions/c4/c4-global-instructions.md`.
+1. Load `resources/c4-global.md`.
 2. Identify the required C4 level based on audience and scope.
 3. Load the matching level prompt from `skills/c4-diagram-generator/prompts/`.
 4. Ask focused clarifying questions only for information that is missing or conflicting.
-5. Generate the Mermaid C4 diagram with correct element types and labelled relationships, applying the Color Conventions palette from `instructions/c4/c4-global-instructions.md` via `UpdateElementStyle`.
+5. Generate the Mermaid C4 diagram with correct element types and labelled relationships, applying the Color Conventions palette from `resources/c4-global.md` via `UpdateElementStyle`.
 6. Write a prose summary (3–5 sentences) explaining the diagram's key design decisions.
 7. Add traceability notes linking the diagram to relevant arc42 sections or ADRs.
 8. List open questions or assumptions explicitly.

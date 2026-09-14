@@ -27,7 +27,7 @@ Use when the user asks to:
 
 ## Workflow
 
-1. Load `instructions/state/state-global-instructions.md`.
+1. Load `resources/state-global.md`.
 2. Confirm the entity name, states, and key transitions with the user.
 3. Load `skills/state-diagram-generator/prompts/state-diagram.prompt.md`.
 4. Ask focused clarifying questions only for missing guards, terminal states, or sub-state structure.

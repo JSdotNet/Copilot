@@ -27,14 +27,14 @@ Ask for the following when not already provided:
 - **Starting point** — where does the flow begin?
 - **Goal** — what is the user trying to accomplish?
 - **Key decision points** — are there branching conditions or error paths to include?
-- **Output location** — where should the artifact be saved? (default: `docs/design/flows/`; never `.design/`, which is guideline-level only)
+- **Output location** — where should the artifact be saved? (default: `docs/design/flows/`; never the design devbook folder, which is guideline-level only)
 
 ## Required Resources
 
 Load and apply before generating:
 
-1. `instructions/ux/ux-global-instructions.md`
-2. `instructions/ux/user-flow-instructions.md`
+1. `resources/ux-global.md`
+2. `resources/user-flow.md`
 
 ## Workflow
 

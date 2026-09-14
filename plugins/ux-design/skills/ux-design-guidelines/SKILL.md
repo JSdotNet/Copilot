@@ -28,14 +28,15 @@ Ask for the following when not already provided:
 - **Platform** — web, mobile, or multi-platform?
 - **Scope** — full design system, tokens only, or specific sections to add or update?
 - **Output location** — where should the guidelines be saved? (default: the repository's
-  `.design/` knowledge folder when it has one, else `docs/design/design-guidelines.md`)
+  design devbook folder — `.design/` or `.devbook/design/` — when it has one, else
+  `docs/design/design-guidelines.md`)
 
 ## Required Resources
 
 Load and apply before generating:
 
-1. `instructions/ux/ux-global-instructions.md`
-2. `instructions/ux/design-guidelines-instructions.md`
+1. `resources/ux-global.md`
+2. `resources/design-guidelines.md`
 3. `resources/design/design-principles.md`
 
 ### Optional — `/impeccable`

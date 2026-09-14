@@ -19,7 +19,7 @@ Use when the user needs to design aggregates, entities, value objects, domain ev
 
 ## Workflow
 
-1. Apply `instructions/ddd/ddd-global-instructions.md` and `instructions/ddd/tactical-design-instructions.md`.
+1. Apply `resources/ddd-global.md` and `resources/tactical-design.md`.
 2. Identify **aggregates** within the context:
    - Determine consistency boundaries: what must be immediately consistent in a single transaction?
    - Identify the aggregate root for each aggregate.
@@ -33,7 +33,7 @@ Use when the user needs to design aggregates, entities, value objects, domain ev
 4. Validate the design against `resources/ddd-checklist.md`.
 5. Check for anti-patterns using `resources/ddd-anti-patterns.md`.
 6. Document domain services for logic that spans multiple aggregates or does not belong to a single entity.
-7. Update the bounded context file following `instructions/output/domain-documentation-structure-instructions.md`.
+7. Update the bounded context file following `resources/domain-documentation-structure.md`.
 
 ## Output
 

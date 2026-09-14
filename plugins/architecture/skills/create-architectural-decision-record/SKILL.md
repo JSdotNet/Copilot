@@ -19,7 +19,7 @@ Use when the user requests a decision record for an architectural choice, trade-
 
 ## Workflow
 
-1. Apply `instructions/adr/adr-global-instructions.md`.
+1. Apply `resources/adr-global.md`.
 2. Capture context, problem statement, and decision drivers.
 3. Record selected option and rejected alternatives with rationale.
 4. Document consequences, risks, and rollback/mitigation notes.

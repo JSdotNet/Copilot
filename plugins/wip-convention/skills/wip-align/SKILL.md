@@ -37,6 +37,13 @@ Direct agents to use the `.wip` folder convention correctly when storing work-in
 | Proposal | `.wip/proposals/` | `proposal-<short-title>.md` |
 | Implementation Plan | `.wip/implementation-plans/` | `plan-<feature>.md` |
 
+## Quality Contracts
+
+Load the contract for the artifact type before writing it — nothing applies it for you:
+`resources/wip-stories.md`, `resources/wip-epics.md`, `resources/wip-bugs.md`,
+`resources/wip-ideas.md`, `resources/wip-proposals.md`, and `resources/wip-confidence.md`
+for anything under `.wip/work/`.
+
 ## Naming Conventions
 
 - Use lowercase with hyphens for `<short-title>` (e.g., `story-user-login.md`)
@@ -100,13 +107,13 @@ When handing off work between agents, always:
 .wip/implementation-plans/plan-payment-integration.md
 ```
 
-## Integration with Instructions
+## Contract Map
 
-When you create or edit files in `.wip/`, the corresponding instruction files auto-apply:
+Which contract to load for a path under `.wip/`:
 
-- `.wip/work/*/story-*.md` → Story writing instructions
-- `.wip/work/*/epic-*.md` → Epic writing instructions
-- `.wip/work/*/bug-*.md` → Bug writing instructions
-- `.wip/ideas/*.md` → Idea writing instructions
-- `.wip/proposals/*.md` → Proposal writing instructions
-- `.wip/work/**/*.md` → Confidence threshold (97%) for planning artifacts
+- `.wip/work/*/story-*.md` → `resources/wip-stories.md`
+- `.wip/work/*/epic-*.md` → `resources/wip-epics.md`
+- `.wip/work/*/bug-*.md` → `resources/wip-bugs.md`
+- `.wip/ideas/*.md` → `resources/wip-ideas.md`
+- `.wip/proposals/*.md` → `resources/wip-proposals.md`
+- `.wip/work/**/*.md` → `resources/wip-confidence.md` (97% confidence threshold)

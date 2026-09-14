@@ -20,7 +20,7 @@ the URL instead.
 An MCP server cannot open that URL itself — driving a browser is the host's job — so the
 orchestration instructions tell the agent to hand `dashboardUrl` to the host's in-app
 browser (`preview_start` in Claude Code) rather than only printing it. See **Surfacing the
-Dashboard** in `instructions/orch-dashboard-contract.instructions.md`. That keeps the dashboard
+Dashboard** in `resources/orch-dashboard-contract.md`. That keeps the dashboard
 beside the conversation on hosts without MCP Apps, which is as close to the App surface as
 the HTTP one gets.
 
@@ -211,7 +211,9 @@ rename the session to.
 | `.arc42/**` | `arc42` |
 | `.tech/**` | `tech` |
 | `.design/**` | `design` |
+| `.ai/**` | `ai` |
 | `.backlog/**` | `backlog` |
+| `.devbook/<folder>/**` | the same as `.<folder>/**` — the nested devbook layout folds onto the flat one |
 | anywhere else in the worktree | `code` |
 | published as a Claude Artifact | `artifact` |
 

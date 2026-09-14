@@ -19,7 +19,7 @@ Use when technical debt needs to be captured, prioritized, or tracked for remedi
 
 ## Workflow
 
-1. Apply `instructions/tdr/tdr-global-instructions.md`.
+1. Apply `resources/tdr-global.md`.
 2. Describe the debt item, origin, and affected components.
 3. Record impact across quality attributes, delivery, and operations.
 4. Assign severity, owner, and target remediation window.
