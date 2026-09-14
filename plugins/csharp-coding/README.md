@@ -17,7 +17,6 @@ A focused, single-agent plugin for writing, reviewing, optimizing, and testing C
   - `skills/csharp-xunit/SKILL.md`
   - `skills/microsoft-code-reference/SKILL.md`
   - `skills/feature-proposal/SKILL.md`
-  - `skills/delegate-to-coding/SKILL.md`
   - `skills/azure/SKILL.md`
   - `skills/aspire/SKILL.md`
   - `skills/open-telemetry/SKILL.md`
@@ -51,7 +50,6 @@ The agent works without MCP servers using `web/fetch` as a fallback.
 - **OpenTelemetry** — tracing, metrics, and logging setup.
 - **Aspire logging** — retrieve and analyze logs/traces via Aspire MCP.
 - **SRE** — error budgets, resilience patterns, health checks, and runbooks.
-- **Delegate to coding** — skill for other agents to hand off coding tasks here.
 
 ## Handoffs
 

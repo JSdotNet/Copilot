@@ -226,14 +226,12 @@ end. Which branch applies is decided by **monitoring ownership**, not by prefere
 - **Caller-owned** — the caller already has `qa-monitor` running. Do not start a second
   monitor. Send it scenario checkpoints as you go so its findings can be correlated, and
   leave stopping it and collecting its summary to the caller.
-- **Persona split you start yourself** — when monitoring is yours and the session is long or
-  high-stakes, the `delegate-to-qa-monitor` skill hands it to the dedicated `qa-monitor` agent
-  so observability gets undivided attention instead of being interleaved with browser steps.
-  That skill is a same-session persona switch, and a monitor you start is a monitor you must
-  stop. Under an orchestration, do not make the switch on your own: return the recommendation
-  to your caller, which owns the parallel monitoring shape its host supports (a background
-  sub-agent in Claude Code, a parallel child session in the GitHub Copilot App) and can stop
-  what it started.
+- **Dedicated monitor wanted** — when monitoring is yours and the session is long or
+  high-stakes, say so: a dedicated `qa-monitor` persona gives observability undivided
+  attention instead of interleaving it with browser steps, but starting one is delegation,
+  which is the caller's to do. Recommend it and carry on self-owned; the caller owns the
+  parallel monitoring shape its host supports (a background sub-agent in Claude Code, a
+  parallel child session in the GitHub Copilot App) and can stop what it started.
 
 ### 3. Validate the Feature with Playwright MCP
 
@@ -288,7 +286,7 @@ When a finding is outside this agent's scope, name where it belongs and why. Thi
 performs no handoff and holds no approval gate — whether the work moves is the caller's
 decision:
 
-- **QA Monitor agent** (`qa:qa-monitor`) — to give continuous Aspire log/trace monitoring a dedicated persona (see `delegate-to-qa-monitor` skill).
+- **QA Monitor agent** (`qa:qa-monitor`) — to give continuous Aspire log/trace monitoring a dedicated persona the caller starts and stops.
 - **Coding agent** (`csharp-coding:coding`) — to fix a runtime bug found during validation.
 - **SRE guidance** (`csharp-coding` plugin's `sre` skill) — for reliability/observability follow-up on repeated log errors.
 
@@ -314,7 +312,6 @@ switch and do not wait (see [Invocation Context](#invocation-context)).
 | `aspire-run` | Start (and confirm healthy) an Aspire-orchestrated app for testing |
 | `playwright-validation` | Drive browser scenarios via Playwright MCP and capture evidence for each |
 | `aspire-log-monitor` | Continuously monitor Aspire logs/traces during a test session |
-| `delegate-to-qa-monitor` | Hand off monitoring to the `qa-monitor` agent persona (same-session) |
 | `feature-test-from-issue` | Derive test scenarios from a GitHub issue or Jira ticket before validating |
 | `deployed-environment-validation` | Validate against a specific deployed test environment (staging/QA/UAT) instead of a local run |
 | `playwright-e2e-authoring` | Turn a validated scenario into a durable, committed Playwright test |

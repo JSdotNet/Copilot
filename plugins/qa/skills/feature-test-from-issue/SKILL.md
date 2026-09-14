@@ -62,7 +62,7 @@ dedicated skill from another installed plugin (see [Fetching the Issue](#1-ident
 
 8. Apply the `aspire-run` skill to start the app and confirm all resources are
    healthy.
-9. Apply the `aspire-log-monitor` skill (or hand off via `delegate-to-qa-monitor`)
+9. Apply the `aspire-log-monitor` skill (unless the caller runs `qa-monitor` itself)
    to keep Aspire log/trace/metric monitoring active for the whole session.
 
 ### 4. Execute Scenarios with Playwright
@@ -106,7 +106,7 @@ dedicated skill from another installed plugin (see [Fetching the Issue](#1-ident
 | Skill | When to use |
 |---|---|
 | `aspire-run` | Start (and confirm healthy) the app under test |
-| `aspire-log-monitor` / `delegate-to-qa-monitor` | Continuous Aspire log/trace/metric monitoring |
+| `aspire-log-monitor` | Continuous Aspire log/trace/metric monitoring |
 | `playwright-validation` | Execute the derived scenarios against the running app and capture evidence |
 | A GitHub-issue skill (from an installed GitHub plugin) | Fetch or update a GitHub issue |
 | A Jira-ticket skill (from an installed Jira plugin) | Fetch or update a Jira ticket |
