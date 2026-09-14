@@ -23,7 +23,7 @@ Before generating any output, detect the repository context from existing files:
 1. Primary asset types in this repository are Markdown customization assets and JSON plugin manifests.
 2. No runtime dependency manifests were found in this repository root structure (for example `package.json`, `.csproj`, `pom.xml`, `requirements.txt`).
 3. Plugin manifest versions follow Semantic Versioning style (`0.1.0`, `1.0.0`) in files such as:
-   - `plugins/development/.github/plugin/plugin.json`
+   - `plugins/csharp-coding/.github/plugin/plugin.json`
    - `plugins/spec-builder/.github/plugin/plugin.json`
    - `plugins/documentation/.github/plugin/plugin.json`
 
@@ -69,7 +69,7 @@ Concrete examples:
 
 - `plugins/spec-builder/`
 - `plugins/architecture/`
-- `plugins/development/`
+- `plugins/csharp-coding/`
 - `plugins/wip-convention/`
 
 Do not introduce a new top-level plugin layout unless the user explicitly requests a structural change.
@@ -78,7 +78,7 @@ Do not introduce a new top-level plugin layout unless the user explicitly reques
 
 Use naming conventions observed in this repository:
 
-- Agent files: `{role}.agent.md` (example: `plugins/development/agents/backend.agent.md`).
+- Agent files: `{role}.agent.md` (example: `plugins/csharp-coding/agents/coding.agent.md`).
 - Instruction files: `*.instructions.md` with `applyTo` and `description` frontmatter.
 - Skill entry files: `SKILL.md` with frontmatter `name` and `description`.
 - Plugin manifests: `.github/plugin/plugin.json` with keys such as `name`, `description`, `version`, `author`, `keywords`, `agents`, `skills`.
@@ -138,7 +138,7 @@ When authoring skills and plugins:
 Examples:
 
 - `plugins/spec-builder/skills/create-instruction/SKILL.md`
-- `plugins/development/.github/plugin/plugin.json`
+- `plugins/csharp-coding/.github/plugin/plugin.json`
 
 ## Codebase Scanning Instructions
 

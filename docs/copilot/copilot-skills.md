@@ -10,7 +10,6 @@ Track skill provenance and avoid duplicate local skills when plugin-provided ski
 |---|---|---|
 | `ai-prompt-engineering-safety-review` | Plugin: `security-best-practices`, Plugin: `testing-automation` | Reviews prompts for security, safety, privacy, and misuse risks. |
 | `appinsights-instrumentation` | Local: `.github/skills` (copied from awesome-copilot collection) | Adds practical telemetry instrumentation for Azure Application Insights. |
-| `architecture-blueprint-generator` | Local: `.github/skills` (copied from awesome-copilot collection) | Generates architecture blueprints from an existing codebase. |
 | `architecture-arc42-generator` | Local: `.github/skills` | Interactive arc42 architecture blueprint generator for drafting, validating, and iterating sections using reusable prompt and instruction assets. |
 | `aspire` | Local: `.github/skills` (copied from awesome-copilot collection) | Guides setup, debugging, and operations for .NET Aspire apps. |
 | `aspnet-minimal-api-openapi` | Plugin: `csharp-dotnet-development` | Builds ASP.NET Minimal APIs with OpenAPI documentation patterns. |

@@ -9,49 +9,43 @@
       "name": "aikido",
       "source": "./plugins/aikido",
       "description": "Copilot plugin for Aikido Security — scan code for vulnerabilities and secrets, triage findings, fix security issues, and sync to GitHub Issues using the Aikido MCP server.",
-      "version": "0.1.0"
+      "version": "0.2.0"
     },
     {
       "name": "architecture",
       "source": "./plugins/architecture",
-      "description": "Copilot plugin for architecture documentation, blueprints, ADRs, technical debt records, and architecture diagrams (C4, sequence, state machine, deployment).",
-      "version": "0.4.0"
+      "description": "Architecture documentation through the `architect` agent: arc42 sections, architectural decision records, technical debt records, and C4, sequence, state-machine, and deployment diagrams. Fills the `architecture` role a flow consults, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
+      "version": "0.5.0"
     },
     {
       "name": "claude-desktop",
       "source": "./plugins/claude-desktop",
-      "description": "Claude Code plugin for orchestration workflows, pull request delivery, and scheduled automation, with a live run dashboard, Mermaid diagram viewer, and Markdown document viewer served by its own MCP server.",
-      "version": "0.11.0"
+      "description": "Claude Code host plugin: the start, session-handoff, and create-pull-request skills plus the orch-dashboard MCP server that renders a run dashboard, Mermaid diagrams, and Markdown documents inline. The orchestration lane it used to ship continues as delivery@jsdotnet.",
+      "version": "0.12.0"
     },
     {
       "name": "csharp-coding",
       "source": "./plugins/csharp-coding",
-      "description": "Copilot plugin for C# .NET coding expertise — write, review, optimize, and test C# code.",
-      "version": "0.1.0"
-    },
-    {
-      "name": "development",
-      "source": "./plugins/development",
-      "description": "Copilot plugin for development planning and implementation workflows across a .NET backend and a React frontend, with repository-detected frontend tooling.",
-      "version": "0.3.0"
+      "description": "C# .NET implementation through the `coding` agent: test-driven development, refactoring, code review and optimization, NuGet management, Aspire wiring, OpenTelemetry, and Azure SDK patterns. Fills the `implement` and `verify` services a flow runs its code stages through, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
+      "version": "0.2.0"
     },
     {
       "name": "documentation",
       "source": "./plugins/documentation",
-      "description": "Write and maintain documentation artifacts, infographics, and profile content using GitHub Copilot.",
-      "version": "0.4.0"
+      "description": "Documentation and profile artifacts through the `documentation` and `profile` agents: how-to guides, explanations, articles, proposals, ideas, and SVG infographics, plus GitHub, LinkedIn, and project profiles. Fills the `docs` role a flow consults, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
+      "version": "0.5.0"
     },
     {
       "name": "domain-design",
       "source": "./plugins/domain-design",
-      "description": "Copilot plugin for Domain-Driven Design — bounded context discovery, ubiquitous language, domain model design, and context mapping.",
-      "version": "0.2.0"
+      "description": "Domain-Driven Design through the `domain-architect` agent: bounded context discovery, ubiquitous language, domain model and interaction design, context mapping, and aggregate, domain-event-flow, and subdomain diagrams. Fills the `domain` role a flow consults, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
+      "version": "0.3.0"
     },
     {
       "name": "fincent",
       "source": "./plugins/fincent",
       "description": "Copilot plugin for Fincent project story review, dev, domain alignment, story point estimation, PR review, PR remark resolution, sprint reporting, and demo presentation workflows.",
-      "version": "0.3.0"
+      "version": "0.4.0"
     },
     {
       "name": "github",
@@ -75,13 +69,19 @@
       "name": "product-owner",
       "source": "./plugins/product-owner",
       "description": "Copilot plugin for product backlog authoring — epics, stories, and bugs as Markdown artifacts.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     },
     {
       "name": "qa",
       "source": "./plugins/qa",
       "description": "Copilot plugin for runtime QA validation — run Aspire-orchestrated apps, drive Playwright browser scenarios with evidence for each, and monitor Aspire logs/traces during the test session.",
-      "version": "0.3.0"
+      "version": "0.4.0"
+    },
+    {
+      "name": "react-coding",
+      "source": "./plugins/react-coding",
+      "description": "React and TypeScript implementation through the `frontend` agent: components, hooks, routes, typed API clients bound to a .NET API contract, and component tests, with the build, typecheck, lint, and test commands detected from the repository rather than assumed. Fills the `implement` and `verify` services a flow runs its frontend stages through, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
+      "version": "0.1.0"
     },
     {
       "name": "review",
@@ -93,25 +93,19 @@
       "name": "spec-builder",
       "source": "./plugins/spec-builder",
       "description": "Copilot plugin focused on GitHub customization asset authoring workflows.",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "ux-design",
       "source": "./plugins/ux-design",
-      "description": "Copilot plugin for UX design workflows — wireframes, design guidelines, user flows, and design reviews.",
-      "version": "0.3.0"
+      "description": "UX design through the `ux-designer` agent: wireframes, user flows, design guidelines, and UI reviews, as SVG or Mermaid artifacts and structured Markdown. Fills the `ux` role a flow consults, and is usable on its own. Holds no flow control: sequencing, approval, and delegation belong to whatever consults it.",
+      "version": "0.4.0"
     },
     {
       "name": "wip-convention",
       "source": "./plugins/wip-convention",
       "description": "Encapsulates the .wip folder convention for storing work-in-progress artifacts. Provides skills and instructions to align agents with the .wip workflow.",
       "version": "0.2.0"
-    },
-    {
-      "name": "worktree-parallel",
-      "source": "./plugins/worktree-parallel",
-      "description": "Copilot plugin for dividing work across isolated git worktrees with per-worktree agent continuity.",
-      "version": "0.1.0"
     }
   ]
 }

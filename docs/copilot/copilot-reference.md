@@ -59,7 +59,6 @@ Notes:
 - Skills: `.github/skills/*.md`
 - Skill resources: `.github/skills/<skill>/resources/**/*.md`
 - Markdown baseline: `.agents/rules/markdown.md`
-- Handoff policy: `.github/instructions/agent/agent-handoff.instructions.md`
 
 ## Notes
 

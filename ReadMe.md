@@ -53,7 +53,6 @@ JSdotNet-Copilot
 |  |     |- markdown-canvas/
 |  |     \- orch-dashboard/
 |  |- csharp-coding/
-|  |- development/
 |  |- documentation/
 |  |- domain-design/
 |  |- fincent/
@@ -61,12 +60,12 @@ JSdotNet-Copilot
 |  |- jira/
 |  |- product-owner/
 |  |- qa/
+|  |- react-coding/
 |  |- review/
 |  |- spec-builder/
 |  |- ux-design/
 |  |- wip-convention/
-|  |- knowledge-base/          (retired; points at devbook@jsdotnet)
-|  \- worktree-parallel/
+|  \- knowledge-base/          (retired; points at devbook@jsdotnet)
 ```
 
 ## Getting Started
@@ -85,7 +84,7 @@ JSdotNet-Copilot
 ```bash
 copilot plugin install JSdotNet/Copilot:plugins/architecture
 copilot plugin install JSdotNet/Copilot:plugins/copilot-app
-copilot plugin install JSdotNet/Copilot:plugins/development
+copilot plugin install JSdotNet/Copilot:plugins/csharp-coding
 ```
 
 Update an already installed plugin by name:
@@ -106,12 +105,12 @@ Unlike plugins (skills, agents, instructions), canvas extensions add interactive
 surfaces the agent can open in a side panel. This repository ships canvas
 extensions inside `plugins/copilot-app/extensions/`: `diagram-canvas` (Mermaid
 diagram viewer), `markdown-canvas` (Markdown document preview), and
-`orch-dashboard` (orchestration progress dashboard). Only `copilot-app`'s
-`orch-*` orchestration skills open/update these canvases directly, on behalf of
-the `architecture`, `domain-design`, `ux-design`, `documentation`, and
-`product-owner` agents they coordinate — those content plugins have no direct
+`orch-dashboard` (run progress dashboard). A flow skill opens/updates these canvases
+on behalf of the `architecture`, `domain-design`, `ux-design`, `documentation`, and
+`product-owner` agents it coordinates — those content plugins have no direct
 dependency on these extensions and work identically with or without them
-installed.
+installed. The flows themselves ship from `delivery@jsdotnet`
+([JSdotNet/ai-agent-stack](https://github.com/JSdotNet/ai-agent-stack)).
 `diagram-canvas` and `markdown-canvas` ship inside `copilot-app` but install and
 run independently of it and of each other — install either one on its own. Each
 is packaged like any other plugin (its own `.github/plugin/plugin.json`), so
@@ -156,7 +155,6 @@ Repository organization centers on reusable Copilot plugin bundles:
 - `plugins/`
   - Installable plugin bundles for specific domains:
     - `architecture`
-    - `development`
     - `documentation`
     - `review`
     - `spec-builder`
@@ -172,8 +170,8 @@ Repository organization centers on reusable Copilot plugin bundles:
     - `ux-design`
     - `wip-convention`
     - `knowledge-base` (retired; notice skill only)
-    - `worktree-parallel`
     - `product-owner`
+    - `react-coding`
 - `docs/copilot/`
   - Plugin inventory/reference docs.
 
@@ -185,7 +183,6 @@ Repository organization centers on reusable Copilot plugin bundles:
 - Spec-driven asset authoring with `spec-builder`.
 - GitHub, Jira, QA, UX, domain design, and security-focused workflow plugins.
 - Work-in-progress artifact conventions via `wip-convention`.
-- Parallel task decomposition patterns via `worktree-parallel`.
 
 ## Development Workflow
 
@@ -199,7 +196,7 @@ Current workflow pattern inferred from repository assets:
 Branching strategy:
 
 - A formal branching policy is not explicitly documented in the scanned source set.
-- The `worktree-parallel` plugin promotes isolated feature branches/worktrees per task slice.
+- Cross-session fan-out over worktrees belongs to `fleet@jsdotnet`, not to a plugin here.
 
 ## Coding Standards
 

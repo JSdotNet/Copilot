@@ -68,6 +68,15 @@ $ExcludedPlugins = @('copilot-app')
 # deliberate and visible.
 $ClaudeNativePlugins = @('claude-desktop')
 
+# Tools that sequence, spawn, or delegate. A specialist fills a role or a service for whatever
+# consults it and never holds flow control (ai-agent-stack ADR 19), so only a runner plugin's
+# agent may carry these. No runner ships from this repository any more - the flow-runner lives
+# in delivery@jsdotnet - so this guards agents added later rather than any on disk today.
+# 'agent' is allowed only when an 'agents' key scopes it to a read-only helper such as Explore.
+$FlowControlTools = @('create_session', 'send_session_message', 'respond_to_session_plan',
+    'list_sessions_and_chats', 'get_session', 'list_projects', 'SendMessage')
+$RunnerPlugins = @()
+
 # Claude Code refuses to load an agent whose model it does not recognise, so a Copilot-only
 # model id would take the agent down on one host. Pins must use a value both hosts accept,
 # or be omitted so each host applies its own default.
@@ -362,6 +371,15 @@ function Update-AgentFile {
     # authored intent: any Claude entry already in the file is discarded and recomputed,
     # which keeps ordering stable no matter what a previous run left behind.
     $authored = @($copilotIds | Where-Object { $_ -cnotmatch '^(mcp__|[A-Z])' })
+
+    if ($RunnerPlugins -notcontains $PluginName) {
+        $carried = @($copilotIds | Where-Object { $FlowControlTools -contains $_ })
+        if ($copilotIds -contains 'agent' -and -not $fm.Contains('agents')) { $carried += 'agent (unscoped)' }
+        if ($carried.Count -gt 0) {
+            $script:Errors.Add("$relSource carries flow-control tools ($($carried -join ', ')); only a runner plugin's agent may. A specialist names where work belongs and lets whatever consulted it sequence, gate, and delegate.")
+            return
+        }
+    }
 
     $merged = @()
     $seen   = [System.Collections.Generic.HashSet[string]]::new()

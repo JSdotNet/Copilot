@@ -273,8 +273,9 @@ Then `/plugin install <name>@jsdotnet-copilot`.
 
 **No `model` pins.** Claude Code refuses to load an agent whose `model` it does not
 recognise — it does not fall back. Since both hosts read the same key and neither accepts
-the other's model ids, pins were removed from the six `development/agents-internal/` agents
-and the intent recorded in a `## Model` section in each body. Each host now applies its own
+the other's model ids, pins were removed from every agent and the intent recorded in a
+`## Model` section in each body that had one (`react-coding/agents/frontend.agent.md` keeps
+the example). Each host now applies its own
 default. The generator rejects any pin that is not a Claude-valid value, so this cannot
 regress silently.
 
@@ -319,7 +320,5 @@ Beyond generating, the script fails the build on problems a script must not fix 
 and warns on:
 
 - a handoff target the agent body never mentions
-- Copilot tool ids left in agent **prose**, which it never rewrites. Currently two:
-  `plugins/csharp-coding/agents/coding.agent.md` (`web/fetch`) and
-  `plugins/development/agents-internal/development-plan.agent.md` (`vscode/askQuestions`,
-  `edit/createFile`).
+- Copilot tool ids left in agent **prose**, which it never rewrites. Currently one:
+  `plugins/csharp-coding/agents/coding.agent.md` (`web/fetch`).
