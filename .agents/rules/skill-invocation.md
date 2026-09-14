@@ -1,3 +1,10 @@
+---
+name: skill-invocation
+description: Whether a plugin skill is model-invoked or user-invoked, and the to-spec-/from-spec- naming for converter skills.
+paths:
+  - "plugins/*/skills/**/SKILL.md"
+---
+
 # Skill Invocation Instructions
 
 ## Purpose

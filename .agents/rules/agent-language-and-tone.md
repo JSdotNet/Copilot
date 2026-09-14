@@ -1,3 +1,11 @@
+---
+name: agent-language-and-tone
+description: The output language and tone every plugin agent and skill holds to.
+paths:
+  - "plugins/*/agents/**/*.agent.md"
+  - "plugins/*/skills/**/SKILL.md"
+---
+
 # Agent Language and Tone Behavior Instructions
 
 ## Purpose

@@ -691,12 +691,101 @@ Write-Generated -Path (Join-Path $RepoRoot '.claude-plugin/marketplace.json') -C
 
 #endregion
 
+#region repository rules
+
+# A repository rule is authored once in .agents/rules/<topic>.md (name / description / paths)
+# and wrapped per host: .claude/rules/<topic>.md copies 'paths' verbatim, and
+# .github/instructions/<topic>.instructions.md carries applyTo = paths joined with ",". The
+# wrappers are hand-authored - this is a checker over them, never a generator - and drift
+# between a wrapper and its rule fails here. A plugin never ships one: neither host applies a
+# glob from inside a plugin, so a plugin's shared text is a resources/ contract instead.
+$RulesDir       = Join-Path $RepoRoot '.agents/rules'
+$ClaudeRulesDir = Join-Path $RepoRoot '.claude/rules'
+$CopilotRulesDir = Join-Path $RepoRoot '.github/instructions'
+
+function Get-RulePaths {
+    param([Parameter(Mandatory)][string]$Frontmatter)
+    $list = [System.Collections.Generic.List[string]]::new()
+    $inPaths = $false
+    foreach ($line in ($Frontmatter -split "`n")) {
+        if ($line -match '^paths:\s*$') { $inPaths = $true; continue }
+        if ($inPaths) {
+            if ($line -match '^\s+-\s+"([^"]+)"\s*$') { $list.Add($Matches[1]); continue }
+            if ($line -match '^\S') { $inPaths = $false }
+        }
+    }
+    return $list
+}
+
+function Read-RuleFrontmatter {
+    param([Parameter(Mandatory)][string]$Path)
+    $raw = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    if ($raw -notmatch '(?s)^---?
+(.*?)?
+---?
+') { return $null }
+    return $Matches[1]
+}
+
+$ruleNames = @()
+foreach ($rule in (Get-ChildItem -LiteralPath $RulesDir -Filter '*.md' -File | Where-Object { $_.Name -ne 'README.md' } | Sort-Object Name)) {
+    $topic = $rule.BaseName
+    $ruleNames += $topic
+    $rel = Get-RelativePath $rule.FullName
+    $fm = Read-RuleFrontmatter -Path $rule.FullName
+    if (-not $fm) { $script:Errors.Add("$rel has no frontmatter; a repository rule declares name, description, and paths."); continue }
+    if ($fm -notmatch "(?m)^name:\s*$([regex]::Escape($topic))\s*$") { $script:Errors.Add("$rel must declare 'name: $topic' to match its filename.") }
+    if ($fm -notmatch '(?m)^description:\s*\S') { $script:Errors.Add("$rel has no description.") }
+    $paths = @(Get-RulePaths -Frontmatter $fm)
+    if ($paths.Count -eq 0) { $script:Errors.Add("$rel declares no paths; a rule with nothing to fire on is dead."); continue }
+
+    $claudeWrapper = Join-Path $ClaudeRulesDir "$topic.md"
+    if (-not (Test-Path -LiteralPath $claudeWrapper)) {
+        $script:Errors.Add("$rel has no Claude wrapper at .claude/rules/$topic.md.")
+    } else {
+        $cfm = Read-RuleFrontmatter -Path $claudeWrapper
+        $cpaths = if ($cfm) { @(Get-RulePaths -Frontmatter $cfm) } else { @() }
+        if (($cpaths -join '|') -ne ($paths -join '|')) {
+            $script:Errors.Add(".claude/rules/$topic.md carries paths [$($cpaths -join ', ')] but $rel declares [$($paths -join ', ')]; a wrapper copies the rule's paths verbatim.")
+        }
+    }
+
+    $copilotWrapper = Join-Path $CopilotRulesDir "$topic.instructions.md"
+    if (-not (Test-Path -LiteralPath $copilotWrapper)) {
+        $script:Errors.Add("$rel has no Copilot wrapper at .github/instructions/$topic.instructions.md.")
+    } else {
+        $gfm = Read-RuleFrontmatter -Path $copilotWrapper
+        $applyTo = if ($gfm -and $gfm -match "(?m)^applyTo:\s*'([^']*)'\s*$") { $Matches[1] } else { '' }
+        $expected = $paths -join ','
+        if ($applyTo -ne $expected) {
+            $script:Errors.Add(".github/instructions/$topic.instructions.md has applyTo '$applyTo' but $rel implies '$expected'; applyTo is exactly the rule's paths joined with a comma.")
+        }
+    }
+}
+
+foreach ($w in (Get-ChildItem -LiteralPath $ClaudeRulesDir -Filter '*.md' -File)) {
+    if ($ruleNames -notcontains $w.BaseName) { $script:Errors.Add("$(Get-RelativePath $w.FullName) wraps no rule in .agents/rules/; delete it or author the rule.") }
+}
+foreach ($w in (Get-ChildItem -LiteralPath $CopilotRulesDir -Filter '*.instructions.md' -File)) {
+    $topic = $w.Name -replace '\.instructions\.md$', ''
+    if ($ruleNames -notcontains $topic) { $script:Errors.Add("$(Get-RelativePath $w.FullName) wraps no rule in .agents/rules/; delete it or author the rule.") }
+}
+
+foreach ($pluginDir in $pluginDirs) {
+    $instr = Join-Path $pluginDir.FullName 'instructions'
+    if (Test-Path -LiteralPath $instr) {
+        $script:Errors.Add("$($pluginDir.Name) ships an instructions/ folder; no host applies a glob from inside a plugin. Move shared text to resources/<name>.md with name and description, referenced by path.")
+    }
+}
+
+#endregion
+
 #region report
 
 foreach ($w in $script:Warnings) { Write-Warning $w }
 
 if ($script:Errors.Count -gt 0) {
-    Write-Host 'Agent definitions need a human fix:' -ForegroundColor Red
+    Write-Host 'Assets need a human fix:' -ForegroundColor Red
     foreach ($e in $script:Errors) { Write-Host "  - $e" }
     exit 1
 }

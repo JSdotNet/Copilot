@@ -23,23 +23,23 @@ High-level architecture follows a plugin-based monorepo pattern:
 - Each plugin is self-contained under `plugins/<plugin-name>/`.
 - Typical plugin composition includes:
   - `agents/`
-  - `instructions/`
   - `skills/`
-  - optional `resources/`
+  - `resources/` — contracts a skill or agent reads by path (no plugin ships an `instructions/` folder)
   - `.github/plugin/plugin.json`
-- Repository-level standards are defined under `.agents/rules/` and `.github/copilot/`. Each
-  `.agents/rules/` body is loaded by a thin `.github/instructions/` loader for Copilot and a
-  `.claude/rules/` loader for Claude.
+- Repository-level standards live in `AGENTS.md` (imported by `CLAUDE.md`, pointed at by
+  `.github/copilot-instructions.md`) and in `.agents/rules/`, where each rule carries its `paths`
+  and is wrapped once per host — `.github/instructions/` for Copilot, `.claude/rules/` for Claude.
 
 Conceptual layout:
 
 ```text
 JSdotNet-Copilot
+|- AGENTS.md                    (the standing rules; CLAUDE.md imports it)
+|- .agents/rules/               (path-scoped rules, one copy each)
+|- .claude/rules/               (Claude wrappers)
 |- .github/
-|  |- copilot/
-|  |  \- copilot-instructions.md
-|  |- instructions/
-|  |- agents/
+|  |- copilot-instructions.md   (Copilot wrapper)
+|  |- instructions/             (Copilot wrappers)
 |  \- skills/
 |- plugins/
 |  |- aikido/
@@ -224,7 +224,7 @@ A dedicated runtime unit-test framework document (for example a separate `Unit_T
 Contribution guidelines for this repository:
 
 1. Follow repository-level instructions first, especially:
-   - `.github/copilot/copilot-instructions.md`
+   - `AGENTS.md`
    - `.agents/rules/markdown.md`
 2. Keep changes minimal and aligned with existing plugin patterns.
 3. Reuse nearby examples when creating new assets:

@@ -17,16 +17,17 @@ not frontmatter but a UI surface Claude Code does not have. See **Claude-native 
 | Path | Authored by | Read by |
 | --- | --- | --- |
 | `skills/<name>/SKILL.md` | hand | both |
-| `instructions/`, `prompts/`, `resources/` | hand | both |
+| `resources/`, `prompts/` | hand | both, by explicit path reference |
 | `agents/<role>.agent.md` | hand, except `name` + `tools` | both |
 | `.github/plugin/plugin.json` | hand | Copilot |
 | `hooks.json` | hand | Copilot |
 | `.claude-plugin/plugin.json` | **generated** | Claude |
 | `hooks/hooks.json` | **generated** | Claude |
 | `.claude-plugin/marketplace.json` (repo root) | **generated** | Claude |
-| `.agents/rules/*.md` (repo root) | hand | both, via the two loaders below |
-| `.github/instructions/*.instructions.md` (repo root) | hand | Copilot |
-| `.claude/rules/*.md` (repo root) | hand | Claude |
+| `AGENTS.md` (repo root) | hand | both — `CLAUDE.md` imports it, `.github/copilot-instructions.md` points at it |
+| `.agents/rules/<topic>.md` (repo root) | hand | both, via the two wrappers below |
+| `.github/instructions/<topic>.instructions.md` (repo root) | hand, checked | Copilot |
+| `.claude/rules/<topic>.md` (repo root) | hand, checked | Claude |
 
 Never edit anything under `.claude-plugin/` or `hooks/`. Change the Copilot source and
 regenerate. The one exception is a Claude-native plugin (`claude-desktop`), which has no Copilot
@@ -250,8 +251,7 @@ transport:
 | `diagram-canvas`, `markdown-canvas` extensions | `/mermaid` and `/markdown` routes on the same server, driven by `render_diagram` / `render_markdown` |
 | host session telemetry events | `PreToolUse`/`PostToolUse`/`SubagentStop`/`PreCompact`/`Stop` hooks plus the session transcript |
 | (no equivalent) | `SessionEnd` hook, which stamps an unfinished run idle so an abandoned gate stops accruing elapsed time |
-| `.github/copilot-orch-context.md`, `.github/copilot-model-selection.md` | `.claude/orch-context.md`, `.claude/model-selection.md` |
-| Copilot model families in the selection table | `opus` / `sonnet` / `haiku` aliases |
+| `.github/copilot-orch-context.md` | `.claude/orch-context.md` |
 | child sessions for concurrent work | background sub-agents, `isolation: "worktree"` when a separate checkout is needed |
 
 What is genuinely shared is the interesting part: `render.mjs` and `report.mjs` are
@@ -284,16 +284,19 @@ around the Copilot CLI canvas extension API (`diagram-canvas`, `markdown-canvas`
 The port could not be a translation — it needed a different transport — so it lives as a
 separate, hand-authored plugin. See **Claude-native plugins** below.
 
-**`applyTo` is not read, but `paths` is.** Claude Code has glob-scoped instruction
-injection — `.claude/rules/*.md` with a `paths:` list, fired when Claude reads a matching
-file. It does not read `applyTo`. So a repository keeps each rule body in `.agents/rules/`,
-owned by neither host, and gives it two thin loaders that carry only the glob: an `applyTo`
-one in `.github/instructions/` and a `paths` one in `.claude/rules/` (see the repository
-`CLAUDE.md`). A **plugin** cannot: there is no
-rules component and no `rules` key in `plugin.json`, and a plugin-root `CLAUDE.md` is not
-loaded ([claude-code#21163](https://github.com/anthropics/claude-code/issues/21163)). So
-plugin instruction files still reach Claude only by explicit reference — which 75 skill and
-agent files already do — or by promotion into the plugin's `SessionStart` hook.
+**Neither host applies a glob from inside a plugin.** Claude Code has glob-scoped
+instruction injection — `.claude/rules/<topic>.md` with a `paths:` list — and Copilot has
+`.github/instructions/<topic>.instructions.md` with `applyTo`, but both only at the repository
+level: there is no rules component and no `instructions` key in either manifest, and a
+plugin-root `CLAUDE.md` is not loaded
+([claude-code#21163](https://github.com/anthropics/claude-code/issues/21163)). So a repository
+keeps each rule body in `.agents/rules/<topic>.md` with `name`, `description`, and `paths`, and
+gives it one wrapper per host that carries only the glob; the sync's `-Check` fails when a
+wrapper drifts from its rule. A **plugin** ships no `instructions/` folder at all: shared text
+a skill or agent needs is a contract in `resources/<name>.md` (`name` + `description`, never a
+glob) reached by an explicit path reference — which is what loads it in both hosts — or
+promoted into the plugin's `sessionStart` hook. The convention is
+[.agents/rules/README.md](../../.agents/rules/README.md).
 
 **`handoffs` are invisible to Claude.** Claude ignores the key and delegates from what it
 reads in the prose, so every handoff target must be described in the agent body. The
