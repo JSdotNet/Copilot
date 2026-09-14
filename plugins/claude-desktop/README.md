@@ -114,7 +114,7 @@ own, and QA evidence paths resolve against that setting.
 Then install the plugin:
 
 ```bash
-/plugin install claude-desktop@jsdotnet-copilot
+/plugin install claude-desktop@jsdotnet-ai-plugins
 ```
 
 The skills, the hooks, and the MCP server are all registered by the install. Ask for the
@@ -137,7 +137,7 @@ MCP server. A change to a dashboard tool argument usually belongs in both.
 ## Uninstall
 
 ```bash
-/plugin uninstall claude-desktop@jsdotnet-copilot
+/plugin uninstall claude-desktop@jsdotnet-ai-plugins
 ```
 
 ## License
